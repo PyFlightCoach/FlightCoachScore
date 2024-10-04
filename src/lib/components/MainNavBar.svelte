@@ -1,8 +1,10 @@
-
+<script lang='ts'>
+  import {base} from "$app/paths";
+</script>
 
 <nav class="navbar navbar-expand-sm bg-body-tertiary" data-bs-theme="dark">
 	<div class="container-fluid">
-		<a class="navbar-brand" href="/">FCScore</a>
+		<a class="navbar-brand" href={base + '/'}>FCScore</a>
 
 		<button
 			class="navbar-toggler"
