@@ -30,11 +30,11 @@ export class Server {
 	async get(path: string, cookie: string|undefined=undefined) {
 		return await this.fetch('GET', path, cookie);
 	}
-	async post(path: string, cookie: string|undefined=undefined, data: Record<string, unknown>) {
+	async post(path: string, data: Record<string, unknown>, cookie: string|undefined=undefined) {
 		return await this.fetch('POST', path, cookie, data);
 	}
 
-	async patch(path: string, cookie: string|undefined=undefined, data: Record<string, unknown>) {
+	async patch(path: string, data: Record<string, unknown>, cookie: string|undefined=undefined) {
 		return await this.fetch('PATCH', path, cookie, data)  
   }
 }
