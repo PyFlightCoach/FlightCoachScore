@@ -48,9 +48,13 @@
         </button>
       {/if}
     </div>
-    
   </div>
+  <div class="row pt-5">
+    
+    <div class="input-group-sm mb-3">
 
+    </div>
+  </div>
 </div>
 <div class="col-7">
 	<Plot

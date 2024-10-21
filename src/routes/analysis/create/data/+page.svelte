@@ -79,7 +79,7 @@
 	{#if ready}
 		<div id="binFile" class="input-group mb-3">
 			{#if !$binData}
-				<label class="form-control" >Load FC Json or f3a Zone box file</label>
+				<label class="form-control" >Load Ardupilot BIN File</label>
 				<input class="form-control" type="file" accept=".bin, .BIN" bind:files />
 				{#if files && files.length > 0}
 					<button
