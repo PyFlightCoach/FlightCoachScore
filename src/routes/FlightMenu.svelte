@@ -5,7 +5,7 @@
 
 <NavMenu>
   <span slot="icon"><i class="bi bi-airplane"/></span>
-  <a class="dropdown-item" href={base + '/analysis/upload/'}>Load</a>
+  <a class="dropdown-item" href={base + '/analysis/create/data'}>Create</a>
   <div class="dropdown-item" >Import</div>
   <div class="dropdown-item" >Example</div>
 </NavMenu>

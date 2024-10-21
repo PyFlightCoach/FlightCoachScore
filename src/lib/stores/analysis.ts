@@ -3,20 +3,18 @@ import { analysisServer } from '$lib/api';
 import { FCJson, Origin, ScheduleInfo } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
 import { MA } from '$lib/analysis/ma';
-import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 import { ManDetails } from '$lib/analysis/splitting';
 import { BinData } from '$lib/analysis/bindata';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 
-export const bin: Writable<File> = writable();
-export const binData: Writable<BinData> = writable();
-export const bootTime: Writable<Date> = writable();
-export const origin: Writable<Origin> = writable(browser ? new Origin(0,0,0,0) : undefined);
-export const fcj: Writable<FCJson | undefined> = writable();
+export const bin: Writable<File | undefined> = writable();
+export const binData: Writable<BinData | undefined> = writable();
+export const bootTime: Writable<Date | undefined> = writable();
+export const origin: Writable<Origin|undefined> = writable();
 
-export const states: Writable<States> = writable();
+export const states: Writable<States | undefined> = writable();
 
 export const manNames: Writable<string[]> = writable();
 export const analyses: Writable<MA | undefined>[] = [];
@@ -65,13 +63,6 @@ truncate.subscribe((value) => {
 	updateScores(get(selectedResult), get(difficulty), value);
 });
 
-fcj.subscribe((value) => {
-	if (value && value.fcs_scores.length > 0) {
-		selectedResult.set(value.fcs_scores[value.fcs_scores.length - 1].fa_version);
-	} else {
-		selectedResult.set(undefined);
-	}
-});
 
 export const manoeuvres: Writable<Record<string, ManDetails[]>> = writable({});
 export const schedules: Writable<Record<string, string[]>> = writable({});

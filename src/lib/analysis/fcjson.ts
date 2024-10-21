@@ -29,16 +29,21 @@ export class Origin {
     return new GPS(this.lat, this.lng, this.alt);
   }
 
+  get rotation () {
+    return Quaternion.parse_euler(
+      new Point(Math.PI, 0, (this.heading * Math.PI) / 180 + Math.PI / 2)
+    )
+  }
   noMove() {
     return new Origin(this.lat, this.lng, this.alt, this.heading);
   }
 
-	static from_centre(pilot: GPS, centre: GPS) {
-		const vec = GPS.sub(centre, pilot);
+	static from_centre(pil: GPS, centre: GPS) {
+		const vec = GPS.sub(centre, pil);
 		return new Origin(
-			pilot.lat,
-			pilot.lon,
-			pilot.alt,
+			pil.lat,
+			pil.lon,
+			pil.alt,
 			(Math.atan2(vec.y, vec.x) * 180) / Math.PI,
 			0,
 			0

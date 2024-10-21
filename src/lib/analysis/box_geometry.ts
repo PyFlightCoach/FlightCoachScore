@@ -1,5 +1,5 @@
-import {Point} from '$lib/analysis/geometry'
-
+import { Origin } from '$lib/analysis/fcjson';
+import { Point } from '$lib/analysis/geometry';
 
 export const F3AGround = [
   new Point(259.80762, 150, 0),
@@ -17,6 +17,17 @@ export const IACGround = [
   new Point(500, 200, 0)
 ]
 
+export function drawBoxInWorld(origin: Origin, kind: string) {
+  const points = {
+    F3A: F3AGround,
+    IAC: IACGround
+  }[kind];  
+  return points!.map((point) => origin.pilot.offset(origin.rotation.transform_point(point)));
+}
+
+export function getPointOnCentre(origin: Origin) {
+  return origin.pilot.offset(origin.rotation.transform_point(new Point(0, 300, 0)))
+}
 
 export function f3aBoxTrace() {
 	const xlim = 175 * Math.tan((60 * Math.PI) / 180);

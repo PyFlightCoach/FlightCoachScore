@@ -24,7 +24,7 @@ export class BinField {
 }
 
 export class BinData {
-	constructor(data: Record<string, any>) {
+	constructor(data: Record<string, BinField>) {
 		return Object.setPrototypeOf(data, BinData.prototype);
 	}
 
@@ -79,7 +79,7 @@ export class BinData {
 		);
 	}
 
-	static parse(data: Record<string, any>) {
+	static parse(data: Record<string, BinField>) {
 		return new BinData(
 			Object.fromEntries(Object.entries(data).map(([k, v]) => [k, new BinField(v)]))
 		);
