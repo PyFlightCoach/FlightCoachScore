@@ -1,7 +1,7 @@
 import { Point, Quaternion} from '$lib/analysis/geometry';
 import { States } from '$lib/analysis/state';
 import ObjFile from 'obj-file-parser';
-
+import { d3Color } from '$lib/components/plots/styling';
 
 export const ribbon = (
 	st: States,
@@ -229,7 +229,7 @@ export const modeltrace = (sts: States, model: OBJ, props: Record<string, any> =
 	return sts.data.map((st) => model.to_mesh3d(st.pos, st.att, props));
 };
 
-import { d3Color } from '$lib/plots/styling';
+
 
 export const alignment_traces = (
 	sts: Record<string, States>,

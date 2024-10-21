@@ -2,7 +2,10 @@ import { lookupMonotonic } from '$lib/utils/arrays';
 
 export class BinField {
 	constructor(data: Record<string, number[]>) {
-		return Object.setPrototypeOf(data, BinField.prototype);
+		return Object.setPrototypeOf(
+      Object.fromEntries(Object.entries(data).map(([k, v]) => [k, Array.from(v)])),
+      BinField.prototype
+    );
 	}
 
 	get t() {

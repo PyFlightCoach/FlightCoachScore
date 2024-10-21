@@ -1,15 +1,24 @@
 <script lang="ts">
-	import { binData, origin } from '$lib/stores/analysis';
-	import { Origin, FCJson } from '$lib/analysis/fcjson';
-	import { GPS } from '$lib/analysis/geometry';
+	import { binData, origin, fcj } from '$lib/stores/analysis';
+	import { FCJson, Origin } from '$lib/analysis/fcjson';
+	import { Point } from '$lib/analysis/geometry';
 	import Plot from 'svelte-plotly.js';
 	import { drawBoxInWorld, getPointOnCentre } from '$lib/analysis/box_geometry';
+	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
+	import pkg from 'file-saver';
+	const { saveAs } = pkg;
 
 	let kind: string = 'F3A'; //TODO make this a cookie?
 	let files: FileList;
-	let norg: Origin = $binData
-		? new Origin($binData!.POS.Lat[0], $binData!.POS.Lng[0], $binData!.POS.Alt[0], 0)
-		: new Origin(0, 0, 0, 0);
+  let fcjson: FCJson | undefined;
+	let norg: Origin = $origin
+		? $origin
+		: $binData
+			? new Origin($binData!.pos.Lat[0], $binData!.pos.Lng[0], $binData!.pos.Alt[0], 0)
+			: new Origin(0, 0, 0, 0);
+  let loadMans: boolean = true;
+
 
 	$: boxPoints = drawBoxInWorld(norg, kind);
 	$: centre = getPointOnCentre(norg);
@@ -17,51 +26,86 @@
 	const loadBoxFile = (file: File) => {
 		const reader = new FileReader();
 		reader.onload = (e) => {
-			const contents = reader.result as string;
-
-			if (contents.startsWith('Emailed box data for F3A Zone Pro')) {
-				const data = contents.split('\n');
-
-				norg = Object.assign(
-					norg,
-					Origin.from_centre(
-						new GPS(parseFloat(data[2]), parseFloat(data[3]), parseFloat(data[6])),
-						new GPS(parseFloat(data[4]), parseFloat(data[5]), parseFloat(data[6]))
-					)
-				);
-			} else {
-				norg = Object.assign(norg, FCJson.parse(JSON.parse(contents)).origin);
-			}
+      const _norg = Origin.parseF3aZone(reader.result as string);
+      if (_norg) {
+        norg = Object.assign(norg, _norg);
+        fcjson = undefined;
+      } else {
+        fcjson = FCJson.parse(JSON.parse(reader.result as string));
+        if (fcjson) {
+          norg = Object.assign(norg, fcjson.origin);
+        }
+      }
 		};
 		reader.readAsText(file);
+	};
+
+	const exportF3aZone = () => {
+		centre = norg.pilot.offset(
+			new Point(100 * Math.cos(norg.radHeading), 100 * Math.sin(norg.radHeading), 0)
+		);
+
+		const data = [
+			"Emailed box data for F3A Zone Pro - please DON'T modify!",
+			'1',
+			norg.lat.toString(),
+			norg.lng.toString(),
+			centre.lat.toString(),
+			centre.lon.toString(),
+			norg.alt.toString()
+		];
+
+		const blob = new Blob([data.join('\n')], { type: 'text/plain;charset=utf-8' });
+		saveAs(blob, 'f3a_zone.f3a');
 	};
 </script>
 
 <div class="col-5">
 	<div class="row pt-5">
-    <div class="input-group-sm mb-3">
-      <label class="form-control-sm text-nowrap">FC Json or f3a Zone file</label>
-      <input class="form-control-sm" type="file" accept=".json, .f3a, '.F3A" bind:files />
-      {#if files && files.length > 0}
-        <button class="btn btn-outline-primary form-control-sm" on:click={() => {loadBoxFile(files[0])}}>
-          Load
-        </button>
+		<div class="input-group-sm mb-3">
+			<label class="form-control-sm text-nowrap">FC Json or f3a Zone file</label>
+			<input class="form-control-sm" type="file" accept=".json, .f3a, '.F3A" bind:files />
+			{#if files && files.length > 0}
+				<button
+					class="btn btn-outline-primary form-control-sm"
+					on:click={() => {
+						loadBoxFile(files[0]);
+					}}
+				>
+					Load
+				</button>
+			{/if}
+		</div>
+	</div>
+	<div class="row pt-5">
+		<div class="input-group-sm mb-3">
+			<button class="btn btn-outline-primary form-control-sm" on:click={exportF3aZone}>
+				Save Box
+			</button>
+      {#if fcjson}
+        <input type="checkbox" class="form-check-input mt-0 form-control-sm" id="loadMans" bind:checked={loadMans}/>
+        <label class="form-control-sm" for="loadMans">Load manoeuvres from FCJ</label>
       {/if}
-    </div>
-  </div>
-  <div class="row pt-5">
-    
-    <div class="input-group-sm mb-3">
 
-    </div>
-  </div>
+			<button
+				class="btn btn-outline-primary form-control-sm"
+				on:click={() => {
+					$origin = norg;
+          if (loadMans ) {fcj.set(fcjson)}
+					goto(base + '/analysis/create/manoeuvres');
+				}}
+			>
+				Next
+			</button>
+		</div>
+	</div>
 </div>
 <div class="col-7">
 	<Plot
 		data={[
 			{
-				lat: $binData ? $binData?.POS?.Lat : [],
-				lon: $binData ? $binData?.POS?.Lng : [],
+				lat: $binData ? $binData?.pos.Lat : [],
+				lon: $binData ? $binData?.pos.Lng : [],
 				type: 'scattermap',
 				mode: 'lines',
 				hovermode: false,
@@ -106,8 +150,8 @@
 			map: {
 				bearing: 0,
 				center: {
-					lat: $binData?.POS?.Lat[0] || norg.lat,
-					lon: $binData?.POS?.Lng[0] || norg.lng
+					lat: $binData?.pos.Lat[0] || norg.lat,
+					lon: $binData?.pos.Lng[0] || norg.lng
 				},
 				pitch: 0,
 				zoom: 13,

@@ -12,14 +12,14 @@ export class Server {
 		}
 	}
 
-  async fetch(method: string, path: string, cookie: string|undefined=undefined, data: Record<string, unknown>|undefined=undefined) {
-    console.log(`${this.address}: ${method} ${path}`);
+  async fetch(method: string, path: string, cookie: string|undefined, data: Record<string, unknown>|undefined=undefined) {
+    console.log(`${this.address}: ${method} ${path.replace(/^\/+/g, '')}`);
     return await this.handleResponse(
-      await fetch(`${this.address}${path}`, {
+      await fetch(`${this.address}/${path.replace(/^\/+/g, "")}`, {
         method: method,
         headers: {
           ...(cookie && {Cookie: cookie}),
-          ...(data && {contentType: 'application/json'})
+          ...(data && {"Content-Type": 'application/json'})
         },
         credentials: 'include',
         ...(data && {body: JSON.stringify(data)})

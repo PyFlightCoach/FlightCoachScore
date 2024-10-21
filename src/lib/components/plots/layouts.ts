@@ -1,7 +1,7 @@
 import {max, min} from '$lib/utils/arrays';
 
 
-export let layout3d = {
+export const layout3d = {
     legend: {font: {size: 20}, yanchor: "top", y: 0.99, xanchor: "left", x: 0.01},
     //autosize: true,
     margin: {l:0, r:0, t:0, b:0},

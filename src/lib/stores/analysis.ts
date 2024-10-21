@@ -13,8 +13,11 @@ export const bin: Writable<File | undefined> = writable();
 export const binData: Writable<BinData | undefined> = writable();
 export const bootTime: Writable<Date | undefined> = writable();
 export const origin: Writable<Origin|undefined> = writable();
+export const fcj: Writable<FCJson | undefined> = writable();
 
-export const states: Writable<States | undefined> = writable();
+binData.subscribe(() => {origin.set(undefined)});
+
+export const states: Writable<States | undefined> = writable()
 
 export const manNames: Writable<string[]> = writable();
 export const analyses: Writable<MA | undefined>[] = [];
@@ -70,14 +73,14 @@ export const categories: Writable<string[]> = writable([]);
 
 export async function loadCategories() {
 	if (get(categories).length == 0) {
-		categories.set(await analysisServer.get('categories'));
+		categories.set(await analysisServer.get('/categories'));
 	}
 	return get(categories);
 }
 
 export async function loadSchedules(category: string) {
-	if (!schedules[category]) {
-		await serverFunc(`${category}/schedules`, {}, 'GET').then((res) => {
+	if (!get(schedules)[category]) {
+    await analysisServer.get(`/${category}/schedules`).then((res) => {
 			schedules.update((s) => {
 				s[category] = res;
 				return s;
@@ -90,11 +93,11 @@ export async function loadSchedules(category: string) {
 export async function loadManoeuvres(category: string, schedule: string) {
 	const sinfo = new ScheduleInfo(category, schedule);
 
-	if (!manoeuvres[sinfo.to_string()]) {
-		await serverFunc(`${category}/${schedule}/manoeuvres`, {}, 'GET').then((pfcMans) => {
+	if (!get(manoeuvres)[sinfo.to_string()]) {
+    await analysisServer.get(`/${category}/${schedule}/manoeuvres`).then((pfcMans) => {
 			manoeuvres.update((mans) => {
 				mans[`${category}_${schedule}`] = pfcMans.map(
-					(m) => new ManDetails(m.name, m.id, m.k, sinfo)
+					m => new ManDetails(m.name, m.id, m.k, sinfo)
 				);
 				return mans;
 			});

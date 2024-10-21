@@ -25,29 +25,24 @@ export class Origin {
 		this.move_north = move_north;
 	}
 
-  get pilot() {
-    return new GPS(this.lat, this.lng, this.alt);
-  }
+	get radHeading() {
+		return (this.heading * Math.PI) / 180;
+	}
 
-  get rotation () {
-    return Quaternion.parse_euler(
-      new Point(Math.PI, 0, (this.heading * Math.PI) / 180 + Math.PI / 2)
-    )
-  }
-  noMove() {
-    return new Origin(this.lat, this.lng, this.alt, this.heading);
-  }
+	get pilot() {
+		return new GPS(this.lat, this.lng, this.alt);
+	}
+
+	get rotation() {
+		return Quaternion.parse_euler(new Point(Math.PI, 0, this.radHeading + Math.PI / 2));
+	}
+	noMove() {
+		return new Origin(this.lat, this.lng, this.alt, this.heading);
+	}
 
 	static from_centre(pil: GPS, centre: GPS) {
 		const vec = GPS.sub(centre, pil);
-		return new Origin(
-			pil.lat,
-			pil.lon,
-			pil.alt,
-			(Math.atan2(vec.y, vec.x) * 180) / Math.PI,
-			0,
-			0
-		);
+		return new Origin(pil.lat, pil.lon, pil.alt, (Math.atan2(vec.y, vec.x) * 180) / Math.PI, 0, 0);
 	}
 
 	get_box_loc(lat: number, lng: number, alt: number) {
@@ -56,6 +51,29 @@ export class Origin {
 		);
 		const pned = GPS.sub(new GPS(lat, lng, alt), new GPS(this.lat, this.lng, this.alt));
 		return rot.transform_point(new Point(pned.y, pned.x, -pned.z));
+	}
+
+	static parseF3aZone(contents: string) {
+		if (contents.startsWith('Emailed box data for F3A Zone Pro')) {
+			const data = contents.split('\n');
+			return Origin.from_centre(
+				new GPS(parseFloat(data[2]), parseFloat(data[3]), parseFloat(data[6])),
+				new GPS(parseFloat(data[4]), parseFloat(data[5]), parseFloat(data[6]))
+			);
+		}
+	}
+
+	static parseString(contents: string) {
+		if (contents.startsWith('Emailed box data for F3A Zone Pro')) {
+			const data = contents.split('\n');
+
+			return Origin.from_centre(
+				new GPS(parseFloat(data[2]), parseFloat(data[3]), parseFloat(data[6])),
+				new GPS(parseFloat(data[4]), parseFloat(data[5]), parseFloat(data[6]))
+			);
+		} else {
+			return FCJson.parse(JSON.parse(contents)).origin;
+		}
 	}
 }
 
@@ -70,12 +88,9 @@ export class ScheduleInfo {
 	}
 
 	async to_pfc() {
-		return await analysisServer.post(
-			'convert_schedule_info',
-			this
-		).then((sinfo) => {
-      return Object.setPrototypeOf(sinfo, ScheduleInfo.prototype);
-    });
+		return await analysisServer.post('/convert_schedule_info', this).then((sinfo) => {
+			return Object.setPrototypeOf(sinfo, ScheduleInfo.prototype);
+		});
 	}
 
 	to_string() {
@@ -203,7 +218,7 @@ export class FCJManResult {
 	static parse(data: Record<string, any>) {
 		return new FCJManResult(
 			data.els.map((v) => Object.setPrototypeOf(v, ElSplit.prototype)),
-			data.results?.map((v) => FCJResult.parse(v)) || [] 
+			data.results?.map((v) => FCJResult.parse(v)) || []
 		);
 	}
 
@@ -314,15 +329,15 @@ export class FCJson {
 		this.add_result_id(version, this.unique_names.indexOf(name), manresult);
 	}
 
-  add_result_id(version: string, id: number, manresult: FCJManResult) {
-    let res = this.get_result(version);
-    
+	add_result_id(version: string, id: number, manresult: FCJManResult) {
+		let res = this.get_result(version);
+
 		if (!res) {
 			res = new FCSResult(version, Array(this.mans.length));
 			this.fcs_scores.push(res);
 		}
 		res.manresults[id] = manresult;
-  }
+	}
 
 	export_data() {
 		return {

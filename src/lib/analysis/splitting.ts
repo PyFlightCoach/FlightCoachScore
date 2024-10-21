@@ -1,5 +1,6 @@
 import { ScheduleInfo, type FCJson, type FCJMan } from '$lib/analysis/fcjson';
 import {States} from '$lib/analysis/state';
+import { loadManoeuvres } from '$lib/stores/analysis';
 import { lookupMonotonic } from '$lib/utils/arrays';
 
 export class ManDetails {
@@ -33,8 +34,11 @@ export class ManSplit {
 	}
 }
 
-export async function parseFCJMans(fcj: FCJson, manDetails: ManDetails[], states: States) {
+export async function parseFCJMans(fcj: FCJson, states: States) {
   const stTime = states.t;
+  const sinfo = await fcj.sinfo.to_pfc();
+  const manDetails = await loadManoeuvres(sinfo.category, sinfo.name);
+
   return fcj.mans.map((man: FCJMan, i: number) => {
 
     const stStop = lookupMonotonic(fcj.data[man.stop].time/1e6, stTime);

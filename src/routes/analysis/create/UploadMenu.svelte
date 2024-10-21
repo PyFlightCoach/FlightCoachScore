@@ -8,7 +8,7 @@
   $: manActive = $page.url.pathname.includes('manoeuvres') ? 'active' : ''
   $: datEnabled = ''
   $: boxEnabled = $binData ? '' : 'disabled'
-  $: manEnabled = $origin ? '' : 'disabled'
+  $: manEnabled = $origin && $binData ? '' : 'disabled'
 
 </script>
 

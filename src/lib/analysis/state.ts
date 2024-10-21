@@ -1,6 +1,6 @@
 import { Point, Quaternion, GPS } from '$lib/analysis/geometry';
 import { FCJson, Origin } from '$lib/analysis/fcjson';
-
+import { BinField } from '$lib/analysis/bindata';
 
 export class State {
 	constructor(data: Record<string, number | string>) {
@@ -107,7 +107,7 @@ export class States {
 	body_to_world(p: Point) {
 		return this.data.map((st) => st.body_to_world(p));
 	}
-	static from_xkf1(box: Origin, orgn: Record<string, any>, xkf1: Record<string, any>) {
+	static from_xkf1(box: Origin, orgn: BinField, xkf1: BinField) {
 		const xorg = new GPS(orgn.Lat[0], orgn.Lng[0], orgn.Alt[0]);
 		const box_rot = Quaternion.parse_euler(
 			new Point(Math.PI, 0, (box.heading * Math.PI) / 180 + Math.PI / 2)
