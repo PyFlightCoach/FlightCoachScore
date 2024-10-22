@@ -1,0 +1,106 @@
+import {
+	scores,
+	analyses,
+	manNames,
+	running,
+	runInfo,
+	selManID,
+	states,
+	isCompFlight,
+	bin,
+	origin,
+	selectedResult,
+	difficulty,
+	truncate,
+	fa_versions,
+	binData,
+  bootTime
+} from '$lib/stores/analysis';
+import { Origin } from '$lib/analysis/fcjson';
+import { get } from 'svelte/store';
+import { fcj } from '$lib/stores/analysis';
+import { writable } from 'svelte/store';
+
+
+export function createAnalyses(mnames: string[]) {
+	manNames.set(mnames);
+	scores.set(new Array(mnames.length).fill(0));
+
+	mnames.forEach((name, i) => {
+		analyses.push(writable());
+		running.push(writable(false));
+		runInfo.push(writable(`Empty Analysis Created At ${new Date().toLocaleTimeString()}`));
+
+		analyses[i].subscribe((value) => {
+			scores.update((s) => {
+				if (value) {
+					s[i] =
+						value.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
+						(value?.mdef?.info?.k | value.k);
+				} else {
+					s[i] = 0;
+				}
+				return s;
+			});
+
+			fa_versions.update((v) => {
+				return [...new Set([...v, ...Object.keys(value?.history || [])])];
+			});
+		});
+	});
+}
+
+export function clearAnalysis() {
+	selManID.set(undefined);
+	states.set(undefined);
+	manNames.set(undefined);
+	scores.set(undefined);
+	selectedResult.set(undefined);
+	fa_versions.set([]);
+	binData.set(undefined);
+  bootTime.set(undefined);
+	origin.set(new Origin(0,0,0,0));
+	fcj.set(undefined);
+	bin.set(undefined);
+	analyses.length = 0;
+	running.length = 0;
+	runInfo.length = 0;
+}
+
+export async function createAnalysisExport(small: boolean = false) {
+	return {
+		origin: get(origin),
+		isComp: get(isCompFlight),
+		sourceBin: get(bin)?.name || undefined,
+		sourceFCJ: get(fcj)?.name || undefined,
+    bootTime: get(bootTime)?.toISOString() || undefined,
+		mans: analyses.map((_ma) => (small ? get(_ma)!.shortExport() : get(_ma)!.longExport()))
+	};
+}
+
+
+export async function analyseMans(ids: number[], optim: boolean, force: boolean) {
+	ids.forEach(async (id) => {
+		await analyseManoeuvre(id, optim, force);
+	});
+}
+
+export async function analyseAll(optim: boolean, force: boolean) {
+	analyses.forEach(async (ma, i) => {
+		await analyseManoeuvre(i, optim, force);
+	});
+}
+
+export async function analyseManoeuvre(id: number, optimise: boolean, force: boolean) {
+	const ma = get(analyses[id]);
+	if ((!ma!.scores || force) && !get(running[id])) {
+		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
+		running[id].set(true);
+
+		await ma!.run(optimise).then((res) => {
+			analyses[id].set(res);
+			running[id].set(false);
+		});
+	}
+}
+

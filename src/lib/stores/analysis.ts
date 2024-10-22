@@ -19,11 +19,11 @@ binData.subscribe(() => {origin.set(undefined)});
 
 export const states: Writable<States | undefined> = writable()
 
-export const manNames: Writable<string[]> = writable();
+export const manNames: Writable<string[] | undefined> = writable();
 export const analyses: Writable<MA | undefined>[] = [];
 export const running: Writable<boolean>[] = [];
 export const runInfo: Writable<string>[] = [];
-export const scores: Writable<number[]> = writable();
+export const scores: Writable<number[] | undefined> = writable();
 export const totalScore: Writable<string> = writable('---');
 export const fa_versions: Writable<string[]> = writable([]);
 

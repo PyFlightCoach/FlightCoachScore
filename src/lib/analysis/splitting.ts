@@ -23,13 +23,13 @@ export class ManSplit {
 		this.stop = stop;
 	}
 
-	static TakeOff(id=0, stop=undefined) {
+	static TakeOff(id=0, stop: number|undefined=undefined) {
 		return new ManSplit('Takeoff', undefined, id, stop);
 	}
-	static Break(id=undefined, stop=undefined) {
+	static Break(id: number|undefined=undefined, stop: number|undefined=undefined) {
 		return new ManSplit('Break', undefined, id, stop);
 	}
-	static Landing(id=18, stop=undefined) {
+	static Landing(id: number|undefined=18, stop: number|undefined=undefined) {
 		return new ManSplit('Landing', undefined, id, stop);
 	}
 }
