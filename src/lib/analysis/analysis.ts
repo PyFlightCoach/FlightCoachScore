@@ -59,7 +59,7 @@ export function clearAnalysis() {
 	fa_versions.set([]);
 	binData.set(undefined);
   bootTime.set(undefined);
-	origin.set(new Origin(0,0,0,0));
+	origin.set(undefined);
 	fcj.set(undefined);
 	bin.set(undefined);
 	analyses.length = 0;

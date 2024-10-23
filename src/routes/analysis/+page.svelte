@@ -1,12 +1,8 @@
 <script lang="ts">
-  import AnalysisSummary from './AnalysisSummary.svelte';
-  import {totalScore, manNames} from '$lib/stores/analysis';
+  import navBarContents from "$lib/stores/navBarContents";
+  import AnalysisMenu from './AnalysisMenu.svelte';
+  $navBarContents = AnalysisMenu;
+
 </script>
 
-
-
-<div class="container">
-  <div class="row"><AnalysisSummary/></div>
-  <h2>Total Score = {$totalScore }</h2>  
-</div>
-
+<p></p>
