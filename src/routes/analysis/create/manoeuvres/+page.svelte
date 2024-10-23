@@ -212,7 +212,7 @@
 				)
 			);
 		});
-		goto(base + '/analysis');
+		goto(base + '/analysis/results');
 	}
 </script>
 

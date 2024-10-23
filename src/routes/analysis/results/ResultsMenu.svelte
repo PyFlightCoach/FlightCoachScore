@@ -8,11 +8,10 @@
 <li class="nav-item">
 <ul class="pagination">
     {#if $manNames && $manNames.length > 0}
-    <li class="page-item"><button class="nav-link" on:click={clearAnalysis}>Clear</button></li>
+      <li class="page-item"><button class="nav-link" on:click={clearAnalysis}>Clear</button></li>
       <li class="page-item"><a class="nav-link" href={base + "/analysis/results"}>Results</a></li>
-      <li class="page-item"><a class="nav-link" href={base + "/analysis/"}>Plot</a></li>
-      {:else}
-      <li class="page-item"><a class="nav-link" href={base + "/analysis/create/data"}>Create</a></li>
+      <li class="page-item"><a class="nav-link" href={base + "/analysis/results/plot"}>Plot</a></li>
     {/if}
 </ul>
 </li>
+

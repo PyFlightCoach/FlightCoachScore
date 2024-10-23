@@ -10,7 +10,7 @@ import { Origin } from '$lib/analysis/fcjson';
 export async function load({ fetch }) {
 	if (true || !dev) {
 		if (!get(manNames)) {
-			goto(base + '/analysis/create/manoeuvres');
+			goto(base + '/analysis/create/data');
 		}
 	} else {
 		if (!get(binData)) {
