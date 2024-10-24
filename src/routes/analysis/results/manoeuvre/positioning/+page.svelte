@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { selManID, analyses } from '$lib/stores';
-	import type { States } from '$lib/state';
+	import { selManID, analyses } from '$lib/stores/analysis';
+	import type { States } from '$lib/analysis/state';
 	import Plot from 'svelte-plotly.js';
-	import { coloured_ribbons, points } from '$lib/plots/traces';
-	import { layout3d } from '$lib/plots/layouts';
-	import { iacBoxTrace, f3aBoxTrace } from '$lib/box_geometry';
+	import { coloured_ribbons, points } from '$lib/components/plots/traces';
+	import { layout3d } from '$lib/components/plots/layouts';
+	import { iacBoxTrace, f3aBoxTrace } from '$lib/analysis/box_geometry';
 
-	$: man = analyses[$selManID];
+	$: man = analyses[$selManID!];
 
 	$: states = $man?.flown.split();
 
@@ -83,24 +83,3 @@
 {:else}
 <div>No data</div>
 {/if}
-
-<style>
-	#parent {
-		display: grid;
-		height: 100%;
-		width: 100%;
-		grid-template-rows: max-content 1fr;
-	}
-	#table {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		align-items: start;
-		align-self: start;
-	}
-	.cell {
-		text-align: center;
-	}
-	.cell.head {
-		font-weight: bold;
-	}
-</style>
