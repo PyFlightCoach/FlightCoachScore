@@ -16,10 +16,12 @@ import {
 	binData,
   bootTime
 } from '$lib/stores/analysis';
-import { Origin } from '$lib/analysis/fcjson';
+import {MA} from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { fcj } from '$lib/stores/analysis';
 import { writable } from 'svelte/store';
+import {base} from '$app/paths';
+import {analysisServer} from '$lib/api';
 
 
 export function createAnalyses(mnames: string[]) {
@@ -78,6 +80,28 @@ export async function createAnalysisExport(small: boolean = false) {
 	};
 }
 
+
+export async function importAnalysis(data: Record<string, any>) {
+	clearAnalysis();
+	origin.set(data.origin);
+	isCompFlight.set(data.isComp);
+  bootTime.set( data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);
+
+	createAnalyses(data.mans.map((ma: MA) => ma.name));
+
+	data.mans.forEach((ma, i) => {
+		MA.parse(ma).then(res=>{analyses[i].set(res)});
+	});
+
+
+
+}
+
+export async function loadExample() {
+	clearAnalysis();
+  importAnalysis(await (await fetch(`${base}/example/example_analysis.ajson`)).json());
+	
+}
 
 export async function analyseMans(ids: number[], optim: boolean, force: boolean) {
 	ids.forEach(async (id) => {

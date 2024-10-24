@@ -31,11 +31,11 @@
 
 	function activate_man(id: number, page: string) {
 		$selManID = id;
-		goto(base + '/analysis/manoeuvre/' + page);
+		goto(base + '/analysis/results/manoeuvre/' + page);
 	}
 
 	async function runMan() {
-		await analyseManoeuvre(id, true, false);
+		await analyseManoeuvre(id, true, true);
 	}
 </script>
 
@@ -43,30 +43,30 @@
 	<td>{$ma?.id}</td>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 
-	<td  role="button" on:click={() => activate_man(id, '')} >
+	<td role="button" on:click={() => activate_man(id, '')}>
 		{$ma?.name}
 	</td>
 
 	<td>{$ma?.k}</td>
 
 	{#if scores}
-		<td 
-      class='text-center'
-      role="button"
+		<td
+			class="text-center"
+			role="button"
 			style:background-color={colscale(intra, 6, colours)}
 			on:click={() => activate_man(id, 'intra')}
 		>
 			{intra.toFixed(2)}
 		</td>
-		<td 
-      class='text-center'
-      role="button"
+		<td
+			class="text-center"
+			role="button"
 			style:background-color={colscale(inter, 6, colours)}
 			on:click={() => activate_man(id, 'inter')}>{inter.toFixed(2)}</td
 		>
-		<td 
-      class='text-center'
-      role="button"
+		<td
+			class="text-center"
+			role="button"
 			style:background-color={colscale(positioning, 6, colours)}
 			on:click={() => activate_man(id, 'positioning')}
 		>
@@ -79,9 +79,9 @@
 	{/if}
 
 	{#if scores}
-		<td 
-      class='text-center'
-      role="button"
+		<td
+			class="text-center"
+			role="button"
 			on:click={() => activate_man(id, '')}
 			style:background-color={colscale(10 - score, 10, colours)}
 		>
@@ -92,21 +92,30 @@
 	{/if}
 
 	{#if $isRunning}
-		<td>Busy</td>
+		<td class="bg-warning text-center">Busy</td>
 	{:else}
-		<td role="button" class="bg-secondary" style="width:200px" on:click={runMan}>Run</td>
+		<td data-toggle="tooltip"  title="ReRun {$ma?.name}" role="button" class="bg-secondary text-center" on:click={runMan}>Run</td>
 	{/if}
 
-	<td ><span class="small text-nowrap text-muted">{$info}</span></td>
-	{#if !$isRunning && !$info.includes('Empty') && score == 0}
-		<td
-    class="text-sm"
-			on:click={() => activate_man(id, 'alignment')}
-			title="Failed analyses or unexpectedly low scores may be a result of a poor element alignment. Go
+	<td
+		><span class="small text-nowrap text-muted">
+			{$info}
+			{#if !$isRunning && !$info.includes('Imported') && score == 0}
+				<a
+          tabindex="0"
+          on:keydown={() => activate_man(id, 'alignment')}
+          href='#'
+					type="link"
+          role="button"
+					class="text-sm"
+					on:click={() => activate_man(id, 'alignment')}
+					title="Failed analyses or unexpectedly low scores may be a result of a poor element alignment. Go
 					the the alignment page to check and fix it for this manoeuvre. Alternatively try flying
 					better."
-		>
-			Check Alignment
-		</td>
-	{/if}
+				>
+					Check Alignment
+    </a>
+			{/if}
+		</span></td
+	>
 </tr>

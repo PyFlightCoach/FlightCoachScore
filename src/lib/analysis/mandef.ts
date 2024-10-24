@@ -219,8 +219,8 @@ export class ElDef {
 		return new ElDef(data.name, data.Kind, data.props, dgs);
 	}
 
-	getDG(critn: string | null) {
-		for (let dg in this.dgs) {
+	getDG(critn: string | undefined) {
+		for (const dg in this.dgs) {
 			if (this.dgs[dg].display_name == critn || dg == critn) {
 				return this.dgs[dg];
 			}
@@ -258,12 +258,12 @@ export class ManDef {
 		}
 	}
 
-	getEd(dgn: string | null) {
+	getEd(dgn: string | undefined) {
 		if (dgn && this.eds[dgn]) {
 			return this.eds[dgn];
 		}
 
-		for (let ed in this.eds) {
+		for (const ed in this.eds) {
 			if (dgn?.startsWith(this.eds[ed].name)) {
 				return this.eds[ed];
 			}

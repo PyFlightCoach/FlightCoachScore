@@ -1,28 +1,17 @@
-import { manNames, binData, origin } from '$lib/stores/analysis';
+import { manNames } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
 import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { BinData } from '$lib/analysis/bindata';
-import { Origin } from '$lib/analysis/fcjson';
+import { loadExample } from '$lib/analysis/analysis';
 
-
-export async function load({ fetch }) {
-	if (true || !dev) {
-		if (!get(manNames)) {
-			goto(base + '/analysis/create/data');
-		}
-	} else {
-		if (!get(binData)) {
+export async function load() {
+	if (!get(manNames)) {
+		if (dev) {
 			console.log('Loading example data');
-			binData.set(
-				BinData.parse(await (await fetch(`${base}/example/example_bindata.json`)).json())
-			);
-		}
-		if (!get(origin)) {
-			origin.set(
-				Origin.parseString(await (await fetch(`${base}/example/example_f3a_zone.f3a`)).text())
-			);
+			loadExample();
+		} else {
+			goto(base + '/analysis/create/data');
 		}
 	}
 }

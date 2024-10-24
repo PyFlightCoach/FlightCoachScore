@@ -1,18 +1,21 @@
 <script lang="ts">
 	import {manNames} from '$lib/stores/analysis';
   import ManSummary from './ManSummary.svelte';
+  import { analyseAll } from '$lib/analysis/analysis';
  </script>
 
-<table class="table table-sm table-hover " data-sveltekit-preload-data="tap">
+<table class="table table-sm table-hover table-bordered border-primary" data-sveltekit-preload-data="tap">
   <thead>
     <tr>
       <th scope='col' >#</th>
-      <th scope='col' class='text-centre'>Name</th>
-      <th scope='col' class='text-centre'>K</th>
-      <th scope='col' class='text-centre'>Intra</th>
-      <th scope='col' class='text-centre'>Inter</th>
-      <th scope='col' class='text-centre'>Position</th>
+      <th scope='col' >Name</th>
+      <th scope='col' class='text-center'>K</th>
+      <th scope='col' class='text-center'>Intra</th>
+      <th scope='col' class='text-center'>Inter</th>
+      <th scope='col' class='text-center'>Box</th>
       <th scope='col' >Score</th>
+      <th role='button' data-toggle="tooltip"  title="Run Remaining" scope='col' class='bg-primary text-center' on:click={()=>analyseAll(true,false)}>Run</th>
+      <th scope='col' >Status</th>
     </tr>
   </thead>
   <tbody>

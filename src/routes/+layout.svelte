@@ -8,7 +8,7 @@
 	import navBarContents from '$lib/stores/navBarContents';
 </script>
 
-<div class="container-fluid d-flex flex-column" style="height: 100vh;">
+<div class="container-fluid justify-content-md-center  min-vh-100 d-flex flex-column ">
 	<div class="row">
 		<MainNavBar>
 			{#if $navBarContents}
@@ -16,7 +16,7 @@
 			{/if}
 		</MainNavBar>
 	</div>
-	<div class="row flex-grow-1 " >
+	<div class="row  flex-grow-1" >
 		<slot />
 	</div>
 </div>
