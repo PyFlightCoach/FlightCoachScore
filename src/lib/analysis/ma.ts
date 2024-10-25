@@ -46,15 +46,8 @@ export class MA {
 		}
 	}
 
-	async run(optimise: boolean | undefined=undefined) {    
-    const isReRun = Object.keys(this.history).includes(await analysisServer.get('fa_version'));
-    if (optimise === undefined) { //optimise if for new analysis version
-      optimise = !isReRun; 
-    }
-    if (this.scores && isReRun) { //if scores exist, only run if server version not in history
-      return this;
-    }
-
+	async run(optimise: boolean ) {    
+    
 		try {
 			const res = await analysisServer.post(
 				'analyse_manoeuvre',
