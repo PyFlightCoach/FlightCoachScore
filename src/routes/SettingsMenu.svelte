@@ -7,7 +7,7 @@
 </script>
 
 <NavMenu>
-	<span slot="icon"><i class="bi bi-gear" /> </span>
+	<span slot="icon"><i class="bi bi-gear" ></i> </span>
 
 	<ServerSelection
 		title="Analysis Server"

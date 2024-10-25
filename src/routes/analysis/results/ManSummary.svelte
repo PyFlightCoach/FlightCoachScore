@@ -34,9 +34,6 @@
 		goto(base + '/analysis/results/manoeuvre/' + page);
 	}
 
-	async function runMan() {
-		await analyseManoeuvre(id, true, true);
-	}
 </script>
 
 <tr>
@@ -94,7 +91,15 @@
 	{#if $isRunning}
 		<td class="bg-warning text-center">Busy</td>
 	{:else}
-		<td data-toggle="tooltip"  title="ReRun {$ma?.name}" role="button" class="bg-secondary text-center" on:click={runMan}>Run</td>
+		<td
+			data-toggle="tooltip"
+			title="ReRun {$ma?.name}"
+			role="button"
+			class="bg-secondary text-center"
+			on:click={() => {
+				analyseManoeuvre(id);
+			}}>Run</td
+		>
 	{/if}
 
 	<td
@@ -102,11 +107,11 @@
 			{$info}
 			{#if !$isRunning && !$info.includes('Imported') && score == 0}
 				<a
-          tabindex="0"
-          on:keydown={() => activate_man(id, 'alignment')}
-          href='#'
+					tabindex="0"
+					on:keydown={() => activate_man(id, 'alignment')}
+					href="#"
 					type="link"
-          role="button"
+					role="button"
 					class="text-sm"
 					on:click={() => activate_man(id, 'alignment')}
 					title="Failed analyses or unexpectedly low scores may be a result of a poor element alignment. Go
@@ -114,7 +119,7 @@
 					better."
 				>
 					Check Alignment
-    </a>
+				</a>
 			{/if}
 		</span></td
 	>

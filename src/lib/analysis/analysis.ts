@@ -103,21 +103,28 @@ export async function loadExample() {
 	
 }
 
-export async function analyseMans(ids: number[], optim: boolean, force: boolean) {
+export async function analyseMans(ids: number[]) {
 	ids.forEach(async (id) => {
-		await analyseManoeuvre(id, optim, force);
+		await analyseManoeuvre(id);
 	});
 }
 
-export async function analyseAll(optim: boolean, force: boolean) {
-	analyses.forEach(async (ma, i) => {
-		await analyseManoeuvre(i, optim, force);
+export async function analyseAll() {
+	analyses.forEach(async (ma, i) => {   
+    await analyseManoeuvre(i);
 	});
 }
 
-export async function analyseManoeuvre(id: number, optimise: boolean, force: boolean) {
+export async function analyseManoeuvre(id: number, optimise: boolean | undefined = undefined) {
 	const ma = get(analyses[id]);
-	if ((!ma!.scores || force) && !get(running[id])) {
+
+  const isReRun = Object.keys(ma!.history).includes(await analysisServer.get('fa_version'));
+
+  if (optimise === undefined) { optimise = !isReRun} //optimise if for new analysis version
+
+  if ((! ma!.scores || optimise) && !get(running[id])) { 
+    //if scores exist, only run if server version not in history
+
 		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
 		running[id].set(true);
 
@@ -125,6 +132,8 @@ export async function analyseManoeuvre(id: number, optimise: boolean, force: boo
 			analyses[id].set(res);
 			running[id].set(false);
 		});
-	}
+  } 
+
+	
 }
 

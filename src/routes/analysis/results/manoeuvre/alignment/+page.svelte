@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
 	import { analyseManoeuvre } from '$lib/analysis/analysis';
-	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
 	import { MA } from '$lib/analysis/ma';
 
@@ -108,14 +108,14 @@
 					}
 				}}>Score</button
 			>
-			<button
+			<a
 				class="form-control-sm btn btn-outline-secondary"
 				title="Back to Main Page"
-				on:click={() => {
-					goto('/analysis/');
-				}}>back</button
-			>
-		</div>
+        href={base + "/analysis/results"}
+				>
+        back
+      
+      </a>
 	</ul>
 </nav>
 </div>

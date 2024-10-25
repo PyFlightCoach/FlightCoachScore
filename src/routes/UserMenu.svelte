@@ -3,7 +3,7 @@
 </script>
 
 <NavMenu>
-  <span slot="icon"><i class="bi bi-person"/></span>
+  <span slot="icon"><i class="bi bi-person"></i></span>
   <div class="dropdown-item" >Login</div>
   <div class="dropdown-item" >Sign Up</div>
 </NavMenu>

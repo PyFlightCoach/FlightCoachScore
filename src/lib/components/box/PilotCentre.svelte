@@ -3,9 +3,7 @@
 	import { GPS, Point } from '$lib/analysis/geometry';
 
 	export let origin: Origin = new Origin(0,0,0, 0);
-  export let kind: string = 'F3A';
-
-  
+    
 	let centre = origin.pilot.offset(origin.rotation.transform_point(new Point(0, 100 ,0)));
 	
   const updateOrigin = (newCentre: GPS) => {

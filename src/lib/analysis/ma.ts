@@ -46,7 +46,15 @@ export class MA {
 		}
 	}
 
-	async run(optimise: boolean = false) {
+	async run(optimise: boolean | undefined=undefined) {    
+    const isReRun = Object.keys(this.history).includes(await analysisServer.get('fa_version'));
+    if (optimise === undefined) { //optimise if for new analysis version
+      optimise = !isReRun; 
+    }
+    if (this.scores && isReRun) { //if scores exist, only run if server version not in history
+      return this;
+    }
+
 		try {
 			const res = await analysisServer.post(
 				'analyse_manoeuvre',
@@ -55,7 +63,7 @@ export class MA {
 					category: this.schedule.category,
 					schedule: this.schedule.name,
 					schedule_direction: this.scheduleDirection,
-					flown: this.flown?.data || get(binData).slice(this.tStart, this.tStop),
+					flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
 					origin: get(origin),
 					optimise_alignment: optimise
 				},
