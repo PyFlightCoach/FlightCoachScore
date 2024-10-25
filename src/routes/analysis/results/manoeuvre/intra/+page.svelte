@@ -36,7 +36,7 @@
 	<ColouredTable data={summaries} bind:activeRow={activeDGName} bind:activeCol={activeCriteria} />
 </div>
 
-<div class="col-8">
+<div class="col-8 d-flex flex-column">
 	{#if !activeCriteria}
 		{#if !activeED}
 			<PlotDTW sts={states} bind:activeEl={activeED} sp={4} />
@@ -51,7 +51,7 @@
 			/>
 		{/if}
 	{:else}
-		<div class="row border flex-grow-1 h-50">
+		<div class="col-12 flex-grow-1 border d-flex flex-row">
 			<div class="col-6 border">
 				<PlotSec
 					flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
@@ -63,37 +63,41 @@
 				/>
 			</div>
 
-			{#if activeCriteria && dg && element && result}
-				<div class="col-6">
-					<div class="row">
-            <div class='col-12'>
+			<div class="col-6 d-flex flex-column border">
+				<div class="col-12 border">
+					{#if activeCriteria && dg && element && result}
 						<table>
 							<tbody>
 								<tr><td>Measurement: </td> <td> {dg.measure}</td></tr>
 								<tr><td>Element: </td> <td> {element.describe()}</td></tr>
 								<tr><td>Sample: </td> <td> {dg.describe_selectors()}</td></tr>
 								<tr>
-                  <td>Smoothing: </td>
+									<td>Smoothing: </td>
 									<td> {dg.smoothers.length > 0 ? dg.smoothers : 'None'}</td>
-                </tr>
+								</tr>
 								<tr><td>Criteria: </td> <td> {dg.criteria_description(result)}</td></tr>
 							</tbody>
 						</table>
-          </div>
-					</div>
-					<div class="row">
-            {#if activeIndex}
-							<div class="col"><VisPlot {result} downgrade={dg} vis={result.measurement.visibility[activeIndex]} /></div>
-							<div class="col"><CriteriaPlot {result} downgrade={dg} /></div>
-						{/if}
-          </div>
+					{/if}
 				</div>
+				<div class="col-12 flex-grow-1 d-flex flex-row border">
+					<div class="col-6">
+						<VisPlot
+							{result}
+							downgrade={dg}
+							vis={activeIndex ? result?.measurement.visibility[activeIndex] : undefined}
+						/>
+					</div>
+					<div class="col-6">
+						<CriteriaPlot {result} downgrade={dg} />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 flex-grow-1 border">
+			{#if result && dg && activeCriteria}
+				<DGPlot {result} bind:activeIndex />
 			{/if}
 		</div>
-		{#if result && dg && activeCriteria}
-			<div class="row border">
-        <DGPlot {result} bind:activeIndex />
-      </div>
-		{/if}
 	{/if}
 </div>
