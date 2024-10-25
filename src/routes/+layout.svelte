@@ -16,7 +16,7 @@
 			{/if}
 		</MainNavBar>
 	</div>
-	<div class="row  flex-grow-1" >
+	<div class="row  flex-grow-1 justify-content-md-center" >
 		<slot />
 	</div>
 </div>

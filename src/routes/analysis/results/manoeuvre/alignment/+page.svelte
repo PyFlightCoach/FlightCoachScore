@@ -53,6 +53,7 @@
 	$: states = $man!.flown!.split();
 </script>
 
+<div class="col-12 border">
 <PlotDTW sts={states} bind:activeEl={element} sp={3} />
 
 <nav class="navbar fixed-bottom navbar-dark bg-dark">
@@ -117,3 +118,4 @@
 		</div>
 	</ul>
 </nav>
+</div>

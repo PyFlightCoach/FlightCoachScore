@@ -34,49 +34,66 @@
 
 <div class="col-4 pt-3 border">
 	<ColouredTable data={summaries} bind:activeRow={activeDGName} bind:activeCol={activeCriteria} />
-  <p>showing criteria: {activeCriteria}</p>
-  <p>showing ED:       {activeED?.name}</p>
 </div>
 
-<div class="col-8 border  d-flex  ">
-	
+<div class="col-8">
+	{#if !activeCriteria}
 		{#if !activeED}
-			<PlotDTW sts={states} bind:activeEl={activeDGName} sp={4} />
+			<PlotDTW sts={states} bind:activeEl={activeED} sp={4} />
 		{:else}
-    
-			<div class="row flex-grow-1 border">
+			<PlotSec
+				flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
+				tpst={templates[activeED.name]}
+				bind:i={activeIndex}
+				controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
+				fixRange
+				scale={3}
+			/>
+		{/if}
+	{:else}
+		<div class="row border flex-grow-1 h-50">
+			<div class="col-6 border">
+				<PlotSec
+					flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
+					tpst={templates[activeED.name]}
+					bind:i={activeIndex}
+					controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
+					fixRange
+					scale={3}
+				/>
+			</div>
 
-				<div class="col-{activeCriteria ? '6' : '12'} border d-flex ">
-					<PlotSec
-						flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
-						tpst={templates[activeED.name]}
-						bind:i={activeIndex}
-						controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
-						fixRange
-						scale={3}
-					/>
-				</div>
-
-				{#if activeCriteria && dg && element && result}
-					<div class="col-6">
-						<div class="row">
-							<div class="description">
-								<div class="row">Measurement: {dg.measure}</div>
-								<div class="row">Element: {element.describe()}</div>
-								<div class="row">Sample: {dg.describe_selectors()}</div>
-								<div class="row">Smoothing: {dg.smoothers.length > 0 ? dg.smoothers : 'None'}</div>
-								<div class="row">Criteria: {dg.criteria_description(result)}</div>
-							</div>
-						</div>
-            <div class="row">
-						{#if activeIndex }
-							<VisPlot {result} downgrade={dg} vis={result.measurement.visibility[activeIndex]} />
-						{/if}
-						<CriteriaPlot {result} downgrade={dg} />
+			{#if activeCriteria && dg && element && result}
+				<div class="col-6">
+					<div class="row">
+            <div class='col-12'>
+						<table>
+							<tbody>
+								<tr><td>Measurement: </td> <td> {dg.measure}</td></tr>
+								<tr><td>Element: </td> <td> {element.describe()}</td></tr>
+								<tr><td>Sample: </td> <td> {dg.describe_selectors()}</td></tr>
+								<tr>
+                  <td>Smoothing: </td>
+									<td> {dg.smoothers.length > 0 ? dg.smoothers : 'None'}</td>
+                </tr>
+								<tr><td>Criteria: </td> <td> {dg.criteria_description(result)}</td></tr>
+							</tbody>
+						</table>
           </div>
 					</div>
-				{/if}
-			</div>
+					<div class="row">
+            {#if activeIndex}
+							<div class="col"><VisPlot {result} downgrade={dg} vis={result.measurement.visibility[activeIndex]} /></div>
+							<div class="col"><CriteriaPlot {result} downgrade={dg} /></div>
+						{/if}
+          </div>
+				</div>
+			{/if}
+		</div>
+		{#if result && dg && activeCriteria}
+			<div class="row border">
+        <DGPlot {result} bind:activeIndex />
+      </div>
 		{/if}
-	
+	{/if}
 </div>

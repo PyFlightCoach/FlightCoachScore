@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { BinData } from '$lib/analysis/bindata';
+import { BinData } from '$lib/components/bin/bindata';
 import { Origin } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
 

@@ -1,6 +1,6 @@
 import { Point, Quaternion, GPS } from '$lib/analysis/geometry';
 import { FCJson, Origin } from '$lib/analysis/fcjson';
-import { BinField } from '$lib/analysis/bindata';
+import { BinField } from '$lib/components/bin/bindata';
 
 export class State {
 	constructor(data: Record<string, number | string>) {

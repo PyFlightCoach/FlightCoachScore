@@ -1,0 +1,123 @@
+<script lang="ts">
+	import BINWorker from '$lib/JsDataflashParser/parser.js?worker';
+	import pkg from 'file-saver';
+	import { BinData, BinField } from '$lib/components/bin/bindata';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+	const { saveAs } = pkg;
+
+	const worker = new BINWorker();
+
+	export let messages: string[] = ['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'ORGN', 'RCIN'];
+	export let binData: BinData | undefined = undefined;
+	export let bin: File | undefined = undefined;
+	export let bootTime: Date | undefined = undefined;
+	export let busy: boolean = false;
+	export let download: boolean = false;
+  export let clear: boolean = false;
+	let files: FileList;
+
+	let availableMessages: Record<string, any>;
+	let loadedMessages: Record<string, boolean> = {};
+	let percent: number;
+	worker.onmessage = (event) => {
+		if (event.data.hasOwnProperty('availableMessages')) {
+			availableMessages = event.data.availableMessages;
+			Object.entries(event.data.availableMessages).forEach(([name, message]) => {
+				const lname = name.split('[')[0];
+				if (!loadedMessages.hasOwnProperty(lname)) {
+					loadedMessages[lname] = false;
+				}
+			});
+		} else if (event.data.hasOwnProperty('percentage')) {
+			percent = event.data.percentage;
+		} else if (event.data.hasOwnProperty('messageType')) {
+			const lname = event.data.messageType.split('[')[0];
+			binData[event.data.messageType] = new BinField(event.data.messageList);
+			loadedMessages[lname] = true;
+		} else if (event.data.hasOwnProperty('metadata')) {
+			bootTime = new Date(Date.parse(event.data.metadata.bootTime));
+		} else if (event.data.hasOwnProperty('messagesDoneLoading')) {
+			busy = false;
+			dispatch('loaded', { bin, binData, bootTime });
+		}
+	};
+
+	async function parseMessages(msgs: string[]) {
+		binData = new BinData({});
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			let dat = reader.result;
+			worker.postMessage({
+				action: 'parse',
+				file: dat,
+				msgs: msgs
+			});
+		};
+		reader.readAsArrayBuffer(bin!);
+	}
+
+	function parseBin(file: File) {
+		if (file) {
+			bin = file;
+			binData = new BinData({});
+			busy = false;
+			loadedMessages = {};
+			parseMessages(messages);
+		}
+		ddopen = false;
+	}
+
+	function saveData() {
+		saveAs(
+			new Blob([JSON.stringify(binData)], { type: 'application/json' }),
+			`${bin!.name.split('.').slice(0, -1).join('.')}.json`
+		);
+	}
+	function clearData() {
+		binData = undefined;
+		bin = undefined;
+	}
+
+	let ddopen = false;
+</script>
+
+{#if !busy}
+	<label
+		for="bininput"
+		class="btn btn-outline-secondary form-control text-nowrap"
+		style:overflow="hidden"
+		>{#if files && files.length > 0}
+			{files[0].name}
+		{:else}
+			Select File
+		{/if}</label
+	>
+	<input
+		id="bininput"
+		class="form-control"
+		type="file"
+		accept=".bin, .BIN"
+		bind:files
+		style="display:none"
+	/>
+	{#if files && files.length > 0}
+		<button
+			class="btn form-control btn-outline-secondary"
+			on:click={() => {
+				parseBin(files[0]);
+			}}>Load</button
+		>
+	{/if}
+	{#if !binData}
+    {#if clear}
+		<button class="form-control btn btn-outline-secondary" on:click={clearData}>Clear Bin</button>
+    {/if}
+		{#if download}
+			<button class="form-control btn btn-outline-secondary" on:click={saveData}>Download</button>
+		{/if}
+	{/if}
+{:else}
+	<span class="form-control">{percent?.toFixed(0) || 0}</span>
+{/if}

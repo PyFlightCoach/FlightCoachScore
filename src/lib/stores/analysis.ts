@@ -5,7 +5,7 @@ import { States } from '$lib/analysis/state';
 import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { ManDetails } from '$lib/analysis/splitting';
-import { BinData } from '$lib/analysis/bindata';
+import { BinData } from '$lib/components/bin/bindata';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 

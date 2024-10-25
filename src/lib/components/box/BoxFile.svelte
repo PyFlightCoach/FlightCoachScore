@@ -1,0 +1,57 @@
+<script lang="ts">
+	import { FCJson, Origin } from '$lib/analysis/fcjson';
+	import { Point } from '$lib/analysis/geometry';
+	import pkg from 'file-saver';
+
+	const { saveAs } = pkg;
+
+	let files: FileList;
+	export let origin: Origin | undefined;
+	export let fcjson: FCJson | undefined = undefined;
+
+	const loadBoxFile = (file: File) => {
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const _norg = Origin.parseF3aZone(reader.result as string);
+			if (_norg) {
+				origin = Object.assign(origin || new Origin(0, 0, 0, 0), _norg);
+			} else {
+				fcjson = FCJson.parse(JSON.parse(reader.result as string));
+				if (fcjson) {
+					origin = Object.assign(origin || new Origin(0, 0, 0, 0), fcjson.origin);
+				}
+			}
+		};
+		reader.readAsText(file);
+	};
+</script>
+
+<label
+	for="boxfile"
+	class="btn btn-outline-secondary form-control text-nowrap"
+	style:overflow="hidden"
+>
+	{#if files && files.length > 0}
+		{files[0].name}
+	{:else}
+		Select File
+	{/if}
+</label>
+<input
+	id="boxfile"
+	class="form-control"
+	type="file"
+	accept=".json, .f3a, '.F3A"
+	bind:files
+	style="display:none"
+/>
+{#if files && files.length > 0}
+	<button
+		class="btn btn-outline-secondary form-control"
+		on:click={() => {
+			loadBoxFile(files[0]);
+		}}
+	>
+		Load
+	</button>
+{/if}

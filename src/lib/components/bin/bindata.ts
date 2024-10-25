@@ -68,6 +68,10 @@ export class BinData {
 		return this.col('GPS');
 	}
 
+  get rcin() {
+    return this.col('RCIN');
+  }
+
 	slice(tStart: number, tEnd: number, keepCols: string[] = ['ORGN', 'PARM']) {
 		const allKeepCols = keepCols.map((col) => this.getCols(col)).flat();
 
