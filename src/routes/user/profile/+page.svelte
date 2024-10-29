@@ -1,18 +1,12 @@
 <script lang="ts">
     import { dbServer } from '$lib/api';
-    import * as countries from '$lib/countries.js'
-    import { goto, invalidateAll } from '$app/navigation';
+    import {countries, split_country} from '$lib/countries.js'
+    import {  invalidateAll } from '$app/navigation';
     import {user} from '$lib/stores/user';
 
-    let country_array = countries.list();
     let form_state: string | undefined = undefined;
 
-    function split_country(s: string) {
-      const split_idx = s.lastIndexOf(' ');
-      const country = s.slice(0, split_idx);
-      const emoji = s.slice(split_idx + 1);
-      return [country, emoji];
-    }
+
 
 
     async function _handleSubmit(event: Event) {
@@ -88,7 +82,7 @@
     <div class="mb-3">
         <label for="country" class="form-label">Country</label>
         <select class="form-select" id="country" name="country" value="{$user.country} {$user.country_emoji}" required>
-            {#each country_array as c}
+            {#each countries as c}
                 <option value="{c.name} {c.emoji}">{c.name} {c.emoji}</option>
             {/each}
         </select>
