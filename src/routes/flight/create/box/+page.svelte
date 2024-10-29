@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { binData, origin, fcj } from '$lib/stores/analysis';
-	import { FCJson, Origin } from '$lib/analysis/fcjson';
+	import { FCJson } from '$lib/analysis/fcjson';
 	import { BoxReader } from '$lib/components/box';
 	import { MapPlot } from '$lib/components/plots/map';
 	import { base } from '$app/paths';
@@ -9,7 +9,7 @@
 	let getmans: boolean = true;
 </script>
 
-<div class="col-6">
+<div class="col-6 pt-5">
 	<BoxReader bind:origin={$origin} bind:fcjson>
 		{#if fcjson}
 			<div class="input-group-text">
@@ -29,7 +29,7 @@
 				on:click={() => {
 					$fcj = fcjson;
 				}}
-				href={base + '/analysis/create/manoeuvres'}
+				href={base + '/flight/create/manoeuvres'}
 			>
 				Next
 			</a>

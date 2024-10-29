@@ -3,20 +3,21 @@
 	import { analysisServer, dbServer } from '$lib/api';
 	import { onMount } from 'svelte';
 	import { version } from '$app/environment';
+	import { user } from '$lib/stores/user';
+
 	$navBarContents = undefined;
 
-	let aSVersion: string;
-	let dbVersion: string;
+	let aSVersion: string | undefined = $state();
+
 	const getServerVersions = async () => {
-		aSVersion = await analysisServer.get('/version');
-		dbVersion = await dbServer.get('/version');
+		aSVersion = await analysisServer.get('version');
 	};
 
 	onMount(getServerVersions);
 </script>
 
 <div class="container-fluid text-center mt-5" style="max-width:800px; ">
-	<div class="row align-items-center ">
+	<div class="row align-items-center">
 		<h4>Welcome to Flight Coach Score</h4>
 		<p>Prepare to discover that everyone else is rubbish at aerobatics too!</p>
 		<p>
@@ -24,26 +25,53 @@
 			share your scores.
 		</p>
 
-		<div class="container" style="width:350px">
-			<div class="row">
-				<div class="col-sm">Client:</div>
-				<div class="col-sm">{version}</div>
-			</div>
-			<div class="row">
-				<div class="col-sm text-right">Analysis:</div>
-				<div class="col-sm">
-					<button on:click={getServerVersions}> {aSVersion || 'not connected'}</button>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm text-right">Database:</div>
-				<div class="col-sm">
-					<button on:click={getServerVersions}> {dbVersion || 'not connected'}</button>
-				</div>
-			</div>
-		</div>
+		<table class="table table-sm">
+			<tbody>
+				<tr>
+					<td>Client Version:</td>
+					<td>{version}</td>
+				</tr>
+				<tr>
+					<td>Analysis Version:</td>
+					<td
+						role="button"
+						onclick={() => {
+							analysisServer
+								.get('version')
+								.then((res) => {
+									aSVersion = res;
+								})
+								.catch(() => {
+									aSVersion = undefined;
+								});
+						}}
+					>
+						{aSVersion || 'not connected'}
+					</td>
+				</tr>
+				<tr>
+					<td>User:</td>
+					<td
+            role="button"
+						onclick={() => {
+							dbServer
+								.get('users/me')
+								.then((res) => {
+									$user = res;
+								})
+								.catch(() => {
+									$user = undefined;
+								});
+						}}
+					>
+						{#if $user}
+							{`${$user.first_name} ${$user.last_name}` || 'not connected'}
+						{:else}
+							not logged in
+						{/if}
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
-
-
-

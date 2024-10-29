@@ -14,7 +14,8 @@ import {
 	truncate,
 	fa_versions,
 	binData,
-  bootTime
+  bootTime,
+  isComplete
 } from '$lib/stores/analysis';
 import {MA} from '$lib/analysis/ma';
 import { get } from 'svelte/store';
@@ -23,6 +24,12 @@ import { writable } from 'svelte/store';
 import {base} from '$app/paths';
 import {analysisServer} from '$lib/api';
 
+
+export function checkComplete() {
+  if (!get(manNames) || !get(bin)) {return false}
+  if (!analyses.every((a) => (get(a) && get(a)!.scores !== undefined))) {return false}
+  return  true;
+}
 
 export function createAnalyses(mnames: string[]) {
 	manNames.set(mnames);
@@ -38,7 +45,7 @@ export function createAnalyses(mnames: string[]) {
 				if (value) {
 					s[i] =
 						value.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
-						(value?.mdef?.info?.k | value.k);
+						(value.mdef?.info.k | value.k);
 				} else {
 					s[i] = 0;
 				}
@@ -48,6 +55,8 @@ export function createAnalyses(mnames: string[]) {
 			fa_versions.update((v) => {
 				return [...new Set([...v, ...Object.keys(value?.history || [])])];
 			});
+
+      isComplete.set(checkComplete());
 		});
 	});
 }
@@ -67,6 +76,7 @@ export function clearAnalysis() {
 	analyses.length = 0;
 	running.length = 0;
 	runInfo.length = 0;
+
 }
 
 export async function createAnalysisExport(small: boolean = false) {
@@ -92,9 +102,6 @@ export async function importAnalysis(data: Record<string, any>) {
 	data.mans.forEach((ma, i) => {
 		MA.parse(ma).then(res=>{analyses[i].set(res)});
 	});
-
-
-
 }
 
 export async function loadExample() {
@@ -133,7 +140,6 @@ export async function analyseManoeuvre(id: number, optimise: boolean | undefined
 			running[id].set(false);
 		});
   } 
-
-	
 }
+
 

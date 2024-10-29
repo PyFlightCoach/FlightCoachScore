@@ -4,7 +4,7 @@
 
 	let man = analyses[$selManID!];
 	$: isRunning = running[$selManID!];
-	const plink = (name: string) => base + '/analysis/results/manoeuvre/' + name;
+	const plink = (name: string) => base + '/flight/results/manoeuvre/' + name;
 </script>
 
 <li class="nav-item">
@@ -20,6 +20,6 @@
 					<li class="page-item"><a class="nav-link" href={plink('templates')}>Templates</a></li>
 				{/if}
 		{/if}
-		<li class="page-item"><a class="nav-link" href={base + '/analysis/results'}>Back</a></li>
+		<li class="page-item"><a class="nav-link" href={base + '/flight/results'}>Back</a></li>
 	</ul>
 </li>

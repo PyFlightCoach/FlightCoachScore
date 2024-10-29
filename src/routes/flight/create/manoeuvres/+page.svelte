@@ -212,7 +212,7 @@
 				)
 			);
 		});
-		goto(base + '/analysis/results');
+		goto(base + '/flight/results');
 	}
 </script>
 

@@ -27,7 +27,6 @@ export const scores: Writable<number[] | undefined> = writable();
 export const totalScore: Writable<string> = writable('---');
 export const fa_versions: Writable<string[]> = writable([]);
 
-
 fa_versions.subscribe((value) => {
   if (value.length > 0) {
     selectedResult.set(value[value.length - 1]);
@@ -65,6 +64,11 @@ difficulty.subscribe((value) => {
 truncate.subscribe((value) => {
 	updateScores(get(selectedResult), get(difficulty), value);
 });
+
+
+export const isComplete: Writable<boolean> = writable(false);
+
+
 
 
 export const manoeuvres: Writable<Record<string, ManDetails[]>> = writable({});

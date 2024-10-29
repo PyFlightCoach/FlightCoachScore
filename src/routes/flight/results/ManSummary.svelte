@@ -31,7 +31,7 @@
 
 	function activate_man(id: number, page: string) {
 		$selManID = id;
-		goto(base + '/analysis/results/manoeuvre/' + page);
+		goto(base + '/flight/results/manoeuvre/' + page);
 	}
 
 </script>

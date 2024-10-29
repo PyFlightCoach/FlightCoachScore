@@ -11,7 +11,7 @@ export async function load() {
 			console.log('Loading example data');
 			loadExample();
 		} else {
-			goto(base + '/analysis/create/data');
+			goto(base + '/flight/create/data');
 		}
 	}
 }

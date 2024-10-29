@@ -1,26 +1,33 @@
 <script lang="ts">
 	import BINWorker from '$lib/JsDataflashParser/parser.js?worker';
-	import pkg from 'file-saver';
+	import { saveAs } from 'file-saver';
 	import { BinData, BinField } from '$lib/components/bin/bindata';
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
-	const { saveAs } = pkg;
 
 	const worker = new BINWorker();
 
-	export let messages: string[] = ['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'ORGN', 'RCIN'];
-	export let binData: BinData | undefined = undefined;
-	export let bin: File | undefined = undefined;
-	export let bootTime: Date | undefined = undefined;
-	export let busy: boolean = false;
-	export let download: boolean = false;
-  export let clear: boolean = false;
-	let files: FileList;
+  let bin: File | undefined = $state();
+  let binData: BinData | undefined = $state();
+	let bootTime: Date | undefined = $state();
 
-	let availableMessages: Record<string, any>;
-	let loadedMessages: Record<string, boolean> = {};
-	let percent: number;
+	let {
+		messages = $bindable(['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'ORGN']),
+		busy = $bindable(false),
+		download = false,
+		clear = false,
+		onloaded = () => {}
+	}: {
+		messages: string[];
+		busy: boolean;
+		download: boolean;
+		clear: boolean;
+		onloaded: (bin: File, binData: BinData, bootTime: Date) => void;
+	} = $props();
+
+	let files: FileList | undefined = $state();
+	let availableMessages: Record<string, any> | undefined = $state();
+	let loadedMessages: Record<string, boolean> = $state({});
+	let percent: number | undefined = $state();
+
 	worker.onmessage = (event) => {
 		if (event.data.hasOwnProperty('availableMessages')) {
 			availableMessages = event.data.availableMessages;
@@ -40,7 +47,7 @@
 			bootTime = new Date(Date.parse(event.data.metadata.bootTime));
 		} else if (event.data.hasOwnProperty('messagesDoneLoading')) {
 			busy = false;
-			dispatch('loaded', { bin, binData, bootTime });
+			onloaded(bin!, binData!, bootTime!);
 		}
 	};
 
@@ -52,7 +59,7 @@
 			worker.postMessage({
 				action: 'parse',
 				file: dat,
-				msgs: msgs
+				msgs: $state.snapshot(msgs)
 			});
 		};
 		reader.readAsArrayBuffer(bin!);
@@ -105,17 +112,19 @@
 	{#if files && files.length > 0}
 		<button
 			class="btn form-control btn-outline-secondary"
-			on:click={() => {
-				parseBin(files[0]);
+			onclick={() => {
+				if (files && files.length > 0) {
+					parseBin(files[0]);
+				}
 			}}>Load</button
 		>
 	{/if}
 	{#if !binData}
-    {#if clear}
-		<button class="form-control btn btn-outline-secondary" on:click={clearData}>Clear Bin</button>
-    {/if}
+		{#if clear}
+			<button class="form-control btn btn-outline-secondary" onclick={clearData}>Clear Bin</button>
+		{/if}
 		{#if download}
-			<button class="form-control btn btn-outline-secondary" on:click={saveData}>Download</button>
+			<button class="form-control btn btn-outline-secondary" onclick={saveData}>Download</button>
 		{/if}
 	{/if}
 {:else}

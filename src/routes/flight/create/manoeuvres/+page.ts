@@ -10,9 +10,9 @@ import { States } from '$lib/analysis/state';
 export async function load({ fetch }) {
 	if (!dev) {
 		if (!get(binData)) {
-			goto(base + '/analysis/create/data');
+			goto(base + '/flight/create/data');
 		} else if (!get(origin)) {
-			goto(base + '/analysis/create/origin');
+			goto(base + '/flight/create/origin');
 		}
 	} else {
 		if (!get(binData)) {

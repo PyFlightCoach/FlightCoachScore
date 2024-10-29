@@ -2,8 +2,31 @@ import { Point, Quaternion, GPS } from '$lib/analysis/geometry';
 import { FCJson, Origin } from '$lib/analysis/fcjson';
 import { BinField } from '$lib/components/bin/bindata';
 
+
+interface St {
+  x: number,
+  y: number,
+  z: number,
+  rw: number,
+  rx: number,
+  ry: number,
+  rz: number,
+  u: number | undefined,
+  v: number | undefined,
+  w: number | undefined,
+  p: number | undefined,
+  q: number | undefined,
+  r: number | undefined,
+  du: number | undefined,
+  dv: number | undefined,
+  dw: number | undefined,
+  manoeuvre: string | undefined,
+  element: string | undefined,
+}
+
+
 export class State {
-	constructor(data: Record<string, number | string>) {
+	constructor(data: St) {
 		return Object.setPrototypeOf(data, State.prototype);
 	}
 

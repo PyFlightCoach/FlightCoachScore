@@ -4,9 +4,10 @@
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import SettingsMenu from './SettingsMenu.svelte';
+	import { user } from '$lib/stores/user';
 </script>
 
-<nav class="navbar navbar-expand-sm bg-body-tertiary" data-bs-theme="dark">
+<nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
 	<div class="container-fluid">
 		<a class="navbar-brand" href={base + '/'}>FCScore</a>
 
@@ -24,17 +25,25 @@
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<div class="container-fluid">
-        <div class='row'> 
-				<ul class="navbar-nav col-3 mr-auto">
-					<UserMenu />
-					<FlightMenu />
-					<DataBaseMenu />
-					<SettingsMenu />
-				</ul>
-				<ul class="navbar-nav col-6 mr-auto">
-					<slot />
-				</ul>
-        <div class='row'> 
+				<div class="row">
+					<ul class="navbar-nav col-3 mr-auto">
+						<UserMenu />
+						<FlightMenu />
+						<DataBaseMenu />
+						<SettingsMenu />
+					</ul>
+					<ul class="navbar-nav col-8 mr-auto">
+						<slot />
+					</ul>
+
+					<span class="navbar-text col-1 mr-auto text-nowrap">
+						{#if $user}
+							{$user.first_name} {$user.last_name}
+						{:else}
+							Not Logged In
+						{/if}
+          </span>
+				</div>
 			</div>
 		</div>
 	</div>
