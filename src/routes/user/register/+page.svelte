@@ -2,7 +2,8 @@
 	import { dbServer } from '$lib/api';
 	import { countries, split_country } from '$lib/countries.js';
 	import { goto } from '$app/navigation';
-
+  import {base} from '$app/paths';
+  
 	let form_state: string | undefined;
 
 	async function _handleSubmit(event: Event) {
@@ -25,7 +26,7 @@
 			const res = await dbServer.post('auth/register', user);
 
 			// Registration was successful
-			goto(`/verify-request?email=${user.email}`);
+			goto(`${base}/user/verify-request?email=${user.email}`);
 		} catch (error) {
 			form_state = 'Oops...something has gone wrong. Please try again later.';
 		}

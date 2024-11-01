@@ -54,68 +54,74 @@
 </script>
 
 <div class="col-12 border">
-<PlotDTW sts={states} bind:activeEl={element} sp={3} />
+	<PlotDTW sts={states} bind:activeEl={element} sp={3} />
 
-<nav class="navbar fixed-bottom navbar-dark bg-dark">
-	<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-		<div class="input-group">
-			<select
-				class="form-control-sm form-select"
-				title="Select element to edit or click ribbon"
-				bind:value={element}
-			>
-				{#each ['Select Element'].concat(...Object.keys(states)) as el}
-					<option value={el}>{el}</option>
-				{/each}
-			</select>
-			<input
-				title="Enter step size in seconds"
-				class="form-control-sm"
-				type="number"
-				id="stepsize"
-				bind:value={step}
-				step="0.1"
-			/>
-			<button
-				class="form-control-sm btn btn-outline-secondary"
-				title="Adjust split location backwards"
-				on:click={() => {
-					editsplit(-Number(step), element);
-				}}>&#60</button
-			>
-			<button
-				class="form-control-sm btn btn-outline-secondary"
-				title="Run aligment optimisation"
-				on:click={() => {
-					editsplit(Number(step), element);
-				}}>&#62</button
-			>
-			<button
-				class="form-control-sm btn btn-outline-secondary"
-				title="Recalculate score without optimisation"
-				on:click={() => {
-					if ($selManID) {
-						analyseManoeuvre($selManID, true, true);
-					}
-				}}>Optimise</button
-			>
-			<button
-				class="form-control-sm btn btn-outline-secondary"
-				title="Adjust split location forwards"
-				on:click={() => {
-					if ($selManID) {
-						analyseManoeuvre($selManID, false, true);
-					}
-				}}>Score</button
-			>
-			<a
-				class="form-control-sm btn btn-outline-secondary"
-				title="Back to Main Page"
-        href={base + "/analysis/results"}
-				>
-        back
-      
-      </a>
-	</ul>
-</nav>
+	<nav class="navbar fixed-bottom">
+		<div class="container-fluid justify-content-md-center">
+			<div class="row">
+        <div class="col">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<div class="input-group">
+						<select
+							class="form-control-sm form-select"
+							title="Select element to edit or click ribbon"
+							bind:value={element}
+						>
+							{#each ['Select Element'].concat(...Object.keys(states)) as el}
+								<option value={el}>{el}</option>
+							{/each}
+						</select>
+						<input
+							title="Enter step size in seconds"
+							class="form-control-sm"
+							type="number"
+							id="stepsize"
+							bind:value={step}
+							step="0.1"
+						/>
+						<button
+							class="form-control-sm btn btn-outline-secondary"
+							title="Adjust split location backwards"
+							on:click={() => {
+								editsplit(-Number(step), element);
+							}}>&#60</button
+						>
+						<button
+							class="form-control-sm btn btn-outline-secondary"
+							title="Run aligment optimisation"
+							on:click={() => {
+								editsplit(Number(step), element);
+							}}>&#62</button
+						>
+						<button
+							class="form-control-sm btn btn-outline-secondary"
+							title="Recalculate score without optimisation"
+							on:click={() => {
+								if ($selManID) {
+									analyseManoeuvre($selManID, true, true);
+								}
+							}}>Optimise</button
+						>
+						<button
+							class="form-control-sm btn btn-outline-secondary"
+							title="Adjust split location forwards"
+							on:click={() => {
+								if ($selManID) {
+									analyseManoeuvre($selManID, false, true);
+								}
+							}}>Score</button
+						>
+						<a
+							class="form-control-sm btn btn-outline-secondary"
+							title="Back to Main Page"
+							href={base + '/analysis/results'}
+						>
+							back
+						</a>
+					</div>
+				</ul>
+      </div>
+			</div>
+		</div>
+	</nav>
 </div>

@@ -15,8 +15,8 @@
 
 <li class="nav-item">
 <ul class="pagination">
-  <li class="page-item"><a class="nav-link {datActive} {datEnabled}" href={base + "/analysis/create/data"}>1 Load Flight Data</a></li>
-  <li class="page-item"><a class="nav-link {boxActive} {boxEnabled}" href={base + "/analysis/create/box"}>2 Define the Box</a></li>
-  <li class="page-item"><a class="nav-link {manActive} {manEnabled}" href={base + "/analysis/create/manoeuvres"}>3 Select Manoeuvres</a></li>
+  <li class="page-item"><a class="nav-link {datActive} {datEnabled}" href={base + "/flight/create/data"}>1 Load Flight Data</a></li>
+  <li class="page-item"><a class="nav-link {boxActive} {boxEnabled}" href={base + "/flight/create/box"}>2 Define the Box</a></li>
+  <li class="page-item"><a class="nav-link {manActive} {manEnabled}" href={base + "/flight/create/manoeuvres"}>3 Select Manoeuvres</a></li>
 </ul>
 </li>

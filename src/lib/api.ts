@@ -14,7 +14,6 @@ export class Server {
       }
 			
 		} else {
-      console.log(response)
 			throw new Error(`${this.address}: Error ${response.statusText}: ${(await response.json()).detail}`);
 		}
 	}
@@ -30,8 +29,6 @@ export class Server {
       credentials: 'include',
       ...(data ? {body: (data instanceof FormData) ? data : JSON.stringify(data)} : {})
     };
-    console.log(_path);
-    console.log(_request);
     return await this.handleResponse(
       await fetch(_path, _request)
     );

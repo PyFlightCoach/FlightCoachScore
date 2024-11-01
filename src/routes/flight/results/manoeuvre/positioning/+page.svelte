@@ -29,62 +29,57 @@
 	$: boxfunc = { RectangularBox: iacBoxTrace, TriangularBox: f3aBoxTrace }[$man!.mdef!.box.Kind]!;
 </script>
 
-<div class="col-12 d-flex">
-		<div class="row bg-justify-content-center">
-			<div class="col-md-4">
-				<table class="table">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Weighted Mean</th>
-							<th>Mean Visibility</th>
-							<th>Downgrade</th>
-						</tr>
-					</thead>
+<div class="col-4 justify-content-md-center border">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Values</th>
+				<th>Visibility</th>
+				<th>Downgrade</th>
+			</tr>
+		</thead>
 
-					<tbody>
-						{#each Object.values($man.scores.positioning.data) as pos}
-							{#if pos.dgs.length > 0}
-								<tr>
-									<td>{pos.name}</td>
-									<td>
-										{pos.errors.map((e) =>
-											(e * (pos.measurement.unit.includes('rad') ? 180 / Math.PI : 1)).toFixed(2)
-										)}
-										{pos.measurement.unit.replace('rad', 'deg')}
-									</td>
-									<td>
-										{'visibility' in pos.measurement ? pos.measurement.visibility[0].toFixed(2) : 1}
-									</td>
-									<td>{pos.total.toFixed(2)}</td>
-								</tr>
-							{/if}
-						{/each}
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<div class="row flex-grow-1">
-			<div class="col">
-				<Plot
-					data={coloured_ribbons(states, 2)
-						.concat(
-							points(
-								centre_points,
-								$man.mdef.info.centre_points.map((i) => 'centre point '.concat(i.toString()))
-							)
-						)
-						.concat(
-							points(
-								el_points,
-								$man.mdef.info.centred_els.map((i) => 'centred el '.concat(i[0].toString()))
-							)
-						)
-						.concat([boxfunc()])}
-					layout={layout3d}
-					fillParent={true}
-				/>
-			</div>
-		</div>
+		<tbody>
+			{#each Object.values($man.scores.positioning.data) as pos}
+				{#if pos.dgs.length > 0}
+					<tr>
+						<td>{pos.name}</td>
+						<td>
+							{pos.errors.map((e) =>
+								(e * (pos.measurement.unit.includes('rad') ? 180 / Math.PI : 1)).toFixed(2)
+							)}
+							{pos.measurement.unit.replace('rad', 'deg')}
+						</td>
+						<td>
+              
+							{pos.keys.map(k=>pos.measurement.visibility[pos.sample_keys[k]].toFixed(2)).join(', ')}
+						</td>
+						<td>{pos.total.toFixed(2)}</td>
+					</tr>
+				{/if}
+			{/each}
+		</tbody>
+	</table>
+</div>
 
+<div class="col-8 border">
+	<Plot
+		data={coloured_ribbons(states, 2)
+			.concat(
+				points(
+					centre_points,
+					$man.mdef.info.centre_points.map((i) => 'centre point '.concat(i.toString()))
+				)
+			)
+			.concat(
+				points(
+					el_points,
+					$man.mdef.info.centred_els.map((i) => 'centred el '.concat(i[0].toString()))
+				)
+			)
+			.concat([boxfunc()])}
+		layout={layout3d}
+		fillParent={true}
+	/>
 </div>

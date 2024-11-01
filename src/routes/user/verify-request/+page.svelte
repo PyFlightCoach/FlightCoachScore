@@ -1,15 +1,9 @@
-<script lang='ts'>
-	
+<script lang="ts">
 	export let data;
-
 </script>
 
-<div class="container">
-    <div class="row mt-4">
-        <p class="lead">
-            {data.request_result}
-        </p>
-    </div>
-</div>    
-
-    
+<div class="col-md-6 pt-5">
+	<p class="lead">
+		{data.request_result}
+	</p>
+</div>

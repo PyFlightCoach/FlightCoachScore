@@ -36,7 +36,7 @@
 	<ColouredTable data={summaries} bind:activeRow={activeDGName} bind:activeCol={activeCriteria} />
 </div>
 
-<div class="col-8 d-flex flex-column">
+<div class="col-8 d-flex flex-column border">
 	{#if !activeCriteria}
 		{#if !activeED}
 			<PlotDTW sts={states} bind:activeEl={activeED} sp={4} />
@@ -51,7 +51,7 @@
 			/>
 		{/if}
 	{:else}
-		<div class="col-12 flex-grow-1 border d-flex flex-row">
+		<div class="col-12 flex-grow-1 border d-flex flex-row border">
 			<div class="col-6 border">
 				<PlotSec
 					flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
@@ -81,14 +81,14 @@
 					{/if}
 				</div>
 				<div class="col-12 flex-grow-1 d-flex flex-row border">
-					<div class="col-6">
+					<div class="col-6 border">
 						<VisPlot
 							{result}
 							downgrade={dg}
 							vis={activeIndex ? result?.measurement.visibility[activeIndex] : undefined}
 						/>
 					</div>
-					<div class="col-6">
+					<div class="col-6 border">
 						<CriteriaPlot {result} downgrade={dg} />
 					</div>
 				</div>

@@ -1,12 +1,14 @@
 <script lang="ts">
-
-	export let data;
+	import { base } from '$app/paths';
+  export let data;
 
 </script>
 
-<p class="text-xs-center">
-	Thank you for completing verification {data.first_name} {data.last_name} ({data.email}).
+<div class="col-md-6 pt-5">
+<p class="lead">
+	Thank you for completing verification. ({data.first_name} {data.last_name}, {data.email})
 </p>
-<p class="text-xs-center">
-	You can now login in to FC Score Databse and start uploading your flights!
+<p class="lead">
+	You can now <a href="{base}/user/login">login</a> in to the FC Score Database and start uploading your flights!
 </p>
+</div>

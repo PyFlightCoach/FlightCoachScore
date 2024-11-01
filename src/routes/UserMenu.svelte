@@ -3,6 +3,7 @@
 	import { base } from '$app/paths';
   import {user} from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
+	import { goto } from '$app/navigation';
 
 </script>
 
@@ -14,7 +15,8 @@
 			class="btn dropdown-item"
 			onclick={() => {
         dbServer.post('auth/jwt/logout', {});
-        $user =undefined
+        $user =undefined;
+        goto(base + '/');
       }}>Logout
     </button>
 	{:else}

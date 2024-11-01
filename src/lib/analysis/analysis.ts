@@ -14,21 +14,24 @@ import {
 	truncate,
 	fa_versions,
 	binData,
-  bootTime,
-  isComplete
+	bootTime,
+	isComplete
 } from '$lib/stores/analysis';
-import {MA} from '$lib/analysis/ma';
+import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { fcj } from '$lib/stores/analysis';
 import { writable } from 'svelte/store';
-import {base} from '$app/paths';
-import {analysisServer} from '$lib/api';
-
+import { base } from '$app/paths';
+import { analysisServer } from '$lib/api';
 
 export function checkComplete() {
-  if (!get(manNames) || !get(bin)) {return false}
-  if (!analyses.every((a) => (get(a) && get(a)!.scores !== undefined))) {return false}
-  return  true;
+	if (!get(manNames) || !get(bin)) {
+		return false;
+	}
+	if (!analyses.every((a) => get(a) && get(a)!.scores !== undefined)) {
+		return false;
+	}
+	return true;
 }
 
 export function createAnalyses(mnames: string[]) {
@@ -56,7 +59,7 @@ export function createAnalyses(mnames: string[]) {
 				return [...new Set([...v, ...Object.keys(value?.history || [])])];
 			});
 
-      isComplete.set(checkComplete());
+			isComplete.set(checkComplete());
 		});
 	});
 }
@@ -69,14 +72,13 @@ export function clearAnalysis() {
 	selectedResult.set(undefined);
 	fa_versions.set([]);
 	binData.set(undefined);
-  bootTime.set(undefined);
+	bootTime.set(undefined);
 	origin.set(undefined);
 	fcj.set(undefined);
 	bin.set(undefined);
 	analyses.length = 0;
 	running.length = 0;
 	runInfo.length = 0;
-
 }
 
 export async function createAnalysisExport(small: boolean = false) {
@@ -85,29 +87,35 @@ export async function createAnalysisExport(small: boolean = false) {
 		isComp: get(isCompFlight),
 		sourceBin: get(bin)?.name || undefined,
 		sourceFCJ: get(fcj)?.name || undefined,
-    bootTime: get(bootTime)?.toISOString() || undefined,
+		bootTime: get(bootTime)?.toISOString() || undefined,
 		mans: analyses.map((_ma) => (small ? get(_ma)!.shortExport() : get(_ma)!.longExport()))
 	};
 }
 
+export async function exportAnalysis(small: boolean = false) {
+	return new Blob([JSON.stringify(await createAnalysisExport(small), null, 2)], {
+		type: 'application/json'
+	});
+}
 
 export async function importAnalysis(data: Record<string, any>) {
 	clearAnalysis();
 	origin.set(data.origin);
 	isCompFlight.set(data.isComp);
-  bootTime.set( data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);
+	bootTime.set(data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);
 
 	createAnalyses(data.mans.map((ma: MA) => ma.name));
 
 	data.mans.forEach((ma, i) => {
-		MA.parse(ma).then(res=>{analyses[i].set(res)});
+		MA.parse(ma).then((res) => {
+			analyses[i].set(res);
+		});
 	});
 }
 
 export async function loadExample() {
 	clearAnalysis();
-  importAnalysis(await (await fetch(`${base}/example/example_analysis.ajson`)).json());
-	
+	importAnalysis(await (await fetch(`${base}/example/example_analysis.ajson`)).json());
 }
 
 export async function analyseMans(ids: number[]) {
@@ -117,20 +125,22 @@ export async function analyseMans(ids: number[]) {
 }
 
 export async function analyseAll() {
-	analyses.forEach(async (ma, i) => {   
-    await analyseManoeuvre(i);
+	analyses.forEach(async (ma, i) => {
+		await analyseManoeuvre(i);
 	});
 }
 
 export async function analyseManoeuvre(id: number, optimise: boolean | undefined = undefined) {
 	const ma = get(analyses[id]);
 
-  const isReRun = Object.keys(ma!.history).includes(await analysisServer.get('fa_version'));
+	const isReRun = Object.keys(ma!.history).includes(await analysisServer.get('fa_version'));
 
-  if (optimise === undefined) { optimise = !isReRun} //optimise if for new analysis version
+	if (optimise === undefined) {
+		optimise = !isReRun;
+	} //optimise if for new analysis version
 
-  if ((! ma!.scores || optimise) && !get(running[id])) { 
-    //if scores exist, only run if server version not in history
+	if ((!ma!.scores || optimise) && !get(running[id])) {
+		//if scores exist, only run if server version not in history
 
 		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
 		running[id].set(true);
@@ -139,7 +149,5 @@ export async function analyseManoeuvre(id: number, optimise: boolean | undefined
 			analyses[id].set(res);
 			running[id].set(false);
 		});
-  } 
+	}
 }
-
-
