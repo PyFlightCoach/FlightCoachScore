@@ -103,9 +103,15 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 
 	let direction: string = 'Infer';
 	if (get(isCompFlight)) {
-		const ddef = await mans[analysisMans[0]].sinfo!.direction_definition();
+    let ddef;
+    try {
+      ddef = await mans[analysisMans[0]].sinfo!.direction_definition();
+    } catch {
+      ddef = {manid: 0, direction: 'UPWIND'};
+    }
+		
 
-		const heading = sts.data[mans[analysisMans[ddef.manid - 1]].stop!].direction_str();
+		const heading = sts.data[mans[ddef.manid].stop!].direction_str();
 		if (ddef.direction == 'DOWNWIND') {
 			direction = heading == 'RTOL' ? 'LTOR' : 'RTOL';
 		} else if (ddef.direction == 'UPWIND') {

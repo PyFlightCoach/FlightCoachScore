@@ -7,7 +7,11 @@
 	import { FCJson, Origin } from '$lib/analysis/fcjson';
 	import { States } from '$lib/analysis/state';
 
-	let _bd: [File, BinData, Date] | undefined = undefined;
+	
+  let _bin: File | undefined = undefined;
+  let _binData: BinData | undefined = undefined;
+  let _bootTime: Date | undefined = undefined;
+
 	let _fcj: FCJson | undefined = undefined;
   let _states: States | undefined = undefined;
 	let getmans: boolean = true;
@@ -21,7 +25,9 @@
 	};
 
 	$: if (inputMode) {
-		_bd = undefined;
+		_bin = undefined;
+    _binData = undefined;
+    _bootTime = undefined;
 		_fcj = undefined;
 	}
 
@@ -65,18 +71,18 @@
 			{#if inputMode === 'bin'}
 				<BinReader
 					onloaded={(...data) => {
-						_bd = data;
+						[_bin, _binData, _bootTime] = data;
 					}}
 				/>
-				{#if _bd}
+				{#if _binData}
 					<a
 						type="button"
 						href={base + '/flight/create/box'}
 						class="btn btn-outline-primary form-control"
 						on:click={() => {
-							$bin = _bd[0];
-							$binData = _bd[1];
-							$bootTime = _bd[2];
+							$bin = _bin;
+							$binData = _binData;
+							$bootTime = _bootTime;
 						}}
 					>
 						Next
@@ -140,8 +146,8 @@
 		</div>
 	</div>
 	<div class="row">
-		{#if inputMode === 'bin' && $binData}
-			<FieldInfo bind:binData={$binData} />
+		{#if inputMode === 'bin' && _binData}
+			<FieldInfo bind:binData={_binData} />
 		{/if}
 	</div>
 </div>
