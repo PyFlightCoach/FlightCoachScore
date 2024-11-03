@@ -4,6 +4,7 @@
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
   import ToggleButton from '$lib/components/ToggleButton.svelte';
+	import { result } from 'lodash';
 
 	$navBarContents = AnalysisMenu;
 </script>
@@ -29,7 +30,12 @@
 
   </div>
 	<p class="small">
-		Showing results for {$bin?.name || '(add DB Identifier)'} from analysis code version {$selectedResult}
+
+    {#if $selectedResult}
+		  Showing results for {$bin?.name || '(add DB Identifier)'} from analysis code version {$selectedResult}
+    {:else if $fa_versions.length == 0}
+      Run some analyses to view result
+    {/if}
 	</p>
 	<AnalysisSummary />
 	<h2>Total Score = {$totalScore}</h2>

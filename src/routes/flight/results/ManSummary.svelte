@@ -98,8 +98,13 @@
 			class="bg-secondary text-center"
 			on:click={() => {
 				analyseManoeuvre(id);
-			}}>Run</td
-		>
+			}}
+      on:dblclick={() => {
+        analyseManoeuvre(id, true);
+      }}
+    >
+      Run
+    </td>
 	{/if}
 
 	<td

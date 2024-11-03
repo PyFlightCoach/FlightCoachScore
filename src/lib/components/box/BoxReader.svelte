@@ -35,7 +35,7 @@
 
 	let inputMode = 'fcj';
 
-  const inputNames = {
+  const inputNames : Record<string, string> = {
     pc: 'Pilot, Centre',
     ph: 'Pilot, Heading',
     fcj: 'F3A Zone / FC JSON File',
@@ -54,10 +54,9 @@
 		{inputNames[inputMode] || 'Select Input Mode'}
 	</button>
 	<ul class="dropdown-menu">
-		<li><ToggleButton bind:group={inputMode} value="pc">{inputNames["pc"]}</ToggleButton></li>
-		<li><ToggleButton bind:group={inputMode} value="ph">{inputNames["ph"]}</ToggleButton></li>
-		<li><ToggleButton bind:group={inputMode} value="fcj">{inputNames["fcj"]}</ToggleButton></li>
-		<li><ToggleButton bind:group={inputMode} value="bin">{inputNames["bin"]}</ToggleButton></li>
+    {#each Object.entries(inputNames) as [k, v]}
+      <li><ToggleButton bind:group={inputMode} value={k}>{v}</ToggleButton></li>
+    {/each}
 	</ul>
 	{#if inputMode === 'fcj'}
 		<BoxFile bind:origin bind:fcjson />

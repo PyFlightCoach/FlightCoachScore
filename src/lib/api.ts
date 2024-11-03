@@ -1,5 +1,5 @@
 import { newCookieStore } from '$lib/utils/cookieStore';
-import { goto } from '$app/navigation';
+
 
 export class Server {
 	constructor(readonly address: string) {}
@@ -68,7 +68,7 @@ export const analysisServerAddress = newCookieStore(
 );
 
 export let dbServer: Server;
-export const ukDBServer: string = 'https://madeupmodels.com:5000';
+export const ukDBServer: string = 'https://madeupmodels.com:5012';
 export const customDBServer = newCookieStore('customDBServer', 'http://localhost:8000');
 export const dbServerAddress = newCookieStore(
   'dbServer', 

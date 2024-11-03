@@ -2,7 +2,7 @@ import { States } from '$lib/analysis/state';
 import { Manoeuvre } from '$lib/analysis/manoeuvre';
 import { ManDef } from '$lib/analysis/mandef';
 import { ManoeuvreResult } from '$lib/analysis/scores';
-import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/analysis/fcjson';
+import { FCJManResult, FCJScore, Origin, ScheduleInfo } from '$lib/analysis/fcjson';
 import { analysisServer } from '$lib/api';
 import { selectedResult, runInfo, binData, origin, loadManoeuvres } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
@@ -57,7 +57,7 @@ export class MA {
 					schedule: this.schedule.name,
 					schedule_direction: this.scheduleDirection,
 					flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
-					origin: get(origin),
+					origin: get(origin) || new Origin(0,0,0,0),
 					optimise_alignment: optimise
 				},
 			);

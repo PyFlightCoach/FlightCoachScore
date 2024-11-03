@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { FCJson, Origin } from '$lib/analysis/fcjson';
-	import { Point } from '$lib/analysis/geometry';
 	import pkg from 'file-saver';
 
 	const { saveAs } = pkg;

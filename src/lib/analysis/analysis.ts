@@ -15,14 +15,17 @@ import {
 	fa_versions,
 	binData,
 	bootTime,
-	isComplete
+	isComplete,
+	manoeuvres,
+	fcj
 } from '$lib/stores/analysis';
 import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
-import { fcj } from '$lib/stores/analysis';
 import { writable } from 'svelte/store';
 import { base } from '$app/paths';
 import { analysisServer } from '$lib/api';
+import { States } from '$lib/analysis/state';
+import { ManSplit } from '$lib/analysis/splitting';
 
 export function checkComplete() {
 	if (!get(manNames) || !get(bin)) {
@@ -81,6 +84,57 @@ export function clearAnalysis() {
 	runInfo.length = 0;
 }
 
+export async function createAnalysis(sts: States, mans: ManSplit[]) {
+	const analysisMans: number[] = [];
+
+	mans.forEach((man, i) => {
+		if (man.sinfo) {
+			analysisMans.push(i);
+		}
+	});
+
+	createAnalyses(analysisMans.map((i) => mans[i].name));
+
+	if (get(binData)) {
+		origin.update((orgn) => {
+			return Object.assign(orgn!, orgn!.noMove());
+		});
+	}
+
+	let direction: string = 'Infer';
+	if (get(isCompFlight)) {
+		const ddef = await mans[analysisMans[0]].sinfo!.direction_definition();
+
+		const heading = sts.data[mans[analysisMans[ddef.manid - 1]].stop!].direction_str();
+		if (ddef.direction == 'DOWNWIND') {
+			direction = heading == 'RTOL' ? 'LTOR' : 'RTOL';
+		} else if (ddef.direction == 'UPWIND') {
+			direction = heading == 'RTOL' ? 'RTOL' : 'LTOR';
+		} else {
+			throw new Error(`Invalid direction definition ${ddef.direction}`);
+		}
+	}
+
+	analysisMans.forEach((id, i) => {
+		analyses[i].set(
+			new MA(
+				mans[id].name,
+				i + 1,
+				id > 0 ? sts.data[mans[id - 1].stop!].t : 0,
+				sts.data[mans[id].stop!].t,
+				mans[id].sinfo!,
+				direction,
+				get(fcj)?.manhistory(id) || {},
+				get(manoeuvres)[mans[id].sinfo!.to_string()][mans[id].id! - 1].k,
+				get(binData)
+					? undefined
+					: new States(sts.data.slice(id > 0 ? mans[id - 1].stop : 0, mans[id].stop))
+			)
+		);
+	});
+	//goto(base + '/flight/results');
+}
+
 export async function createAnalysisExport(small: boolean = false) {
 	return {
 		origin: get(origin),
@@ -124,13 +178,17 @@ export async function analyseMans(ids: number[]) {
 	});
 }
 
-export async function analyseAll() {
+export async function analyseAll(force: boolean = false) {
 	analyses.forEach(async (ma, i) => {
-		await analyseManoeuvre(i);
+		await analyseManoeuvre(i, force);
 	});
 }
 
-export async function analyseManoeuvre(id: number, optimise: boolean | undefined = undefined) {
+export async function analyseManoeuvre(
+	id: number,
+  force: boolean = false,
+	optimise: boolean | undefined = undefined,
+) {
 	const ma = get(analyses[id]);
 
 	const isReRun = Object.keys(ma!.history).includes(await analysisServer.get('fa_version'));
@@ -139,7 +197,7 @@ export async function analyseManoeuvre(id: number, optimise: boolean | undefined
 		optimise = !isReRun;
 	} //optimise if for new analysis version
 
-	if ((!ma!.scores || optimise) && !get(running[id])) {
+	if ((!ma!.scores || optimise || force) && !get(running[id])) {
 		//if scores exist, only run if server version not in history
 
 		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);

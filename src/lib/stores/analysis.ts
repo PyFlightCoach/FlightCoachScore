@@ -12,12 +12,14 @@ export const isCompFlight: Writable<boolean> = writable(true);
 export const bin: Writable<File | undefined> = writable();
 export const binData: Writable<BinData | undefined> = writable();
 export const bootTime: Writable<Date | undefined> = writable();
-export const origin: Writable<Origin|undefined> = writable();
+export const origin: Writable<Origin | undefined> = writable();
 export const fcj: Writable<FCJson | undefined> = writable();
+export const states: Writable<States | undefined> = writable();
 
-binData.subscribe(() => {origin.set(undefined)});
+binData.subscribe(() => {
+	origin.set(undefined);
+});
 
-export const states: Writable<States | undefined> = writable()
 
 export const manNames: Writable<string[] | undefined> = writable();
 export const analyses: Writable<MA | undefined>[] = [];
@@ -28,9 +30,9 @@ export const totalScore: Writable<string> = writable('---');
 export const fa_versions: Writable<string[]> = writable([]);
 
 fa_versions.subscribe((value) => {
-  if (value.length > 0) {
-    selectedResult.set(value[value.length - 1]);
-  }
+	if (value.length > 0) {
+		selectedResult.set(value[value.length - 1]);
+	}
 });
 
 export const selectedResult: Writable<string | undefined> = writable();
@@ -43,18 +45,18 @@ scores.subscribe((value) => {
 });
 
 function updateScores(result: string | undefined, diff: number, trunc: boolean) {
-  if (result) {
-    scores.set(
-      analyses.map((a) => {
-        const ma = get(a);
-        return ma ? ma.get_score(result, diff, trunc).total * (ma.mdef?.info.k | ma.k) : 0;
-      })
-    );
-  }
+	if (result) {
+		scores.set(
+			analyses.map((a) => {
+				const ma = get(a);
+				return ma ? ma.get_score(result, diff, trunc).total * (ma.mdef?.info.k | ma.k) : 0;
+			})
+		);
+	}
 }
 
 selectedResult.subscribe((value) => {
-  updateScores(value, get(difficulty), get(truncate));
+	updateScores(value, get(difficulty), get(truncate));
 });
 
 difficulty.subscribe((value) => {
@@ -65,11 +67,7 @@ truncate.subscribe((value) => {
 	updateScores(get(selectedResult), get(difficulty), value);
 });
 
-
 export const isComplete: Writable<boolean> = writable(false);
-
-
-
 
 export const manoeuvres: Writable<Record<string, ManDetails[]>> = writable({});
 export const schedules: Writable<Record<string, string[]>> = writable({});
@@ -84,7 +82,7 @@ export async function loadCategories() {
 
 export async function loadSchedules(category: string) {
 	if (!get(schedules)[category]) {
-    await analysisServer.get(`/${category}/schedules`).then((res) => {
+		await analysisServer.get(`/${category}/schedules`).then((res) => {
 			schedules.update((s) => {
 				s[category] = res;
 				return s;
@@ -98,14 +96,15 @@ export async function loadManoeuvres(category: string, schedule: string) {
 	const sinfo = new ScheduleInfo(category, schedule);
 
 	if (!get(manoeuvres)[sinfo.to_string()]) {
-    await analysisServer.get(`/${category}/${schedule}/manoeuvres`).then((pfcMans) => {
+		await analysisServer.get(`/${category}/${schedule}/manoeuvres`).then((pfcMans) => {
 			manoeuvres.update((mans) => {
 				mans[`${category}_${schedule}`] = pfcMans.map(
-					m => new ManDetails(m.name, m.id, m.k, sinfo)
+					(m) => new ManDetails(m.name, m.id, m.k, sinfo)
 				);
 				return mans;
 			});
 		});
+
 	}
 	return get(manoeuvres)[sinfo.to_string()];
 }

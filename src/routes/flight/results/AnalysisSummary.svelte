@@ -23,8 +23,11 @@
 				title="Run Remaining"
 				scope="col"
 				class="bg-primary text-center"
-				on:click={() => analyseAll()}>Run</th
-			>
+				on:click={() => analyseAll()}
+        on:dblclick={() => analyseAll(true)}
+      >
+        Run
+      </th>
 			<th scope="col">Status</th>
 		</tr>
 	</thead>

@@ -107,7 +107,7 @@
 							title="Adjust split location forwards"
 							on:click={() => {
 								if ($selManID) {
-									analyseManoeuvre($selManID, false, true);
+									analyseManoeuvre($selManID, true, false);
 								}
 							}}>Score</button
 						>

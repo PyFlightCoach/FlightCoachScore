@@ -96,6 +96,11 @@ export class ScheduleInfo {
 	to_string() {
 		return `${this.category}_${this.name}`;
 	}
+
+  async direction_definition() {
+    return await analysisServer.get(`/${this.category}/${this.name}/direction_definition`)
+  }
+
 }
 
 export class FCJMan {
