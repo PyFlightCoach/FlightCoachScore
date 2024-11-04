@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bin, totalScore, analyses } from '$lib/stores/analysis';
-	import { exportAnalysis } from '$lib/analysis/analysis';
+	import { createAnalysisExport } from '$lib/analysis/analysis';
 	import { get } from 'svelte/store';
 	import { user } from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
@@ -26,18 +26,28 @@
 		});
 	}
 
-	const upload = async () => {
+	const upload = async (e: Event) => {
 		try {
-			const ajson = await exportAnalysis(true);
+			//      const js = await file_handle(ajson);
+			//      const bi = await file_handle($bin);
 
-//      const js = await file_handle(ajson);
-//      const bi = await file_handle($bin);
-
-      const form_data = new FormData();
-      form_data.append('files', new File([ajson], 'analysis.json', {type:"application/json"}));
-      form_data.append('files', $bin!);
-      const r = await dbServer.post('flight', form_data);
-
+			const form_data = new FormData();
+			form_data.append(
+				'files',
+				new File(
+					[
+						new Blob([JSON.stringify(await createAnalysisExport(true), null, 2)], {
+							type: 'application/octet-stream'
+						})
+					],
+					'analysis.ajson',
+					{ type: 'application/octet-stream' }
+				)
+			);
+			if (e.target?.include_bin!.checked && $bin) {
+				form_data.append('files', $bin);
+			}
+			const r = await dbServer.post('flight', form_data);
 		} catch {
 			form_state = 'Oops...something has gone wrong. Please try again later.';
 		}

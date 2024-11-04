@@ -5,6 +5,10 @@
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import SettingsMenu from './SettingsMenu.svelte';
 	import { user } from '$lib/stores/user';
+	import ScheduleMenu from './ScheduleMenu.svelte';
+
+
+
 </script>
 
 <nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
@@ -31,6 +35,11 @@
 						<FlightMenu />
 						<DataBaseMenu />
 						<SettingsMenu />
+            {#if $user && $user.is_superuser}
+              <ScheduleMenu />
+            {/if}
+
+
 					</ul>
 					<ul class="navbar-nav col-8 mr-auto">
 						<slot />
