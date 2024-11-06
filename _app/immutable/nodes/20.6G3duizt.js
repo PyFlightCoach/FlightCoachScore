@@ -1,0 +1,1 @@
+import"../chunks/disclose-version.Bg9kRutz.js";function n(o){sessionStorage.getItem("user")!=null&&sessionStorage.removeItem("user"),window.location.assign(window.location.origin+"/")}export{n as component};

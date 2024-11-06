@@ -1,0 +1,3 @@
+[submodule "src/lib/JsDataflashParser"]
+	path = src/lib/JsDataflashParser
+	url = git@github.com:ThomasDavid0/JsDataflashParser.git
