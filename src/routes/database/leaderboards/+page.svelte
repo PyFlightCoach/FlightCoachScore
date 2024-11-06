@@ -73,8 +73,8 @@
 					</select>
 				</div>
 				<div class="mb-3">
-					<label for="fa_version">FA Version</label>
-					<select class="form-select" id="fa_version" name="fa_version" required>
+					<label for="version">FA Version</label>
+					<select class="form-select" id="version" name="version" required>
 						{#each data.fa_versions as ver}
 							<option value={ver}>{ver}</option>
 						{/each}
