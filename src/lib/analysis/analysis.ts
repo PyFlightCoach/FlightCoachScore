@@ -184,9 +184,9 @@ export async function analyseMans(ids: number[]) {
 	});
 }
 
-export async function analyseAll(force: boolean = false) {
+export async function analyseAll(force: boolean = false, optimise: boolean | undefined = undefined) {
 	analyses.forEach(async (ma, i) => {
-		await analyseManoeuvre(i, force);
+		await analyseManoeuvre(i, force, optimise);
 	});
 }
 

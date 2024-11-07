@@ -22,10 +22,24 @@ export class Measurement {
   }
 }
 
+interface IResult {
+  name: string
+  measurement: Measurement
+  raw_sample: number[]
+  sample: number[]
+  sample_keys: number[]
+  errors: number[]
+  dgs: number[]
+  keys: string[] | number[]
+  total: number
+  criteria: Criteria
+}
+
 export class Result {
   constructor(
     readonly name: string,
     readonly measurement: Measurement,
+    readonly raw_sample: number[],
     readonly sample: number[],
     readonly sample_keys: number[],
     readonly errors: number[],
@@ -34,15 +48,12 @@ export class Result {
     readonly total: number,
     readonly criteria: Criteria
   ) {}
-  static parse(data: Record<string, any>) {
-    let m =
-      data.measurement.constructor == Object
-        ? Measurement.parse(data.measurement)
-        : data.measurement;
-
+  static parse(data: IResult) {
+    
     return new Result(
       data.name,
-      m,
+      Measurement.parse(data.measurement),
+      data.raw_sample,
       data.sample,
       data.sample_keys,
       data.errors,
@@ -67,7 +78,7 @@ export class Result {
   info() {
     const scale = this.scale();
     return this.keys.map((_k, i) => {
-      let k = this.sample_keys[_k as number];
+      const k = this.sample_keys[_k as number];
       return 'measurement = ' +
           (this.measurement.value[k] * scale).toFixed(2) +
           '<br>error = ' +

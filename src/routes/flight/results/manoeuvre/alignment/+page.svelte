@@ -97,18 +97,14 @@
 							class="form-control-sm btn btn-outline-secondary"
 							title="Recalculate score without optimisation"
 							on:click={() => {
-								if ($selManID) {
-									analyseManoeuvre($selManID, true, true);
-								}
+								analyseManoeuvre($selManID, true, true);
 							}}>Optimise</button
 						>
 						<button
 							class="form-control-sm btn btn-outline-secondary"
 							title="Adjust split location forwards"
 							on:click={() => {
-								if ($selManID) {
-									analyseManoeuvre($selManID, true, false);
-								}
+								analyseManoeuvre($selManID, true, false);
 							}}>Score</button
 						>
 						<a

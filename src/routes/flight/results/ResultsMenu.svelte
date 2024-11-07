@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
 	import { manNames, isComplete } from '$lib/stores/analysis';
-	import { clearAnalysis } from '$lib/analysis/analysis';
+	import { clearAnalysis, analyseAll } from '$lib/analysis/analysis';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 </script>
@@ -28,4 +28,7 @@
 			href={base + '/flight/results'}>Results</a
 		>
 	</ul>
+  <button class="nav-link" on:click={()=>{analyseAll(true, true)}}>
+    Optimise All
+  </button>
 {/if}

@@ -42,9 +42,7 @@
 		{
 			type: 'scatter',
 			x: result.sample_keys,
-			y: result.measurement.value.map((p, i) => {
-				return p * result.measurement.visibility[i] * scale;
-			}),
+			y: result.sample_keys.map(k=>result.raw_sample[k]),
 			name: 'raw sample',
 			line: { width: 1, color: 'grey' }
 		},
