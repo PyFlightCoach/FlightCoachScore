@@ -1,7 +1,7 @@
 <script lang="ts">
   import {dbServer} from "$lib/api";
   import NavMenu from "$lib/components/NavMenu.svelte";
-
+  import {base} from "$app/paths";
 
   const uploadSchedule = (file: File) => {
     const form_data = new FormData();
@@ -9,6 +9,9 @@
     const r = dbServer.post('schedule', form_data);
   };
 
+  const createSchedule = async (category: string, name: string) => {
+    
+  };
 
 </script>
 
@@ -28,4 +31,5 @@
     <span>Upload</span>
   </label>
   <div class="dropdown-item" >Browse</div>
+  <a class="dropdown-item" href="{base}/schedule/create" >Create</a>
 </NavMenu>

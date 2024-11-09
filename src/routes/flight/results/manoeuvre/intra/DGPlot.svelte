@@ -41,8 +41,8 @@
 		},
 		{
 			type: 'scatter',
-			x: result.sample_keys,
-			y: result.sample_keys.map(k=>result.raw_sample[k]),
+			x,
+			y: result.raw_sample.map(v=>v*scale),
 			name: 'raw sample',
 			line: { width: 1, color: 'grey' }
 		},

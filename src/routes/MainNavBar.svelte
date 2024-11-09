@@ -6,7 +6,7 @@
 	import SettingsMenu from './SettingsMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import ScheduleMenu from './ScheduleMenu.svelte';
-
+  import { dev } from '$app/environment';
 
 
 </script>
@@ -35,7 +35,7 @@
 						<FlightMenu />
 						<DataBaseMenu />
 						<SettingsMenu />
-            {#if $user && $user.is_superuser}
+            {#if $user && $user.is_superuser || dev}
               <ScheduleMenu />
             {/if}
 
