@@ -3,7 +3,7 @@ import { FCJson, Origin } from '$lib/analysis/fcjson';
 import { BinField } from '$lib/components/bin/bindata';
 
 
-interface St {
+export interface St {
   x: number,
   y: number,
   z: number,

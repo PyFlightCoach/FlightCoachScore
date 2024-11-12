@@ -18,7 +18,7 @@ export class Server {
 		}
 	}
 
-  async fetch(method: string, path: string, cookie: string|undefined=undefined, data: Record<string, any>|undefined=undefined) {
+  async fetch(method: string, path: string, cookie: string|undefined=undefined, data: Record<string, unknown>|FormData|undefined=undefined) {
     const _path = `${this.address}/${path.replace(/^\/+/g, "")}`
     const _request = {
       method: method,
@@ -34,15 +34,15 @@ export class Server {
     );
   }
 
-	async get(path: string, cookie: string|undefined=undefined) {
-		return await this.fetch('GET', path, cookie);
+	async get(path: string, data: Record<string, unknown> | FormData | undefined = undefined) {
+		return await this.fetch('GET', path, undefined, data);
 	}
-	async post(path: string, data: Record<string, any>, cookie: string|undefined=undefined) {
-		return await this.fetch('POST', path, cookie, data);
+	async post(path: string, data: Record<string, unknown> | FormData) {
+		return await this.fetch('POST', path, undefined, data);
 	}
 
-	async patch(path: string, data: Record<string, any>, cookie: string|undefined=undefined) {
-		return await this.fetch('PATCH', path, cookie, data)  
+	async patch(path: string, data: Record<string, unknown> | FormData) {
+		return await this.fetch('PATCH', path, undefined, data)  
   }
 }
 

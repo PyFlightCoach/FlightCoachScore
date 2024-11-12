@@ -2,13 +2,14 @@
 	import BINWorker from '$lib/JsDataflashParser/parser.js?worker';
 	import { saveAs } from 'file-saver';
 	import { BinData, BinField } from '$lib/components/bin/bindata';
-
+	import { md5 } from 'js-md5';
+	import { dbServer } from '$lib/api';
 	const worker = new BINWorker();
 
-  let bin: File | undefined = $state();
-  let binData: BinData | undefined = $state();
+	let bin: File | undefined = $state();
+	let binData: BinData | undefined = $state();
 	let bootTime: Date | undefined = $state();
-
+	let md5Sum: string | undefined = $state();
 	let {
 		messages = $bindable(['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'ORGN']),
 		busy = $bindable(false),
@@ -20,7 +21,7 @@
 		busy: boolean;
 		download: boolean;
 		clear: boolean;
-		onloaded: (bin: File, binData: BinData, bootTime: Date) => void;
+		onloaded: (bin: File, binData: BinData, bootTime: Date, md5Sum: string) => void;
 	} = $props();
 
 	let files: FileList | undefined = $state();
@@ -47,21 +48,23 @@
 			bootTime = new Date(Date.parse(event.data.metadata.bootTime));
 		} else if (event.data.hasOwnProperty('messagesDoneLoading')) {
 			busy = false;
-			onloaded(bin!, binData!, bootTime!);
+			onloaded(bin!, binData!, bootTime!, md5Sum!);
 		}
 	};
 
 	async function parseMessages(msgs: string[]) {
 		binData = new BinData({});
 		let reader = new FileReader();
-		reader.onload = (e) => {
-			let dat = reader.result;
+
+		reader.onload = () => {
+			md5Sum = md5(reader.result as ArrayBuffer);
 			worker.postMessage({
 				action: 'parse',
-				file: dat,
+				file: reader.result,
 				msgs: $state.snapshot(msgs)
 			});
 		};
+    
 		reader.readAsArrayBuffer(bin!);
 	}
 
