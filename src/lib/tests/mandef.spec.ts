@@ -1,7 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
-import {  split_arg_string } from '$lib/analysis/mandef';
+import {  split_arg_string, ManDef, ManOpt } from '$lib/analysis/mandef';
+import { Server } from '$lib/api';
 
+const server = new Server('http://localhost:5000');
+
+describe('mandef', async () => {
+  
+  it('should parse a mdef', async ()=>{
+    const trgle = ManDef.parse(await server.get('f3a/p25/trgle/definition')); 
+    expect(trgle).toBeDefined();
+    expect(trgle).toBeInstanceOf(ManDef);
+  });
+
+  it('should parse a manopt', async ()=>{
+    const that = ManDef.parse(await server.get('f3a/p25/tHat/definition'));
+    expect(that).toBeDefined();
+    expect(that).toBeInstanceOf(ManOpt);
+  });
+});
 
 
 describe('utility functions', () => {

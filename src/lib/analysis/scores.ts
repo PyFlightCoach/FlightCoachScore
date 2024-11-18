@@ -22,18 +22,6 @@ export class Measurement {
   }
 }
 
-interface IResult {
-  name: string
-  measurement: Measurement
-  raw_sample: number[]
-  sample: number[]
-  sample_keys: number[]
-  errors: number[]
-  dgs: number[]
-  keys: string[] | number[]
-  total: number
-  criteria: Criteria
-}
 
 export class Result {
   constructor(
@@ -48,8 +36,7 @@ export class Result {
     readonly total: number,
     readonly criteria: Criteria
   ) {}
-  static parse(data: IResult) {
-    
+  static parse(data: Record<string, any>) {
     return new Result(
       data.name,
       Measurement.parse(data.measurement),

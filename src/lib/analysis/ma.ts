@@ -1,6 +1,6 @@
 import { States } from '$lib/analysis/state';
 import { Manoeuvre } from '$lib/analysis/manoeuvre';
-import { ManDef } from '$lib/analysis/mandef';
+import { ManDef, ManOpt } from '$lib/analysis/mandef';
 import { ManoeuvreResult } from '$lib/analysis/scores';
 import { FCJManResult, FCJScore, Origin, ScheduleInfo } from '$lib/analysis/fcjson';
 import { analysisServer } from '$lib/api';
@@ -18,7 +18,7 @@ export class MA {
 		readonly history: Record<string, FCJManResult> = {},
 		readonly k: number | undefined = undefined,
 		readonly flown: States | undefined = undefined,
-		readonly mdef: ManDef | undefined = undefined,
+		readonly mdef: ManDef | ManOpt | undefined = undefined,
 		readonly manoeuvre: Manoeuvre | undefined = undefined,
 		readonly template: States | undefined = undefined,
 		readonly corrected: Manoeuvre | undefined = undefined,
@@ -50,15 +50,14 @@ export class MA {
     
 		try {
 			const res = await analysisServer.post(
-				'analyse_manoeuvre',
+				'analyse',
 				{
-					name: this.name,
-					category: this.schedule.category,
-					schedule: this.schedule.name,
-					schedule_direction: this.scheduleDirection,
+					id: this.id,
+          mdef: this.mdef instanceof ManDef ? this.mdef : this.mdef!.options,
+					optimise_alignment: optimise,
 					flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
 					origin: get(origin) || new Origin(0,0,0,0),
-					optimise_alignment: optimise
+					schedule_direction: this.scheduleDirection,
 				},
 			);
 			selectedResult.set(res.fa_version);

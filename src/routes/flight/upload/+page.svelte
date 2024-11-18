@@ -30,7 +30,7 @@
 		try {
 			//      const js = await file_handle(ajson);
 			//      const bi = await file_handle($bin);
-
+      form_state = 'Uploading...';
 			const form_data = new FormData();
 			form_data.append(
 				'files',
@@ -48,6 +48,7 @@
 				form_data.append('files', $bin);
 			}
 			const r = await dbServer.post('flight', form_data);
+      form_state = 'Upload Successful'
 		} catch {
 			form_state = 'Oops...something has gone wrong. Please try again later.';
 		}

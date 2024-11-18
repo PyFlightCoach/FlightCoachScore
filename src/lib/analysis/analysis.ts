@@ -26,6 +26,7 @@ import { base } from '$app/paths';
 import { analysisServer } from '$lib/api';
 import { States } from '$lib/analysis/state';
 import { ManSplit } from '$lib/analysis/splitting';
+import {ManDef} from '$lib/analysis/mandef';
 
 export function checkComplete() {
 	if (!get(manNames) || !get(bin)) {
@@ -46,20 +47,20 @@ export function createAnalyses(mnames: string[]) {
 		running.push(writable(false));
 		runInfo.push(writable(`Empty Analysis Created At ${new Date().toLocaleTimeString()}`));
 
-		analyses[i].subscribe((value) => {
+		analyses[i].subscribe((ma: MA | undefined) => {
 			scores.update((s) => {
-				if (value) {
-					s[i] =
-						value.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
-						(value.mdef?.info.k | value.k);
+				if (ma) {
+					s![i] =
+						ma.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
+						(ma.mdef?.info.k || ma.k!);
 				} else {
-					s[i] = 0;
+					s![i] = 0;
 				}
 				return s;
 			});
 
 			fa_versions.update((v) => {
-				return [...new Set([...v, ...Object.keys(value?.history || [])])];
+				return [...new Set([...v, ...Object.keys(ma?.history || [])])];
 			});
 
 			isComplete.set(checkComplete());
@@ -103,13 +104,12 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 
 	let direction: string = 'Infer';
 	if (get(isCompFlight)) {
-    let ddef;
-    try {
-      ddef = await mans[analysisMans[0]].sinfo!.direction_definition();
-    } catch {
-      ddef = {manid: 0, direction: 'UPWIND'};
-    }
-		
+		let ddef;
+		try {
+			ddef = await mans[analysisMans[0]].sinfo!.direction_definition();
+		} catch {
+			ddef = { manid: 0, direction: 'UPWIND' };
+		}
 
 		const heading = sts.data[mans[ddef.manid].stop!].direction_str();
 		if (ddef.direction == 'DOWNWIND') {
@@ -121,7 +121,7 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 		}
 	}
 
-	analysisMans.forEach((id, i) => {
+	analysisMans.forEach(async (id, i) => {
 		analyses[i].set(
 			new MA(
 				mans[id].name,
@@ -134,7 +134,10 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 				get(manoeuvres)[mans[id].sinfo!.to_string()][mans[id].id! - 1].k,
 				get(binData)
 					? undefined
-					: new States(sts.data.slice(id > 0 ? mans[id - 1].stop : 0, mans[id].stop))
+					: new States(sts.data.slice(id > 0 ? mans[id - 1].stop : 0, mans[id].stop)),
+        get(analyses[i])?.mdef || ManDef.parse(await analysisServer.get(
+					`${mans[id].sinfo?.category}/${mans[id].sinfo!.name}/${mans[id].name}/definition`
+				))
 			)
 		);
 	});
@@ -166,9 +169,26 @@ export async function importAnalysis(data: Record<string, any>) {
 
 	createAnalyses(data.mans.map((ma: MA) => ma.name));
 
-	data.mans.forEach((ma, i) => {
-		MA.parse(ma).then((res) => {
-			analyses[i].set(res);
+	data.mans.forEach(async (ma, i) => {
+		MA.parse(ma).then(async (res) => {
+      if (res.mdef) {
+			  analyses[i].set(res);
+      } else {
+        analyses[i].set(new MA(
+          res.name,
+          res.id,
+          res.tStart,
+          res.tStop,
+          res.schedule,
+          res.scheduleDirection,
+          res.history,
+          res.k,
+          res.flown,
+          ManDef.parse(await analysisServer.get(
+            `${res.schedule.category}/${res.schedule.name}/${res.name}/definition`
+          ))
+        ));
+      }
 		});
 	});
 }
@@ -184,7 +204,10 @@ export async function analyseMans(ids: number[]) {
 	});
 }
 
-export async function analyseAll(force: boolean = false, optimise: boolean | undefined = undefined) {
+export async function analyseAll(
+	force: boolean = false,
+	optimise: boolean | undefined = undefined
+) {
 	analyses.forEach(async (ma, i) => {
 		await analyseManoeuvre(i, force, optimise);
 	});
@@ -192,8 +215,8 @@ export async function analyseAll(force: boolean = false, optimise: boolean | und
 
 export async function analyseManoeuvre(
 	id: number,
-  force: boolean = false,
-	optimise: boolean | undefined = undefined,
+	force: boolean = false,
+	optimise: boolean | undefined = undefined
 ) {
 	const ma = get(analyses[id]);
 

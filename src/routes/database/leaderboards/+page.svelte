@@ -6,7 +6,7 @@
 	console.log(data.schedules);
 	console.log(data.fa_versions);
 
-	let n_days_val = 60;
+	let n_days_val = 30;
 	let col_heads = ['Position', 'Rank', 'Name', 'Country', 'Date', 'Score'];
 	let table_rows: {
 		table_rank: number;
@@ -74,8 +74,8 @@
 				</div>
 				<div class="mb-3">
 					<label for="version">FA Version</label>
-					<select class="form-select" id="version" name="version" required>
-						{#each data.fa_versions as ver}
+					<select class="form-select" id="version" name="version" required value={data.fa_versions.sort()[data.fa_versions.length]}>
+						{#each data.fa_versions.sort() as ver, i}
 							<option value={ver}>{ver}</option>
 						{/each}
 					</select>
@@ -103,7 +103,7 @@
 						value={n_days_val}
 						id="n_days"
 						name="n_days"
-						min="30"
+						min="1"
 						max="380"
 						step="10"
 						on:change={_update_n_days}

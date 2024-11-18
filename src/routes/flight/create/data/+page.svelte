@@ -67,13 +67,10 @@
 	};
 
 	const checkCanUpload = (binFile: File) => {
-		const fd = new FormData();
-		fd.append('bin-md5sum', _md5);
 		dbServer
-			.post('check-file-duplicate', fd)
+			.get(`flight/check_duplicate/${_md5}`)
 			.then(() => {
 				_bin = binFile;
-				form_state = undefined;
 			})
 			.catch((e) => {
 				_bin = undefined;
@@ -115,7 +112,7 @@
 					checkCanUpload(tempbin!);
 				}}
 			/>
-			{#if _bin && _binData && _bootTime && _md5}
+			{#if _binData && _bootTime}
 				<a
 					type="button"
 					href={base + '/flight/create/box'}

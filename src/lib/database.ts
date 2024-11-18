@@ -7,7 +7,7 @@ export async function get_analysis_table(formdata: FormData) {
       .map(x => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`)
       .join('&');
 
-  const res = await dbServer.get('flight/bestof?' + query_str);
+  const res = await dbServer.get('analysis/leaderboard?' + query_str);
   let raw_rows = res.results;
 
   // Round score to 1 decimal place

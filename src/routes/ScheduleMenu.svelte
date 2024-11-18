@@ -23,7 +23,7 @@
       type="file"
       name="input-name"
       style="display: none;"
-      accept=".json, .ajson"
+      accept=" .json, .sdef"
       on:change={(e: Event) => {
         if (e.target?.files?.length > 0) {uploadSchedule(e.target.files[0])};
       }}
