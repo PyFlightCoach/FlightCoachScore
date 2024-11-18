@@ -70,8 +70,8 @@
 		<label class="form-check-label" for="include_bin">Include BIN File</label>
 	</div>
 	<div class="input-group">
-		<label class="input-group-text" for="comments">Comments</label>
-		<input id="comments" class="form-control" type="text" name="comments" />
+		<label class="input-group-text" for="comment">Comment</label>
+		<input id="comment" class="form-control" type="text" name="comment" />
 	</div>
 	{#if $user?.is_superuser}
 		<div class="input-group">
