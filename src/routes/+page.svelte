@@ -7,7 +7,7 @@
 
 	$navBarContents = undefined;
 
-	let aSVersion: string | undefined = $state();
+	let aSVersion: string = $state('not connected');
 
 	const getServerVersions = async () => {
 		aSVersion = await analysisServer.get('version');
@@ -42,11 +42,11 @@
 									aSVersion = res;
 								})
 								.catch(() => {
-									aSVersion = undefined;
+									aSVersion = 'not connected';
 								});
 						}}
 					>
-						{aSVersion || 'not connected'}
+						{aSVersion}
 					</td>
 				</tr>
 				<tr>
