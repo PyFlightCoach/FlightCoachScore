@@ -74,8 +74,8 @@
 				</div>
 				<div class="mb-3">
 					<label for="version">FA Version</label>
-					<select class="form-select" id="version" name="version" required value={data.fa_versions.sort()[data.fa_versions.length]}>
-						{#each data.fa_versions.sort() as ver, i}
+					<select class="form-select" id="version" name="version" required value={data.fa_versions}>
+						{#each data.fa_versions as ver, i}
 							<option value={ver}>{ver}</option>
 						{/each}
 					</select>

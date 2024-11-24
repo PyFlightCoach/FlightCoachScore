@@ -6,10 +6,12 @@
 	import { goto } from '$app/navigation';
 	import { saveAs } from 'file-saver';
 	
+  let importedname: string | undefined
   
   const parseAnalysis = (file: File) => { 
     const reader = new FileReader();
     reader.onload = (e) => {
+      importedname = file.name;
       importAnalysis(JSON.parse(reader.result));
       goto(base + '/flight/results');
     };
@@ -24,7 +26,7 @@
 	{#if $bin}
 		<h5 class="dropdown-header">{$bin.name}</h5>
 	{:else if $manNames}
-		<h5 class="dropdown-header">Example Loaded</h5>
+		<h5 class="dropdown-header">{importedname || 'Example Loaded'}</h5>
 	{/if}
 	{#if $manNames}
 		<button
