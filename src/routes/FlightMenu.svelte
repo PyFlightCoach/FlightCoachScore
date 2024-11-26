@@ -5,7 +5,8 @@
 	import { clearAnalysis, exportAnalysis, loadExample, importAnalysis } from '$lib/analysis/analysis';
 	import { goto } from '$app/navigation';
 	import { saveAs } from 'file-saver';
-	
+	import {loading} from '$lib/stores/shared';
+
   let importedname: string | undefined
   
   const parseAnalysis = (file: File) => { 
@@ -75,8 +76,10 @@
 		<button
 			class="dropdown-item"
 			on:click={() => {
+        $loading=true
 				loadExample().then(() => {
 					goto(base + '/flight/results');
+          $loading=false;
 				});
 			}}
 		>

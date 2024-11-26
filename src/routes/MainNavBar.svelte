@@ -6,8 +6,8 @@
 	import SettingsMenu from './SettingsMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import ScheduleMenu from './ScheduleMenu.svelte';
-  import { dev } from '$app/environment';
-
+	import { dev } from '$app/environment';
+	import AnalysisProgress from '$lib/components/progress/AnalysisProgress.svelte';
 
 </script>
 
@@ -35,23 +35,27 @@
 						<FlightMenu />
 						<DataBaseMenu />
 						<SettingsMenu />
-            {#if $user && $user.is_superuser || dev}
-              <ScheduleMenu />
-            {/if}
-
-
+						{#if ($user && $user.is_superuser) || dev}
+							<ScheduleMenu />
+						{/if}
 					</ul>
-					<ul class="navbar-nav col-8 mr-auto">
+					<ul class="navbar-nav col-7 mr-auto">
 						<slot />
 					</ul>
-
+					{#if 17 > 0}
+						<div class="nav col-1 mr-auto">
+							<AnalysisProgress />
+						</div>
+					{:else}
+						<div class="col-1"></div>
+					{/if}
 					<span class="navbar-text col-1 mr-auto text-nowrap">
 						{#if $user}
 							{$user.first_name} {$user.last_name}
 						{:else}
 							Not Logged In
 						{/if}
-          </span>
+					</span>
 				</div>
 			</div>
 		</div>

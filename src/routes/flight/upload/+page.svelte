@@ -4,32 +4,17 @@
 	import { get } from 'svelte/store';
 	import { user } from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
+  import {loading} from '$lib/stores/shared';
+  import {goto} from '$app/navigation';
+  import {base} from '$app/paths';
 
 	let form_state: string | undefined;
 
 	let schedule = get(analyses[0])!.schedule;
 
-	function file_handle(fu) {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onloadend = async () => {
-				try {
-					console.log('Finished read');
-					resolve(reader.result);
-				} catch (err) {
-					reject(err);
-				}
-			};
-			reader.onerror = (error) => reject(error);
-			console.log('Starting read on', fu);
-			reader.readAsArrayBuffer(fu);
-		});
-	}
-
 	const upload = async (e: Event) => {
+    $loading=true;
 		try {
-			//      const js = await file_handle(ajson);
-			//      const bi = await file_handle($bin);
       form_state = 'Uploading...';
 			const form_data = new FormData();
 			form_data.append(
@@ -49,9 +34,11 @@
 			}
 			const r = await dbServer.post('flight', form_data);
       form_state = 'Upload Successful'
+      goto(base + '/database/leaderboards')
 		} catch {
 			form_state = 'Oops...something has gone wrong. Please try again later.';
 		}
+    $loading=false;
 	};
 </script>
 

@@ -5,13 +5,13 @@
 
 	import MainNavBar from './MainNavBar.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
-  import { onMount } from 'svelte';
-  import { dbServer } from '$lib/api';
-  import { user } from '$lib/stores/user';
+	import { onMount } from 'svelte';
+	import { dbServer } from '$lib/api';
+	import { user } from '$lib/stores/user';
+	import { loading } from '$lib/stores/shared';
 
-
-  onMount(() => {
-    dbServer
+	onMount(() => {
+		dbServer
 			.get('/users/me')
 			.then((res) => {
 				if (res) {
@@ -21,10 +21,10 @@
 			.catch((e) => {
 				console.log('no user', e.message);
 			});
-  });
+	});
 </script>
 
-<div class="container-fluid justify-content-md-center  min-vh-100 d-flex flex-column">
+<div class="container-fluid justify-content-md-center min-vh-100 d-flex flex-column">
 	<div class="row">
 		<MainNavBar>
 			{#if $navBarContents}
@@ -32,7 +32,10 @@
 			{/if}
 		</MainNavBar>
 	</div>
-	<div class="row flex-grow-1 justify-content-center" >
+  {#if $loading}
+		<div class="position-absolute top-50 start-50 spinner-border" role="status"></div>
+	{/if}
+	<div class="row flex-grow-1 justify-content-center">
 		<slot />
 	</div>
 </div>

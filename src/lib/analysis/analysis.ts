@@ -22,7 +22,6 @@ import {
 import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { writable } from 'svelte/store';
-import { base } from '$app/paths';
 import { analysisServer } from '$lib/api';
 import { States } from '$lib/analysis/state';
 import { ManSplit } from '$lib/analysis/splitting';
@@ -41,10 +40,10 @@ export function checkComplete() {
 export function createAnalyses(mnames: string[]) {
 	manNames.set(mnames);
 	scores.set(new Array(mnames.length).fill(0));
+  running.set(new Array(mnames.length).fill(false));
 
 	mnames.forEach((name, i) => {
 		analyses.push(writable());
-		running.push(writable(false));
 		runInfo.push(writable(`Empty Analysis Created At ${new Date().toLocaleTimeString()}`));
 
 		analyses[i].subscribe((ma: MA | undefined) => {
@@ -58,7 +57,7 @@ export function createAnalyses(mnames: string[]) {
 				}
 				return s;
 			});
-
+      
 			fa_versions.update((v) => {
 				return [...new Set([...v, ...Object.keys(ma?.history || [])])];
 			});
@@ -81,8 +80,8 @@ export function clearAnalysis() {
 	fcj.set(undefined);
 	bin.set(undefined);
 	analyses.length = 0;
-	running.length = 0;
-	runInfo.length = 0;
+	running.set([]);
+	runInfo.length = 0;  
 }
 
 export async function createAnalysis(sts: States, mans: ManSplit[]) {
@@ -223,15 +222,15 @@ export async function analyseManoeuvre(
 		optimise = !isReRun;
 	} //optimise if for new analysis version
 
-	if ((!ma!.scores || optimise || force) && !get(running[id])) {
+	if ((!ma!.scores || optimise || force) && !get(running)[id]) {
 		//if scores exist, only run if server version not in history
 
 		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
-		running[id].set(true);
+		running.update(v=>{v[id]=true;return v});
 
 		await ma!.run(optimise).then((res) => {
 			analyses[id].set(res);
-			running[id].set(false);
+      running.update(v=>{v[id]=false;return v});
 		});
 	}
 }
