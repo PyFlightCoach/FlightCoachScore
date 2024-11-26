@@ -192,7 +192,7 @@ export async function importAnalysis(data: Record<string, any>) {
 
 export async function loadExample() {
 	clearAnalysis();
-	importAnalysis(await (await fetch(`${base}/example/example_analysis.ajson`)).json());
+	importAnalysis(await analysisServer.get('example'));
 }
 
 export async function analyseMans(ids: number[]) {
