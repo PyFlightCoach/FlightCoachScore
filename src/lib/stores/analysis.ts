@@ -73,9 +73,10 @@ export const manoeuvres: Writable<Record<string, ManDetails[]>> = writable({});
 export const schedules: Writable<Record<string, string[]>> = writable({});
 export const categories: Writable<string[]> = writable([]);
 
+// TODO these need to go to the DB Server
 export async function loadCategories() {
 	if (get(categories).length == 0) {
-		categories.set(await analysisServer.get('/categories'));
+		categories.set(await analysisServer.get('/categories'));   
 	}
 	return get(categories);
 }

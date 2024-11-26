@@ -135,13 +135,10 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 				get(binData)
 					? undefined
 					: new States(sts.data.slice(id > 0 ? mans[id - 1].stop : 0, mans[id].stop)),
-        get(analyses[i])?.mdef || ManDef.parse(await analysisServer.get(
-					`${mans[id].sinfo?.category}/${mans[id].sinfo!.name}/${mans[id].name}/definition`
-				))
+        mans[id].mdef
 			)
 		);
 	});
-	//goto(base + '/flight/results');
 }
 
 export async function createAnalysisExport(small: boolean = false) {

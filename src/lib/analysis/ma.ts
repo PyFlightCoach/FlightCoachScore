@@ -56,7 +56,7 @@ export class MA {
           mdef: this.mdef instanceof ManDef ? this.mdef : this.mdef!.options,
 					optimise_alignment: optimise,
 					flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
-					origin: get(origin) || new Origin(0,0,0,0),
+					origin: get(origin),
 					schedule_direction: this.scheduleDirection,
 				},
 			);

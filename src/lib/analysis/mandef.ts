@@ -193,7 +193,7 @@ export class DownGrade {
 		return `${all ? 'All values' : 'The'} ${sels.join(' ')}`;
 	}
 
-	static parse(data: Record<string, any>) {
+	static parse(data: Record<string, never>) {
 		return new DownGrade(
 			data.name,
 			data.measure,
@@ -209,10 +209,10 @@ export class ElDef {
 	constructor(
 		readonly name: string,
 		readonly Kind: string,
-		readonly props: Record<string, any>,
+		readonly props: Record<string, never>,
 		readonly dgs: Record<string, DownGrade>
 	) {}
-	static parse(data: Record<string, any>) {
+	static parse(data: Record<string, never>) {
 		const dgs = Object.fromEntries(
 			Object.entries(data.dgs).map(([k, v]) => {
 				return [k, DownGrade.parse(v)];
@@ -236,9 +236,9 @@ export class ManDef {
 		readonly info: ManInfo,
 		readonly mps: Record<string, ManParm>,
 		readonly eds: Record<string, ElDef>,
-		readonly box: Record<string, any>
+		readonly box: Record<string, never>
 	) {}
-	static parse(data: Record<string, any> | Record<string, any>[]): ManDef | ManOpt {
+	static parse(data: Record<string, never> | Record<string, never>[]): ManDef | ManOpt {
 		if (Array.isArray(data)) {
 			return ManOpt.parse(data);
 		} else {
@@ -281,8 +281,8 @@ export class ManOpt {
 
   get box() {return this.options[0].box;}
 
-  static parse(data: Record<string, any>[]) {
-    return new ManOpt(data.map(ManDef.parse));
+  static parse(data: Record<string, unknown>[]) {
+    return new ManOpt(data.map(v=>ManDef.parse(v) as ManDef));
   }
 
 }

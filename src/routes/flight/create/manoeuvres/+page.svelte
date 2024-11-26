@@ -1,5 +1,4 @@
 <script lang="ts">
-	//import PlotSec from '$lib/plots/PlotSec.svelte';
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import { ManSplit, parseFCJMans } from '$lib/analysis/splitting';
 	import { FCJson } from '$lib/analysis/fcjson';
@@ -57,11 +56,11 @@
 	const setRange = () => {
 		mans[activeMan].stop = Math.min(
 			range[1],
-			activeMan == mans.length - 1 ? data.states.data.length : mans[activeMan + 1].stop!
+			activeMan == mans.length - 1 ? data.states!.data.length : mans[activeMan + 1].stop!
 		);
 		if (
 			mans[activeMan].name != 'Landing' &&
-			mans[activeMan].stop! < data.states.data.length &&
+			mans[activeMan].stop! < data.states!.data.length &&
 			activeMan == mans.length - 1
 		) {
 			addMan();
