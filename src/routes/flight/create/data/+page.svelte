@@ -43,22 +43,7 @@
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			if (inputMode === 'state') {
-				let cols: string[];
-				_states = new States([]);
-
-				(reader.result as string)!.split('\n').forEach((line: string) => {
-					if (!cols) {
-						cols = line.split(',');
-					} else {
-						_states!.data.push(
-							new State(
-								Object.fromEntries(
-									line.split(',').map((val, i) => [cols[i], Number(val)])
-								) as unknown as St
-							)
-						);
-					}
-				});
+        _states = States.read_csv(reader.result as string);
 			} else {
 				_fcj = FCJson.parse(JSON.parse(reader.result! as string));
 			}

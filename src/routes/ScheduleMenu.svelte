@@ -9,9 +9,6 @@
     const r = dbServer.post('schedule', form_data);
   };
 
-  const createSchedule = async (category: string, name: string) => {
-    
-  };
 
 </script>
 
@@ -30,6 +27,5 @@
     />
     <span>Upload</span>
   </label>
-  <div class="dropdown-item" >Browse</div>
-  <a class="dropdown-item" href="{base}/schedule/create" >Create</a>
+  <a class="dropdown-item" href="{base}/schedule/browse">Browse</a>
 </NavMenu>

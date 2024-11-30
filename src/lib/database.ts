@@ -15,3 +15,6 @@ export async function get_analysis_table(formdata: FormData) {
       raw_rows[r].score = Math.round(parseFloat(raw_rows[r].score) * 10) / 10;
   return raw_rows;
 }
+
+
+

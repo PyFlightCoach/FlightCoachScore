@@ -35,7 +35,10 @@ export class Server {
   }
 
 	async get(path: string, data: Record<string, unknown> | FormData | undefined = undefined) {
-		return await this.fetch('GET', path, undefined, data);
+    if (data) {
+      path += '?' + new URLSearchParams(data).toString();
+    }
+		return await this.fetch('GET', path);
 	}
 	async post(path: string, data: Record<string, unknown> | FormData) {
 		return await this.fetch('POST', path, undefined, data);
@@ -52,9 +55,9 @@ export function jsonEscapeUTF(s: string) {
 	return s.replace(/[^\x20-\x7F]/g, x => "\\u" + ("000"+x!.codePointAt(0)!.toString(16)).slice(-4))
 }
 
-export function formDataFromDict(data: Record<string, any>) {
+export function formDataFromDict(data: unknown) {
   const fd = new FormData()
-  Object.entries(data).forEach(([k,v])=>{fd.append(k, v)});
+  Object.entries(data as Record<string, never>).forEach(([k,v])=>{fd.append(k, v)});
   return fd;
 }
 
@@ -75,3 +78,5 @@ export const dbServerAddress = newCookieStore(
   ukDBServer,
   (value) => {dbServer=new Server(value)}
 );
+
+

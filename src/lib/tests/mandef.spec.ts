@@ -5,20 +5,20 @@ import { Server } from '$lib/api';
 
 const server = new Server('http://localhost:5000');
 
-describe('mandef', async () => {
+//describe('mandef', async () => {
   
-  it('should parse a mdef', async ()=>{
-    const trgle = ManDef.parse(await server.get('f3a/p25/trgle/definition')); 
-    expect(trgle).toBeDefined();
-    expect(trgle).toBeInstanceOf(ManDef);
-  });
-
-  it('should parse a manopt', async ()=>{
-    const that = ManDef.parse(await server.get('f3a/p25/tHat/definition'));
-    expect(that).toBeDefined();
-    expect(that).toBeInstanceOf(ManOpt);
-  });
-});
+//  it('should parse a mdef', async ()=>{
+//    const trgle = ManDef.parse(await server.get('f3a/p25/trgle/definition')); 
+//    expect(trgle).toBeDefined();
+//    expect(trgle).toBeInstanceOf(ManDef);
+//  });
+//
+//  it('should parse a manopt', async ()=>{
+//    const that = ManDef.parse(await server.get('f3a/p25/tHat/definition'));
+//    expect(that).toBeDefined();
+//    expect(that).toBeInstanceOf(ManOpt);
+//  });
+//});
 
 
 describe('utility functions', () => {

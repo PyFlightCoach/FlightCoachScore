@@ -69,6 +69,26 @@ export class States {
 		return new States((data.hasOwnProperty('data') ? data.data : data).map((st) => new State(st)));
 	}
 
+  static read_csv(data: string) {
+    let cols: string[];
+    const sts: State[] = [];
+
+    data.split('\n').forEach((line: string) => {
+      if (!cols) {
+        cols = line.split(',');
+      } else {
+        sts.push(
+          new State(
+            Object.fromEntries(
+              line.split(',').map((val, i) => [cols[i], Number(val)])
+            ) as unknown as St
+          )
+        );
+      }
+    });
+    return new States(sts.slice(0, sts.length - 1));
+  }
+
 	getFCJIndexOffset(minalt = 10) {
 		for (let i = 0; i < this.data.length; i++) {
 			if (this.data[i].z > minalt) {
@@ -222,7 +242,7 @@ export class States {
 	}
 
 	split() {
-		let states: Record<string, States> = {};
+		const states: Record<string, States> = {};
 		let last_el = '';
 		this.data.forEach((st) => {
 			if (st.element in states) {

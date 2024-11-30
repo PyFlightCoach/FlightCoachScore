@@ -45,7 +45,8 @@
 			$man!.scheduleDirection,
 			history,
 			$man!.k,
-			$man!.flown
+			$man!.flown,
+      $man!.mdef,
 		);
 		//    delete $fcj?.get_result($fa_version)?.manresults[$selManID!];
 	};

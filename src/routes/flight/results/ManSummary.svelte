@@ -18,7 +18,7 @@
 
 	let ma = analyses[id];
 
-	let isRunning = running[id];
+	$: isRunning = $running[id];
 	let info = runInfo[id];
 
 	$: colours = [yellColors, tealsColrs, redsColors][$difficulty - 1];
@@ -88,7 +88,7 @@
 		<td>-</td>
 	{/if}
 
-	{#if $isRunning}
+	{#if isRunning}
 		<td class="bg-warning text-center">Busy</td>
 	{:else}
 		<td
@@ -110,7 +110,7 @@
 	<td
 		><span class="small text-nowrap text-muted">
 			{$info}
-			{#if !$isRunning && !$info.includes('Imported') && score == 0}
+			{#if !isRunning && !$info.includes('Imported') && score == 0}
 				<a
 					tabindex="0"
 					on:keydown={() => activate_man(id, 'alignment')}

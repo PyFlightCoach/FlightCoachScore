@@ -16,7 +16,6 @@ import {
 	binData,
 	bootTime,
 	isComplete,
-	manoeuvres,
 	fcj
 } from '$lib/stores/analysis';
 import { MA } from '$lib/analysis/ma';
@@ -130,7 +129,7 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 				mans[id].sinfo!,
 				direction,
 				get(fcj)?.manhistory(id) || {},
-				get(manoeuvres)[mans[id].sinfo!.to_string()][mans[id].id! - 1].k,
+				1, // todo get K
 				get(binData)
 					? undefined
 					: new States(sts.data.slice(id > 0 ? mans[id - 1].stop : 0, mans[id].stop)),

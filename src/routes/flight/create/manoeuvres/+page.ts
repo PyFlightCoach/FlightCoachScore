@@ -1,13 +1,12 @@
 import { binData, origin, states, fcj } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
-import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { BinData } from '$lib/components/bin/bindata';
-import { Origin } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
+import { dev } from '$app/environment';
 
-export async function load({ fetch }) {
+export async function load({fetch}) {
+  
 	if (get(binData) && get(origin)) {
 		states.set(States.from_xkf1(get(origin)!, get(binData)!.orgn, get(binData)!.xkf1));
 	} else if (!get(states) && get(fcj)) {
@@ -15,12 +14,12 @@ export async function load({ fetch }) {
 	} else if (!get(states)) {
 		if (get(binData)) {
 			goto(base + '/flight/create/origin');
-		} else {
+    } else if (dev) {
+      await fetch('/st.csv').then(r=>r.text()).then(text => states.set(States.read_csv(text)));
+    } else {
 			goto(base + '/flight/create/data');
 		}
 	}
-
-	return {
-		states: get(states)
-	};
+  
+  
 }

@@ -11,7 +11,7 @@ export const ribbon = (
 ) => {
 	const semisp = sp / 2;
 
-	let points: Point[] = [];
+	const points: Point[] = [];
 
 	Object.keys(expandprops).forEach((key) => {
 		props[key] = [];
@@ -22,9 +22,9 @@ export const ribbon = (
 		points.push(st.data[i].body_to_world(new Point(0, -semisp, 0)));
 	}
 
-	let _i: number[] = [];
-	let _j: number[] = [];
-	let _k: number[] = [];
+	const _i: number[] = [];
+	const _j: number[] = [];
+	const _k: number[] = [];
 	for (let i = 0; i < points.length - 2; i += 2) {
 		_i.push(i);
 		_j.push(i + 1);

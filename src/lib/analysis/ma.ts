@@ -2,10 +2,11 @@ import { States } from '$lib/analysis/state';
 import { Manoeuvre } from '$lib/analysis/manoeuvre';
 import { ManDef, ManOpt } from '$lib/analysis/mandef';
 import { ManoeuvreResult } from '$lib/analysis/scores';
-import { FCJManResult, FCJScore, Origin, ScheduleInfo } from '$lib/analysis/fcjson';
+import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/analysis/fcjson';
 import { analysisServer } from '$lib/api';
-import { selectedResult, runInfo, binData, origin, loadManoeuvres } from '$lib/stores/analysis';
+import { selectedResult, runInfo, binData, origin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
+
 
 export class MA {
 	constructor(
@@ -26,6 +27,7 @@ export class MA {
 		readonly scores: ManoeuvreResult | undefined = undefined
 	) {}
 
+  
 	summary() {
 		return {
 			name: this.name,
@@ -124,8 +126,7 @@ export class MA {
 					return [k, FCJManResult.parse(v)];
 				})
 			),
-			data.mdef?.info.k ||
-				(await loadManoeuvres(data.schedule.category, data.schedule.name))[data.id - 1].k,
+			data.mdef?.info.k,
 			data.flown ? States.parse(data.flown) : undefined,
 			data.mdef ? ManDef.parse(data.mdef) : undefined,
 			data.manoeuvre ? Manoeuvre.parse(data.manoeuvre) : undefined,

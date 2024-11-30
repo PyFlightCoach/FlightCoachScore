@@ -1,207 +1,90 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
-	import { ManSplit, parseFCJMans } from '$lib/analysis/splitting';
-	import { FCJson } from '$lib/analysis/fcjson';
+	import { ManSplit } from '$lib/analysis/splitting';
 	import { createAnalysis } from '$lib/analysis/analysis';
-	import {
-		categories,
-		schedules,
-		manoeuvres,
-		loadCategories,
-		loadSchedules,
-		loadManoeuvres,
-		fcj,
-		isCompFlight
-	} from '$lib/stores/analysis';
+	import { isCompFlight, states, fcj } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
-	export let data;
+	import { FCJson } from '$lib/analysis/fcjson';
+	import ScheduleSelect from '$lib/components/ScheduleSelect.svelte';
+	import { type Schedule, type Manoeuvre } from '$lib/schedules';
 
-	let files: FileList | undefined;
+	let mans: ManSplit[] = [ManSplit.TakeOff(1000)];
+	let activeManId: number = 0;
+	let activeIndex: number = 0;
 
-	let range: number[] = [0, data.states!.data.length];
-	let mans: ManSplit[] = [ManSplit.TakeOff()];
-	let activeMan = 0;
+	let range: number[] = [0, $states!.data.length];
+	$: activeMan = mans[activeManId];
 
-	const updateRange = (activeMan: number) => {
-		const start = activeMan == 0 ? 0 : mans[activeMan - 1].stop;
-
-		let stop = mans[activeMan].stop;
-
-		if (!stop) {
-			if (mans[activeMan].name == 'Landing') {
-				stop = data.states!.data.length;
-			} else {
-				switch (activeMan) {
-					case 0:
-						stop = 4500;
-						break;
-					case 1:
-						stop = start! + 600;
-						break;
-					default:
-						stop = start! + 2 * (start! - mans[activeMan - 2].stop!);
-				}
-			}
-		}
-		return [start, Math.min(stop, data.states!.data.length-1)];
-	};
-	$: range = updateRange(activeMan);
-
-	const setManoeuvre = (i: number, manoeuvre: ManSplit) => {
-		mans[i] = manoeuvre;
-		checkComp();
-	};
-
-	const setRange = () => {
-		mans[activeMan].stop = Math.min(
-			range[1],
-			activeMan == mans.length - 1 ? data.states!.data.length : mans[activeMan + 1].stop!
-		);
-		if (
-			mans[activeMan].name != 'Landing' &&
-			mans[activeMan].stop! < data.states!.data.length &&
-			activeMan == mans.length - 1
-		) {
-			addMan();
-		}
-	};
-
-	const addMan = () => {
-		//Add a new manoeuvre to the end of the list, make some assumptions about what it is based
-		//on the previous manoeuvre
-		if (activeMan < mans.length) {
-			let name: string = 'Select';
-			const manid = mans[activeMan].id;
-			if (mans[activeMan].sinfo) {
-				const shedmans = $manoeuvres[mans[activeMan].sinfo!.to_string()];
-				if (manid! < Object.values(shedmans).length) {
-					name = shedmans[manid!].name;
-				} else {
-					name = 'Landing';
-				}
-			}
-
-			mans.push(
-				new ManSplit(
-					name,
-					name == 'Landing' ? undefined : mans[activeMan].sinfo,
-					mans[activeMan].id! + 1,
-					undefined
-				)
-			);
-		}
-		activeMan += 1;
-	};
-
-	const deleteMan = (i: number) => {
-		mans.splice(i, 1);
-		activeMan = Math.max(activeMan - 1, 0);
-		mans = mans;
-	};
-
-	const keyPress = (k: string) => {
-		switch (k) {
-			case 's':
-				if (mans[activeMan].name != 'Select') {
-					setRange();
-				}
-				break;
-			case 'd':
-				range[1] = Math.min(
-					range[1] + 50,
-					activeMan == mans.length - 1 ? data.states.data.length : mans[activeMan + 1].stop!
-				);
-				break;
-			case 'a':
-				range[1] = Math.max(range[1] - 50, range[0]);
-				break;
-		}
-	};
-
-	const clearSplitting = () => {
-		activeMan = 0;
-		mans = [ManSplit.TakeOff()];
-	};
+	$: if (activeMan) {
+		range = [
+			activeManId > 0 ? mans[activeManId - 1].stop! : 0,
+			activeMan.stop || $states!.data.length
+		];
+	}
 
 	const parseFCJ = (file: File) => {
 		const reader = new FileReader();
-		reader.onload = () => {
-			if (reader.result) {
-				$fcj = FCJson.parse(JSON.parse(reader.result as string));
-			}
+		reader.onload = (e) => {
+			$fcj = FCJson.parse(JSON.parse(e.target?.result as string));
 		};
 		reader.readAsText(file);
 	};
 
-	$: if ($fcj) {
-		parseFCJMans($fcj, data.states).then((res) => {
-			mans = res;
-			activeMan = 1;
-		});
-	}
-
-	const checkComp = (alerts = false) => {
-		const fail = (msg: string) => {
-			if (alerts) {
-				alert(msg);
-			}
-			console.log(msg);
-			$isCompFlight = false;
-		};
-
-		if (mans[0].name != 'Takeoff') {
-			return fail('Invalid Competition Flight, expected to start with Takeoff');
-		}
-		if (mans.length > 1) {
-			if (!mans[1].sinfo) {
-				return fail(
-					'Invalid Competition Flight, expected first manoeuvre to have a category and schedule'
-				);
-			}
-			const checkMans = $manoeuvres[mans[1].sinfo.to_string()];
-			let failedMans: string[] = [];
-			mans.slice(1, mans.length).forEach((man, i) => {
-				if (i < checkMans.length && man.name != checkMans[i].name) {
-					failedMans.push(`${i}: ${checkMans[i].name}`);
-				}
-			});
-			if (failedMans.length > 0) {
-				return fail(`Invalid Competition Flight, expected manoeuvres:\n${failedMans.join('\n')}`);
-			}
-		}
+	const addMan = () => {
+    let new_man: ManSplit;
+    if (activeMan.schedule && activeMan.manoeuvre) {
+      const lastMan = activeMan.manoeuvre as Manoeuvre;
+      new_man = new ManSplit(activeMan.schedule, activeMan.schedule.manoeuvres[lastMan.index], $states!.data.length);
+    } else {
+      new_man = ManSplit.Empty($states!.data.length);
+    }
+		mans = [...mans, new_man];
+		activeManId = mans.length - 1;
 	};
-	$: if (mans) {
-		$isCompFlight = true;
-		checkComp(false);
-	}
 </script>
 
 <div class="col-8">
-	<PlotSec flst={data.states} controls={['slider', 'rangeEndClick']} bind:range />
+	{#if $states}
+		<PlotSec
+			bind:i={activeIndex}
+			bind:range
+			flst={$states}
+			greyUnselected={true}
+			controls={['slider', 'modelClick']}
+      on:doubleclick={() => {
+        activeMan.stop = activeIndex;
+        range = [range[0], activeMan.stop!];
+        addMan();
+      }}
+		/>
+	{/if}
 </div>
 
 <div class="col-4">
 	<div class="input-group-sm">
 		{#if mans.length == 1}
-			<input class="form-control-sm" type="file" accept=".json" bind:files />
-			{#if files && files.length > 0}
-				<button
-					class="btn btn-outline-secondary form-control-sm"
-					on:click={() => parseFCJ(files[0])}
-				>
-					Load
-				</button>
-			{/if}
+			<label class="btn btn-outline-secondary form-control-sm">
+				<input
+					type="file"
+					name="input-name"
+					style="display: none;"
+					accept=" .json"
+					on:change={(e: Event) => {
+						if (e.target?.files?.length > 0) {
+							parseFCJ(e.target.files[0]);
+						}
+					}}
+				/>
+				<span>Parse FCJ</span>
+			</label>
 		{:else}
-			<button class="btn btn-outline-secondary form-control-sm" on:click={clearSplitting}>
-				Clear
-			</button>
+			<button class="btn btn-outline-secondary form-control-sm"> Clear </button>
 			<span class="input-group-text-sm">{$isCompFlight ? 'Competition' : 'Training'} </span>
 			<button
 				class="btn btn-outline-primary form-control-sm"
 				on:click={() => {
-					createAnalysis(data.states, mans);
+					createAnalysis($states!, mans);
 					goto(base + '/flight/results');
 				}}
 			>
@@ -210,179 +93,71 @@
 		{/if}
 	</div>
 
-	<table class="table-sm align-middle container-fluid">
+	<table class="table-sm table-bordered align-middle container-fluid text-center">
 		<thead>
 			<tr>
-				<th>Manoeuvre</th>
-				<th>End Time</th>
-				<th>Split</th>
-				<th>Delete</th>
+				<th scope="col" class="col-1"></th>
+				<th scope="col" class="col-2">Manoeuvre</th>
+				<th colspan="4" scope="col" class="col-7">Action</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each mans as man, i}
 				<tr>
-					{#if activeMan == i}
-						<td class="p-1">
-							<div class="dropdown">
-								<button
-									class="btn btn-sm dropdown-toggle"
-									data-bs-toggle="dropdown"
-									data-bs-placement="top"
-									title="Select Manoeuvre {i}"
-									on:click={() => {
-										loadCategories();
-										activeMan = i;
-									}}
-								>
-									{man.name}
-								</button>
-								<ul class="dropdown-menu">
-									<li>
-										<button
-											tabindex="-1"
-											class="dropdown-item"
-											on:click={() => setManoeuvre(i, ManSplit.TakeOff(i, man.stop))}
-											>Takeoff</button
-										>
-									</li>
-									<li>
-										<button
-											tabindex="-1"
-											class="dropdown-item"
-											on:click={() => setManoeuvre(i, ManSplit.Break(i, man.stop))}>Break</button
-										>
-									</li>
-									<li>
-										<button
-											tabindex="-1"
-											class="dropdown-item"
-											on:click={() => setManoeuvre(i, ManSplit.Landing(i, man.stop))}
-											>Landing</button
-										>
-									</li>
-									{#each $categories as category}
-										<li>
-											<div class="dropdown dropend">
-												<button
-													tabindex="-1"
-													class="dropdown-item dropdown-toggle"
-													on:click={(e) => {
-														e.stopPropagation();
-														loadSchedules(category);
-													}}
-													data-bs-toggle="dropdown">{category}</button
-												>
-												<ul class="dropdown-menu dropdown-submenu">
-													{#each $schedules[category] as schedule}
-														<li>
-															<div class="dropdown dropend">
-																<button
-																	tabindex="-1"
-																	class="dropdown-item dropdown-toggle"
-																	on:click={(e) => {
-																		e.stopPropagation();
-																		loadManoeuvres(category, schedule);
-																	}}
-																	data-bs-toggle="dropdown"
-																>
-																	{schedule}
-																</button>
-																<ul class="dropdown-menu dropdown-submenu">
-																	{#each $manoeuvres[`${category}_${schedule}`] as manoeuvre}
-																		<li>
-																			<button
-																				class="dropdown-item"
-																				on:click={() =>
-																					setManoeuvre(
-																						i,
-																						new ManSplit(
-																							manoeuvre.name,
-																							manoeuvre.sinfo,
-																							manoeuvre.id,
-																							man.stop
-																						)
-																					)}>{manoeuvre.name}</button
-																			>
-																		</li>
-																	{/each}
-																</ul>
-															</div>
-														</li>
-													{/each}
-												</ul>
-											</div>
-										</li>
-									{/each}
-								</ul>
-							</div>
-						</td>
+					<td
+						><input
+							class="radio"
+							type="radio"
+							name="manSelect"
+							value={i}
+							bind:group={activeManId}
+						/></td
+					>
 
-						<td>
-							{#if man.name != 'Select'}
-								<button
-									class="btn btn-sm"
-									on:click={setRange}
-									type="button"
-									data-bs-placement="top"
-									title="Set the end point of this manoeuvre to the end of the active range (or press 's')"
-								>
-									{#if man.stop && data.states.data[man.stop]}
-										{`Update (${data.states.data[man.stop].t.toFixed(2)} -> ${data.states.data[range[1]].t.toFixed(2)})`}
-									{:else}
-										{`Not set -> ${data.states.data[range[1]].t.toFixed(2)}`}
-									{/if}
-								</button>
-							{/if}
+					{#if man.fixed || activeManId != i}
+						<td>{man.name}</td>
+					{:else}
+						<td class="dropdown-toggle" role="button" data-bs-toggle="dropdown">
+							{man.name}
+								<ScheduleSelect
+									manoeuvre={man.manoeuvre}
+									onselected={(schedule: Schedule, manoeuvre: Manoeuvre) => {
+										man.schedule = schedule;
+                    man.manoeuvre = manoeuvre;
+									}}
+								/>
 						</td>
-						{#if man.stop && range[1] < data.states.data.length && activeMan == mans.length - 1}
-							<td>
-								<button
-									on:click={addMan}
-									class="btn btn-sm"
-									type="button"
-									data-bs-placement="top"
-									title="Add Manoeuvre">+</button
-								>
-							</td>
+					{/if}
+					{#if activeManId == i}
+						<td
+							role="button"
+							on:click={() => {
+								man.stop = activeIndex;
+								range = [range[0], man.stop!];
+							}}>Set</td
+						>
+						<td
+							role="button"
+							on:click={() => {
+								console.log(`split at ${activeIndex}`);
+							}}>Split</td
+						>
+						<td role="button" on:click={addMan}>Add</td>
+						{#if !man.fixed}
+							<td
+								role="button"
+								on:click={() => {
+									activeManId = activeManId - 1;
+									mans.splice(activeManId + 1, 1);
+									mans = mans;
+								}}>Delete</td
+							>
 						{/if}
 					{:else}
-						<td>
-							<button
-								class="btn btn-sm"
-								type="button"
-								data-bs-placement="top"
-								title="Activate {man.name}"
-								on:click={() => {
-									activeMan = i;
-								}}>{man.name}</button
-							>
-						</td>
-						<td
-							><span class="text-sm"
-								>{man.stop ? data.states.data[man.stop]?.t.toFixed(2) : 'not set'}</span
-							></td
-						>
+						<td colspan="4">Activate</td>
 					{/if}
-					<td>
-						<button
-							class="btn btn-sm"
-							type="button"
-							data-bs-placement="top"
-							title="Delete {man.name}"
-							on:click={() => {
-								deleteMan(i);
-							}}><small>X</small></button
-						>
-					</td>
 				</tr>
 			{/each}
 		</tbody>
 	</table>
 </div>
-
-<svelte:window
-	on:keydown={(e) => {
-		keyPress(e.key);
-	}}
-/>
