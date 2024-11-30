@@ -5,8 +5,8 @@
 	import { layout3d } from '$lib/components/plots/layouts';
 	import DoubleSlider from '$lib/components/DoubleSlider.svelte';
 	import colddraft from '$lib/components/plots/colddraft';
-  import {createEventDispatcher} from 'svelte';
-	export let flst: States;
+
+  export let flst: States;
 	export let tpst: States | undefined = undefined;
 	export let i: number | undefined = undefined;
 	export let controls = [
@@ -23,11 +23,11 @@
 	export let scale: number = 1;
 	export let scaleType: string = 'range';
 	export let speed = 50;
-	export let range = [0, flst.data.length];
+	export let visibleRange: [number, number] = [0, flst.data.length];
+  export let range = [0, flst.data.length];
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
 
-  const dispatch = createEventDispatcher();
 	let scale_multiplier = 1;
 
 	$: if (flst && fixRange) {
@@ -72,7 +72,8 @@
 			? {
 					...createRibbonTrace(flst, _scale * scale_multiplier, 0, range[0]),
 					opacity: 0.2,
-					name: 'before'
+					name: 'before',
+          color: 'grey'
 				}
 			: { type: 'mesh3d', visible: false };
 
@@ -81,7 +82,8 @@
 			? {
 					...createRibbonTrace(flst, _scale * scale_multiplier, range[1], flst.data.length),
 					opacity: 0.2,
-					name: 'after'
+					name: 'after',
+          color: 'grey'
 				}
 			: { type: 'mesh3d', visible: false, name: 'grey2' };
 
@@ -141,10 +143,6 @@
 				{layout}
 				fillParent={true}
 				on:click={handleClick}
-        on:doubleclick={(e) => {
-          handleClick(e);
-          dispatch('doubleclick');
-        }}
 			/>
 		{/if}
 	</div>

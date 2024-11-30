@@ -55,17 +55,17 @@ export class ManSplit {
 export async function parseFCJMans(fcj: FCJson, states: States) {
 	const stTime = states.t;
 	const sinfo = await fcj.sinfo.to_pfc();
-	const manDetails = await library[sinfo.category][sinfo.schedule];
+	const schedule = library[sinfo.category].schedules![sinfo.name];
 
 	return fcj.mans.map((man: FCJMan, i: number) => {
 		const stStop = lookupMonotonic(fcj.data[man.stop].time / 1e6, stTime);
 		switch (i) {
 			case 0:
-				return new ManSplit('Takeoff', undefined, i, stStop);
+				return ManSplit.TakeOff(stStop);
 			case fcj.mans.length - 1:
-				return new ManSplit('Landing', undefined, i, stTime.length);
+				return ManSplit.Landing(stTime.length);
 			default:
-				return new ManSplit(manDetails[i - 1].name, manDetails[i - 1].sinfo, i, stStop);
+				return new ManSplit(schedule, schedule.manoeuvres[i-1], stStop);
 		}
 	});
 }

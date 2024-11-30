@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
-	import { ManSplit } from '$lib/analysis/splitting';
+	import { ManSplit, parseFCJMans } from '$lib/analysis/splitting';
 	import { createAnalysis } from '$lib/analysis/analysis';
 	import { isCompFlight, states, fcj } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
@@ -9,11 +9,11 @@
 	import ScheduleSelect from '$lib/components/ScheduleSelect.svelte';
 	import { type Schedule, type Manoeuvre } from '$lib/schedules';
 
-	let mans: ManSplit[] = [ManSplit.TakeOff(1000)];
+	let mans: ManSplit[] = [ManSplit.TakeOff(undefined)];
 	let activeManId: number = 0;
 	let activeIndex: number = 0;
-
-	let range: number[] = [0, $states!.data.length];
+  let visibleRange: [number, number] = [0, $states!.data.length];
+	let range: [number, number] = [0, $states!.data.length];
 	$: activeMan = mans[activeManId];
 
 	$: if (activeMan) {
@@ -31,32 +31,65 @@
 		reader.readAsText(file);
 	};
 
+	$: if ($fcj) {
+    activeManId = 0;
+    mans=[ManSplit.TakeOff(undefined)];
+		parseFCJMans($fcj, $states!).then((res) => {
+			mans = res;
+			activeManId = 1;
+		});
+	}
+
 	const addMan = () => {
     let new_man: ManSplit;
     if (activeMan.schedule && activeMan.manoeuvre) {
       const lastMan = activeMan.manoeuvre as Manoeuvre;
-      new_man = new ManSplit(activeMan.schedule, activeMan.schedule.manoeuvres[lastMan.index], $states!.data.length);
+      new_man = new ManSplit(activeMan.schedule, activeMan.schedule.manoeuvres[lastMan.index]);
     } else {
-      new_man = ManSplit.Empty($states!.data.length);
+      new_man = ManSplit.Empty();
     }
 		mans = [...mans, new_man];
 		activeManId = mans.length - 1;
 	};
+
+  const setRange = (man: ManSplit) => {
+    if (activeManId==0 || activeIndex >= mans[activeManId-1].stop! ) {
+      if (activeManId < mans.length-2 || !mans[activeManId+1].stop || activeIndex <= mans[activeManId+1].stop!) 
+      man.stop = activeIndex;
+      range = [range[0], man.stop!];
+    }
+  }
+
 </script>
+
+
+
+
+<svelte:window
+	on:keydown={(e) => {
+		switch (e.key) {
+      case 's':
+        setRange(activeMan);
+        break;
+      case 'Enter':
+        if (mans[mans.length-1].manoeuvre) {addMan();}
+        break;
+    }
+	}}
+/>
+
+
+
 
 <div class="col-8">
 	{#if $states}
 		<PlotSec
 			bind:i={activeIndex}
 			bind:range
+      bind:visibleRange
 			flst={$states}
 			greyUnselected={true}
 			controls={['slider', 'modelClick']}
-      on:doubleclick={() => {
-        activeMan.stop = activeIndex;
-        range = [range[0], activeMan.stop!];
-        addMan();
-      }}
 		/>
 	{/if}
 </div>
@@ -79,7 +112,7 @@
 				<span>Parse FCJ</span>
 			</label>
 		{:else}
-			<button class="btn btn-outline-secondary form-control-sm"> Clear </button>
+			<button class="btn btn-outline-secondary form-control-sm" on:click={()=>{activeManId=0;mans=[ManSplit.TakeOff()];}}> Clear </button>
 			<span class="input-group-text-sm">{$isCompFlight ? 'Competition' : 'Training'} </span>
 			<button
 				class="btn btn-outline-primary form-control-sm"
@@ -131,10 +164,7 @@
 					{#if activeManId == i}
 						<td
 							role="button"
-							on:click={() => {
-								man.stop = activeIndex;
-								range = [range[0], man.stop!];
-							}}>Set</td
+							on:click={()=>setRange(man)}>Set (s)</td
 						>
 						<td
 							role="button"
@@ -142,7 +172,7 @@
 								console.log(`split at ${activeIndex}`);
 							}}>Split</td
 						>
-						<td role="button" on:click={addMan}>Add</td>
+						
 						{#if !man.fixed}
 							<td
 								role="button"
@@ -153,11 +183,16 @@
 								}}>Delete</td
 							>
 						{/if}
-					{:else}
-						<td colspan="4">Activate</td>
+            {:else}
+              <td colspan="3"></td>
 					{/if}
 				</tr>
 			{/each}
+      {#if mans[mans.length-1].manoeuvre && mans[mans.length-1].manoeuvre != 'Landing'}
+      <tr>
+        <td colspan="6" role="button" on:click={addMan}>Add (return)</td>
+      </tr>
+      {/if}
 		</tbody>
 	</table>
 </div>
