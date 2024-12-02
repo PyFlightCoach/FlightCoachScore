@@ -3,7 +3,7 @@
 	import UserMenu from './UserMenu.svelte';
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
-	import SettingsMenu from './SettingsMenu.svelte';
+	import SuperMenu from './SuperMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import ScheduleMenu from './ScheduleMenu.svelte';
 	import { dev } from '$app/environment';
@@ -34,9 +34,9 @@
 						<UserMenu />
 						<FlightMenu />
 						<DataBaseMenu />
-						<SettingsMenu />
+            <ScheduleMenu />
 						{#if ($user && $user.is_superuser) || dev}
-							<ScheduleMenu />
+              <SuperMenu />
 						{/if}
 					</ul>
 					<ul class="navbar-nav col-7 mr-auto">

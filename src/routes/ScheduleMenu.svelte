@@ -2,6 +2,8 @@
   import {dbServer} from "$lib/api";
   import NavMenu from "$lib/components/NavMenu.svelte";
   import {base} from "$app/paths";
+	import { user } from '$lib/stores/user';
+	import { dev } from '$app/environment';
 
   const uploadSchedule = (file: File) => {
     const form_data = new FormData();
@@ -13,19 +15,21 @@
 </script>
 
 
-<NavMenu>
+<NavMenu tooltip="Schedule Tools">
   <span slot="icon"><i class="bi bi-clipboard"></i> </span>
-  <label class="dropdown-item">
-    <input
-      type="file"
-      name="input-name"
-      style="display: none;"
-      accept=" .json, .sdef"
-      on:change={(e: Event) => {
-        if (e.target?.files?.length > 0) {uploadSchedule(e.target.files[0])};
-      }}
-    />
-    <span>Upload</span>
-  </label>
+  {#if $user?.is_superuser || dev}
+    <label class="dropdown-item">
+      <input
+        type="file"
+        name="input-name"
+        style="display: none;"
+        accept=" .json, .sdef"
+        on:change={(e: Event) => {
+          if (e.target?.files?.length > 0) {uploadSchedule(e.target.files[0])};
+        }}
+      />
+      <span>Upload</span>
+    </label>  
+  {/if}
   <a class="dropdown-item" href="{base}/schedule/browse">Browse</a>
 </NavMenu>

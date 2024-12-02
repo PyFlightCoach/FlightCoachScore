@@ -1,16 +1,16 @@
 <script lang="ts">
 	import navBarContents from '$lib/stores/navBarContents';
-	import { analysisServer, dbServer } from '$lib/api';
+	import { analysisServer, dbServer, faVersion } from '$lib/api';
 	import { onMount } from 'svelte';
 	import { version } from '$app/environment';
 	import { user } from '$lib/stores/user';
-
+  
 	$navBarContents = undefined;
 
 	let aSVersion: string = $state('not connected');
 
 	const getServerVersions = async () => {
-		aSVersion = await analysisServer.get('version');
+		$faVersion = await analysisServer.get('fa_version');
 	};
 
 	onMount(getServerVersions);
@@ -35,18 +35,9 @@
 					<td>Analysis Version:</td>
 					<td
 						role="button"
-						onclick={() => {
-							analysisServer
-								.get('version')
-								.then((res) => {
-									aSVersion = res;
-								})
-								.catch(() => {
-									aSVersion = 'not connected';
-								});
-						}}
+						onclick={getServerVersions}
 					>
-						{aSVersion}
+						{$faVersion || 'not connected'}
 					</td>
 				</tr>
 				<tr>

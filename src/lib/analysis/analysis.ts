@@ -19,12 +19,13 @@ import {
 	fcj
 } from '$lib/stores/analysis';
 import { MA } from '$lib/analysis/ma';
-import { get } from 'svelte/store';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { analysisServer } from '$lib/api';
 import { States } from '$lib/analysis/state';
-import { ManSplit } from '$lib/analysis/splitting';
-import {ManDef} from '$lib/analysis/mandef';
+import { Splitting, ManSplit } from '$lib/analysis/splitting';
+import { ManDef } from '$lib/analysis/mandef';
+import { ScheduleInfo } from './fcjson';
+import { library, loadManDef } from '$lib/schedules';
 
 export function checkComplete() {
 	if (!get(manNames) || !get(bin)) {
@@ -36,33 +37,38 @@ export function checkComplete() {
 	return true;
 }
 
-export function createAnalyses(mnames: string[]) {
+function setupAnalysisArrays(mnames: string[]) {
 	manNames.set(mnames);
 	scores.set(new Array(mnames.length).fill(0));
-  running.set(new Array(mnames.length).fill(false));
+	running.set(new Array(mnames.length).fill(false));
+  analyses.length = mnames.length;
+  runInfo.length = mnames.length;
+  mnames.forEach((_, i) => {
+    runInfo[i] = writable();
+    analyses[i] = writable();
+  });
+}
 
-	mnames.forEach((name, i) => {
-		analyses.push(writable());
-		runInfo.push(writable(`Empty Analysis Created At ${new Date().toLocaleTimeString()}`));
+function setAnalysis(i: number, man: MA) {
+	analyses[i].set(man);
 
-		analyses[i].subscribe((ma: MA | undefined) => {
-			scores.update((s) => {
-				if (ma) {
-					s![i] =
-						ma.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
-						(ma.mdef?.info.k || ma.k!);
-				} else {
-					s![i] = 0;
-				}
-				return s;
-			});
-      
-			fa_versions.update((v) => {
-				return [...new Set([...v, ...Object.keys(ma?.history || [])])];
-			});
-
-			isComplete.set(checkComplete());
+	analyses[i].subscribe((ma: MA | undefined) => {
+		scores.update((s) => {
+			if (ma) {
+				s![i] =
+					ma.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
+					(ma.mdef?.info.k || ma.k!);
+			} else {
+				s![i] = 0;
+			}
+			return s;
 		});
+
+		fa_versions.update((v) => {
+			return [...new Set([...v, ...Object.keys(ma?.history || [])])];
+		});
+
+		isComplete.set(checkComplete());
 	});
 }
 
@@ -80,19 +86,11 @@ export function clearAnalysis() {
 	bin.set(undefined);
 	analyses.length = 0;
 	running.set([]);
-	runInfo.length = 0;  
+	runInfo.length = 0;
 }
 
-export async function createAnalysis(sts: States, mans: ManSplit[]) {
-	const analysisMans: number[] = [];
-
-	mans.forEach((man, i) => {
-		if (man.sinfo) {
-			analysisMans.push(i);
-		}
-	});
-
-	createAnalyses(analysisMans.map((i) => mans[i].name));
+export async function newAnalysis(sts: States, split: Splitting) {
+	setupAnalysisArrays(split.manNames);
 
 	if (get(binData)) {
 		origin.update((orgn) => {
@@ -102,14 +100,9 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 
 	let direction: string = 'Infer';
 	if (get(isCompFlight)) {
-		let ddef;
-		try {
-			ddef = await mans[analysisMans[0]].sinfo!.direction_definition();
-		} catch {
-			ddef = { manid: 0, direction: 'UPWIND' };
-		}
+		const ddef = split.directionDefinition();
 
-		const heading = sts.data[mans[ddef.manid].stop!].direction_str();
+		const heading = sts.data[split.mans[ddef.manid].stop!].direction_str();
 		if (ddef.direction == 'DOWNWIND') {
 			direction = heading == 'RTOL' ? 'LTOR' : 'RTOL';
 		} else if (ddef.direction == 'UPWIND') {
@@ -119,21 +112,23 @@ export async function createAnalysis(sts: States, mans: ManSplit[]) {
 		}
 	}
 
-	analysisMans.forEach(async (id, i) => {
-		analyses[i].set(
+	split.analysisMans.forEach(async (id: number, i: number) => {
+    runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
+		setAnalysis(
+      i,
 			new MA(
-				mans[id].name,
-				i + 1,
-				id > 0 ? sts.data[mans[id - 1].stop!].t : 0,
-				sts.data[mans[id].stop!].t,
-				mans[id].sinfo!,
+				split.mans[id].name!,
+				id,
+				id > 0 ? sts.data[split.mans[id-1].stop!].t : 0,
+				sts.data[split.mans[id].stop!].t,
+				new ScheduleInfo(split.mans[id].schedule!.category_name, split.mans[id].schedule_name),
 				direction,
 				get(fcj)?.manhistory(id) || {},
-				1, // todo get K
+				split.mans[id].manoeuvre!.k, // todo get K
 				get(binData)
 					? undefined
-					: new States(sts.data.slice(id > 0 ? mans[id - 1].stop : 0, mans[id].stop)),
-        mans[id].mdef
+					: new States(sts.data.slice(split.mans[id-1].stop, split.mans[id].stop)),
+          split.mans[id].mdef
 			)
 		);
 	});
@@ -162,28 +157,32 @@ export async function importAnalysis(data: Record<string, any>) {
 	isCompFlight.set(data.isComp);
 	bootTime.set(data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);
 
-	createAnalyses(data.mans.map((ma: MA) => ma.name));
+	setupAnalysisArrays(data.mans.map((ma: MA) => ma.name));
 
-	data.mans.forEach(async (ma, i) => {
+	data.mans.forEach(async (ma: ManDef, i: number) => {
+    runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
 		MA.parse(ma).then(async (res) => {
-      if (res.mdef) {
-			  analyses[i].set(res);
-      } else {
-        analyses[i].set(new MA(
-          res.name,
-          res.id,
-          res.tStart,
-          res.tStop,
-          res.schedule,
-          res.scheduleDirection,
-          res.history,
-          res.k,
-          res.flown,
-          ManDef.parse(await analysisServer.get(
-            `${res.schedule.category}/${res.schedule.name}/${res.name}/definition`
-          ))
-        ));
-      }
+			if (res.mdef) {
+				setAnalysis(i, res);
+			} else {
+				setAnalysis(
+          i,
+					new MA(
+						res.name,
+						res.id,
+						res.tStart,
+						res.tStop,
+						res.schedule,
+						res.scheduleDirection,
+						res.history,
+						res.k,
+						res.flown,
+						await loadManDef(
+							library[res.schedule.category].schedules![res.schedule.name].manoeuvres[res.id].id
+						)
+					)
+				);
+			}
 		});
 	});
 }
@@ -225,11 +224,17 @@ export async function analyseManoeuvre(
 		//if scores exist, only run if server version not in history
 
 		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
-		running.update(v=>{v[id]=true;return v});
+		running.update((v) => {
+			v[id] = true;
+			return v;
+		});
 
 		await ma!.run(optimise).then((res) => {
 			analyses[id].set(res);
-      running.update(v=>{v[id]=false;return v});
+			running.update((v) => {
+				v[id] = false;
+				return v;
+			});
 		});
 	}
 }

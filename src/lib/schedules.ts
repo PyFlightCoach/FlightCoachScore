@@ -1,4 +1,5 @@
-import { dbServer } from '$lib/api';
+import { dbServer, dbServerAddress } from '$lib/api';
+import { ManDef, ManOpt } from '$lib/analysis/mandef';
 
 export interface Manoeuvre {
 	id: string;
@@ -37,18 +38,34 @@ export async function loadSchedules(
 	return Object.fromEntries(schedules.results.map((s: Schedule) => [s.schedule_name, s]));
 }
 
-export async function loadCategories(user: string='me'): Promise<Record<string, Category>> {
+export async function loadCategories(user: string = 'me'): Promise<Record<string, Category>> {
 	const cats = await dbServer.get(`schedule/categories`);
 
-  const ocats: Record<string, Category> = {};
-  cats.results.forEach((cat: Category) => {
-    loadSchedules({ category: cat.category_name, owner: user}).then((schedules) => {
+	const ocats: Record<string, Category> = {};
+	cats.results.forEach((cat: Category) => {
+		loadSchedules({ category: cat.category_name, owner: user }).then((schedules) => {
+			ocats[cat.category_name] = Object.assign(cat, { schedules });
+		});
+	});
 
-      ocats[cat.category_name] = Object.assign(cat, {schedules});
-    });
-  });
-
-  return ocats;
+	return ocats;
 }
 
-export const library = await loadCategories('thomasdavid0@googlemail.com');
+export let library;
+
+export async function loadLibrary() {
+	loadCategories('thomasdavid0@googlemail.com')
+		.then((cats) => {
+			library = cats;
+		})
+		.catch(() => {
+			console.error('Error loading categories');
+			library = {};
+		});
+}
+
+dbServerAddress.subscribe(loadLibrary);
+
+export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
+	return dbServer.get(`schedule/manoeuvre/definition/${manoeuvre_id}`).then((r) => ManDef.parse(r));
+}

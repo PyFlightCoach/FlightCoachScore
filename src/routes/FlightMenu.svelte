@@ -2,27 +2,32 @@
 	import NavMenu from '$lib/components/NavMenu.svelte';
 	import { base } from '$app/paths';
 	import { manNames, bin } from '$lib/stores/analysis';
-	import { clearAnalysis, exportAnalysis, loadExample, importAnalysis } from '$lib/analysis/analysis';
+	import {
+		clearAnalysis,
+		exportAnalysis,
+		loadExample,
+		importAnalysis
+	} from '$lib/analysis/analysis';
 	import { goto } from '$app/navigation';
 	import { saveAs } from 'file-saver';
-	import {loading} from '$lib/stores/shared';
+	import { loading } from '$lib/stores/shared';
+	import { user } from '$lib/stores/user';
+	import { dev } from '$app/environment';
 
-  let importedname: string | undefined
-  
-  const parseAnalysis = (file: File) => { 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      importedname = file.name;
-      importAnalysis(JSON.parse(reader.result));
-      goto(base + '/flight/results');
-    };
-    reader.readAsText(file);
-  }
+	let importedname: string | undefined;
 
-
+	const parseAnalysis = (file: File) => {
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			importedname = file.name;
+			importAnalysis(JSON.parse(reader.result));
+			goto(base + '/flight/results');
+		};
+		reader.readAsText(file);
+	};
 </script>
 
-<NavMenu>
+<NavMenu tooltip="Flight Analysis Menu">
 	<span slot="icon"><i class="bi bi-airplane"></i></span>
 	{#if $bin}
 		<h5 class="dropdown-header">{$bin.name}</h5>
@@ -37,49 +42,54 @@
 				goto(`${base}/`);
 			}}>Clear</button
 		>
-		<button
-			class="dropdown-item"
-			on:click={() => {
-				exportAnalysis(false).then((res) => {
-					saveAs(res, 'flight.ajson');
-				});
-			}}
-		>
-			Export Full
-		</button>
-		<button
-			class="dropdown-item"
-			on:click={() => {
-				exportAnalysis(true).then((res) => {
-					saveAs(res, 'flight.ajson');
-				});
-			}}
-		>
-			Export Short
-		</button>
+		{#if $user?.is_superuser || dev}
+			<button
+				class="dropdown-item"
+				on:click={() => {
+					exportAnalysis(false).then((res) => {
+						saveAs(res, 'flight.ajson');
+					});
+				}}
+			>
+				Export Full
+			</button>
+			<button
+				class="dropdown-item"
+				on:click={() => {
+					exportAnalysis(true).then((res) => {
+						saveAs(res, 'flight.ajson');
+					});
+				}}
+			>
+				Export Short
+			</button>
+		{/if}
 		<a class="dropdown-item" href={base + '/flight/results'}>Results</a>
 	{:else}
 		<a class="dropdown-item" href={base + '/flight/create/data'}>Create</a>
-		<label class="dropdown-item">
-			<input
-				type="file"
-				name="input-name"
-				style="display: none;"
-        accept=".json, .ajson"
-				on:change={(e) => {
-					if (e.target?.files?.length > 0) {parseAnalysis(e.target.files[0])};
-				}}
-			/>
-			<span>Import</span>
-		</label>
-
+		{#if $user?.is_superuser || dev}
+			<label class="dropdown-item">
+				<input
+					type="file"
+					name="input-name"
+					style="display: none;"
+					accept=".json, .ajson"
+					on:change={(e) => {
+						if (e.target?.files?.length > 0) {
+							parseAnalysis(e.target.files[0]);
+						}
+					}}
+				/>
+				<span>Import</span>
+			</label>
+		{/if}
 		<button
 			class="dropdown-item"
 			on:click={() => {
-        $loading=true
+				$loading = true;
 				loadExample().then(() => {
 					goto(base + '/flight/results');
-          $loading=false;
+					$loading = false;
 				});
 			}}
 		>

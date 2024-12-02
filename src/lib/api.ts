@@ -1,5 +1,5 @@
 import { newCookieStore } from '$lib/utils/cookieStore';
-
+import { type Writable, writable } from 'svelte/store';
 
 export class Server {
 	constructor(readonly address: string) {}
@@ -63,6 +63,7 @@ export function formDataFromDict(data: unknown) {
 
 export let analysisServer: Server;
 export const ukAnalysisServer: string = 'https://madeupmodels.com:5010';
+export const preAnalysisServer: string = 'https://madeupmodels.com:5020';
 export const customAnalysisServer = newCookieStore('customAnalysisServer', 'http://localhost:5000');
 export const analysisServerAddress = newCookieStore(
   'analysisServer', 
@@ -70,8 +71,15 @@ export const analysisServerAddress = newCookieStore(
   (value) => {analysisServer=new Server(value)}
 );
 
+export const faVersion: Writable<string|undefined> = writable(undefined);
+analysisServerAddress.subscribe((value) => {
+  analysisServer.get('fa_version').then(res=>faVersion.set(res)).catch(()=>faVersion.set(undefined));
+});
+
+
 export let dbServer: Server;
 export const ukDBServer: string = 'https://madeupmodels.com:5012';
+export const preDBServer: string = 'https://madeupmodels.com:5022';
 export const customDBServer = newCookieStore('customDBServer', 'http://localhost:8000');
 export const dbServerAddress = newCookieStore(
   'dbServer', 

@@ -19,11 +19,11 @@
 		'rangeEndClick',
 		'rangeStartClick'
 	];
-
+  export let showBefore: boolean = false;
+  export let showAfter: boolean = false;
 	export let scale: number = 1;
 	export let scaleType: string = 'range';
 	export let speed = 50;
-	export let visibleRange: [number, number] = [0, flst.data.length];
   export let range = [0, flst.data.length];
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
@@ -68,22 +68,24 @@
 	$: tp_model = createModelTrace(tpst, i, _scale * scale_multiplier);
 
 	$: grey_ribbon1 =
-		greyUnselected && range[0] > 0
+		(greyUnselected && range[0] > 0 )
 			? {
 					...createRibbonTrace(flst, _scale * scale_multiplier, 0, range[0]),
 					opacity: 0.2,
 					name: 'before',
-          color: 'grey'
+          color: 'grey',
+          visible: showBefore
 				}
 			: { type: 'mesh3d', visible: false };
 
 	$: grey_ribbon2 =
-		greyUnselected && range[1] < flst.data.length
+		(greyUnselected && range[1] < flst.data.length)
 			? {
 					...createRibbonTrace(flst, _scale * scale_multiplier, range[1], flst.data.length),
 					opacity: 0.2,
 					name: 'after',
-          color: 'grey'
+          color: 'grey',
+          visible: showAfter
 				}
 			: { type: 'mesh3d', visible: false, name: 'grey2' };
 

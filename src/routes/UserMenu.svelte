@@ -7,7 +7,7 @@
 
 </script>
 
-<NavMenu>
+<NavMenu tooltip="User Menu">
 	<span slot="icon"><i class="bi bi-person"></i></span>
 	{#if $user}
 		<a class="dropdown-item" href="{base}/user/profile">Profile</a>
@@ -24,3 +24,4 @@
 		<a class="dropdown-item" href="{base}/user/register">Sign Up</a>
 	{/if}
 </NavMenu>
+

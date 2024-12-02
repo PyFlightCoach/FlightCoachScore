@@ -112,8 +112,6 @@ export class MA {
 	}
 
 	static async parse(data: Record<string, any>) {
-		runInfo[data.id - 1].set(`Analysis Imported at ${new Date().toLocaleTimeString()}`);
-
 		return new MA(
 			data.name,
 			data.id,

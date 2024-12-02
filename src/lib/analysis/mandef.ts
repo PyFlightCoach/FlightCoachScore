@@ -2,7 +2,7 @@ import { parse_dict } from '$lib/utils/arrays';
 import { Result } from './scores';
 
 export const Heights = ['BTM', 'MID', 'TOP'] as const;
-export const Directions = ['DRIVEN', 'UPWIND', 'DOWNWIND'] as const;
+export const Directions = ['DRIVEN', 'UPWIND', 'DOWNWIND', 'CROSS'] as const;
 export const Orientations = ['DRIVEN', 'UPRIGHT', 'INVERTED'] as const;
 export const Positions = ['CENTRE', 'END'] as const;
 export type Height = (typeof Heights)[number];
@@ -12,9 +12,9 @@ export type Position = (typeof Positions)[number];
 
 export class BoxLocation {
 	constructor(
-		readonly h: Height,
-		readonly d: Direction,
-		readonly o: Orientation
+		readonly height: Height,
+		readonly direction: Direction,
+		readonly orientation: Orientation
 	) {}
 }
 
