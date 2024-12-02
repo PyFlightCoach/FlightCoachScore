@@ -179,11 +179,13 @@
 						<td class="dropdown-toggle" role="button" data-bs-toggle="dropdown">
 							{man.name}
 							<ScheduleSelect
-								manoeuvre={man.manoeuvre}
-								onselected={(schedule: Schedule, manoeuvre: Manoeuvre) => {
+                level="manoeuvre"
+								onselected={(schedule, manoeuvre) => {
 									man.schedule = schedule;
-									man.manoeuvre = manoeuvre;
-                  loadManDef(man.manoeuvre.id).then(manDef =>{man.mdef = manDef});
+                  if (manoeuvre) {
+                    man.manoeuvre = manoeuvre;
+                    loadManDef(man.manoeuvre.id).then(manDef =>{man.mdef = manDef});
+                  }
 								}}
 							/>
 						</td>

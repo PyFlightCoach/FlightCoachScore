@@ -51,7 +51,7 @@ export async function loadCategories(user: string = 'me'): Promise<Record<string
 	return ocats;
 }
 
-export let library;
+export let library: Record<string, Category> = {};
 
 export async function loadLibrary() {
 	loadCategories('thomasdavid0@googlemail.com')
