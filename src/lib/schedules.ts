@@ -117,8 +117,8 @@ export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary()
 
 export async function loadKnowns() {
   const lib = get(library);
-  if (lib.subset({owner_name: 'Tom David'}).empty) {
-    lib.update({owner: 'thomasdavid0@googlemail.com'}).then(
+  if (lib.subset({owner_name: 'Fcscore Admin'}).empty) {
+    lib.update({owner: 'admin@fcscore.org'}).then(
       newlib=>{library.set(newlib.sort(['rule_name', 'category_name', 'schedule_name']))}
     );
   } 

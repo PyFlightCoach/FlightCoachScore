@@ -19,7 +19,7 @@ describe('Loading Schedules', async () => {
 
 describe ('Schedule Library', async () => {
   dbServerAddress.set('http://localhost:8000');    
-  const library = new ScheduleLibrary(await loadSchedules({ owner: 'thomasdavid0@googlemail.com' }));
+  const library = new ScheduleLibrary(await loadSchedules({ owner: 'admin@fcscore.org' }));
 
   it('should subset the library', async ()=>{
     expect(library).toBeDefined();
@@ -29,13 +29,13 @@ describe ('Schedule Library', async () => {
   });
 
   it('should return unique values', async ()=>{
-    expect(library.unique('owner_name')).toEqual(['Tom David']);
+    expect(library.unique('owner_name')).toEqual(['Fcscore Admin']);
   })
 
   it('should append unique schedules to a library', async ()=>{
     let lib = new ScheduleLibrary();
     expect(lib.length).toBe(0);
-    const new_schedules = await loadSchedules({ owner: 'thomasdavid0@googlemail.com' });
+    const new_schedules = await loadSchedules({ owner: 'admin@fcscore.org' });
     lib = lib.append(new_schedules); 
     expect(lib.length).toBeGreaterThan(0);
     const lib2 = lib.append(new_schedules); 
