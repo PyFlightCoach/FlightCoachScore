@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { library } from '$lib/schedules';
-	
+	import { library, loadKnowns } from '$lib/schedules';
+
+	loadKnowns();
 	let selectedCategory: string | undefined = undefined;
 	let selectedSchedule: string | undefined = undefined;
 </script>
@@ -11,24 +12,28 @@
 		<thead>
 			<tr>
 				<th>Category</th>
-				<th>Rule</th>
+				<th>rule_name</th>
+				<th>n</th>
 			</tr>
 		</thead>
 		<tbody>
-			{#each Object.values(library) as category}
+			{#each $library
+				.unique('category_name')
+				.map((catn) => $library.subset({ category_name: catn })) as catlib}
 				<tr>
-					<td>{category.category_name}</td>
-					<td>{category.rule_name}</td>
+					<td>{catlib.first.category_name}</td>
+					<td>{catlib.first.rule_name}</td>
+					<td>{catlib.length}</td>
 					<td>
 						<input
 							class="radio"
 							type="radio"
 							name="z"
-							value={category.category_name}
+							value={catlib.first.category_name}
 							bind:group={selectedCategory}
-              on:change={() => {
-                selectedSchedule = undefined;
-              }}
+							on:change={() => {
+								selectedSchedule = undefined;
+							}}
 						/>
 					</td>
 				</tr>
@@ -47,7 +52,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each Object.values(library[selectedCategory].schedules!) as schedule}
+				{#each $library.subset({ category_name: selectedCategory }).schedules as schedule}
 					<tr>
 						<td>{schedule.schedule_name}</td>
 						<td>{schedule.owner_name}</td>
@@ -79,7 +84,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each Object.values(library[selectedCategory].schedules![selectedSchedule].manoeuvres) as manoeuvre}
+				{#each $library.subset( { category_name: selectedCategory, schedule_name: selectedSchedule } ).first.manoeuvres as manoeuvre}
 					<tr>
 						<td>{manoeuvre.index}</td>
 						<td>{manoeuvre.short_name}</td>

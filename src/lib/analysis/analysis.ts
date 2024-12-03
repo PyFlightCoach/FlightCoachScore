@@ -102,7 +102,7 @@ export async function newAnalysis(sts: States, split: Splitting) {
 	if (get(isCompFlight)) {
 		const ddef = split.directionDefinition();
 
-		const heading = sts.data[split.mans[ddef.manid].stop!].direction_str();
+		const heading = sts.data[split.mans[ddef.manid-1].stop!].direction_str();
 		if (ddef.direction == 'DOWNWIND') {
 			direction = heading == 'RTOL' ? 'LTOR' : 'RTOL';
 		} else if (ddef.direction == 'UPWIND') {

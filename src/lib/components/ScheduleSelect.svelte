@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { library, type Schedule, type Manoeuvre } from '$lib/schedules';
-
+	import { library, loadKnowns, type Schedule, type Manoeuvre } from '$lib/schedules';
+  loadKnowns();
 	let {
 		level = 'schedule',
 		onselected
@@ -11,7 +11,10 @@
 </script>
 
 <ul class="dropdown-menu">
-	{#each Object.values(library) as category}
+	{#each $library
+    .unique('category_name')
+    .map((catn) => $library.subset({ category_name: catn })) as catlib
+  }
 		<li>
 			<div class="dropdown dropend">
 				<button
@@ -21,14 +24,14 @@
 					}}
 					data-bs-toggle="dropdown"
 				>
-					{category.category_name}({category.rule_name})
+          {catlib.first.rule_name}: {catlib.first.category_name}
 				</button>
 				<ul class="dropdown-menu dropdown-submenu">
-					{#each Object.values(category.schedules!) as schedule}
+					{#each catlib.schedules as sched}
 						<li>
 							{#if level == 'schedule'}
-								<button class="dropdown-item" onclick={() => onselected(schedule, undefined)}>
-									{schedule.schedule_name}
+								<button class="dropdown-item" onclick={() => onselected(sched, undefined)}>
+									{sched.schedule_name}
 								</button>
 							{:else}
 								<button
@@ -38,13 +41,13 @@
 									}}
 									data-bs-toggle="dropdown"
 								>
-									{schedule.schedule_name}
+									{sched.schedule_name}
 								</button>
 							{/if}
 							<ul class="dropdown-menu dropdown-submenu">
-								{#each schedule.manoeuvres as m}
+								{#each sched.manoeuvres as m}
 									<li>
-										<button class="dropdown-item" onclick={() => onselected(schedule, m)}>
+										<button class="dropdown-item" onclick={() => onselected(sched, m)}>
 											{m.index}: {m.short_name}
 										</button>
 									</li>

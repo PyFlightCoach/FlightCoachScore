@@ -1,5 +1,7 @@
-import { dbServer, dbServerAddress } from '$lib/api';
+import { dbServer } from '$lib/api';
 import { ManDef, ManOpt } from '$lib/analysis/mandef';
+import { writable, type Writable } from 'svelte/store';
+import { get } from 'svelte/store';
 
 export interface Manoeuvre {
 	id: string;
@@ -23,48 +25,106 @@ export interface Schedule {
 	num_flights: number;
 }
 
-export interface Category {
-	category_id: string;
-	category_name: string;
-	rule_id: string;
-	rule_name: string;
-	schedules?: Record<string, Schedule>;
+export function scheduleRepr(s :Schedule|undefined): string {
+  if (!s) {
+    return 'Select Schedule';
+  } else {
+    return `${s.category_name} - ${s.schedule_name}`;
+  }
 }
 
-export async function loadSchedules(
-	request: Record<string, unknown>
-): Promise<Record<string, Schedule>> {
+export interface ScheduleRequest {
+  schedule_id?: string;
+  rule?: string;
+  category?: string;
+  owner?: string;
+}
+
+export async function loadSchedules(request: ScheduleRequest): Promise<Schedule[]> {
 	const schedules = await dbServer.get(`schedule/schedules`, request);
-	return Object.fromEntries(schedules.results.map((s: Schedule) => [s.schedule_name, s]));
+	return schedules.results;
 }
 
-export async function loadCategories(user: string = 'me'): Promise<Record<string, Category>> {
-	const cats = await dbServer.get(`schedule/categories`);
+export class ScheduleLibrary {
+	constructor(readonly schedules: Schedule[] = []) {}
 
-	const ocats: Record<string, Category> = {};
-	cats.results.forEach((cat: Category) => {
-		loadSchedules({ category: cat.category_name, owner: user }).then((schedules) => {
-			ocats[cat.category_name] = Object.assign(cat, { schedules });
-		});
-	});
+	get length(): number {
+		return this.schedules.length;
+	}
+	get first(): Schedule {
+		return this.schedules[0];
+	}
+	get only(): Schedule {
+		if (this.schedules.length !== 1) {
+			throw new Error(
+				'ScheduleLibrary.only: ScheduleLibrary does not contain exactly one schedule'
+			);
+		}
+		return this.schedules[0];
+	}
 
-	return ocats;
+  get empty(): boolean {
+    return this.schedules.length === 0;
+  }
+
+	unique(key: string): string[] {
+		return Array.from(new Set(this.schedules.map((s) => s[key as keyof Schedule] as string)));
+	}
+
+	subset(conditions: Record<string, string>): ScheduleLibrary {
+		const checkConditions = (s: Schedule) => {
+			for (const key in conditions) {
+				if (s[key as keyof Schedule] !== conditions[key]) {
+					return false;
+				}
+			}
+			return true;
+		};
+
+		return new ScheduleLibrary(this.schedules.filter(checkConditions));
+	}
+
+	append(schedules: Schedule[]): ScheduleLibrary {
+		const lib = new ScheduleLibrary(this.schedules.concat(schedules));
+		const unique_ids = lib.unique('schedule_id');
+		return new ScheduleLibrary(
+			unique_ids.map((id: string) => lib.subset({ schedule_id: id }).first)
+		);
+	}
+
+	async update(request: ScheduleRequest): Promise<ScheduleLibrary> {
+    return this.append(await loadSchedules(request));
+	}
+
+  sort(keys: string[]) {
+    const sortFunction = (a: Schedule, b: Schedule) => {
+      for (const key of keys) {
+        if (a[key as keyof Schedule] < b[key as keyof Schedule]) {
+          return -1;
+        } else if (a[key as keyof Schedule] > b[key as keyof Schedule]) {
+          return 1;
+        }
+      }
+      return 0;
+    };
+    return new ScheduleLibrary(this.schedules.sort(sortFunction));
+  }
+
+
 }
 
-export let library: Record<string, Category> = {};
+export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
 
-export async function loadLibrary() {
-	loadCategories('thomasdavid0@googlemail.com')
-		.then((cats) => {
-			library = cats;
-		})
-		.catch(() => {
-			console.error('Error loading categories');
-			library = {};
-		});
-}
+export async function loadKnowns() {
+  const lib = get(library);
+  if (lib.subset({owner_name: 'Tom David'}).empty) {
+    lib.update({owner: 'thomasdavid0@googlemail.com'}).then(
+      newlib=>{library.set(newlib.sort(['rule_name', 'category_name', 'schedule_name']))}
+    );
+  } 
+};
 
-dbServerAddress.subscribe(loadLibrary);
+
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
 	return dbServer.get(`schedule/manoeuvre/definition/${manoeuvre_id}`).then((r) => ManDef.parse(r));

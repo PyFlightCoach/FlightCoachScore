@@ -72,7 +72,7 @@ export const analysisServerAddress = newCookieStore(
 );
 
 export const faVersion: Writable<string|undefined> = writable(undefined);
-analysisServerAddress.subscribe((value) => {
+analysisServerAddress.subscribe(() => {
   analysisServer.get('fa_version').then(res=>faVersion.set(res)).catch(()=>faVersion.set(undefined));
 });
 
