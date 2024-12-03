@@ -1,13 +1,11 @@
 <script lang="ts">
 	import navBarContents from '$lib/stores/navBarContents';
-	import { analysisServer, dbServer, faVersion } from '$lib/api';
+	import { analysisServer, dbServer, faVersion, dbServerAddress, anServerAddress } from '$lib/api';
 	import { onMount } from 'svelte';
 	import { version } from '$app/environment';
 	import { user } from '$lib/stores/user';
   
 	$navBarContents = undefined;
-
-	let aSVersion: string = $state('not connected');
 
 	const getServerVersions = async () => {
 		$faVersion = await analysisServer.get('fa_version');

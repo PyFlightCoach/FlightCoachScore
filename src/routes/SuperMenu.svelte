@@ -2,8 +2,8 @@
 	import NavMenu from '$lib/components/NavMenu.svelte';
 	import ServerSelection from '$lib/components/ServerSelection.svelte';
 
-	import { analysisServerAddress, ukAnalysisServer, preAnalysisServer, customAnalysisServer } from '$lib/api';
-	import { dbServerAddress, ukDBServer, preDBServer, customDBServer } from '$lib/api';
+	import { anSOptions, anSOption, customAnalysisServer } from '$lib/api';
+	import { dbSOption, customDbServer } from '$lib/api';
 </script>
 
 <NavMenu tooltip="Super User Menu">
@@ -11,18 +11,16 @@
 
 	<ServerSelection
 		title="Analysis Server"
-		uk={ukAnalysisServer}
-    pre={preAnalysisServer}
+    options={Object.keys(anSOptions)}
 		bind:custom={$customAnalysisServer}
-		bind:active={$analysisServerAddress}
+		bind:selected={$anSOption}
 	/>
 	<div class="dropdown-divider" ></div>
 	<ServerSelection
 		title="Database Server"
-		uk={ukDBServer}
-    pre={preDBServer}
-		bind:custom={$customDBServer}
-		bind:active={$dbServerAddress}
+		options={['uk']}
+		bind:custom={$customDbServer}
+		bind:selected={$dbSOption}
 	/>
 
 </NavMenu>
