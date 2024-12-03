@@ -27,12 +27,14 @@
 		score: number;
 	}[] = [];
 
-	let date_after = new Date(new Date().getTime() - (n_days || 30) * 24 * 60 * 60 * 1000)
+	$: date_after = new Date(new Date().getTime() - (n_days || 30) * 24 * 60 * 60 * 1000)
 		.toISOString()
 		.split('T')[0];
 	let date_before = new Date().toISOString().split('T')[0];
+
+	$: console.log(date_after);
 	
-	let schedule_name: string = 'Select Schedule'
+  let schedule_name: string = 'Select Schedule'
   $: if ($schedule_id) {schedule_name = scheduleRepr($library.subset({ schedule_id: $schedule_id }).first)}
 	let manoeuvre_ind: number | undefined = undefined;
   let version: string = data.fa_versions[0];
@@ -41,8 +43,7 @@
 		const q = {
 			...{
 				n_results: $n_results,
-				date_after,
-				date_before,
+        n_days,
 				me_only_flag: $me_only_flag,
 				difficulty: $difficulty,
 				truncate: $truncate,
