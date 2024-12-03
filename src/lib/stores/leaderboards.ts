@@ -1,4 +1,5 @@
 import { newCookieStore, newCookieStoreInt, newCookieStoreBool } from '$lib/utils/cookieStore';
+import { writable, type Writable } from 'svelte/store';
 
 export const n_results = newCookieStoreInt('n_results', 1000);
 export const n_days_val = newCookieStoreInt('search_n_days', 30);
@@ -12,3 +13,7 @@ export const sort_by_score_flag = newCookieStoreBool('sort_by_score_flag', true)
 export const select_by_date = newCookieStoreBool('select_by_date', false)
 export const date_after = newCookieStore('date_after', '')
 export const date_before = newCookieStore('date_before', '')
+
+
+export const table_rows: Writable<Record<string, any>[]> = writable([]);
+export const lastResponse: Writable<'leaderboard' | 'flightlist' | undefined> = writable();
