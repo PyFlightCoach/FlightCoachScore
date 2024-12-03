@@ -1,4 +1,3 @@
-import { browser, dev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type Writable, writable, get } from 'svelte/store';
 

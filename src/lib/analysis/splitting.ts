@@ -4,6 +4,7 @@ import { lookupMonotonic } from '$lib/utils/arrays';
 import { ManDef, ManOpt } from './mandef';
 import { library } from '$lib/schedules';
 import { type Manoeuvre, type Schedule, loadManDef } from '$lib/schedules';
+import { get } from 'svelte/store';
 
 export class ManSplit {
 	schedule: Schedule | undefined;
@@ -90,7 +91,7 @@ export class Splitting {
 export async function parseFCJMans(fcj: FCJson, states: States) {
 	const stTime = states.t;
 	const sinfo = await fcj.sinfo.to_pfc();
-	const schedule = library[sinfo.category].schedules![sinfo.name];
+	const schedule = get(library).subset({category_name: sinfo.category, schedule_name: sinfo.name}).first;
 
 	return fcj.mans.map((man: FCJMan, i: number) => {
 		const stStop = lookupMonotonic(fcj.data[man.stop].time / 1e6, stTime);
