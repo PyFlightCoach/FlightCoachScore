@@ -35,8 +35,9 @@
 						<FlightMenu />
 						<DataBaseMenu />
             <ScheduleMenu />
-						{#if ($user && $user.is_superuser) || dev}
-              <SuperMenu />
+            
+						{#if ($user && $user.is_superuser) || dev || true}
+              <SuperMenu />  
 						{/if}
 					</ul>
 					<ul class="navbar-nav col-7 mr-auto">
