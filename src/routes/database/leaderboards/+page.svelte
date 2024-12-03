@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dbServer, faVersion } from '$lib/api.js';
+	import { dbServer } from '$lib/api.js';
 	import ScheduleSelect from '$lib/components/ScheduleSelect.svelte';
 	import { library, loadKnowns, scheduleRepr } from '$lib/schedules.js';
 	import {
@@ -53,11 +53,14 @@
 		score: number;
 	}[] = [];
 
-	let startDate: Date = $date_after ? new Date($date_after): new Date();
-  let endDate: Date = $date_before ? new Date($date_before): new Date();
+  $: if (n_days) {
+    $date_before = new Date().toISOString().split('T')[0];  // restrict to flights before this date yyyy-mm-dd
+    $date_after = new Date(new Date().getTime() - 24 * n_days *3600*1000).toISOString().split('T')[0]; // restrict to flights after this date yyyy-mm-dd
+  }
 
-  $: $date_after = startDate.toISOString().split('T')[0];
-  $: $date_before = endDate.toISOString().split('T')[0];
+  $: console.log(n_days);
+  $: console.log($date_after);
+  $: console.log($date_before);
 	
   let schedule_name: string = 'Select Schedule'
   $: if ($schedule_id) {schedule_name = scheduleRepr($library.subset({ schedule_id: $schedule_id }).first)}
@@ -186,9 +189,9 @@
   {#if $select_by_date}
     <div class="mb-3">
       <label for="startDate">Start</label>
-      <input id="startDate" class="form-control" type="date" bind:value={startDate}/>
+      <input id="startDate" class="form-control" type="date" bind:value={$date_after}/>
       <label for="endDate">End</label>
-      <input id="endDate" class="form-control" type="date" bind:value={endDate}/>
+      <input id="endDate" class="form-control" type="date" bind:value={$date_before}/>
     </div>
   {:else}
     <div class="mb-3">
