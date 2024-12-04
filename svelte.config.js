@@ -14,7 +14,7 @@ const config = {
 			strict: true
 		}),
     paths: {
-      base: process.env.NODE_ENV === 'production' ? '/PyFlightCoach/FlightCoachScore' : '',
+      base: process.env.NODE_ENV === 'production' ? '/fcscore' : '',
   },
     version: {name: process.env.npm_package_version}
 	}
