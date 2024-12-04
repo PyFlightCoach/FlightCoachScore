@@ -34,7 +34,7 @@
 			}
 			const r = await dbServer.post('flight', form_data);
       form_state = 'Upload Successful'
-      goto(base + '/database/leaderboards')
+      goto(base + '/database/query/leaderboards')
 		} catch {
 			form_state = 'Oops...something has gone wrong. Please try again later.';
 		}

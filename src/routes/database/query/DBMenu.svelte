@@ -11,7 +11,7 @@
 
 <li class="nav-item">
 <ul class="pagination">
-  <li class="page-item"><a class="nav-link {leaActive} " href={base + "/database/leaderboards"}>Leaderboards</a></li>
+  <li class="page-item"><a class="nav-link {leaActive} " href={base + "/database/query/leaderboards"}>Leaderboards</a></li>
   <li class="page-item"><a class="nav-link {mapActive} " href={base + "/database/map"}>Map</a></li>
   <li class="page-item"><a class="nav-link {proctive} " href={base +  "/database/progress"}>Progress</a></li>
 </ul>

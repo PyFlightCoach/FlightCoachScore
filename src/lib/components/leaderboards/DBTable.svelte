@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { library, loadKnowns, scheduleRepr } from '$lib/schedules.js';
 	import { user } from '$lib/stores/user.js';
-
+  import {base} from '$app/paths';
 	loadKnowns();
   
   export let lastResponse: 'leaderboard' | 'flightlist' | undefined = undefined;
@@ -50,7 +50,7 @@
               {#each col_heads as col_head}
                 <td>{row[col_map[col_head]]}</td>
               {/each}
-              <td>View</td>
+              <td><a href="{base}/database/flight/?flight_id={row.flight_id}">View</a></td>
             </tr>
           {/each}
         </tbody>

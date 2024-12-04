@@ -29,5 +29,5 @@ const uploadFlight = (file: File) => {
     <span>Upload</span>
   </label>
   {/if}
-  <a class="dropdown-item" href="{base}/database/leaderboards">Leaderboards</a>
+  <a class="dropdown-item" href="{base}/database/query/leaderboards">Leaderboards</a>
 </NavMenu>
