@@ -1,4 +1,5 @@
 import {GPS} from '$lib/analysis/geometry'
+import { get, type Writable, writable } from 'svelte/store';
 
 //https://www.flightcoach.org/ribbon/siteDB/sites.json
 
@@ -11,42 +12,70 @@ export class FCSite {
     readonly pilot: GPS,
     readonly center: GPS,
   ) {}
+
+  description () {
+    return `${this.country}_${this.region}_${this.name}_${this.box}`
+  }
+
+  heading () {
+    return GPS.sub(this.center, this.pilot)  
+  }
+
+  
+
 }
 
 
+
 export const getSites = async () => {
-  const startTime = performance.now();
-  const sitedata = await (await fetch('https://www.flightcoach.org/ribbon/siteDB/sites.json')).json();
-  const sites: FCSite[] = [];
-  const loadedTime = performance.now();
-  let country = '';
-  let region = '';
-  let name = '';
   
-  sitedata.slice(2).forEach(rC => {
-    country = rC.label;
-    rC.children.forEach(rR => {
-      region = rR.label;
-      rR.children.forEach(rN => {
-        name = rN.label;
-
-        rN.children.forEach(rS => {
-          sites.push(new FCSite(
-            country,
-            region,
-            name,
-            rS.label,
-            new GPS(rS.pilotGPS.lat, rS.pilotGPS.lng, rS.pilotGPS.alt),
-            new GPS(rS.centerGPS.lat, rS.centerGPS.lng, rS.centerGPS.alt)
-          ))
-
+  const data = await (await fetch('/sites.json')).json();
+  
+  if (data) {
+    const sites: FCSite[] = [];
+  
+    let country = '';
+    let region = '';
+    let name = '';
+    
+    data.slice(2).forEach(rC => {
+      country = rC.label;
+      rC.children.forEach(rR => {
+        region = rR.label;
+        rR.children.forEach(rN => {
+          name = rN.label;
+  
+          rN.children.forEach(rS => {
+            sites.push(new FCSite(
+              country,
+              region,
+              name,
+              rS.label,
+              new GPS(parseFloat(rS.pilotGPS.lat), parseFloat(rS.pilotGPS.lng), parseFloat(rS.pilotGPS.alt)),
+              new GPS(parseFloat(rS.centerGPS.lat), parseFloat(rS.centerGPS.lng), parseFloat(rS.centerGPS.alt))
+            ))
+  
+          });
+  
         });
-
-      });
-    })
-  });
-  const finishTime = performance.now();
-  console.debug(`loading: ${loadedTime - startTime}ms, processing: ${finishTime - loadedTime}ms`);
-  return sites;
+      })
+    });
+    
+    return sites;
+  
+  } else {
+    console.log ("Error loading sites");
+    console.log(sites);
+    return []
+  }
 
 };
+
+export const sites: Writable<FCSite[] | undefined> = writable();
+
+export async function loadSites() {
+  if (!get(sites)?.length) {
+    sites.set(await getSites());
+  }
+  return get(sites);
+}

@@ -1,181 +1,96 @@
 <script lang="ts">
-	import { binData, bin, bootTime, fcj, states } from '$lib/stores/analysis';
-	import { BinData, BinReader, FieldInfo } from '$lib/components/bin';
+	import { binData, origin, fcj, bin, bootTime, states } from '$lib/stores/analysis';
+	import FlightDataReader from '$lib/components/FlightDataReader.svelte';
+	import { BoxReader } from '$lib/components/box';
+	import { MapPlot } from '$lib/components/plots/map';
+	import PlanViewPlot from '$lib/components/plots/PlanViewPlot.svelte';
 	import { base } from '$app/paths';
-	import ToggleButton from '$lib/components/ToggleButton.svelte';
-	import { onMount } from 'svelte';
-	import { FCJson } from '$lib/analysis/fcjson';
-	import { States, State, type St } from '$lib/analysis/state';
-	import { dbServer } from '$lib/api';
+	import Help from './Help.svelte';
+	import { GPS } from '$lib/analysis/geometry';
+	import { Origin } from '$lib/analysis/fcjson';
 
-	let _md5: string | undefined = undefined;
-	let _bin: File | undefined = undefined;
-	let _binData: BinData | undefined = undefined;
-	let _bootTime: Date | undefined = undefined;
-
-	let _fcj: FCJson | undefined = undefined;
-	let _states: States | undefined = undefined;
-	let getmans: boolean = true;
-	let files: FileList;
+	let inputMode: 'bin' | 'fcj' | 'state' = 'bin';
 	let form_state: string | undefined;
-
-	let inputMode = 'bin';
-	const inputNames: Record<string, string> = {
-		bin: 'bin file',
-		fcj: 'fc json file',
-		state: 'state csv'
-	};
-
+  let target: GPS | undefined;
 	$: if (inputMode) {
-		_md5 = undefined;
-		_bin = undefined;
-		_binData = undefined;
-		_bootTime = undefined;
-		_fcj = undefined;
+		$bin = undefined;
+		$binData = undefined;
+		$bootTime = undefined;
+		$fcj = undefined;
+		$states = undefined;
 		if (inputMode != 'bin') {
-			form_state = `You can can analyse a ${inputNames[inputMode]} but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
+			form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
 		} else {
 			form_state = undefined;
 		}
 	}
+  $origin = Origin.load();
+  $: console.log($origin);
+  $: if ($binData) {
+    target=new GPS($binData.pos.Lat[0], $binData.pos.Lng[0], $binData.pos.Alt[0]);
+  }
 
-	const parseFile = (file: File) => {
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			if (inputMode === 'state') {
-        _states = States.read_csv(reader.result as string);
-			} else {
-				_fcj = FCJson.parse(JSON.parse(reader.result! as string));
-			}
-		};
-		reader.readAsText(file);
-	};
-
-	const checkCanUpload = (binFile: File) => {
-		dbServer
-			.get(`flight/check_duplicate/${_md5}`)
-			.then(() => {
-				_bin = binFile;
-			})
-			.catch((e) => {
-				_bin = undefined;
-				form_state =
-					'Bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
-				console.log(e);
-			});
-	};
-
-	onMount(() => {
-		binData.set(undefined);
-		bin.set(undefined);
-		bootTime.set(undefined);
-		states.set(undefined);
-		fcj.set(undefined);
-	});
+	$: if ($binData && !$bin) {
+		form_state =
+			'This bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
+	}
 </script>
 
-<div class="col-lg-5 pt-5">
-	<form class="input-group">
-		<button
-			class="btn btn-outline-secondary dropdown-toggle form-control-sm"
-			type="button"
-			data-bs-toggle="dropdown"
-			aria-expanded="false"
-		>
-			{inputNames[inputMode] || 'Select Input Mode'}
-		</button>
-		<ul class="dropdown-menu">
-			{#each Object.entries(inputNames) as [k, v]}
-				<li><ToggleButton bind:group={inputMode} value={k}>{v}</ToggleButton></li>
-			{/each}
-		</ul>
-		{#if inputMode === 'bin'}
-			<BinReader
-				onloaded={(...data) => {
-					let tempbin: File | undefined = undefined;
-					[tempbin, _binData, _bootTime, _md5] = data;
-					checkCanUpload(tempbin!);
-				}}
-			/>
-			{#if _binData && _bootTime}
-				<a
-					type="button"
-					href={base + '/flight/create/box'}
-					class="btn btn-outline-primary form-control"
-					on:click={() => {
-						$bin = _bin;
-						$binData = _binData;
-						$bootTime = _bootTime;
-					}}
-				>
-					Next
-				</a>
-			{/if}
-		{:else if inputMode === 'fcj' || inputMode === 'state'}
-			<label
-				for="fcjfile"
-				class="btn btn-outline-secondary form-control text-nowrap"
-				style:overflow="hidden"
-			>
-				{#if files && files.length > 0}
-					{files[0].name}
-				{:else}
-					Select File
-				{/if}
-			</label>
-			<input
-				id="fcjfile"
-				class="form-control"
-				type="file"
-				accept={inputMode === 'fcj' ? '.json' : '.csv'}
-				bind:files
-				style="display:none"
-			/>
-			{#if files && files.length > 0}
-				<button
-					class="btn btn-outline-secondary form-control"
-					on:click={() => {
-						parseFile(files[0]);
-					}}
-				>
-					Load
-				</button>
-			{/if}
-			{#if _fcj}
-				<div class="input-group-text">
-					<input
-						id="getmans"
-						class="form-check-input mt-0"
-						type="checkbox"
-						bind:checked={getmans}
-						aria-label="Parse manoeuvre split locations from FC json"
-					/>
-					<label for="getmans" class="form-check-label">Include Manoeuvres</label>
-				</div>
-			{/if}
-			{#if _states || _fcj}
-				<a
-					type="button"
-					href={base + '/flight/create/manoeuvres'}
-					class="btn btn-outline-primary form-control"
-					data-sveltekit-preload-data="false"
-					on:click={() => {
-						$fcj = _fcj;
-						$states = _states;
-					}}
-				>
-					Next
-				</a>
-			{/if}
-		{/if}
+<div class="col-4 pt-5">
+	<div class="container bg-light border">
+		<small>Load Flight Data</small>
+
+		<FlightDataReader
+			bind:bin={$bin}
+			bind:binData={$binData}
+			bind:bootTime={$bootTime}
+			bind:fcj={$fcj}
+			bind:states={$states}
+			bind:inputMode
+		/>
+
 		{#if form_state}
 			<div class="row mt-4">
 				<p><mark>{form_state}</mark></p>
 			</div>
 		{/if}
-	</form>
+	</div>
 
-	{#if inputMode === 'bin' && _binData}
-		<FieldInfo bind:binData={_binData} />
+	{#if inputMode == 'bin'}
+		<div class="container bg-light border">
+			<small>Define The Box</small>
+			<BoxReader
+				bind:origin={$origin}
+				bind:fcjson={$fcj}
+				bind:target
+			/>
+		</div>
+	{/if}
+
+	{#if ($binData && $origin) || $states}
+		<div class="container bg-light border">
+			<small>Select Manoeuvres</small>
+			<div class="row">
+				<label class="col" for="select-manoeuvres">Move on to the next stage:</label>
+				<a
+					id="select-manoeuvres"
+					class="btn btn-outline-primary col"
+					href={base + '/flight/create/manoeuvres'}
+          on:click={()=>{if($origin) {$origin.save()}}}
+				>
+					Next
+				</a>
+			</div>
+		</div>
+	{/if}
+</div>
+
+<div class="col-8">
+	{#if $origin || $binData}
+		<MapPlot bind:origin={$origin} bind:binData={$binData} />
+	{:else if $states}
+		<PlanViewPlot />
+	{:else}
+		<Help />
 	{/if}
 </div>

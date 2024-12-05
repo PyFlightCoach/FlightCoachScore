@@ -1,78 +1,51 @@
 <script lang="ts">
 	import { FCJson, Origin } from '$lib/analysis/fcjson';
-	import { Point } from '$lib/analysis/geometry';
-	import ToggleButton from '$lib/components/ToggleButton.svelte';
 	import PilotCentre from './PilotCentre.svelte';
 	import BoxFile from './BoxFile.svelte';
 	import pkg from 'file-saver';
 	import BinFileBox from './BinFileBox.svelte';
 	import PilotHeading from './PilotHeading.svelte';
+	import FCSites from './FCSites.svelte';
+	import { GPS } from '$lib/analysis/geometry';
 	const { saveAs } = pkg;
 
-	export let origin: Origin | undefined; // = new Origin(0, 0, 0, 0);
-  export let fcjson: FCJson | undefined;
-	export let kind: string = 'F3A';
+	export let origin: Origin | undefined;
+	export let fcjson: FCJson | undefined;
+	export let target: GPS | undefined;
 
-	const exportF3aZone = () => {
-		if (!origin) return;
-		const centre = origin.pilot.offset(
-			new Point(100 * Math.cos(origin.radHeading), 100 * Math.sin(origin.radHeading), 0)
-		);
+	$: if (target) {
+		if (origin && GPS.sub(target, origin.pilot).length() > 500) {
+			//origin = undefined;
+		}
+	}
 
-		const data = [
-			"Emailed box data for F3A Zone Pro - please DON'T modify!",
-			'1',
-			origin.lat.toString(),
-			origin.lng.toString(),
-			centre.lat.toString(),
-			centre.lon.toString(),
-			origin.alt.toString()
-		];
+	let inputMode = origin ? 'ph' : 'fcsites';
 
-		const blob = new Blob([data.join('\n')], { type: 'text/plain;charset=utf-8' });
-		saveAs(blob, 'f3a_zone.f3a');
+	const inputNames: Record<string, string> = {
+		fcsites: 'Flight Coach Sites',
+		pc: 'Pilot, Centre',
+		ph: 'Pilot, Heading',
+		fcj: 'F3A Zone / FC JSON File',
+		bin: 'BIN File'
 	};
-
-	let inputMode = 'fcj';
-
-  const inputNames : Record<string, string> = {
-    pc: 'Pilot, Centre',
-    ph: 'Pilot, Heading',
-    fcj: 'F3A Zone / FC JSON File',
-    bin: 'BIN File'
-  }
-
 </script>
 
-<div class="input-group mb-3">
-	<button
-		class="btn btn-outline-secondary dropdown-toggle form-control-sm"
-		type="button"
-		data-bs-toggle="dropdown"
-		aria-expanded="false"
-	>
-		{inputNames[inputMode] || 'Select Input Mode'}
-	</button>
-	<ul class="dropdown-menu">
-    {#each Object.entries(inputNames) as [k, v]}
-      <li><ToggleButton bind:group={inputMode} value={k}>{v}</ToggleButton></li>
-    {/each}
-	</ul>
-	{#if inputMode === 'fcj'}
-		<BoxFile bind:origin bind:fcjson />
-	{:else if inputMode === 'bin'}
-		<BinFileBox bind:origin />
-	{/if}
-	{#if origin}
-		<button class="btn btn-outline-secondary form-control-sm" on:click={exportF3aZone}>
-			Save Box
-		</button>
-    
-	{/if}
-  <slot/>
+<div class="row mt-2 mb-3">
+	<label class="col" for="box-input-mode">Select Box Input Mode: </label>
+	<select class="col form-select" id="data-input-mode" bind:value={inputMode}>
+		{#each Object.entries(inputNames) as [k, v]}
+			<option value={k}>{v}</option>
+		{/each}
+	</select>
 </div>
-{#if inputMode === 'pc'}
-  <PilotCentre bind:origin />
-  {:else if inputMode === 'ph'}
-  <PilotHeading bind:origin />
+{#if inputMode === 'fcsites'}
+	<FCSites bind:origin bind:target />
+{:else if inputMode === 'fcj'}
+	<BoxFile bind:origin bind:fcjson />
+{:else if inputMode === 'bin'}
+	<BinFileBox bind:origin />
+{:else if inputMode === 'pc'}
+	<PilotCentre bind:origin />
+{:else if inputMode === 'ph'}
+	<PilotHeading bind:origin />
 {/if}

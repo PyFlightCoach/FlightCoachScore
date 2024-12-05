@@ -3,10 +3,9 @@
 	import { saveAs } from 'file-saver';
 	import { BinData, BinField } from '$lib/components/bin/bindata';
 	import { md5 } from 'js-md5';
-	import { dbServer } from '$lib/api';
 	const worker = new BINWorker();
 
-	let bin: File | undefined = $state();
+  let bin: File | undefined = $state();
 	let binData: BinData | undefined = $state();
 	let bootTime: Date | undefined = $state();
 	let md5Sum: string | undefined = $state();
@@ -15,12 +14,14 @@
 		busy = $bindable(false),
 		download = false,
 		clear = false,
+    loadOnChange = true,
 		onloaded = () => {}
 	}: {
 		messages: string[];
 		busy: boolean;
 		download: boolean;
 		clear: boolean;
+    loadOnChange: boolean;
 		onloaded: (bin: File, binData: BinData, bootTime: Date, md5Sum: string) => void;
 	} = $props();
 
@@ -42,7 +43,7 @@
 			percent = event.data.percentage;
 		} else if (event.data.hasOwnProperty('messageType')) {
 			const lname = event.data.messageType.split('[')[0];
-			binData[event.data.messageType] = new BinField(event.data.messageList);
+			binData![event.data.messageType as keyof BinData] = new BinField(event.data.messageList);
 			loadedMessages[lname] = true;
 		} else if (event.data.hasOwnProperty('metadata')) {
 			bootTime = new Date(Date.parse(event.data.metadata.bootTime));
@@ -111,15 +112,17 @@
 		accept=".bin, .BIN"
 		bind:files
 		style="display:none"
+    onchange={()=>{
+      if (loadOnChange && files && files.length) {parseBin(files[0])}
+    }}
 	/>
-	{#if files && files.length > 0}
+	{#if !loadOnChange && files && files.length > 0}
 		<button
 			class="btn form-control btn-outline-secondary"
-			onclick={() => {
-				if (files && files.length > 0) {
-					parseBin(files[0]);
-				}
-			}}>Load</button
+			onclick={() => {if (files && files.length) {parseBin(files[0])}}}
+    >
+      Load
+    </button
 		>
 	{/if}
 	{#if !binData}

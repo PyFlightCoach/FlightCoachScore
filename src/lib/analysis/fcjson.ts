@@ -25,6 +25,30 @@ export class Origin {
 		this.move_north = move_north;
 	}
 
+	save() {
+		localStorage.setItem('orginLat', this.lat.toFixed(10));
+		localStorage.setItem('orginLon', this.lng.toFixed(10));
+		localStorage.setItem('orginAlt', this.alt.toFixed(10));
+		localStorage.setItem('orginHead', this.heading.toFixed(10));
+	}
+
+	static load() {
+		if (
+			['orginLat', 'orginLon', 'orginAlt', 'orginHead']
+				.map((key) => localStorage.getItem(key))
+				.every((v) => v)
+		) {
+			return new Origin(
+				parseFloat(localStorage.getItem('orginLat') || '0'),
+				parseFloat(localStorage.getItem('orginLon') || '0'),
+				parseFloat(localStorage.getItem('orginAlt') || '0'),
+				parseFloat(localStorage.getItem('orginHead') || '0')
+			);
+		} else {
+      return undefined;
+    }
+	}
+
 	get radHeading() {
 		return (this.heading * Math.PI) / 180;
 	}
@@ -97,10 +121,9 @@ export class ScheduleInfo {
 		return `${this.category}_${this.name}`;
 	}
 
-  async direction_definition() {
-    return await analysisServer.get(`/${this.category}/${this.name}/direction_definition`)
-  }
-
+	async direction_definition() {
+		return await analysisServer.get(`/${this.category}/${this.name}/direction_definition`);
+	}
 }
 
 export class FCJMan {

@@ -25,6 +25,9 @@
 	};
 </script>
 
+<div class="row">
+<label for="box-file-input" class="col">Select Box File:</label>
+<div class="col" style:overflow="hidden" id="box-file-input">
 <label
 	for="boxfile"
 	class="btn btn-outline-secondary form-control text-nowrap"
@@ -43,14 +46,9 @@
 	accept=".json, .f3a, '.F3A"
 	bind:files
 	style="display:none"
+  on:change={()=>{
+   if (files && files.length)  {loadBoxFile(files[0])}
+  }}
 />
-{#if files && files.length > 0}
-	<button
-		class="btn btn-outline-secondary form-control"
-		on:click={() => {
-			loadBoxFile(files[0]);
-		}}
-	>
-		Load
-	</button>
-{/if}
+</div>
+</div>

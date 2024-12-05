@@ -1,16 +1,26 @@
 <script lang="ts">
   import Plot from 'svelte-plotly.js';
-  import {BinData} from '$lib/components/bin';
-	import type { Origin } from '$lib/analysis/fcjson';
   import {binDataMapTrace, originMapTraces} from './mapTraces';
 	import { GPS } from '$lib/analysis/geometry';
+	import type { BinData } from '$lib/components/bin';
+	import type { Origin } from '$lib/analysis/fcjson';
 
-  export let defaultOrigin: GPS = new GPS(0, 0, 0);
-  export let binData: BinData | undefined = undefined;
-  export let origin: Origin | undefined = undefined;
+  export let origin: Origin |undefined;
+  export let binData: BinData | undefined;
   export let kind: string = 'F3A';
 
+  let centre: GPS | undefined;
+  
+  $: if (binData) {
+    centre = new GPS(binData?.pos.Lat[0], binData?.pos.Lng[0], 0);
+  }
+
+  $: if (origin) {
+    centre = new GPS(origin?.lat, origin.lng, 0);
+  }
+
 </script>
+
 
 <Plot
 		data={
@@ -23,8 +33,8 @@
 			map: {
 				bearing: 0,
 				center: {
-					lat: binData?.pos.Lat[0] || origin?.lat || defaultOrigin.lat,
-					lon: binData?.pos.Lng[0] || origin?.lng || defaultOrigin.lon
+					lat: centre?.lat,
+					lon: centre?.lon
 				},
 				pitch: 0,
 				zoom: 13,

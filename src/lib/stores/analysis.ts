@@ -14,10 +14,6 @@ export const origin: Writable<Origin | undefined> = writable();
 export const fcj: Writable<FCJson | undefined> = writable();
 export const states: Writable<States | undefined> = writable();
 
-binData.subscribe(() => {
-	origin.set(undefined);
-});
-
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);
 export const analyses: Writable<MA | undefined>[] = [];

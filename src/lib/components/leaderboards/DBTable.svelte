@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { library, loadKnowns, scheduleRepr } from '$lib/schedules.js';
+	import { loadKnowns } from '$lib/schedules.js';
 	import { user } from '$lib/stores/user.js';
   import {base} from '$app/paths';
 	loadKnowns();

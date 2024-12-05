@@ -16,16 +16,16 @@
 	$: activeMan = mans[activeManId];
 
 	$: if (activeMan) {
-
-    if (activeManId>0) {
-      const _lastLen = mans[activeManId - 1].stop! - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
-      range = [
-        mans[activeManId - 1].stop!,
-        activeMan.stop || Math.min(mans[activeManId - 1].stop! + _lastLen * 2, $states!.data.length)
-      ];  
-    } else {
-      range = [0, $states!.data.length];
-    }
+		if (activeManId > 0) {
+			const _lastLen =
+				mans[activeManId - 1].stop! - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
+			range = [
+				mans[activeManId - 1].stop!,
+				activeMan.stop || Math.min(mans[activeManId - 1].stop! + _lastLen * 2, $states!.data.length)
+			];
+		} else {
+			range = [0, $states!.data.length];
+		}
 	}
 
 	const parseFCJ = (file: File) => {
@@ -63,7 +63,6 @@
 		activeManId = mans.length - 1;
 		activeIndex =
 			activeMan.stop || Math.min(mans[activeManId - 1].stop! + 1000, $states!.data.length);
-    
 	};
 
 	const setRange = (man: ManSplit) => {
@@ -100,6 +99,149 @@
 	}}
 />
 
+<div class="col-4 pt-2">
+	<div class="container bg-light border">
+		<small>Actions</small>
+
+		{#if mans.length == 1}
+			<div class="row">
+				<label for="load-fcj" class="col-8">Load Mans from FC Json File:</label>
+				<div id="load-fcj" class="col-4">
+					<label class="btn btn-outline-secondary">
+						<input
+							type="file"
+							name="input-name"
+							style="display: none;"
+							accept=" .json"
+							on:change={(e: Event) => {
+								if (e.target?.files?.length > 0) {
+									parseFCJ(e.target.files[0]);
+								}
+							}}
+						/>
+						<span>Parse FCJ</span>
+					</label>
+				</div>
+			</div>
+		{:else}
+			<div class="row">
+				<label for="clear-splitting" class="col-8">Clear Manoeuvres:</label>
+				<button
+					id="clear-splitting"
+					class="btn btn-outline-secondary form-control-sm col-4"
+					on:click={() => {
+						$fcj = undefined;
+						activeManId = 0;
+						mans = [ManSplit.TakeOff()];
+					}}
+				>
+					Clear
+				</button>
+			</div>
+		{/if}
+	</div>
+
+	<div class="container bg-light border">
+		<small>Manoeuvres</small>
+		<table class="table-sm table-bordered align-middle container-fluid text-center">
+			<thead>
+				<tr>
+					<th scope="col" class="col-1"></th>
+					<th scope="col" class="col-2">Name</th>
+					<th colspan="4" scope="col" class="col-7">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each mans as man, i}
+					<tr>
+						<td
+							><input
+								class="radio"
+								type="radio"
+								name="manSelect"
+								value={i}
+								bind:group={activeManId}
+							/></td
+						>
+
+						{#if man.fixed || activeManId != i}
+							<td>{man.name}</td>
+						{:else}
+							<td class="dropdown-toggle" 
+                role="button" 
+                data-bs-toggle="dropdown"
+                title="Select the schedule and manoeuvre"
+              >
+								{man.name}
+								<ScheduleSelect
+									level="manoeuvre"
+									onselected={(schedule, manoeuvre) => {
+										man.schedule = schedule;
+										if (manoeuvre) {
+											man.manoeuvre = manoeuvre;
+											loadManDef(man.manoeuvre.id).then((manDef) => {
+												man.mdef = manDef;
+											});
+										}
+									}}
+								/>
+							</td>
+						{/if}
+						{#if activeManId == i}
+							{#if activeMan.alternate_name != 'Landing'}
+								<td
+									role="button"
+									data-bs-toggle="tooltip"
+									title="Set the end point of this manoeuvre to the point identified by the little plane"
+									on:click={() => setRange(man)}
+								>
+									Set (s)
+								</td>
+							{/if}
+							{#if !man.fixed}
+								<td
+									role="button"
+									data-bs-toggle="tooltip"
+									title="Delete this manoeuvre"
+									on:click={() => {
+										activeManId = activeManId - 1;
+										mans.splice(activeManId + 1, 1);
+										mans = mans;
+									}}>Delete</td
+								>
+							{/if}
+						{:else}
+							<td colspan="3"></td>
+						{/if}
+					</tr>
+				{/each}
+				{#if mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name != 'Landing'}
+					{#if mans[mans.length - 1].stop}
+						<tr>
+							<td colspan="6" role="button" on:click={addMan}>Add (return)</td>
+						</tr>
+					{/if}
+				{/if}
+			</tbody>
+		</table>
+	</div>
+	{#if mans[mans.length - 1].name == 'Landing'}
+		<div class="container bg-light border">
+			<div class="row">
+				<button
+					class="btn btn-outline-primary form-control-sm"
+					on:click={() => {
+						newAnalysis($states!, new Splitting(mans));
+						goto(base + '/flight/results');
+					}}
+				>
+					Complete
+				</button>
+			</div>
+		</div>
+	{/if}
+</div>
+
 <div class="col-8">
 	{#if $states}
 		<PlotSec
@@ -110,119 +252,4 @@
 			controls={['slider', 'modelClick']}
 		/>
 	{/if}
-</div>
-
-<div class="col-4">
-	<div class="input-group-sm">
-		{#if mans.length == 1}
-			<label class="btn btn-outline-secondary form-control-sm">
-				<input
-					type="file"
-					name="input-name"
-					style="display: none;"
-					accept=" .json"
-					on:change={(e: Event) => {
-						if (e.target?.files?.length > 0) {
-							parseFCJ(e.target.files[0]);
-						}
-					}}
-				/>
-				<span>Parse FCJ</span>
-			</label>
-		{:else}
-			<button
-				class="btn btn-outline-secondary form-control-sm"
-				on:click={() => {
-					activeManId = 0;
-					mans = [ManSplit.TakeOff()];
-				}}
-			>
-				Clear
-			</button>
-			<span class="input-group-text-sm">{$isCompFlight ? 'Competition' : 'Training'} </span>
-			<button
-				class="btn btn-outline-primary form-control-sm"
-				on:click={() => {
-					newAnalysis($states!, new Splitting(mans));
-					goto(base + '/flight/results');
-				}}
-			>
-				Next
-			</button>
-		{/if}
-	</div>
-
-	<table class="table-sm table-bordered align-middle container-fluid text-center">
-		<thead>
-			<tr>
-				<th scope="col" class="col-1"></th>
-				<th scope="col" class="col-2">Manoeuvre</th>
-				<th colspan="4" scope="col" class="col-7">Action</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each mans as man, i}
-				<tr>
-					<td
-						><input
-							class="radio"
-							type="radio"
-							name="manSelect"
-							value={i}
-							bind:group={activeManId}
-						/></td
-					>
-
-					{#if man.fixed || activeManId != i}
-						<td>{man.name}</td>
-					{:else}
-						<td class="dropdown-toggle" role="button" data-bs-toggle="dropdown">
-							{man.name}
-							<ScheduleSelect
-                level="manoeuvre"
-								onselected={(schedule, manoeuvre) => {
-									man.schedule = schedule;
-                  if (manoeuvre) {
-                    man.manoeuvre = manoeuvre;
-                    loadManDef(man.manoeuvre.id).then(manDef =>{man.mdef = manDef});
-                  }
-								}}
-							/>
-						</td>
-					{/if}
-					{#if activeManId == i}
-						{#if activeMan.alternate_name != 'Landing'}
-							<td role="button" on:click={() => setRange(man)}>Set (s)</td>
-
-							<td
-								role="button"
-								on:click={() => {
-									console.log(`split at ${activeIndex}`);
-								}}>Split</td
-							>
-						{/if}
-						{#if !man.fixed}
-							<td
-								role="button"
-								on:click={() => {
-									activeManId = activeManId - 1;
-									mans.splice(activeManId + 1, 1);
-									mans = mans;
-								}}>Delete</td
-							>
-						{/if}
-					{:else}
-						<td colspan="3"></td>
-					{/if}
-				</tr>
-			{/each}
-			{#if mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name != 'Landing'}
-				{#if mans[mans.length - 1].stop}
-					<tr>
-						<td colspan="6" role="button" on:click={addMan}>Add (return)</td>
-					</tr>
-				{/if}
-			{/if}
-		</tbody>
-	</table>
 </div>

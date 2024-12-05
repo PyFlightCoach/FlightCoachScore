@@ -191,7 +191,7 @@ export class States {
 		);
 
     const shift = new Point(fcj.parameters.moveEast, -fcj.parameters.moveNorth, 0);
-    console.log(shift);
+  
 		let lastT = fcj.data[0].time / 1e6 - 1 / 25;
 
 		return new States(

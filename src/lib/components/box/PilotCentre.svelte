@@ -18,23 +18,25 @@
 	<thead>
 		<tr>
 			<th>Point</th>
-			<th>Lat</th>
-			<th>Lng</th>
-			<th>Alt</th>
+			<th>Pilot</th>
+			<th>Center</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td>Pilot</td>
+			<td>Lat</td>
 			<td><input type="number" bind:value={origin.lat} on:change={()=>{centre=centre}} step="0.0001"/></td>
-			<td><input type="number" bind:value={origin.lng} on:change={()=>{centre=centre}} step="0.0001"/></td>
-			<td><input type="number" bind:value={origin.alt} on:change={()=>{centre=centre}} step="1"/></td>
+			<td><input type="number" bind:value={centre.lat} on:change={()=>{centre=centre}} step="0.0001"/></td>
 		</tr>
 			<tr>
-				<td>Center</td>
-				<td><input type="number" bind:value={centre.lat} on:change={()=>{centre=centre}} step="0.0001"/></td>
+				<td>Lng</td>
+        <td><input type="number" bind:value={origin.lng} on:change={()=>{centre=centre}} step="0.0001"/></td>
 				<td><input type="number" bind:value={centre.lon} on:change={()=>{centre=centre}} step="0.0001"/></td>
-				<td><input type="number" bind:value={origin.alt} on:change={()=>{centre=centre}} step="1"/></td>
 			</tr>
+      <tr>
+        <td>Alt</td>
+        <td><input type="number" bind:value={origin.alt} on:change={()=>{centre=centre}} step="1"/></td>
+        <td><input type="number" bind:value={origin.alt} on:change={()=>{centre=centre}} step="1"/></td>
+      </tr>
 	</tbody>
 </table>

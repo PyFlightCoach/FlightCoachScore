@@ -4,6 +4,7 @@ import { drawBoxInWorld, getPointOnCentre } from '$lib/components/box';
 
 
 export const originMapTraces = (origin: Origin, kind: string) => {
+
   const boxPoints = drawBoxInWorld(origin, kind);
   const centre = getPointOnCentre(origin);
 	return [
@@ -54,4 +55,6 @@ export const binDataMapTrace = (binData: BinData) => {
     hovermode: false,
     showlegend: false
   };
+
+  
 }
