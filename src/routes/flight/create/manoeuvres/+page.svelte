@@ -7,7 +7,7 @@
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/analysis/fcjson';
 	import ScheduleSelect from '$lib/components/ScheduleSelect.svelte';
-	import { type Schedule, type Manoeuvre, loadManDef } from '$lib/schedules';
+	import {loadManDef } from '$lib/schedules';
 
 	let mans: ManSplit[] = [ManSplit.TakeOff()];
 	let activeManId: number = 0;
@@ -24,7 +24,7 @@
 				activeMan.stop || Math.min(mans[activeManId - 1].stop! + _lastLen * 2, $states!.data.length)
 			];
 		} else {
-			range = [0, Math.round($states!.data.length/10)];
+			range = [0, Math.round($states!.data.length / 10)];
 		}
 	}
 
@@ -87,12 +87,13 @@
 <svelte:window
 	on:keydown={(e) => {
 		switch (e.key) {
-			case 's':
-				setRange(activeMan);
-				break;
 			case 'Enter':
-				if (mans[mans.length - 1].manoeuvre) {
-					addMan();
+				if (activeManId == mans.length - 1) {
+					if (!activeMan.stop) {
+						setRange(activeMan);
+					} else if (mans[mans.length - 1].name) {
+						addMan();
+					}
 				}
 				break;
 		}
@@ -167,11 +168,12 @@
 						{#if man.fixed || activeManId != i}
 							<td>{man.name}</td>
 						{:else}
-							<td class="dropdown-toggle" 
-                role="button" 
-                data-bs-toggle="dropdown"
-                title="Select the schedule and manoeuvre"
-              >
+							<td
+								class="dropdown-toggle"
+								role="button"
+								data-bs-toggle="dropdown"
+								title="Select the schedule and manoeuvre"
+							>
 								{man.name}
 								<ScheduleSelect
 									level="manoeuvre"
@@ -195,7 +197,7 @@
 									title="Set the end point of this manoeuvre to the point identified by the little plane"
 									on:click={() => setRange(man)}
 								>
-									Set (s)
+									Set (return)
 								</td>
 							{/if}
 							{#if !man.fixed}

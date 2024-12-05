@@ -14,6 +14,16 @@ export const origin: Writable<Origin | undefined> = writable();
 export const fcj: Writable<FCJson | undefined> = writable();
 export const states: Writable<States | undefined> = writable();
 
+export const isFullSize: Writable<boolean> = writable(false);
+
+states.subscribe((sts) => {
+	isFullSize.set(
+		sts
+			? Math.max(...sts.data.map((s) => s.z)) - Math.min(...sts.data.map((s) => s.z)) > 1000
+			: false
+	);
+});
+
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);
 export const analyses: Writable<MA | undefined>[] = [];
