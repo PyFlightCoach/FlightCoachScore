@@ -24,7 +24,7 @@
 				activeMan.stop || Math.min(mans[activeManId - 1].stop! + _lastLen * 2, $states!.data.length)
 			];
 		} else {
-			range = [0, $states!.data.length];
+			range = [0, Math.round($states!.data.length/10)];
 		}
 	}
 

@@ -1,6 +1,6 @@
 import {GPS} from '$lib/analysis/geometry'
 import { get, type Writable, writable } from 'svelte/store';
-
+import {base} from '$app/paths'
 //https://www.flightcoach.org/ribbon/siteDB/sites.json
 
 export class FCSite {
@@ -29,7 +29,7 @@ export class FCSite {
 
 export const getSites = async () => {
   
-  const data = await (await fetch('/sites.json')).json();
+  const data = await (await fetch(base + '/sites.json')).json();
   
   if (data) {
     const sites: FCSite[] = [];
