@@ -3,8 +3,8 @@
 	import { analysisServer, dbServer, faVersion, dbServerAddress, anServerAddress } from '$lib/api';
 	import { onMount } from 'svelte';
 	import { version } from '$app/environment';
-	import { user } from '$lib/stores/user';
-  
+	import { user} from '$lib/stores/user';
+	 
 	$navBarContents = undefined;
 
 	const getServerVersions = async () => {
@@ -21,9 +21,9 @@
 		<p>
 			Flight Coach Score facilitates automatic judging of aerobatic flights and offers a place to
 			share your scores.
+      
 		</p>
-
-		<table class="table table-sm">
+    <table class="table table-sm">
 			<tbody>
 				<tr>
 					<td>Client Version:</td>
@@ -63,4 +63,5 @@
 			</tbody>
 		</table>
 	</div>
+
 </div>

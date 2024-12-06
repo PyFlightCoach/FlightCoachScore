@@ -2,30 +2,10 @@ import { dbServer } from '$lib/api';
 import { ManDef, ManOpt } from '$lib/analysis/mandef';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
+import { type DBSchedule } from '$lib/database/interfaces';
 
-export interface Manoeuvre {
-	id: string;
-	index: number;
-	k: number;
-	name: string;
-	short_name: string;
-	version: string;
-}
 
-export interface Schedule {
-	schedule_id: string;
-	schedule_name: string;
-	owner_id: string;
-	owner_name: string;
-	category_id: string;
-	category_name: string;
-	rule_id: string;
-	rule_name: string;
-	manoeuvres: Manoeuvre[];
-	num_flights: number;
-}
-
-export function scheduleRepr(s :Schedule|undefined): string {
+export function scheduleRepr(s :DBSchedule|undefined): string {
   if (!s) {
     return 'Select Schedule';
   } else {
@@ -40,21 +20,21 @@ export interface ScheduleRequest {
   owner?: string;
 }
 
-export async function loadSchedules(request: ScheduleRequest): Promise<Schedule[]> {
+export async function loadSchedules(request: ScheduleRequest): Promise<DBSchedule[]> {
 	const schedules = await dbServer.get(`schedule/schedules`, request);
 	return schedules.results;
 }
 
 export class ScheduleLibrary {
-	constructor(readonly schedules: Schedule[] = []) {}
+	constructor(readonly schedules: DBSchedule[] = []) {}
 
 	get length(): number {
 		return this.schedules.length;
 	}
-	get first(): Schedule {
+	get first(): DBSchedule {
 		return this.schedules[0];
 	}
-	get only(): Schedule {
+	get only(): DBSchedule {
 		if (this.schedules.length !== 1) {
 			throw new Error(
 				'ScheduleLibrary.only: ScheduleLibrary does not contain exactly one schedule'
@@ -68,13 +48,13 @@ export class ScheduleLibrary {
   }
 
 	unique(key: string): string[] {
-		return Array.from(new Set(this.schedules.map((s) => s[key as keyof Schedule] as string)));
+		return Array.from(new Set(this.schedules.map((s) => s[key as keyof DBSchedule] as string)));
 	}
 
 	subset(conditions: Record<string, string>): ScheduleLibrary {
-		const checkConditions = (s: Schedule) => {
+		const checkConditions = (s: DBSchedule) => {
 			for (const key in conditions) {
-				if (s[key as keyof Schedule] !== conditions[key]) {
+				if (s[key as keyof DBSchedule] !== conditions[key]) {
 					return false;
 				}
 			}
@@ -84,7 +64,7 @@ export class ScheduleLibrary {
 		return new ScheduleLibrary(this.schedules.filter(checkConditions));
 	}
 
-	append(schedules: Schedule[]): ScheduleLibrary {
+	append(schedules: DBSchedule[]): ScheduleLibrary {
 		const lib = new ScheduleLibrary(this.schedules.concat(schedules));
 		const unique_ids = lib.unique('schedule_id');
 		return new ScheduleLibrary(
@@ -97,11 +77,11 @@ export class ScheduleLibrary {
 	}
 
   sort(keys: string[]) {
-    const sortFunction = (a: Schedule, b: Schedule) => {
+    const sortFunction = (a: DBSchedule, b: DBSchedule) => {
       for (const key of keys) {
-        if (a[key as keyof Schedule] < b[key as keyof Schedule]) {
+        if (a[key as keyof DBSchedule] < b[key as keyof DBSchedule]) {
           return -1;
-        } else if (a[key as keyof Schedule] > b[key as keyof Schedule]) {
+        } else if (a[key as keyof DBSchedule] > b[key as keyof DBSchedule]) {
           return 1;
         }
       }

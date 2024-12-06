@@ -155,15 +155,13 @@
 			<tbody>
 				{#each mans as man, i}
 					<tr>
-						<td
-							><input
-								class="radio"
-								type="radio"
-								name="manSelect"
-								value={i}
-								bind:group={activeManId}
-							/></td
-						>
+						<td><input
+              class="radio"
+              type="radio"
+              name="manSelect"
+              value={i}
+              bind:group={activeManId}
+						/></td>
 
 						{#if man.fixed || activeManId != i}
 							<td>{man.name}</td>
