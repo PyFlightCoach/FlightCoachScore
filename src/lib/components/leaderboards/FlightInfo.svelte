@@ -5,6 +5,7 @@
 	import { type DBFlightScore, privacyOptions } from '$lib/database/interfaces';
 	import { Flight } from '$lib/database/flight';
 	import { dbServer } from '$lib/api';
+	import { base } from '$app/paths';
 
 	export let f: Flight;
 
@@ -15,6 +16,10 @@
 	let targetPrivacy = f.meta.privacy;
 	let newComment = f.meta.comment;
 
+	$: canEdit = false //$user?.id.replaceAll('-', '') == f.meta.pilot_id || $user?.is_superuser;
+	$: canView = false //canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;
+	$: canAnalyse = canEdit || privacyOptions.indexOf(f.meta.privacy) > 1;
+  
 	const patchMeta = () => {
 		const fd = new FormData();
 		fd.append('privacy', targetPrivacy);
@@ -22,10 +27,14 @@
 		dbServer.patch(`flight/${f.meta.flight_id}`, fd).then((res) => {
 			dbServer.get(`flight/${f.meta.flight_id}`).then((res) => {
 				f = new Flight(res, f.schedule);
-        targetPrivacy = f.meta.privacy;
-        newComment = f.meta.comment;
+				targetPrivacy = f.meta.privacy;
+				newComment = f.meta.comment;
 			});
 		});
+	};
+
+	const loadAnalysis = () => {
+		//const zippedAjson = dbServer.get(`flight/ajson/${f.meta.flight_id}`);
 	};
 </script>
 
@@ -60,7 +69,7 @@
 				<li class="input-group">
 					<label class="input-group-text" for="set-privacy">Privacy</label>
 					<select
-						disabled={$user?.id.replaceAll('-', '') != f.meta.pilot_id}
+						disabled={!canEdit}
 						class="form-select"
 						id="set-privacy"
 						bind:value={targetPrivacy}
@@ -73,17 +82,32 @@
 
 				<li class="input-group">
 					<label class="input-group-text" for="set-comment">Comment</label>
-					<textarea id="set-comment" class="form-control" rows="2" bind:value={newComment}
+					<textarea
+						id="set-comment"
+						class="form-control"
+						rows="2"
+						bind:value={newComment}
+						disabled={!canEdit}
 					></textarea>
 				</li>
 
-				{#if $user?.id.replaceAll('-', '') == f.meta.pilot_id && (targetPrivacy != f.meta.privacy || newComment != f.meta.comment)}
+				{#if canEdit && (targetPrivacy != f.meta.privacy || newComment != f.meta.comment)}
 					<li>
 						<button class="btn btn-outline-secondary w-100" on:click={patchMeta}> Update </button>
 					</li>
 				{/if}
-				<li class="list-group-item text-start">Difficulty: {$difficulty}</li>
-				<li class="list-group-item text-start">Truncate DGS: {$truncate}</li>
+				<li class="input-group w-100">
+					<a
+						class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
+						href="{base}/database/flight_view/?flight_id={f.meta.flight_id}"
+					>View Flight</a>
+					<button
+						class="form-control btn btn-outline-secondary  {canAnalyse ? '' : 'disabled'}"
+						on:click={loadAnalysis}
+          >
+          View Analysis
+          </button>
+				</li>
 				<li class="list-group-item">
 					<table class="table-sm table-responsive">
 						<thead>
