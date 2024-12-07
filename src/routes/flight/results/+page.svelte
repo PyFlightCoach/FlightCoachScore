@@ -4,8 +4,7 @@
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
   import ToggleButton from '$lib/components/ToggleButton.svelte';
-	import { result } from 'lodash';
-
+	
 	$navBarContents = AnalysisMenu;
 </script>
 

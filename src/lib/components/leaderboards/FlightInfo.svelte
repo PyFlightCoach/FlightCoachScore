@@ -6,6 +6,10 @@
 	import { Flight } from '$lib/database/flight';
 	import { dbServer } from '$lib/api';
 	import { base } from '$app/paths';
+	import { loadAnalysisFromDB } from '$lib/analysis/analysis';
+	import { manNames } from '$lib/stores/analysis';
+	import { loading, activeFlight } from '$lib/stores/shared';
+  import { goto } from '$app/navigation';
 
 	export let f: Flight;
 
@@ -16,10 +20,12 @@
 	let targetPrivacy = f.meta.privacy;
 	let newComment = f.meta.comment;
 
-	$: canEdit = false //$user?.id.replaceAll('-', '') == f.meta.pilot_id || $user?.is_superuser;
-	$: canView = false //canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;
+  let isAnalysisLoaded = f.meta.flight_id == $activeFlight?.meta.flight_id;
+
+	$: canEdit = $user?.id.replaceAll('-', '') == f.meta.pilot_id || $user?.is_superuser;
+	$: canView = false; //canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;
 	$: canAnalyse = canEdit || privacyOptions.indexOf(f.meta.privacy) > 1;
-  
+
 	const patchMeta = () => {
 		const fd = new FormData();
 		fd.append('privacy', targetPrivacy);
@@ -31,10 +37,6 @@
 				newComment = f.meta.comment;
 			});
 		});
-	};
-
-	const loadAnalysis = () => {
-		//const zippedAjson = dbServer.get(`flight/ajson/${f.meta.flight_id}`);
 	};
 </script>
 
@@ -99,14 +101,23 @@
 				<li class="input-group w-100">
 					<a
 						class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
-						href="{base}/database/flight_view/?flight_id={f.meta.flight_id}"
-					>View Flight</a>
+						href="{base}/database/flight_view/?flight_id={f.meta.flight_id}">View Flight</a
+					>
 					<button
-						class="form-control btn btn-outline-secondary  {canAnalyse ? '' : 'disabled'}"
-						on:click={loadAnalysis}
-          >
-          View Analysis
-          </button>
+						class="form-control btn btn-outline-secondary {canAnalyse  ? '' : 'disabled'}"
+						on:click={() => {
+              if (isAnalysisLoaded) {
+                goto(base + '/flight/results');
+              } else if (!$manNames || confirm('This will clear the current analysis. Continue?')) {
+								$loading = true;
+								loadAnalysisFromDB(f.meta.flight_id).finally(() => {
+									$loading = false;
+								});
+							}
+						}}
+					>
+						View Analysis
+					</button>
 				</li>
 				<li class="list-group-item">
 					<table class="table-sm table-responsive">

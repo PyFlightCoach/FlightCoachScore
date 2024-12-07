@@ -1,9 +1,6 @@
 import type { DBFlightMeta, DBSchedule, DBFlightScore } from './interfaces';
 import { dbServer } from '$lib/api';
-import { library } from '$lib/schedules';
-import { get } from 'svelte/store';
-
-
+import { safeGetLibrary } from '$lib/schedules';
 
 export class Flight {
 	constructor(
@@ -13,7 +10,9 @@ export class Flight {
 
 	static async load(flight_id: string) {
 		const meta = await dbServer.get(`flight/${flight_id}`);
-		const schedule = get(library).subset({ schedule_id: meta.schedule_id }).only;
+		const schedule = await safeGetLibrary().then(
+			(lib) => lib.subset({ schedule_id: meta.schedule_id }).only
+		);
 		return new Flight(meta, schedule);
 	}
 
@@ -29,5 +28,3 @@ export class Flight {
 		}
 	}
 }
-
-

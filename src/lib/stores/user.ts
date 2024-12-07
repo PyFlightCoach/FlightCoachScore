@@ -23,9 +23,10 @@ user.subscribe((value) => {
 					})
 					.catch(() => {
             console.log('User logged out');
-            alert('Your session has expired. Please log in again.');
-						user.set(undefined);
-            goto(base + '/user/login');
+            user.set(undefined);
+            if (confirm('Your session has expired. Please log in again.')) {
+              goto(base + '/user/login');
+            };
 					});
 			}, 1000 * 60)
 		);

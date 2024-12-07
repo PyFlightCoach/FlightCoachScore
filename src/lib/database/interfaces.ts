@@ -16,7 +16,7 @@ export interface DBUser {
 }
 
 
-export const privacyOptions = ['basic', 'view_flown', 'view_analysis']
+export const privacyOptions = ['basic', 'view_flown', 'view_analysis'];
 
 export interface DBFlight {
 	flight_id: string;

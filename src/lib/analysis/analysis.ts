@@ -18,17 +18,23 @@ import {
 	isComplete,
 	fcj
 } from '$lib/stores/analysis';
+import { activeFlight } from '$lib/stores/shared';
 import { MA } from '$lib/analysis/ma';
 import { get, writable } from 'svelte/store';
 import { analysisServer } from '$lib/api';
 import { States } from '$lib/analysis/state';
-import { Splitting, ManSplit } from '$lib/analysis/splitting';
+import { Splitting } from '$lib/analysis/splitting';
 import { ManDef } from '$lib/analysis/mandef';
 import { ScheduleInfo } from './fcjson';
-import { library, loadManDef } from '$lib/schedules';
+import { loadManDef, safeGetLibrary } from '$lib/schedules';
+import { dbServer } from '$lib/api';
+import JSZip from 'jszip';
+import { goto } from '$app/navigation';
+import { base } from '$app/paths';
+import { Flight } from '$lib/database/flight';
 
 export function checkComplete() {
-	if (!get(manNames) || !get(bin)) {
+	if (!get(manNames)) {
 		return false;
 	}
 	if (!analyses.every((a) => get(a) && get(a)!.scores !== undefined)) {
@@ -41,12 +47,12 @@ function setupAnalysisArrays(mnames: string[]) {
 	manNames.set(mnames);
 	scores.set(new Array(mnames.length).fill(0));
 	running.set(new Array(mnames.length).fill(false));
-  analyses.length = mnames.length;
-  runInfo.length = mnames.length;
-  mnames.forEach((_, i) => {
-    runInfo[i] = writable();
-    analyses[i] = writable();
-  });
+	analyses.length = mnames.length;
+	runInfo.length = mnames.length;
+	mnames.forEach((_, i) => {
+		runInfo[i] = writable();
+		analyses[i] = writable();
+	});
 }
 
 function setAnalysis(i: number, man: MA) {
@@ -67,12 +73,13 @@ function setAnalysis(i: number, man: MA) {
 		fa_versions.update((v) => {
 			return [...new Set([...v, ...Object.keys(ma?.history || [])])];
 		});
-
+    
 		isComplete.set(checkComplete());
 	});
 }
 
 export function clearAnalysis() {
+  activeFlight.set(undefined);
 	selManID.set(undefined);
 	states.set(undefined);
 	manNames.set(undefined);
@@ -87,6 +94,7 @@ export function clearAnalysis() {
 	analyses.length = 0;
 	running.set([]);
 	runInfo.length = 0;
+  activeFlight.update(f=> {if (f) {f.isAnalysisLoaded = false}; return f});
 }
 
 export async function newAnalysis(sts: States, split: Splitting) {
@@ -102,7 +110,7 @@ export async function newAnalysis(sts: States, split: Splitting) {
 	if (get(isCompFlight)) {
 		const ddef = split.directionDefinition();
 
-		const heading = sts.data[split.mans[ddef.manid-1].stop!].direction_str();
+		const heading = sts.data[split.mans[ddef.manid - 1].stop!].direction_str();
 		if (ddef.direction == 'DOWNWIND') {
 			direction = heading == 'RTOL' ? 'LTOR' : 'RTOL';
 		} else if (ddef.direction == 'UPWIND') {
@@ -113,13 +121,13 @@ export async function newAnalysis(sts: States, split: Splitting) {
 	}
 
 	split.analysisMans.forEach(async (id: number, i: number) => {
-    runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
+		runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
 		setAnalysis(
-      i,
+			i,
 			new MA(
 				split.mans[id].name!,
 				id,
-				id > 0 ? sts.data[split.mans[id-1].stop!].t : 0,
+				id > 0 ? sts.data[split.mans[id - 1].stop!].t : 0,
 				sts.data[split.mans[id].stop!].t,
 				new ScheduleInfo(split.mans[id].schedule!.category_name, split.mans[id].schedule_name),
 				direction,
@@ -127,8 +135,8 @@ export async function newAnalysis(sts: States, split: Splitting) {
 				split.mans[id].manoeuvre!.k, // todo get K
 				get(binData)
 					? undefined
-					: new States(sts.data.slice(split.mans[id-1].stop, split.mans[id].stop)),
-          split.mans[id].mdef
+					: new States(sts.data.slice(split.mans[id - 1].stop, split.mans[id].stop)),
+				split.mans[id].mdef
 			)
 		);
 	});
@@ -159,37 +167,58 @@ export async function importAnalysis(data: Record<string, any>) {
 
 	setupAnalysisArrays(data.mans.map((ma: MA) => ma.name));
 
-	data.mans.forEach(async (ma: ManDef, i: number) => {
-    runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
-		MA.parse(ma).then(async (res) => {
-			if (res.mdef) {
-				setAnalysis(i, res);
-			} else {
-				setAnalysis(
-          i,
-					new MA(
-						res.name,
-						res.id,
-						res.tStart,
-						res.tStop,
-						res.schedule,
-						res.scheduleDirection,
-						res.history,
-						res.k,
-						res.flown,
-						await loadManDef(
-							library[res.schedule.category].schedules![res.schedule.name].manoeuvres[res.id].id
+	await safeGetLibrary().then(library => {
+		data.mans.forEach(async (ma: ManDef, i: number) => {
+			runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
+
+			MA.parse(ma).then(async (res) => {
+				if (res.mdef) {
+					setAnalysis(i, res);
+				} else {
+					setAnalysis(
+						i,
+						new MA(
+							res.name,
+							res.id,
+							res.tStart,
+							res.tStop,
+							res.schedule,
+							res.scheduleDirection,
+							res.history,
+							res.k,
+							res.flown,
+							await loadManDef(
+								library.subset({
+									category_name: res.schedule.category,
+									schedule_name: res.schedule.name
+								}).first!.manoeuvres[res.id - 1].id
+							)
 						)
-					)
-				);
-			}
+					);
+				}
+			});
 		});
 	});
 }
 
 export async function loadExample() {
-	clearAnalysis();
 	importAnalysis(await analysisServer.get('example'));
+}
+
+export async function loadAnalysisFromDB(flight_id: string) {
+	const response = await dbServer.get(`flight/ajson/${flight_id}`, undefined, 'arrayBuffer');
+	const zip = new JSZip();
+
+	zip
+		.loadAsync(response)
+		.then((res) => Object.values(res.files)[0].async('string'))
+		.then((ajson) => JSON.parse(ajson))
+		.then(importAnalysis)
+		.then(() => Flight.load(flight_id))
+		.then((flight: Flight) => {
+			activeFlight.set(flight);
+			goto(`${base}/flight/results`);
+		});
 }
 
 export async function analyseMans(ids: number[]) {

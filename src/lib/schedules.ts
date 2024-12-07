@@ -98,14 +98,17 @@ export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary()
 export async function loadKnowns() {
   const lib = get(library);
   if (lib.subset({owner_name: 'Fcscore Admin'}).empty) {
-    lib.update({owner: 'admin@fcscore.org'}).then(
+    await lib.update({owner: 'admin@fcscore.org'}).then(
       newlib=>{library.set(newlib.sort(['rule_name', 'category_name', 'schedule_name']))}
     );
   } 
 };
 
-
-
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
 	return dbServer.get(`schedule/manoeuvre/definition/${manoeuvre_id}`).then((r) => ManDef.parse(r));
+}
+
+export async function safeGetLibrary() {
+  await loadKnowns();
+  return get(library);
 }

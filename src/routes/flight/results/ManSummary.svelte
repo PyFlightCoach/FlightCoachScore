@@ -110,7 +110,7 @@
 	<td
 		><span class="small text-nowrap text-muted">
 			{$info}
-			{#if !isRunning && !$info.includes('Imported') && score == 0}
+			{#if $info && !isRunning && !$info.includes('Imported') && score == 0}
 				<a
 					tabindex="0"
 					on:keydown={() => activate_man(id, 'alignment')}

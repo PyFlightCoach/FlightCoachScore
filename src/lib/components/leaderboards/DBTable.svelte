@@ -3,6 +3,7 @@
 	import { user } from '$lib/stores/user.js';
 	import FlightInfo from './FlightInfo.svelte';
 	import { Flight } from '$lib/database/flight';
+  import {activeFlight} from '$lib/stores/shared';
 	loadKnowns();
 
 	export let lastResponse: 'leaderboard' | 'flightlist' | undefined = undefined;
@@ -29,8 +30,12 @@
 		col_heads = [...['Date', 'Score', 'Comment'], ...($user?.is_superuser ? ['Name'] : [])];
 	}
 
-	let showID: Number | undefined;
-	let showFlight: Flight | undefined;
+  $: loadedID = $activeFlight?.meta.flight_id
+
+  $: showID = loadedID;
+  let showFlight: Flight | undefined;
+	$: if (showID) Flight.load(showID).then(r=>{showFlight=r});
+
 	//  <a href="{base}/database/flight/?flight_id={row.flight_id}">View</a>
 </script>
 
@@ -47,16 +52,13 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each table_rows as row, i}
-						<tr role="button" on:click={() => {
-              if (showID == i) {
+					{#each table_rows as row}
+						<tr class="{row.flight_id == $activeFlight?.meta.flight_id ? 'table-active': ''}" role="button" on:click={() => {
+              if (showID == row.flight_id) {
                 showID = undefined;
                 showFlight = undefined;
               } else {
-                showID = i;
-                Flight.load(row.flight_id).then(res => {
-                  showFlight = res;
-                });
+                showID = row.flight_id;
               }
             }}
             >
@@ -64,14 +66,14 @@
 								<td>{row[col_map[col_head]]}</td>
 							{/each}
 							<td>
-                {#if showID == i}
+                {#if showID == row.flight_id}
                   <i class="bi bi-chevron-up"></i>
                 {:else}
                   <i class="bi bi-chevron-down"></i>
                 {/if}
 							</td>
 						</tr>
-						{#if showID == i}
+						{#if showID == row.flight_id}
 							<tr>
 								<td colspan={col_heads.length + 1}>
 									{#if showFlight}

@@ -13,6 +13,7 @@
 	import { loading } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
 	import { dev } from '$app/environment';
+  import {page} from '$app/stores';
 
 	let importedname: string | undefined;
 
@@ -39,7 +40,9 @@
 			class="dropdown-item"
 			on:click={() => {
 				clearAnalysis();
-				goto(`${base}/`);
+        if ($page.url.pathname.includes('/flight/')) {
+          goto(base +'/');
+        }
 			}}>Clear</button
 		>
 		{#if $user?.is_superuser || dev}

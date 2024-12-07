@@ -12,6 +12,7 @@
 	let inputMode: 'bin' | 'fcj' | 'state' = 'bin';
 	let form_state: string | undefined;
   let target: GPS | undefined;
+  let isDuplicate: boolean = false;
 	$: if (inputMode) {
 		$bin = undefined;
 		$binData = undefined;
@@ -30,10 +31,16 @@
     target=new GPS($binData.pos.Lat[0], $binData.pos.Lng[0], $binData.pos.Alt[0]);
   }
 
-	$: if ($binData && !$bin) {
-		form_state =
-			'This bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
-	}
+  $: if (isDuplicate != undefined) {
+    if (isDuplicate) {
+      $bin = undefined;
+      form_state = 'This bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
+    } else {
+      form_state = undefined;
+    }
+
+  }
+
 </script>
 
 <div class="col-4 pt-5">
@@ -47,6 +54,7 @@
 			bind:fcj={$fcj}
 			bind:states={$states}
 			bind:inputMode
+      bind:isDuplicate
 		/>
 
 		{#if form_state}

@@ -2,7 +2,7 @@ import { type FCJson, type FCJMan } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
 import { ManDef, ManOpt } from './mandef';
-import { library } from '$lib/schedules';
+import { library, safeGetLibrary } from '$lib/schedules';
 import { type Manoeuvre, type Schedule, loadManDef } from '$lib/schedules';
 import { get } from 'svelte/store';
 
@@ -57,41 +57,42 @@ export class ManSplit {
 }
 
 export class Splitting {
-  constructor(readonly mans: ManSplit[]) {}
-  
-  get analysisMans() {
-    const oMans: number[] = [];
-    this.mans.forEach((man, i) => {
-      if (man.manoeuvre) {
-        oMans.push(i);
-      }
-    });
-    return oMans;
-  }
-  
-  directionDefinition() {
-    let ddef;
-    const imans = this.analysisMans;
-    for (let i = 0; i < imans.length; i++) {
-      if (this.mans[imans[i]].mdef!.info.start.direction != 'CROSS') {
-        ddef = {direction: this.mans[imans[i]].mdef!.info.start.direction, manid: imans[i]};
-        break;
-      }
-    }
-    return ddef!;
-  }
-  
-  get manNames() {
-    return this.analysisMans.map(iman=>this.mans[iman].manoeuvre!.short_name);
-  }
+	constructor(readonly mans: ManSplit[]) {}
+
+	get analysisMans() {
+		const oMans: number[] = [];
+		this.mans.forEach((man, i) => {
+			if (man.manoeuvre) {
+				oMans.push(i);
+			}
+		});
+		return oMans;
+	}
+
+	directionDefinition() {
+		let ddef;
+		const imans = this.analysisMans;
+		for (let i = 0; i < imans.length; i++) {
+			if (this.mans[imans[i]].mdef!.info.start.direction != 'CROSS') {
+				ddef = { direction: this.mans[imans[i]].mdef!.info.start.direction, manid: imans[i] };
+				break;
+			}
+		}
+		return ddef!;
+	}
+
+	get manNames() {
+		return this.analysisMans.map((iman) => this.mans[iman].manoeuvre!.short_name);
+	}
 }
-
-
 
 export async function parseFCJMans(fcj: FCJson, states: States) {
 	const stTime = states.t;
 	const sinfo = await fcj.sinfo.to_pfc();
-	const schedule = get(library).subset({category_name: sinfo.category, schedule_name: sinfo.name}).first;
+
+	const schedule = await safeGetLibrary().then(
+		lib => lib.subset({ category_name: sinfo.category, schedule_name: sinfo.name }).first
+	);
 
 	return fcj.mans.map((man: FCJMan, i: number) => {
 		const stStop = lookupMonotonic(fcj.data[man.stop].time / 1e6, stTime);

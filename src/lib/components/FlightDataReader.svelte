@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BinData, BinReader} from '$lib/components/bin';
+	import { BinData, BinReader } from '$lib/components/bin';
 	import { FCJson } from '$lib/analysis/fcjson';
 	import { States } from '$lib/analysis/state';
 	import { dbServer } from '$lib/api';
@@ -10,19 +10,20 @@
 	export let fcj: FCJson | undefined;
 	export let states: States | undefined;
 	export let inputMode = 'bin';
+	export let isDuplicate: boolean = false;
 	let md5: string | undefined = undefined;
 	let files: FileList | undefined;
-  
+
 	const inputNames: Record<string, string> = {
 		bin: 'bin file',
 		fcj: 'fc json file',
 		state: 'state csv'
 	};
 
-  $: if (inputMode) {
-    files=undefined;
-    md5 = undefined;
-  }
+	$: if (inputMode) {
+		files = undefined;
+		md5 = undefined;
+	}
 
 	const parseFile = (file: File) => {
 		const reader = new FileReader();
@@ -31,45 +32,39 @@
 				states = States.read_csv(reader.result as string);
 			} else {
 				fcj = FCJson.parse(JSON.parse(reader.result! as string));
-        states = States.from_fcj(fcj);
+				states = States.from_fcj(fcj);
 			}
 		};
 		reader.readAsText(file);
-	};
-
-	const checkCanUpload = (binFile: File) => {
-		dbServer
-			.get(`flight/check_duplicate/${md5}`)
-			.then(() => {
-				bin = binFile;
-			})
-			.catch((e) => {
-				bin = undefined;
-				console.log(e);
-			});
 	};
 </script>
 
 <div class="row pt-3">
 	<label class="col" for="data-input-mode">Select Data Source:</label>
-  <select class="col form-select" id="data-input-mode" bind:value={inputMode}>
+	<select class="col form-select" id="data-input-mode" bind:value={inputMode}>
 		{#each Object.entries(inputNames) as [k, v]}
 			<option value={k}>{v}</option>
 		{/each}
-  </select>
+	</select>
 </div>
 
 <div class="row pt-3">
-  <label class="col" for="data-input-file">Load {inputMode} File:</label>
+	<label class="col" for="data-input-file">Load {inputMode} File:</label>
 	<div class="col" style:overflow="hidden" id="data-file-input">
 		{#if inputMode === 'bin'}
 			<BinReader
 				onloaded={(...data) => {
-					let tempbin: File | undefined;
-					let tempBD: BinData | undefined;
-					[tempbin, tempBD, bootTime, md5] = data;
-					checkCanUpload(tempbin!);
-					binData = tempBD;
+					[bin, binData, bootTime, md5] = data;
+					dbServer
+						.get(`flight/check_duplicate/${md5}`)
+						.then(r => {
+              console.log(r);
+              isDuplicate = false;
+            })
+						.catch(e => {
+							isDuplicate = true;
+							console.log(e);
+						});
 				}}
 			/>
 		{:else if inputMode === 'fcj' || inputMode === 'state'}
@@ -99,5 +94,4 @@
 			/>
 		{/if}
 	</div>
-  
 </div>

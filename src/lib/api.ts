@@ -4,11 +4,11 @@ import { type Writable, writable, get } from 'svelte/store';
 export class Server {
 	constructor(readonly address: string) {}
 
-	async handleResponse(response: Response) {
+	async handleResponse(response: Response, key: keyof Response = 'json') {
 		if (response.ok) {
       console.log(`${this.address}: OK`);
       try {
-        return await response.json();
+        return typeof response[key] === 'function' ? await response[key]() : response[key];
       } catch {
         return;
       }
@@ -18,9 +18,9 @@ export class Server {
 		}
 	}
 
-  async fetch(method: string, path: string, cookie: string|undefined=undefined, data: Record<string, unknown>|FormData|undefined=undefined) {
+  async fetch(method: string, path: string, cookie: string|undefined=undefined, data: Record<string, unknown>|FormData|undefined=undefined, key: keyof Response='json') {
     const _path = `${this.address}/${path.replace(/^\/+/g, "")}`
-    const _request = {
+    const _request: RequestInit = {
       method: method,
       headers: ({
         ...(cookie ? {Cookie: cookie} : {}),
@@ -30,22 +30,24 @@ export class Server {
       ...(data ? {body: (data instanceof FormData) ? data : JSON.stringify(data)} : {})
     };
     return await this.handleResponse(
-      await fetch(_path, _request)
+      await fetch(_path, _request),
+      key
     );
   }
 
-	async get(path: string, data: Record<string, unknown> | FormData | undefined = undefined) {
+	async get(path: string, data: Record<string, string> | FormData | undefined = undefined, key: keyof Response='json') {
     if (data) {
       path += '?' + new URLSearchParams(data).toString();
     }
-		return await this.fetch('GET', path);
-	}
-	async post(path: string, data: Record<string, unknown> | FormData) {
-		return await this.fetch('POST', path, undefined, data);
+		return await this.fetch('GET', path, undefined, undefined, key);
 	}
 
-	async patch(path: string, data: Record<string, unknown> | FormData) {
-		return await this.fetch('PATCH', path, undefined, data)  
+	async post(path: string, data: Record<string, unknown> | FormData, key: keyof Response='json') {
+		return await this.fetch('POST', path, undefined, data, key);
+	}
+
+	async patch(path: string, data: Record<string, unknown> | FormData, key: keyof Response='json') {
+		return await this.fetch('PATCH', path, undefined, data, key);
   }
 }
 
