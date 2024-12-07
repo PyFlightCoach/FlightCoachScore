@@ -1,10 +1,16 @@
-import { table_rows } from "$lib/stores/leaderboards";
-import { get} from "svelte/store";
+import { dbServer } from "$lib/api.js";
+import {Flight} from '$lib/database/flight';
+import {States} from '$lib/analysis/state';
 
-export function load({url}) {
+export async function load({url}) {
   
-  const trs = get(table_rows);
-  const tr = trs.find(tr => tr.flight_id == url.searchParams.get('flight_id'));
-  
-  return { flight: tr };
+  const flight_id = url.searchParams.get('flight_id');
+  if (!flight_id) {
+    return { status: 404, error: new Error("Flight ID not found") };
+  }
+  const meta = await Flight.load(flight_id);
+  const mans = (await dbServer.get(`flight/view/${flight_id}`)).mans.map(v=>States.parse(v.flown));
+
+
+  return { meta: meta, mans: mans };
 }

@@ -82,6 +82,7 @@
 		<PlotInter
 			sts={states}
 			activeEls={activeMP ? activeMP.getCollectorEls(Object.keys($man.mdef.eds)) : undefined}
+      sp={1.5}
 		/>
 	</div>
 {:else}

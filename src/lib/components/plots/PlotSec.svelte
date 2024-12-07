@@ -28,7 +28,7 @@
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
 
-	let scale_multiplier = isFullSize ? 15 : 2;
+	let scale_multiplier = $isFullSize ? 15 : 5;
 
 	$: if (flst && fixRange) {
 		range = [0, flst.data.length];
@@ -49,7 +49,7 @@
 		if (st != null && i < st.data.length) {
 			const fst = st.data[i];
 			return colddraft
-				.scale(sc * 0.3)
+				.scale(sc * 0.6)
 				.to_mesh3d(fst.pos, fst.att, { opacity: 1.0, hoverinfo: 'skip', name: 'fl model' });
 		} else {
 			return { type: 'mesh3d', visible: false };

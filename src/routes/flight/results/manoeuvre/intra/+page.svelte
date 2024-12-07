@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
-	import { analyses, selManID } from '$lib/stores/analysis';
+	import { analyses, selManID, isFullSize } from '$lib/stores/analysis';
 	import type { States } from '$lib/analysis/state';
 	import CriteriaPlot from './CriteriaPlot.svelte';
 	import VisPlot from './VisPlot.svelte';
@@ -39,7 +39,7 @@
 <div class="col-8 d-flex flex-column border">
 	{#if !activeCriteria}
 		{#if !activeED}
-			<PlotDTW sts={states} bind:activeEl={activeED} sp={4} />
+			<PlotDTW sts={states} bind:activeEl={activeED} sp={$isFullSize ? 10 : 4} />
 		{:else}
 			<PlotSec
 				flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
@@ -47,7 +47,7 @@
 				bind:i={activeIndex}
 				controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
 				fixRange
-				scale={3}
+				scale={0.2}
 			/>
 		{/if}
 	{:else}
@@ -59,7 +59,7 @@
 					bind:i={activeIndex}
 					controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
 					fixRange
-					scale={3}
+					scale={0.4}
 				/>
 			</div>
 

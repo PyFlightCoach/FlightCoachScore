@@ -23,7 +23,7 @@
   let isAnalysisLoaded = f.meta.flight_id == $activeFlight?.meta.flight_id;
 
 	$: canEdit = $user?.id.replaceAll('-', '') == f.meta.pilot_id || $user?.is_superuser;
-	$: canView = false; //canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;
+	$: canView = canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;
 	$: canAnalyse = canEdit || privacyOptions.indexOf(f.meta.privacy) > 1;
 
 	const patchMeta = () => {
@@ -101,7 +101,7 @@
 				<li class="input-group w-100">
 					<a
 						class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
-						href="{base}/database/flight_view/?flight_id={f.meta.flight_id}">View Flight</a
+						href="{base}/database/flight/?flight_id={f.meta.flight_id}">View Flight</a
 					>
 					<button
 						class="form-control btn btn-outline-secondary {canAnalyse  ? '' : 'disabled'}"

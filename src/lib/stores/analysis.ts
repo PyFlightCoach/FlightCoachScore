@@ -16,10 +16,10 @@ export const states: Writable<States | undefined> = writable();
 
 export const isFullSize: Writable<boolean> = writable(false);
 
-states.subscribe((sts) => {
+states.subscribe((sts: States | undefined) => {
 	isFullSize.set(
 		sts
-			? Math.max(...sts.data.map((s) => s.z)) - Math.min(...sts.data.map((s) => s.z)) > 1000
+			? Math.max(sts.range('z'), sts.range('x'), sts.range('y')) > 1000
 			: false
 	);
 });

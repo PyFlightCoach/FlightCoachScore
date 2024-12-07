@@ -1,10 +1,9 @@
-
 <script lang="ts">
+  import PlotSec from '$lib/components/plots/PlotSec.svelte';
   export let data;
 </script>
 
 <div>
-{#each Object.entries(data.flight) as [key, value]}
-    <p>{key}:{value}</p>
-{/each}
+<PlotSec flst={data.mans[0]} />
+
 </div>
