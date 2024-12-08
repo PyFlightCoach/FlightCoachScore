@@ -53,7 +53,7 @@
 			</div>
 
 			<div class="col">
-				<a href="/password-request">Forgotten your password?</a>
+				<a href="{base}/user/password-request">Forgotten your password?</a>
 			</div>
 		</div>
 	</form>
