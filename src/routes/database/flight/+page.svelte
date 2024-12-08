@@ -25,7 +25,7 @@
     <label class="input-check-label" for="showBox">Show Box</label>
   </div>
 
-  
+
 		<div class="row">
 			<table class="table-sm">
 				<thead>
@@ -63,5 +63,6 @@
 		flst={data.mans[activeManId]}
 		controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
 		bind:showBox
+    fixRange
 	/>
 </div>
