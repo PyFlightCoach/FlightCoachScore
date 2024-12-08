@@ -2,7 +2,7 @@
 	import NavMenu from '$lib/components/NavMenu.svelte';
 	import ServerSelection from '$lib/components/ServerSelection.svelte';
 	import { dev } from '$lib/stores/shared';
-	import { anSOptions, anSOption, customAnalysisServer } from '$lib/api';
+	import { an_servers, anSOption, customAnalysisServer } from '$lib/api';
 	import { dbSOption, customDbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
 </script>
@@ -10,13 +10,15 @@
 <NavMenu tooltip="Super User Menu">
 	<span slot="icon"><i class="bi bi-star"></i> </span>
 
-	{#if $dev}
+  {#if $user?.is_superuser}
 		<ServerSelection
 			title="Analysis Server"
-			options={Object.keys(anSOptions)}
+			options={Object.keys(an_servers)}
 			bind:custom={$customAnalysisServer}
 			bind:selected={$anSOption}
 		/>
+    {/if}
+  {#if $dev}
 		<div class="dropdown-divider"></div>
 		<ServerSelection
 			title="Database Server"

@@ -86,26 +86,26 @@ export const anServerAddress: Writable<string> = writable();
 
 export const customAnalysisServer = newCookieStore('customAnalysisServer', 'http://localhost:5000');
 
-export const anSOptions = {
+export const an_servers = {
 	uk: 'https://madeupmodels.com:5010',
 	pre: 'https://madeupmodels.com:5020'
 };
 
 export const anSOption = newCookieStore('anSOption', 'uk', (value) => {
   if (dev) {
-    if (Object.keys(anSOptions).includes(value)) {
-      anServerAddress.set(anSOptions[value as keyof typeof anSOptions]);
+    if (Object.keys(an_servers).includes(value)) {
+      anServerAddress.set(an_servers[value as keyof typeof an_servers]);
     } else {
       anServerAddress.set(get(customAnalysisServer));
     }
   } else { 
-    anServerAddress.set(anSOptions['uk']);
+    anServerAddress.set(an_servers['uk']);
   }
 	
 });
 
 customAnalysisServer.subscribe((value) => {
-	if (!Object.keys(anSOptions).includes(value)) {
+	if (!Object.keys(an_servers).includes(value)) {
 		anServerAddress.set(value);
 	}
 });
