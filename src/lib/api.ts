@@ -99,13 +99,13 @@ export const anSOption = newCookieStore('anSOption', 'uk', (value) => {
       anServerAddress.set(get(customAnalysisServer));
     }
   } else { 
-    anServerAddress.set(an_servers['uk']);
+    anServerAddress.set(an_servers.uk);
   }
 	
 });
 
 customAnalysisServer.subscribe((value) => {
-	if (!Object.keys(an_servers).includes(value)) {
+	if (get(anSOption)=='custom') {
 		anServerAddress.set(value);
 	}
 });
@@ -141,7 +141,7 @@ export const dbSOption = newCookieStore('dbSOption', 'uk', (value) => {
 });
 
 customDbServer.subscribe((value) => {
-	if (get(dbSOption) != 'uk') {
+	if (get(dbSOption) == 'custom') {
 		dbServerAddress.set(value);
 	}
 });
