@@ -1,26 +1,38 @@
 <script lang="ts">
 	import NavMenu from '$lib/components/NavMenu.svelte';
 	import ServerSelection from '$lib/components/ServerSelection.svelte';
-
+	import { dev } from '$lib/stores/shared';
 	import { anSOptions, anSOption, customAnalysisServer } from '$lib/api';
 	import { dbSOption, customDbServer } from '$lib/api';
+	import { user } from '$lib/stores/user';
 </script>
 
 <NavMenu tooltip="Super User Menu">
-	<span slot="icon"><i class="bi bi-star" ></i> </span>
+	<span slot="icon"><i class="bi bi-star"></i> </span>
 
-	<ServerSelection
-		title="Analysis Server"
-    options={Object.keys(anSOptions)}
-		bind:custom={$customAnalysisServer}
-		bind:selected={$anSOption}
-	/>
-	<div class="dropdown-divider" ></div>
-	<ServerSelection
-		title="Database Server"
-		options={['uk']}
-		bind:custom={$customDbServer}
-		bind:selected={$dbSOption}
-	/>
-
+	{#if $dev}
+		<ServerSelection
+			title="Analysis Server"
+			options={Object.keys(anSOptions)}
+			bind:custom={$customAnalysisServer}
+			bind:selected={$anSOption}
+		/>
+		<div class="dropdown-divider"></div>
+		<ServerSelection
+			title="Database Server"
+			options={['uk']}
+			bind:custom={$customDbServer}
+			bind:selected={$dbSOption}
+		/>
+	{/if}
+  <button
+    class="dropdown-item"
+    title="Temporarily make me a normal user to see how it looks."
+    on:click={() => {
+      $dev = false;
+      user.update(u => {u.is_superuser = false; return u;})
+    }}
+  >
+    Make Me Normal
+  </button>
 </NavMenu>

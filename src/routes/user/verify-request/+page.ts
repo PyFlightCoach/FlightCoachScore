@@ -8,7 +8,7 @@ export async function load({ url }) {
 		email = get(user)!.email;
 	}
 
-	console.log(email);
+	console.debug(email);
 	try {
 		await dbServer.post('auth/request-verify-token', { email: email });
 		return {

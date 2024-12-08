@@ -26,7 +26,7 @@
 		}
 	}
   $origin = Origin.load();
-  $: console.log($origin);
+  $: console.debug($origin);
   $: if ($binData) {
     target=new GPS($binData.pos.Lat[0], $binData.pos.Lng[0], $binData.pos.Alt[0]);
   }

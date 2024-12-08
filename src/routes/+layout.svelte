@@ -9,7 +9,7 @@
 	import { dbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
 	import { loading } from '$lib/stores/shared';
-
+  
 	onMount(() => {
 		dbServer
 			.get('/users/me')
@@ -19,7 +19,7 @@
 				}
 			})
 			.catch((e) => {
-				console.log('no user', e.message);
+				console.debug('no user', e.message);
 			});
 	});
 </script>

@@ -12,7 +12,7 @@
 	import { saveAs } from 'file-saver';
 	import { loading } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
-	import { dev } from '$app/environment';
+	import { dev } from '$lib/stores/shared';
   import {page} from '$app/stores';
 
 	let importedname: string | undefined;
@@ -45,7 +45,7 @@
         }
 			}}>Clear</button
 		>
-		{#if $user?.is_superuser || dev}
+		{#if $user?.is_superuser || $dev}
 			<button
 				class="dropdown-item"
 				on:click={() => {
@@ -70,7 +70,7 @@
 		<a class="dropdown-item" href={base + '/flight/results'}>Results</a>
 	{:else}
 		<a class="dropdown-item" href={base + '/flight/create/data'}>Create</a>
-		{#if $user?.is_superuser || dev}
+		{#if $user?.is_superuser || $dev}
 			<label class="dropdown-item">
 				<input
 					type="file"

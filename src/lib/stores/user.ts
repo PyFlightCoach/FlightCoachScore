@@ -19,7 +19,7 @@ user.subscribe((value) => {
 				dbServer
 					.get('users/me')
 					.then((me) => {
-						console.log(`${me.first_name} ${me.last_name} still logged in`);
+						console.debug(`${me.first_name} ${me.last_name} still logged in`);
 					})
 					.catch(() => {
             console.log('User logged out');

@@ -2,6 +2,7 @@ import { GPS, Quaternion, Point } from '$lib/analysis/geometry';
 import { analysisServer } from '$lib/api';
 import _ from 'lodash';
 
+
 export class Origin {
 	lat: number;
 	lng: number;
@@ -45,8 +46,8 @@ export class Origin {
 				parseFloat(localStorage.getItem('orginHead') || '0')
 			);
 		} else {
-      return undefined;
-    }
+			return undefined;
+		}
 	}
 
 	get radHeading() {
@@ -253,6 +254,15 @@ export class FCJManResult {
 	get_score(difficulty: number, truncate: boolean) {
 		return this.results.find((v: FCJResult) =>
 			_.isEqual(Object.setPrototypeOf(v.properties, {}), { difficulty, truncate })
+		);
+	}
+
+	compareSplit(other: FCJManResult) {
+		return this.els.every(
+			(v, i) =>
+				v.start === other.els[i].start &&
+				v.stop === other.els[i].stop &&
+				v.name === other.els[i].name
 		);
 	}
 }

@@ -16,7 +16,7 @@
 			<th scope="col" class="text-center">Intra</th>
 			<th scope="col" class="text-center">Inter</th>
 			<th scope="col" class="text-center">Box</th>
-			<th scope="col">Score</th>
+			<th scope="col" class="text-center">Score</th>
 			<th
 				role="button"
 				data-toggle="tooltip"
@@ -28,7 +28,7 @@
       >
         Run
       </th>
-			<th scope="col">Status</th>
+			<th scope="col" style="width:400px">Status</th>
 		</tr>
 	</thead>
 	<tbody>

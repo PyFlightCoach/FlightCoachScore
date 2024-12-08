@@ -20,7 +20,7 @@
 	let targetPrivacy = f.meta.privacy;
 	let newComment = f.meta.comment;
 
-  let isAnalysisLoaded = f.meta.flight_id == $activeFlight?.meta.flight_id;
+  $: isAnalysisLoaded = f.meta.flight_id == $activeFlight?.meta.flight_id;
 
 	$: canEdit = $user?.id.replaceAll('-', '') == f.meta.pilot_id || $user?.is_superuser;
 	$: canView = canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;

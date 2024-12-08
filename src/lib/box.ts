@@ -64,8 +64,8 @@ export const getSites = async () => {
     return sites;
   
   } else {
-    console.log ("Error loading sites");
-    console.log(sites);
+    console.debug("Error loading sites");
+    console.debug(sites);
     return []
   }
 

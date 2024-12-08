@@ -18,10 +18,10 @@ import {
 	isComplete,
 	fcj
 } from '$lib/stores/analysis';
-import { activeFlight } from '$lib/stores/shared';
+import { activeFlight, isAnalysisModified } from '$lib/stores/shared';
 import { MA } from '$lib/analysis/ma';
 import { get, writable } from 'svelte/store';
-import { analysisServer } from '$lib/api';
+import { analysisServer, faVersion } from '$lib/api';
 import { States } from '$lib/analysis/state';
 import { Splitting } from '$lib/analysis/splitting';
 import { ManDef } from '$lib/analysis/mandef';
@@ -34,13 +34,7 @@ import { base } from '$app/paths';
 import { Flight } from '$lib/database/flight';
 
 export function checkComplete() {
-	if (!get(manNames)) {
-		return false;
-	}
-	if (!analyses.every((a) => get(a) && get(a)!.scores !== undefined)) {
-		return false;
-	}
-	return true;
+  return get(manNames)?.length && analyses.every(a => get(a) && get(a)?.history[get(faVersion)!]);
 }
 
 function setupAnalysisArrays(mnames: string[]) {
@@ -94,11 +88,14 @@ export function clearAnalysis() {
 	analyses.length = 0;
 	running.set([]);
 	runInfo.length = 0;
-  activeFlight.update(f=> {if (f) {f.isAnalysisLoaded = false}; return f});
+  activeFlight.set(undefined);
+  isAnalysisModified.set(undefined);
 }
 
 export async function newAnalysis(sts: States, split: Splitting) {
 	setupAnalysisArrays(split.manNames);
+
+  isAnalysisModified.set(false);
 
 	if (get(binData)) {
 		origin.update((orgn) => {
@@ -252,7 +249,9 @@ export async function analyseManoeuvre(
 	if ((!ma!.scores || optimise || force) && !get(running)[id]) {
 		//if scores exist, only run if server version not in history
 
-		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
+		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`)
+      
+
 		running.update((v) => {
 			v[id] = true;
 			return v;

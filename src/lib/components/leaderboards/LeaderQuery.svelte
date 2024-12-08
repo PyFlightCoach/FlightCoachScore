@@ -48,7 +48,7 @@
       ...($sort_by_score_flag ? {sort_by_score_flag: $sort_by_score_flag} : {}),
       ...($select_by_date ? {date_after: $date_after, date_before: $date_before} : {n_days})
 		};
-		console.log(q);
+		console.debug(q);
     const _method = $sort_by_score_flag ? 'leaderboard' : 'flightlist';
     dbServer.get('analysis/' + _method, q).then((res) => {
       table_rows = res.results.map(row=>{return {...row, score: Math.round(row.score*100)/100}});
@@ -70,7 +70,7 @@
   <label for="sort_by_score_flag">Sort By Score</label>
 </div>
 {#if $sort_by_score_flag || $user?.is_superuser}
-  <div class="mt-2 mb-3">
+  <div class="form-check">
     <input
       type="checkbox"
       class="form-check-input"
@@ -78,7 +78,7 @@
       name="me_only_flag"
       bind:checked={$me_only_flag}
     />
-    <label for="me_only_flag">Only my flights</label>
+    <label for="form-check-label">Only my flights</label>
   </div>  
   <div class="mb-3">
     <input
@@ -97,7 +97,7 @@
   <ScheduleSelect
     level="schedule"
     onselected={(schedule, manoeuvre) => {
-      console.log(`selecting: ${schedule.schedule_name}`);
+      console.debug(`selecting: ${schedule.schedule_name}`);
       $schedule_id = schedule.schedule_id;
     }}
   />

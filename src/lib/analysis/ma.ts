@@ -6,7 +6,7 @@ import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/analysis/fcjson';
 import { analysisServer } from '$lib/api';
 import { selectedResult, runInfo, binData, origin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
-
+import { isAnalysisModified } from '$lib/stores/shared';
 
 export class MA {
 	constructor(
@@ -64,6 +64,15 @@ export class MA {
 			);
 			selectedResult.set(res.fa_version);
 			runInfo[this.id - 1].set(res.info);
+
+      const results = FCJManResult.parse(res);
+      const isNewFAVersion = !this.history[res.fa_version];
+      const isNewSplit = !isNewFAVersion ? !this.history[res.fa_version].compareSplit(results) : false
+
+      if (isNewFAVersion || isNewSplit) {
+        isAnalysisModified.set(true);
+      }
+
 			return new MA(
 				this.name,
 				this.id,
@@ -71,7 +80,7 @@ export class MA {
 				this.tStop,
 				this.schedule,
 				this.scheduleDirection,
-				{ ...this.history, [res.fa_version]: FCJManResult.parse(res) },
+				{ ...this.history, [res.fa_version]: results },
 				res.mdef.info.k,
 				States.parse(res.flown),
 				ManDef.parse(res.mdef),

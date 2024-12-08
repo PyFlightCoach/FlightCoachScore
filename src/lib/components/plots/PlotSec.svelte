@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { States } from '$lib/analysis/state';
 	import Plot from 'svelte-plotly.js';
-	import { ribbon } from '$lib/components/plots/traces';
+	import { ribbon, boxtrace } from '$lib/components/plots/traces';
 	import { layout3d } from '$lib/components/plots/layouts';
 	import DoubleSlider from '$lib/components/DoubleSlider.svelte';
 	import colddraft from '$lib/components/plots/colddraft';
@@ -27,6 +27,7 @@
   export let range: [number, number] = [0, flst.data.length];
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
+  export let showBox: boolean = false;
 
 	let scale_multiplier = $isFullSize ? 15 : 5;
 
@@ -56,6 +57,8 @@
 		}
 	};
 
+
+  $: box = showBox ? boxtrace() : { type: 'mesh3d', visible: false };
 	$: fl_ribbon = { ...createRibbonTrace(flst, scale * scale_multiplier, ...range), name: 'fl' };
 	$: tp_ribbon = { ...createRibbonTrace(tpst, scale * scale_multiplier, ...range), name: 'tp' };
 	$: fl_model = createModelTrace(flst, i, scale * scale_multiplier);
@@ -83,7 +86,7 @@
 				}
 			: { type: 'mesh3d', visible: false, name: 'grey2' };
 
-	$: traces = [fl_ribbon, tp_ribbon, fl_model, tp_model, grey_ribbon1, grey_ribbon2];
+	$: traces = [box, fl_ribbon, tp_ribbon, fl_model, tp_model, grey_ribbon1, grey_ribbon2];
 
 	let player: number| undefined;
 
@@ -199,13 +202,14 @@
 			{/if}
 		</div>
 		<div>
-			{#if controls.includes('perspective')}
+			{#if controls.includes('projection')}
 				<button
 					on:click={() => {
-						layout = structuredClone(layout3d);
-						layout.scene.camera.projection.type =
-							layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
-						layout = layout;
+						const newlayout = structuredClone(layout3d);
+            console.debug(layout.scene.camera.projection.type);
+						newlayout.scene.camera.projection.type =
+              layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
+						layout = newlayout;
 					}}>{layout.scene.camera.projection.type}</button
 				>
 			{/if}

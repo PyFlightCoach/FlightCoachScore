@@ -33,7 +33,6 @@
 		$selManID = id;
 		goto(base + '/flight/results/manoeuvre/' + page);
 	}
-
 </script>
 
 <tr>
@@ -99,16 +98,16 @@
 			on:click={() => {
 				analyseManoeuvre(id);
 			}}
-      on:dblclick={() => {
-        analyseManoeuvre(id, true);
-      }}
-    >
-      Run
-    </td>
+			on:dblclick={() => {
+				analyseManoeuvre(id, true);
+			}}
+		>
+			Run
+		</td>
 	{/if}
 
-	<td
-		><span class="small text-nowrap text-muted">
+	<td>
+		<span class="small text-nowrap text-muted w-100">
 			{$info}
 			{#if $info && !isRunning && !$info.includes('Imported') && score == 0}
 				<a
@@ -126,6 +125,6 @@
 					Check Alignment
 				</a>
 			{/if}
-		</span></td
-	>
+		</span>
+	</td>
 </tr>

@@ -13,7 +13,7 @@
 		id: 'flight_id',
 		lat: 'origin_lat',
 		lng: 'origin_lng',
-		Name: 'name',
+		Pilot: 'name',
 		Country: 'country',
 		Date: 'date',
 		Comment: 'comment',
@@ -25,9 +25,9 @@
 
 	let col_heads: string[];
 	$: if (lastResponse == 'leaderboard') {
-		col_heads = ['Position', 'Rank', 'Name', 'Country', 'Date', 'Score'];
+		col_heads = ['Position', 'Rank', 'Pilot', 'Country', 'Date', 'Score'];
 	} else if (lastResponse == 'flightlist') {
-		col_heads = [...['Date', 'Score', 'Comment'], ...($user?.is_superuser ? ['Name'] : [])];
+		col_heads = ['Date', 'Pilot', 'Country', 'Score', 'Comment'];
 	}
 
   $: loadedID = $activeFlight?.meta.flight_id

@@ -8,9 +8,9 @@ export async function load({url}) {
   if (!flight_id) {
     return { status: 404, error: new Error("Flight ID not found") };
   }
-  const meta = await Flight.load(flight_id);
+  const flight = await Flight.load(flight_id);
   const mans = (await dbServer.get(`flight/view/${flight_id}`)).mans.map(v=>States.parse(v.flown));
 
 
-  return { meta: meta, mans: mans };
+  return { flight: flight, mans: mans };
 }

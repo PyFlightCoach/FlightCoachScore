@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bin, totalScore, analyses } from '$lib/stores/analysis';
-	import { activeFlight } from '$lib/stores/shared';
+	import { activeFlight, isAnalysisModified } from '$lib/stores/shared';
 	import { createAnalysisExport } from '$lib/analysis/analysis';
 	import { get } from 'svelte/store';
 	import { dbServer } from '$lib/api';
@@ -9,6 +9,7 @@
 	import { base } from '$app/paths';
 	import { Flight } from '$lib/database/flight';
 	import { privacyOptions } from '$lib/database/interfaces';
+	import { user } from '$lib/stores/user';
 
 	let form_state: string | undefined;
 
@@ -17,6 +18,11 @@
   let comment: string | undefined= $activeFlight?.meta.comment || '';
   let privacy: string | undefined = $activeFlight?.meta.privacy || 'view_flown';
   let include_bin = true;
+
+  $: isNew = $bin && !$activeFlight;
+  $: isUpdated = $activeFlight?.meta.comment != comment || $activeFlight?.meta.privacy != privacy || $isAnalysisModified
+  $: canI = isNew || $user?.is_superuser || $activeFlight?.isMine;
+
 
 	const upload = async () => {
 		$loading = true;
@@ -68,10 +74,12 @@
 	<p class="form-label">Category: {schedule.category}</p>
 	<p class="form-label">Schedule: {schedule.name}</p>
 	<p class="form-label">Total Score: {$totalScore}</p>
-	<div class="form-check">
-		<input id="include_bin" name="include_bin" class="form-check-input" type="checkbox" bind:checked={include_bin}/>
-		<label class="form-check-label" for="include_bin">Include BIN File</label>
-	</div>
+  {#if !$activeFlight}
+    <div class="form-check">
+      <input id="include_bin" name="include_bin" class="form-check-input" type="checkbox" bind:checked={include_bin}/>
+      <label class="form-check-label" for="include_bin">Include BIN File</label>
+    </div>
+  {/if}
 	<li class="input-group">
     <label class="input-group-text" for="set-privacy">Privacy</label>
     <select
@@ -88,9 +96,7 @@
 		<label class="input-group-text" for="comments">Comment</label>
 		<textarea id="comments" class="form-control" name="comments" rows="2"  bind:value={comment}></textarea>
 	</div>
-  {#if $activeFlight && $activeFlight.meta.comment != comment && $activeFlight.meta.privacy != privacy}
-    <button class="btn btn-primary" type="submit" on:click={upload}>Update</button>
-  {:else if $bin}
-	  <button class=" btn btn-primary" type="submit" on:click={upload}>Submit</button>
+  {#if canI && (isNew || isUpdated)}
+    <button class="btn btn-primary" type="submit" on:click={upload}>{isNew ? 'upload' : 'update'}</button>
   {/if}
 </form>

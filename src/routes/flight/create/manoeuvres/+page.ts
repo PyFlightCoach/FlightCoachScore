@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { States } from '$lib/analysis/state';
-import { dev } from '$app/environment';
+import { dev } from '$lib/stores/shared';
 import { loadKnowns } from '$lib/schedules';
 
 
@@ -12,7 +12,7 @@ export async function load({fetch}) {
 	if (get(binData) && get(origin)) {
 		states.set(States.from_xkf1(get(origin)!, get(binData)!.orgn, get(binData)!.xkf1));
   } else if (!get(states)) {
-		if (dev && confirm("no data loaded, load test data ?")) {
+		if (get(dev) && confirm("no data loaded, load test data ?")) {
       await fetch('/st.csv').then(r=>r.text()).then(text => states.set(States.read_csv(text)));
     } else {
 			goto(base + '/flight/create/data');

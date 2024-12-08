@@ -1,11 +1,19 @@
 import { writable, type Writable } from 'svelte/store';
 import { Flight } from '$lib/database/flight';
+import {dev as isdev} from '$app/environment';
+
+
 export const mouse = writable({ x: 0, y: 0 });
 
-export const lastErrorCode: Writable<number|undefined> = writable(undefined);
-export const lastErrorText: Writable<string|undefined> = writable(undefined);
-export const lastErrorDetail: Writable<string|undefined> = writable(undefined);
+export const lastErrorCode: Writable<number|undefined> = writable();
+export const lastErrorText: Writable<string|undefined> = writable();
+export const lastErrorDetail: Writable<string|undefined> = writable();
 
-export const loading: Writable<boolean | undefined> = writable(undefined);
+export const loading: Writable<boolean | undefined> = writable();
 
-export const activeFlight: Writable<Flight | undefined> = writable(undefined); 
+export const activeFlight: Writable<Flight | undefined> = writable(); 
+export const isAnalysisModified: Writable<boolean | undefined> = writable();
+
+
+
+export const dev: Writable<boolean> = writable(isdev);

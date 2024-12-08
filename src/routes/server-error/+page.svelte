@@ -4,7 +4,7 @@
   import {base} from '$app/paths';
 
 	if ($lastErrorCode == 401) {
-		console.log('Login session expired');
+		console.debug('Login session expired');
 		goto(base + '/');
 	}
 </script>

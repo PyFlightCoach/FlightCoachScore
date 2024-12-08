@@ -35,7 +35,6 @@
 			}
 		}
 		let history = $man!.history;
-		//delete history[$fa_version];
 		$man = new MA(
 			$man!.name,
 			$man!.id,
@@ -48,7 +47,7 @@
 			$man!.flown,
       $man!.mdef,
 		);
-		//    delete $fcj?.get_result($fa_version)?.manresults[$selManID!];
+		
 	};
 
 	$: states = $man!.flown!.split();

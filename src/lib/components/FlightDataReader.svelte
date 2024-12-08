@@ -58,12 +58,12 @@
 					dbServer
 						.get(`flight/check_duplicate/${md5}`)
 						.then(r => {
-              console.log(r);
+              console.debug(r);
               isDuplicate = false;
             })
 						.catch(e => {
 							isDuplicate = true;
-							console.log(e);
+							console.debug(e);
 						});
 				}}
 			/>

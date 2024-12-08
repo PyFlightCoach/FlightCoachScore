@@ -5,8 +5,7 @@
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import SuperMenu from './SuperMenu.svelte';
 	import { user } from '$lib/stores/user';
-	import ScheduleMenu from './ScheduleMenu.svelte';
-	import { dev } from '$app/environment';
+	import { dev } from '$lib/stores/shared';
 	import AnalysisProgress from '$lib/components/progress/AnalysisProgress.svelte';
 
 </script>
@@ -33,10 +32,8 @@
 					<ul class="navbar-nav col-3 mr-auto">
 						<UserMenu />
 						<FlightMenu />
-						<DataBaseMenu />
-            <ScheduleMenu />
-            
-						{#if ($user && $user.is_superuser) || dev || true}
+            <DataBaseMenu />
+						{#if ($user && $user.is_superuser) || $dev}
               <SuperMenu />  
 						{/if}
 					</ul>
@@ -52,7 +49,7 @@
 					{/if}
 					<span class="navbar-text col-1 mr-auto text-nowrap">
 						{#if $user}
-							{$user.first_name} {$user.last_name}
+							{$user.first_name} {$user.last_name} {$dev ? 'd' : ''}{$user.is_superuser ? '*' : ''}
 						{:else}
 							Not Logged In
 						{/if}
