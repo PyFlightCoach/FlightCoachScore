@@ -20,19 +20,19 @@
       <div class="carousel-item active">
         <img src="{base}/images/leaderboard.png" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>See how your flights compare.</p>
+          <p>See how your flights compare to other peoples.</p>
         </div>
       </div>
       <div class="carousel-item">
         <img src="{base}/images/intra_analysis.png" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>See why you received every downgrade.</p>
+          <p>Understand why you received every downgrade.</p>
         </div>
       </div>
       <div class="carousel-item">
         <img src="{base}/images/templates.png" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>Compare your flights to aligned perfect templates.</p>
+          <p>View your flights alongside aligned perfect templates.</p>
         </div>
       </div>
     </div>
