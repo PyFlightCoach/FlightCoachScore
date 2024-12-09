@@ -8,9 +8,9 @@
 	import { onMount } from 'svelte';
 	import { dbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
-	import { loading } from '$lib/stores/shared';
+	import { loading, dev } from '$lib/stores/shared';
   
-	onMount(() => {
+  onMount(() => {
 		dbServer
 			.get('/users/me')
 			.then((res) => {
@@ -39,3 +39,7 @@
 		<slot />
 	</div>
 </div>
+
+<svelte:head>
+    <title>FCScore{$dev ? ' dev' : '' }</title> 
+</svelte:head>

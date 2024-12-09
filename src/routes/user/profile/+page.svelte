@@ -3,6 +3,7 @@
 	import { countries, split_country } from '$lib/countries.js';
 	import { invalidateAll } from '$app/navigation';
 	import { user } from '$lib/stores/user';
+  import {base} from '$app/paths';
 
 	let form_state: string | undefined = undefined;
 
@@ -47,6 +48,13 @@
 </script>
 
 <div class="container" style="max-width:800px">
+
+  {#if $user && !$user.is_verified}
+    <div class="row mt-4 text-danger">
+      <p><mark>Awaiting email verification, click <a class="link" href="{base}/user/verify-request/?email={$user.email}">here</a> for a new verification email</mark></p>
+    </div>
+  {/if}
+
 	{#if form_state}
 		<div class="row mt-4">
 			<p><mark>{form_state}</mark></p>

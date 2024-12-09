@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { dbServer, formDataFromDict, jsonEscapeUTF } from '$lib/api';
 	import { base } from '$app/paths';
-	import { goto } from '$app/navigation';
+	import { goto, afterNavigate } from '$app/navigation';
 	import { user } from '$lib/stores/user';
+  
+  let previousPage : string = base ;
 
 	let form_state: string | undefined;
+
+  afterNavigate(({from}) => {
+   previousPage = from?.url.pathname || previousPage
+}) ;
 
 	async function _handleSubmit(event: Event) {
 		try {
@@ -22,7 +28,7 @@
 			}
 			$user = await dbServer.get('users/me');
 
-			goto(`${base}/`);
+			goto(previousPage);
 		} catch (error) {
 			form_state = 'Oops...something has gone wrong. Please try again later.';
 		}

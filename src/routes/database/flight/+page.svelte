@@ -2,9 +2,8 @@
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	export let data;
 
-	let scores = data.flight!.getScore(3, false, '0.4.0');
-
-	let version = Object.keys(data.flight!.meta.scores)[0];
+  let version = Object.keys(data.flight!.meta.scores)[0];
+	let scores = data.flight!.getScore(3, false, version);	
 	let activeManId = 0;
 	let showBox = true;
 </script>

@@ -15,7 +15,7 @@
     date_after,
     date_before
 	} from '$lib/stores/leaderboards';
-	import { user } from '$lib/stores/user.js';
+	import { user, checkUser } from '$lib/stores/user.js';
 	export let fa_versions: string[];;
   export let table_rows
   export let lastResponse: 'leaderboard' | 'flightlist' | undefined = undefined;
@@ -29,7 +29,9 @@
   }
 	
   let schedule_name: string = 'Select Schedule'
-  $: if ($schedule_id) {schedule_name = scheduleRepr($library.subset({ schedule_id: $schedule_id }).first)}
+  $: if ($schedule_id) {
+    schedule_name = scheduleRepr($library.subset({ schedule_id: $schedule_id }).first)
+  }
 	let manoeuvre_ind: number | undefined = undefined;
   let version: string = fa_versions[0];
   
@@ -50,10 +52,13 @@
 		};
 		console.debug(q);
     const _method = $sort_by_score_flag ? 'leaderboard' : 'flightlist';
-    dbServer.get('analysis/' + _method, q).then((res) => {
+    if (await checkUser()) {
+      dbServer.get('analysis/' + _method, q).then((res) => {
       table_rows = res.results.map(row=>{return {...row, score: Math.round(row.score*100)/100}});
-    });
-    lastResponse = _method;
+      });
+      lastResponse = _method;
+    } 
+    
 		
 	};
 </script>

@@ -33,7 +33,7 @@
 						<UserMenu />
 						<FlightMenu />
             <DataBaseMenu />
-						{#if ($user && $user.is_superuser) || $dev}
+						{#if ($user?.is_superuser) || $dev}
               <SuperMenu />  
 						{/if}
 					</ul>
@@ -47,7 +47,7 @@
 					{:else}
 						<div class="col-1"></div>
 					{/if}
-					<span class="navbar-text col-1 mr-auto text-nowrap">
+					<span class="navbar-text col-1 mr-auto text-nowrap {$user?.is_verified ? '' : 'text-danger'}">
 						{#if $user}
 							{$user.first_name} {$user.last_name} {$dev ? 'd' : ''}{$user.is_superuser ? '*' : ''}
 						{:else}
