@@ -30,7 +30,7 @@
   export let showBox: boolean = false;
 
 	let scale_multiplier = $isFullSize ? 15 : 5;
-
+  
 	$: if (flst && fixRange) {
 		range = [0, flst.data.length];
 	}
@@ -40,7 +40,7 @@
 			return { type: 'mesh3d', visible: false };
 		} else {
 			max = max == -1 ? st.data.length : max;
-			return ribbon(new States(st.data.slice(min, max)), sc);
+			return {...ribbon(new States(st.data.slice(min, max)), sc), hoverinfo:'none'};
 		}
 	};
 

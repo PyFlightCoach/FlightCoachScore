@@ -24,7 +24,7 @@
 				activeMan.stop || Math.min(mans[activeManId - 1].stop! + _lastLen * 2, $states!.data.length)
 			];
 		} else {
-			range = [0, Math.round($states!.data.length / 10)];
+			range = [0, activeMan.stop || Math.round($states!.data.length / 10)];
 		}
 	}
 
@@ -79,7 +79,7 @@
 		if (canSet) {
 			man.stop = activeIndex;
 			range = [range[0], man.stop!];
-			mans = mans;
+      mans = mans;
 		}
 	};
 </script>
@@ -195,7 +195,7 @@
 									title="Set the end point of this manoeuvre to the point identified by the little plane"
 									on:click={() => setRange(man)}
 								>
-									Set (return)
+									Set{activeMan.stop? '' : ' (return)'}
 								</td>
 							{/if}
 							{#if !man.fixed}
@@ -215,10 +215,10 @@
 						{/if}
 					</tr>
 				{/each}
-				{#if mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name != 'Landing'}
+				{#if (mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name) && (mans[mans.length - 1].alternate_name != 'Landing') }
 					{#if mans[mans.length - 1].stop}
 						<tr>
-							<td colspan="6" role="button" on:click={addMan}>Add (return)</td>
+							<td colspan="6" role="button" on:click={addMan}>Add{activeMan.stop && (activeMan.manoeuvre || activeMan.alternate_name) ? '(return)' : ''}</td>
 						</tr>
 					{/if}
 				{/if}
