@@ -20,7 +20,7 @@
       <div class="carousel-item active">
         <img src="{base}/images/leaderboard.png" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>See how your flights compare to other peoples.</p>
+          <p>See how your flights compare to other pilot's.</p>
         </div>
       </div>
       <div class="carousel-item">
