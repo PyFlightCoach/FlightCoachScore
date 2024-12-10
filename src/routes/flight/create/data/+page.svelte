@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { binData, origin, fcj, bin, bootTime, states } from '$lib/stores/analysis';
+  import {dataSource} from '$lib/stores/shared';
 	import FlightDataReader from '$lib/components/FlightDataReader.svelte';
 	import { BoxReader } from '$lib/components/box';
 	import { MapPlot } from '$lib/components/plots/map';
@@ -84,7 +85,10 @@
 					id="select-manoeuvres"
 					class="btn btn-outline-primary col"
 					href={base + '/flight/create/manoeuvres'}
-          on:click={()=>{if($origin) {$origin.save()}}}
+          on:click={()=>{
+            $dataSource = inputMode;
+            if($origin) {$origin.save()}
+          }}
 				>
 					Next
 				</a>

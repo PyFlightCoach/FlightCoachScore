@@ -4,8 +4,8 @@
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
 	import ToggleButton from '$lib/components/ToggleButton.svelte';
-	import { activeFlight } from '$lib/stores/shared';
-	import { user } from '$lib/stores/user';
+	import { activeFlight, dataSource } from '$lib/stores/shared';
+	import { file } from 'jszip';
 
 	$navBarContents = AnalysisMenu;
 
@@ -38,10 +38,22 @@
 		</div>
 		<div class="col-8">
 			<p class="small">
-				{#if $selectedResult}
-					Showing results for {#if isNew || isMine}Your{:else}{$user?.first_name}
-						{$user?.last_name}'s{/if}
-					flight from {$bootTime || $activeFlight?.meta.date}.
+        
+        {#if $selectedResult}
+          Showing results for 
+          {#if $dataSource=='example'}
+            the example
+          {:else if $dataSource=='db'}
+            {$activeFlight?.meta.name}'s
+          {:else}
+            your
+          {/if}
+          flight imported 
+          {#if $bin}
+            from a bin file. The flight logger was booted on {$bootTime || $activeFlight?.meta.date}.
+          {:else}
+            from a {$dataSource} file.
+          {/if}
 				{:else if $fa_versions.length == 0}
 					Run some analyses to view result
 				{/if}

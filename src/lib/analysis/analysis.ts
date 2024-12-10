@@ -18,7 +18,7 @@ import {
 	isComplete,
 	fcj
 } from '$lib/stores/analysis';
-import { activeFlight, isAnalysisModified } from '$lib/stores/shared';
+import { activeFlight, isAnalysisModified, dataSource } from '$lib/stores/shared';
 import { MA } from '$lib/analysis/ma';
 import { get, writable } from 'svelte/store';
 import { analysisServer, faVersion } from '$lib/api';
@@ -34,7 +34,7 @@ import { base } from '$app/paths';
 import { Flight } from '$lib/database/flight';
 
 export function checkComplete() {
-  return get(manNames)?.length && analyses.every(a => get(a) && get(a)?.history[get(faVersion)!]);
+	return get(manNames)?.length && analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!]);
 }
 
 function setupAnalysisArrays(mnames: string[]) {
@@ -67,13 +67,13 @@ function setAnalysis(i: number, man: MA) {
 		fa_versions.update((v) => {
 			return [...new Set([...v, ...Object.keys(ma?.history || [])])];
 		});
-    
+
 		isComplete.set(checkComplete());
 	});
 }
 
 export function clearAnalysis() {
-  activeFlight.set(undefined);
+	activeFlight.set(undefined);
 	selManID.set(undefined);
 	states.set(undefined);
 	manNames.set(undefined);
@@ -88,14 +88,15 @@ export function clearAnalysis() {
 	analyses.length = 0;
 	running.set([]);
 	runInfo.length = 0;
-  activeFlight.set(undefined);
-  isAnalysisModified.set(undefined);
+	activeFlight.set(undefined);
+	isAnalysisModified.set(undefined);
+	dataSource.set(undefined);
 }
 
 export async function newAnalysis(sts: States, split: Splitting) {
 	setupAnalysisArrays(split.manNames);
 
-  isAnalysisModified.set(false);
+	isAnalysisModified.set(false);
 
 	if (get(binData)) {
 		origin.update((orgn) => {
@@ -164,7 +165,7 @@ export async function importAnalysis(data: Record<string, any>) {
 
 	setupAnalysisArrays(data.mans.map((ma: MA) => ma.name));
 
-	await safeGetLibrary().then(library => {
+	await safeGetLibrary().then((library) => {
 		data.mans.forEach(async (ma: ManDef, i: number) => {
 			runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
 
@@ -199,21 +200,25 @@ export async function importAnalysis(data: Record<string, any>) {
 }
 
 export async function loadExample() {
-	importAnalysis(await analysisServer.get('example'));
+	await analysisServer.get('example').then((res) => {
+		importAnalysis(res);
+    dataSource.set('example');
+	});
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
-	const response = await dbServer.get(`flight/ajson/${flight_id}`, undefined, 'arrayBuffer');
 	const zip = new JSZip();
 
-	zip
-		.loadAsync(response)
-		.then((res) => Object.values(res.files)[0].async('string'))
-		.then((ajson) => JSON.parse(ajson))
+	await dbServer
+		.get(`flight/ajson/${flight_id}`, undefined, 'arrayBuffer')
+		.then(response => zip.loadAsync(response))
+		.then(res => Object.values(res.files)[0].async('string'))
+		.then(ajson => JSON.parse(ajson))
 		.then(importAnalysis)
 		.then(() => Flight.load(flight_id))
-		.then((flight: Flight) => {
-			activeFlight.set(flight);
+		.then(flight => {
+			dataSource.set('db');
+      activeFlight.set(flight);
 			goto(`${base}/flight/results`);
 		});
 }
@@ -249,8 +254,7 @@ export async function analyseManoeuvre(
 	if ((!ma!.scores || optimise || force) && !get(running)[id]) {
 		//if scores exist, only run if server version not in history
 
-		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`)
-      
+		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
 
 		running.update((v) => {
 			v[id] = true;
