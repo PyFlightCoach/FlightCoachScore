@@ -9,7 +9,7 @@ export function scheduleRepr(s :DBSchedule|undefined): string {
   if (!s) {
     return 'Select Schedule';
   } else {
-    return `${s.category_name} - ${s.schedule_name}`;
+    return `${s.category_name} ${s.schedule_name}`;
   }
 }
 

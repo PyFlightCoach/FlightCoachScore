@@ -7,7 +7,7 @@
 
 <li class="nav-item dropdown">
 	<a
-		class="nav-link dropdown-toggle"
+		class="nav-link dropdown-toggle ms-2"
 		id="navbarDropdown"
 		role="button"
     data-bs-toggle="dropdown"
@@ -16,9 +16,10 @@
 	>
 		<slot name="icon" />
 	</a>
-	<ul class="dropdown-menu" aria-labelledby="navbarDropdown" >
-		<slot />
-	</ul>
+  <ul class="dropdown-menu" aria-labelledby="navbarDropdown" >
+    <slot />
+  </ul>
+  
 </li>
 
   

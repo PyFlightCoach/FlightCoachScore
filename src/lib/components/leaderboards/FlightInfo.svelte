@@ -40,9 +40,9 @@
 	};
 </script>
 
-<div class="container bg-light">
-	<div class="row bg-light" style="height:300px;">
-		<div class="col h-100">
+
+	<div class="row bg-light">
+		<div class="col-auto"  style="max-height:300px;max-width:400px;">
 			<Plot
 				data={[
 					{
@@ -61,12 +61,14 @@
 						pitch: 0,
 						zoom: 4
 					},
-					margin: { l: 0, r: 0, t: 0, b: 0 }
+					margin: { l: 0, r: 0, t: 0, b: 0 },
+          width: 350,
+          height: 300
 				}}
-				fillParent={true}
+				fillparent={true}
 			/>
 		</div>
-		<div class="col h-100 overflow-scroll">
+		<div class="col-auto overflow-scroll"  style="max-height:300px;">
 			<ul class="list-group">
 				<li class="input-group">
 					<label class="input-group-text" for="set-privacy">Privacy</label>
@@ -98,7 +100,7 @@
 						<button class="btn btn-outline-secondary w-100" on:click={patchMeta}> Update </button>
 					</li>
 				{/if}
-				<li class="input-group w-100">
+				<li class="input-group ">
 					<a
 						class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
 						href="{base}/database/flight/?flight_id={f.meta.flight_id}">View Flight</a
@@ -149,7 +151,7 @@
 				</li>
 			</ul>
 		</div>
-		<div class="col h-100 overflow-scroll">
+		<div class="col-auto overflow-scroll"  style="max-height:300px;">
 			<table class="table table-sm table-responsive">
 				<thead>
 					<tr>
@@ -170,4 +172,3 @@
 			</table>
 		</div>
 	</div>
-</div>

@@ -7,12 +7,20 @@
 	import { user } from '$lib/stores/user';
 	import { dev } from '$lib/stores/shared';
 	import AnalysisProgress from '$lib/components/progress/AnalysisProgress.svelte';
-
 </script>
 
 <nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
-	<div class="container-fluid">
-		<a class="navbar-brand" href={base + '/'}>FCScore</a>
+	<div class="container-fluid justify-content-between">
+    
+		<ul class="navbar-nav flex-row">
+      <a class="navbar-brand" href={base + '/'}>FCScore</a>
+			<UserMenu />
+			<FlightMenu />
+			<DataBaseMenu />
+			{#if $user?.is_superuser || $dev}
+				<SuperMenu />
+			{/if}
+		</ul>
 
 		<button
 			class="navbar-toggler"
@@ -27,35 +35,25 @@
 		</button>
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<div class="container-fluid">
-				<div class="row">
-					<ul class="navbar-nav col-3 mr-auto">
-						<UserMenu />
-						<FlightMenu />
-            <DataBaseMenu />
-						{#if ($user?.is_superuser) || $dev}
-              <SuperMenu />  
-						{/if}
-					</ul>
-					<ul class="navbar-nav col-7 mr-auto">
+			<div class="container-fluid ">
+        <div class="row justify-content-between">
+					<ul class="col-8 navbar-nav justify-content-center">
 						<slot />
 					</ul>
-					{#if 17 > 0}
-						<div class="nav col-1 mr-auto">
-							<AnalysisProgress />
-						</div>
-					{:else}
-						<div class="col-1"></div>
-					{/if}
-					<span class="navbar-text col-1 mr-auto text-nowrap {$user?.is_verified ? '' : 'text-danger'}">
-						{#if $user}
-							{$user.first_name} {$user.last_name} {$dev ? 'd' : ''}{$user.is_superuser ? '*' : ''}
-						{:else}
-							Not Logged In
-						{/if}
-					</span>
-				</div>
+					<ul class="col-4 justify-content-end navbar-nav">
+						<AnalysisProgress />
+						<span class="navbar-text mr-auto text-nowrap {$user?.is_verified ? '' : 'text-danger'}">
+							{#if $user}
+								{$user.first_name}
+								{$user.last_name}
+								{$dev ? 'd' : ''}{$user.is_superuser ? '*' : ''}
+							{:else}
+								Not Logged In
+							{/if}
+						</span>
+					</ul>
 			</div>
+    </div>
 		</div>
 	</div>
 </nav>

@@ -39,11 +39,11 @@
 	//  <a href="{base}/database/flight/?flight_id={row.flight_id}">View</a>
 </script>
 
-<div class="col">
+
 	{#if lastResponse}
-		<div class="mh-100 overflow-scroll">
-			<table class="table table-sm table-striped text-center">
-				<thead class="table-dark sticky-top" style="z-index:-1">
+		<div class="table-responsive">
+			<table class="table table-striped text-center">
+				<thead class="table-dark" style="z-index:-1">
 					<tr>
 						{#each col_heads as col_head}
 							<th scope="col">{col_head}</th>
@@ -89,4 +89,4 @@
 			</table>
 		</div>
 	{/if}
-</div>
+

@@ -8,6 +8,7 @@
 		level: string;
 		onselected: (schedule: Schedule, manoeuvre: Manoeuvre | undefined) => void;
 	} = $props();
+
 </script>
 
 <ul class="dropdown-menu">
@@ -16,7 +17,7 @@
     .map((catn) => $library.subset({ category_name: catn })) as catlib
   }
 		<li>
-			<div class="dropdown dropend">
+			<div class="dropdown dropstart" >
 				<button
 					class="dropdown-item dropdown-toggle"
 					onclick={(e) => {
@@ -26,7 +27,7 @@
 				>
           {catlib.first.rule_name}: {catlib.first.category_name}
 				</button>
-				<ul class="dropdown-menu dropdown-submenu">
+				<ul class="dropdown-menu dropdown-submenu" style="min-width: 1rem;">
 					{#each catlib.schedules as sched}
 						<li>
 							{#if level == 'schedule'}
@@ -36,9 +37,7 @@
 							{:else}
 								<button
 									class="dropdown-item dropdown-toggle"
-									onclick={(e) => {
-										e.stopPropagation();
-									}}
+
 									data-bs-toggle="dropdown"
 								>
 									{sched.schedule_name}

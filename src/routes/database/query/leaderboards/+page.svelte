@@ -5,6 +5,5 @@
 </script>
 
 
-<div class="col">
-  <DbTable bind:lastResponse={$lastResponse} bind:table_rows={$table_rows}/>
-</div>
+<DbTable bind:lastResponse={$lastResponse} bind:table_rows={$table_rows}/>
+
