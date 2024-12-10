@@ -6,6 +6,7 @@
 	import ToggleButton from '$lib/components/ToggleButton.svelte';
 	import { activeFlight, dataSource } from '$lib/stores/shared';
 	import { file } from 'jszip';
+	import { dbFlightPrivacy } from '$lib/database/interfaces';
 
 	$navBarContents = AnalysisMenu;
 
@@ -37,27 +38,23 @@
 			</div>
 		</div>
 		<div class="col-8">
-			<p class="small">
-        
-        {#if $selectedResult}
-          Showing results for 
-          {#if $dataSource=='example'}
-            the example
-          {:else if $dataSource=='db'}
-            {$activeFlight?.meta.name}'s
-          {:else}
-            your
-          {/if}
-          flight imported 
-          {#if $bin}
-            from a bin file. The flight logger was booted on {$bootTime || $activeFlight?.meta.date}.
-          {:else}
-            from a {$dataSource} file.
-          {/if}
+			<small >
+				{#if $selectedResult}
+					Showing results for
+					{#if $dataSource == 'example'}
+						the example flight.
+					{:else if $dataSource == 'db'}
+						a flight by {$activeFlight?.meta.name}, loaded from the db.
+					{:else}
+						your flight imported from a {$dataSource} file.
+					{/if}
 				{:else if $fa_versions.length == 0}
 					Run some analyses to view result
 				{/if}
-			</p>
+      </small>
+      {#if $dataSource == 'bin'}
+				<small> Boot time: {$bootTime || $activeFlight?.meta.date}. </small>
+			{/if}
 		</div>
 	</div>
 	<AnalysisSummary />

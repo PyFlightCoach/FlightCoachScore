@@ -35,7 +35,7 @@
   {#if $loading}
 		<div class="position-absolute top-50 start-50 spinner-border" role="status"></div>
 	{/if}
-	<div class="row flex-grow-1 justify-content-center align-content-start">
+	<div class="row flex-grow-1 justify-content-center ">
 		<slot />
 	</div>
 </div>

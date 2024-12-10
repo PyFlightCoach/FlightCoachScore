@@ -5,9 +5,9 @@
 	import { layout3d } from '$lib/components/plots/layouts';
 	import DoubleSlider from '$lib/components/DoubleSlider.svelte';
 	import colddraft from '$lib/components/plots/colddraft';
-  import { isFullSize } from '$lib/stores/analysis';
-  
-  export let flst: States;
+	import { isFullSize } from '$lib/stores/analysis';
+
+	export let flst: States;
 	export let tpst: States | undefined = undefined;
 	export let i: number | undefined = undefined;
 	export let controls = [
@@ -20,27 +20,27 @@
 		'rangeEndClick',
 		'rangeStartClick'
 	];
-  export let showBefore: boolean = false;
-  export let showAfter: boolean = false;
+	export let showBefore: boolean = false;
+	export let showAfter: boolean = false;
 	export let scale: number = 1;
 	export let speed = 50;
-  export let range: [number, number] = [0, flst.data.length];
+	export let range: [number, number] = [0, flst.data.length];
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
-  export let showBox: boolean = false;
+	export let showBox: boolean = false;
 
 	let scale_multiplier = $isFullSize ? 15 : 5;
-  
+
 	$: if (flst && fixRange) {
 		range = [0, flst.data.length];
 	}
-	
+
 	const createRibbonTrace = (st: States | undefined, sc: number, min: number, max: number) => {
 		if (!st) {
 			return { type: 'mesh3d', visible: false };
 		} else {
 			max = max == -1 ? st.data.length : max;
-			return {...ribbon(new States(st.data.slice(min, max)), sc), hoverinfo:'none'};
+			return { ...ribbon(new States(st.data.slice(min, max)), sc), hoverinfo: 'none' };
 		}
 	};
 
@@ -57,38 +57,37 @@
 		}
 	};
 
-
-  $: box = showBox ? boxtrace() : { type: 'mesh3d', visible: false };
+	$: box = showBox ? boxtrace() : { type: 'mesh3d', visible: false };
 	$: fl_ribbon = { ...createRibbonTrace(flst, scale * scale_multiplier, ...range), name: 'fl' };
 	$: tp_ribbon = { ...createRibbonTrace(tpst, scale * scale_multiplier, ...range), name: 'tp' };
 	$: fl_model = createModelTrace(flst, i, scale * scale_multiplier);
 	$: tp_model = createModelTrace(tpst, i, scale * scale_multiplier);
 
 	$: grey_ribbon1 =
-		(greyUnselected && range[0] > 0 )
+		greyUnselected && range[0] > 0
 			? {
 					...createRibbonTrace(flst, scale * scale_multiplier, 0, range[0]),
 					opacity: 0.2,
 					name: 'before',
-          color: 'grey',
-          visible: showBefore
+					color: 'grey',
+					visible: showBefore
 				}
 			: { type: 'mesh3d', visible: false };
 
 	$: grey_ribbon2 =
-		(greyUnselected && range[1] < flst.data.length)
+		greyUnselected && range[1] < flst.data.length
 			? {
 					...createRibbonTrace(flst, scale * scale_multiplier, range[1], flst.data.length),
 					opacity: 0.2,
 					name: 'after',
-          color: 'grey',
-          visible: showAfter
+					color: 'grey',
+					visible: showAfter
 				}
 			: { type: 'mesh3d', visible: false, name: 'grey2' };
 
 	$: traces = [box, fl_ribbon, tp_ribbon, fl_model, tp_model, grey_ribbon1, grey_ribbon2];
 
-	let player: number| undefined;
+	let player: number | undefined;
 
 	const play = () => {
 		player = setInterval(() => {
@@ -101,26 +100,35 @@
 		player = undefined;
 	};
 
-  const handleClick = (e: Event) => {
-    const offset = {
-      fl: range[0],
-      tp: range[0],
-      before: 0,
-      after: range[1]
-    }[e.detail.points[0].fullData.name as string];
+	const changeWhilePlaying = (fun) => {
+		if (player) {
+			pause();
+			fun();
+			play();
+		} else {
+			fun();
+		}
+	};
 
-    //const offset = e.detail.points[0].curveNumber <= 1 ? range[0] : 0;
-    if (offset != undefined) {
-      if (controls.includes('modelClick')) {
-        i = offset + Math.floor(e.detail.points[0].pointNumber / 2);
-      } else if (controls.includes('rangeEndClick')) {
-        range[1] = offset + Math.floor(e.detail.points[0].pointNumber / 2);
-      } else if (controls.includes('rangeStartClick')) {
-        range[0] = offset + Math.floor(e.detail.points[0].pointNumber / 2);
-      }
-    }
-  };
+	const handleClick = (e: Event) => {
+		const offset = {
+			fl: range[0],
+			tp: range[0],
+			before: 0,
+			after: range[1]
+		}[e.detail.points[0].fullData.name as string];
 
+		//const offset = e.detail.points[0].curveNumber <= 1 ? range[0] : 0;
+		if (offset != undefined) {
+			if (controls.includes('modelClick')) {
+				i = offset + Math.floor(e.detail.points[0].pointNumber / 2);
+			} else if (controls.includes('rangeEndClick')) {
+				range[1] = offset + Math.floor(e.detail.points[0].pointNumber / 2);
+			} else if (controls.includes('rangeStartClick')) {
+				range[0] = offset + Math.floor(e.detail.points[0].pointNumber / 2);
+			}
+		}
+	};
 </script>
 
 <div style:height="100%" id="parent">
@@ -137,12 +145,7 @@
 		}}
 	>
 		{#if traces}
-			<Plot
-				data={traces}
-				{layout}
-				fillParent={true}
-				on:click={handleClick}
-			/>
+			<Plot data={traces} {layout} fillParent={true} on:click={handleClick} />
 		{/if}
 	</div>
 	<div id="buttons">
@@ -156,59 +159,63 @@
 				/>
 			{/if}
 		</div>
-		<div>
+		<div class="btn-group">
 			{#if controls.includes('play')}
 				{#if player}
-					<button on:click={pause}>Pause</button>
+					<button class="btn btn-outline-secondary" on:click={pause}>Pause</button>
 				{:else}
-					<button on:click={play}>Play</button>
+					<button class="btn btn-outline-secondary" on:click={play}>Play</button>
 				{/if}
 			{/if}
-		</div>
-		<div>
+
 			{#if controls.includes('scale')}
 				<button
+					class="btn btn-outline-secondary"
 					on:click={() => {
-						scale_multiplier = scale_multiplier + 0.1;
+						changeWhilePlaying(() => {
+							scale_multiplier = scale_multiplier + 0.1;
+						});
 					}}>+</button
 				>
-			{/if}
-		</div>
-		<div>
-			{#if controls.includes('scale')}
+
 				<button
+					class="btn btn-outline-secondary"
 					on:click={() => {
-						scale_multiplier = Math.max(0.2, scale_multiplier - 0.2);
+						changeWhilePlaying(() => {
+							scale_multiplier = Math.max(0.2, scale_multiplier - 0.2);
+						});
 					}}>-</button
 				>
 			{/if}
-		</div>
-		<div>
+
 			{#if controls.includes('speed')}
 				<button
+					class="btn btn-outline-secondary"
 					on:click={() => {
-						speed = Math.min(200, speed * 1.6);
+						changeWhilePlaying(() => {
+							speed = Math.min(200, speed * 1.6);
+						});
 					}}>Slow</button
 				>
-			{/if}
-		</div>
-		<div>
-			{#if controls.includes('speed')}
+
 				<button
+					class="btn btn-outline-secondary"
 					on:click={() => {
-						speed = Math.max(20, speed / 1.6);
+						changeWhilePlaying(() => {
+							speed = Math.max(20, speed / 1.6);
+						});
 					}}>Fast</button
 				>
 			{/if}
-		</div>
-		<div>
+
 			{#if controls.includes('projection')}
 				<button
+					class="btn btn-outline-secondary"
 					on:click={() => {
 						const newlayout = structuredClone(layout3d);
-            console.debug(layout.scene.camera.projection.type);
+						console.debug(layout.scene.camera.projection.type);
 						newlayout.scene.camera.projection.type =
-              layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
+							layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
 						layout = newlayout;
 					}}>{layout.scene.camera.projection.type}</button
 				>

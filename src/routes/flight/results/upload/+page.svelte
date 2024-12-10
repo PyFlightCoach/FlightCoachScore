@@ -26,6 +26,8 @@
 		$isAnalysisModified;
 	$: canI = isNew || $user?.is_superuser || $activeFlight?.isMine;
 
+
+
 	const upload = async () => {
 		$loading = true;
 
@@ -46,8 +48,9 @@
 		if (comment) form_data.append('comment', comment);
 		if (privacy) form_data.append('privacy', privacy);
 		if (include_bin && $bin) form_data.append('files', $bin);
-
-		if (await checkUser()) {
+      
+    if (await checkUser()) {
+      console.debug("1 - Uploading ", $bin?.name);
 			dbServer
 				.post('flight', form_data)
 				.then((r) => Flight.load(r.id))
@@ -70,7 +73,7 @@
 	};
 </script>
 
-<form class="col-md-3 pt-5" on:submit|preventDefault={upload}>
+<div class="col-md-3 pt-5">
 	{#if form_state}
 		<div class="row mt-4">
 			<p><mark>{form_state}</mark></p>
@@ -111,4 +114,4 @@
 			>{isNew ? 'upload' : 'update'}</button
 		>
 	{/if}
-</form>
+</div>

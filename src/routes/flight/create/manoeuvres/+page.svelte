@@ -2,12 +2,12 @@
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import { ManSplit, parseFCJMans, Splitting } from '$lib/analysis/splitting';
 	import { newAnalysis } from '$lib/analysis/analysis';
-	import { isCompFlight, states, fcj } from '$lib/stores/analysis';
+	import { isCompFlight, states, fcj, bin } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/analysis/fcjson';
 	import ScheduleSelect from '$lib/components/ScheduleSelect.svelte';
-	import {loadManDef } from '$lib/schedules';
+	import { loadManDef } from '$lib/schedules';
 
 	let mans: ManSplit[] = [ManSplit.TakeOff()];
 	let activeManId: number = 0;
@@ -79,7 +79,7 @@
 		if (canSet) {
 			man.stop = activeIndex;
 			range = [range[0], man.stop!];
-      mans = mans;
+			mans = mans;
 		}
 	};
 </script>
@@ -100,13 +100,14 @@
 	}}
 />
 
-<div class="col-4 pt-2">
-	<div class="container bg-light border">
-		<small>Actions</small>
-
+<div class="col-3 pt-2">
+	<div class="container bg-light border pt-2">
+		{#if $bin || $fcj}
+			<span>Source File: {$bin?.name || $fcj.name}</span>
+		{/if}
 		{#if mans.length == 1}
-			<div class="row">
-				<label for="load-fcj" class="col-8">Load Mans from FC Json File:</label>
+			<div class="row pt-2 mb-2">
+				<label for="load-fcj" class="col-8 col-form-label">Load FC Json File:</label>
 				<div id="load-fcj" class="col-4">
 					<label class="btn btn-outline-secondary">
 						<input
@@ -155,13 +156,15 @@
 			<tbody>
 				{#each mans as man, i}
 					<tr>
-						<td><input
-              class="radio"
-              type="radio"
-              name="manSelect"
-              value={i}
-              bind:group={activeManId}
-						/></td>
+						<td
+							><input
+								class="radio"
+								type="radio"
+								name="manSelect"
+								value={i}
+								bind:group={activeManId}
+							/></td
+						>
 
 						{#if man.fixed || activeManId != i}
 							<td>{man.name}</td>
@@ -195,7 +198,7 @@
 									title="Set the end point of this manoeuvre to the point identified by the little plane"
 									on:click={() => setRange(man)}
 								>
-									Set{activeMan.stop? '' : ' (return)'}
+									Set{activeMan.stop ? '' : ' (return)'}
 								</td>
 							{/if}
 							{#if !man.fixed}
@@ -215,10 +218,14 @@
 						{/if}
 					</tr>
 				{/each}
-				{#if (mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name) && (mans[mans.length - 1].alternate_name != 'Landing') }
+				{#if (mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name) && mans[mans.length - 1].alternate_name != 'Landing'}
 					{#if mans[mans.length - 1].stop}
 						<tr>
-							<td colspan="6" role="button" on:click={addMan}>Add{activeMan.stop && (activeMan.manoeuvre || activeMan.alternate_name) ? '(return)' : ''}</td>
+							<td colspan="6" role="button" on:click={addMan}
+								>Add{activeMan.stop && (activeMan.manoeuvre || activeMan.alternate_name)
+									? '(return)'
+									: ''}</td
+							>
 						</tr>
 					{/if}
 				{/if}
@@ -242,7 +249,7 @@
 	{/if}
 </div>
 
-<div class="col-8">
+<div class="col-9">
 	{#if $states}
 		<PlotSec
 			bind:i={activeIndex}
