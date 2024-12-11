@@ -14,6 +14,11 @@
 
 <li class="nav-item">
   <ul class="pagination" >
-    
+    <a class="col nav-link {leaActive ? 'active' : ''}"  href="{base}/database/query/leaderboards" aria-label="Leaderboards">
+      Leaderboards
+    </a>
+    <a class="col nav-link {mapActive ? 'active' : ''}" href="{base}/database/query/map" aria-label="Map">
+      Map
+    </a>
   </ul>
 </li>

@@ -6,10 +6,9 @@
 	import { MapPlot } from '$lib/components/plots/map';
 	import PlanViewPlot from '$lib/components/plots/PlanViewPlot.svelte';
 	import { base } from '$app/paths';
-	import Help from './Help.svelte';
 	import { GPS } from '$lib/analysis/geometry';
 	import { Origin } from '$lib/analysis/fcjson';
-
+  
 	let inputMode: 'bin' | 'fcj' | 'state' = 'bin';
 	let form_state: string | undefined;
   let target: GPS | undefined;
@@ -102,7 +101,5 @@
 		<MapPlot bind:origin={$origin} bind:binData={$binData} />
 	{:else if $states}
 		<PlanViewPlot />
-	{:else}
-		<Help />
 	{/if}
 </div>

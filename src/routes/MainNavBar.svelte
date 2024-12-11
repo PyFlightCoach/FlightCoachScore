@@ -4,15 +4,16 @@
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import SuperMenu from './SuperMenu.svelte';
-	import { user } from '$lib/stores/user';
+  import { user } from '$lib/stores/user';
 	import { dev } from '$lib/stores/shared';
 	import AnalysisProgress from '$lib/components/progress/AnalysisProgress.svelte';
+	import HelpMenu from './HelpMenu.svelte';
 </script>
 
 <nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
 	<div class="container-fluid justify-content-between">
     
-		<ul class="navbar-nav flex-row">
+		<ul class="navbar-nav flex-row ">
       <a class="navbar-brand" href={base + '/'}>FCScore</a>
 			<UserMenu />
 			<FlightMenu />
@@ -20,10 +21,11 @@
 			{#if $user?.is_superuser || $dev}
 				<SuperMenu />
 			{/if}
+      <HelpMenu/>
 		</ul>
-
-		<button
-			class="navbar-toggler"
+		
+    <button
+			class="navbar-toggler "
 			type="button"
 			data-bs-toggle="collapse"
 			data-bs-target="#navbarSupportedContent"
@@ -34,7 +36,7 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<div class="collapse navbar-collapse " id="navbarSupportedContent">
 			<div class="container-fluid ">
         <div class="row justify-content-between">
 					<ul class="col-8 navbar-nav justify-content-center">
@@ -54,6 +56,7 @@
 					</ul>
 			</div>
     </div>
-		</div>
+		
+  </div>
 	</div>
 </nav>

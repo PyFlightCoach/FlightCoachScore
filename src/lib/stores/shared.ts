@@ -17,3 +17,5 @@ export const isAnalysisModified: Writable<boolean | undefined> = writable();
 export const dataSource: Writable<string | undefined> = writable();
 
 export const dev: Writable<boolean> = writable(isdev);
+
+export const help: Writable<string | undefined> = writable();
