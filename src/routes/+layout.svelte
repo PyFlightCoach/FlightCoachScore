@@ -15,16 +15,12 @@
 	const md = new MarkdownIt();
 
 	$: if ($page) {
-    console.log($page.url.pathname);
-		
-    //'/FlightCoachScore/flight/create/data'
-    console.log('base:',base);
-    let helpFileName = $page.url.pathname.replace('/', '').replaceAll('/', '_');
-    console.log(helpFileName);
-    if (base) {
-      helpFileName = helpFileName.replace(`${base}_`, '');
-    }
-    console.log(helpFileName);
+		console.log($page.url.pathname);
+
+		console.log('base:', base);
+		let helpFileName = $page.url.pathname.replace(`/${base}`, '').replaceAll('/', '_');
+				
+		console.log(helpFileName);
 		fetch(`${base}/help/${helpFileName || 'home'}.md`)
 			.then((response) => {
 				if (!response.ok) {
@@ -34,7 +30,7 @@
 			})
 			.then((text) => ($help = text))
 			.catch((error) => {
-        console.debug('no help available', error.message);
+				console.debug('no help available', error.message);
 				$help = undefined;
 			});
 	}
