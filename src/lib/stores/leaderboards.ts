@@ -4,6 +4,7 @@ import { faVersion } from '$lib/api';
 import { get } from 'svelte/store';
 import { dbServer } from '$lib/api';
 import { checkUser } from '$lib/stores/user';
+import type { DBFlightRanked, DBFlightScore } from '$lib/database/interfaces';
 
 export const n_results = newCookieStoreInt('n_results', 1000);
 export const n_days_val = newCookieStoreInt('search_n_days', 30);
@@ -22,7 +23,7 @@ export const date_before = newCookieStore('date_before', '')
 
 export const version = writable(get(faVersion));
 
-export const table_rows: Writable<Record<string, any>[]> = writable([]);
+export const table_rows: Writable<DBFlightRanked[]> = writable([]);
 export const lastResponse: Writable<'leaderboard' | 'flightlist' | undefined> = writable();
 
 
@@ -49,7 +50,7 @@ export const updateTable = async () => {
   const _method = get(sort_by_score_flag) ? 'leaderboard' : 'flightlist';
   if (await checkUser()) {
     dbServer.get('analysis/' + _method, q).then((res) => {
-      table_rows.set(res.results.map((row) => {
+      table_rows.set(res.results.map((row: DBFlightRanked | DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));
     });

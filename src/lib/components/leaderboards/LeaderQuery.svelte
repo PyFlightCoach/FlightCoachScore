@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { safeGetLibrary, ScheduleLibrary } from '$lib/schedules.js';
 	import {
-    n_results,
+		n_results,
 		n_days_val,
 		me_only_flag,
 		difficulty,
@@ -12,14 +12,13 @@
 		select_by_date,
 		date_after,
 		date_before,
-    version,
-    manoeuvre_ind,
-    singleman,
-    getDays
+		version,
+		manoeuvre_ind,
+		singleman,
+		getDays
 	} from '$lib/stores/leaderboards';
 
 	export let fa_versions: string[];
-
 
 	let library: ScheduleLibrary | undefined;
 	let categories: string[] = [];
@@ -30,10 +29,10 @@
 	$: categories = library?.unique('category_name') || [];
 
 	$: schedules = selectedCategory
-			? library?.subset({ category_name: selectedCategory }).unique('schedule_name')
-			: [];
+		? library?.subset({ category_name: selectedCategory }).unique('schedule_name')
+		: [];
 
-  $: if (selectedCategory &&  library && selectedSchedule) {
+	$: if (selectedCategory && library && selectedSchedule) {
 		$schedule_id = library.subset({
 			category_name: selectedCategory,
 			schedule_name: selectedSchedule
@@ -60,15 +59,21 @@
 			.toISOString()
 			.split('T')[0]; // restrict to flights after this date yyyy-mm-dd
 	}
-
-
-
 </script>
 
-
-<div class="p-2 row ">
-  <button class="col btn btn-outline-secondary {$sort_by_score_flag ? 'active' : ''}" on:click={()=>{$sort_by_score_flag=true}}>Leaderboard</button>
-  <button class="col btn btn-outline-secondary {$sort_by_score_flag ? '' : 'active'}" on:click={()=>{$sort_by_score_flag=false}}>History</button>
+<div class="p-2 row">
+	<button
+		class="col btn btn-outline-secondary {$sort_by_score_flag ? 'active' : ''}"
+		on:click={() => {
+			$sort_by_score_flag = true;
+		}}>Leaderboard</button
+	>
+	<button
+		class="col btn btn-outline-secondary {$sort_by_score_flag ? '' : 'active'}"
+		on:click={() => {
+			$sort_by_score_flag = false;
+		}}>History</button
+	>
 </div>
 
 <div class="row p-2">
@@ -130,7 +135,6 @@
 	<label for="truncate">Truncate</label>
 </div>
 
-
 <div class="form-check p-2 px-4">
 	<input
 		type="checkbox"
@@ -143,43 +147,44 @@
 </div>
 
 {#if $sort_by_score_flag}
-<div class="form-check p-2 px-4">
-	<input
-		type="checkbox"
-		class="form-check-input"
-		id="one_per_pilot_flag"
-		name="one_per_pilot_flag"
-		bind:checked={$one_per_pilot_flag}
-	/>
-	<label for="one_per_pilot_flag">Only best flight from each pilot</label>
-</div>
-{/if}
-
-<div class="form-check p-2 px-4">
-	<input
-		type="checkbox"
-		class="form-check-input"
-		id="wholeflight"
-		name="truncate"
-		bind:checked={$singleman}
-	/>
-	<label for="wholeflight">Single Manoeuvre</label>
-</div>
-
-{#if $singleman}
-	<div class="row p-2 px-4">
-		<label class="col col-form-label text-nowrap" for="manoeuvre_ind">Manoeuvre Number</label>
+	<div class="form-check p-2 px-4">
 		<input
-			type="number"
-			class="col form-control text-center"
-			id="manoeuvre_ind"
-			name="manoeuvre_ind"
-			min="1"
-			bind:value={$manoeuvre_ind}
+			type="checkbox"
+			class="form-check-input"
+			id="one_per_pilot_flag"
+			name="one_per_pilot_flag"
+			bind:checked={$one_per_pilot_flag}
 		/>
+		<label for="one_per_pilot_flag">Only best flight from each pilot</label>
 	</div>
 {/if}
 
+{#if $sort_by_score_flag}
+	<div class="form-check p-2 px-4">
+		<input
+			type="checkbox"
+			class="form-check-input"
+			id="wholeflight"
+			name="truncate"
+			bind:checked={$singleman}
+		/>
+		<label for="wholeflight">Single Manoeuvre</label>
+	</div>
+
+	{#if $singleman}
+		<div class="row p-2 px-4">
+			<label class="col col-form-label text-nowrap" for="manoeuvre_ind">Manoeuvre Number</label>
+			<input
+				type="number"
+				class="col form-control text-center"
+				id="manoeuvre_ind"
+				name="manoeuvre_ind"
+				min="1"
+				bind:value={$manoeuvre_ind}
+			/>
+		</div>
+	{/if}
+{/if}
 <div class="form-check p-2 px-4">
 	<input
 		type="checkbox"
@@ -216,4 +221,3 @@
 		/>
 	</div>
 {/if}
-

@@ -15,12 +15,11 @@
 	const md = new MarkdownIt();
 
 	$: if ($page) {
-
 		let helpFileName = $page.url.pathname
 			.replaceAll('/', '_')
 			.split(base.replace('/', '_'))
 			.join('')
-      .replace('_', '');
+			.replace('_', '');
 
 		fetch(`${base}/help/${helpFileName || 'home'}.md`)
 			.then((response) => {
@@ -66,7 +65,12 @@
 	</div>
 </div>
 
-<div class="offcanvas offcanvas-end position-fixed" tabindex="-1" id="help" aria-labelledby="help">
+<div 
+  class="offcanvas offcanvas-end position-fixed" 
+  tabindex="-1" 
+  id="help" 
+
+>
 	<div class="offcanvas-header">
 		<h5>Help for {$page.url.pathname}</h5>
 		<button

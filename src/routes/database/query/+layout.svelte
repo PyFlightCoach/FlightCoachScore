@@ -1,32 +1,13 @@
 <script lang="ts">
 	import DbTable from '$lib/components/leaderboards/DBTable.svelte';
 	import LeaderQuery from '$lib/components/leaderboards/LeaderQuery.svelte';
-	import { table_rows, lastResponse } from '$lib/stores/leaderboards';
 	import navBarContents from '$lib/stores/navBarContents';
 	import DBMenu from './DBMenu.svelte';
 	import { base } from '$app/paths';
-	import {
-    n_results,
-		me_only_flag,
-		difficulty,
-		truncate,
-		schedule_id,
-		one_per_pilot_flag,
-		sort_by_score_flag,
-		select_by_date,
-		date_after,
-		date_before,
-    version,
-    manoeuvre_ind,
-    singleman,
-    updateTable
-	} from '$lib/stores/leaderboards';
-	import { dbServer } from '$lib/api.js';
-  import {checkUser} from '$lib/stores/user';
-
+	import {updateTable} from '$lib/stores/leaderboards';
+	
   export let data;
-
-  
+ 
 
 	$: innerWidth = 0;
 	$: md = innerWidth >= 768;
@@ -50,16 +31,14 @@
 		</div>
 	{/if}
 
-	<LeaderQuery
-		fa_versions={data.fa_versions}
-		bind:lastResponse={$lastResponse}
-	/>
+	<LeaderQuery fa_versions={data.fa_versions}/>
+
   <div class="row p-2 justify-content-end">
     <button class="w-50 btn btn-primary" on:click={updateTable} data-bs-dismiss="offcanvas">Submit</button>
   </div>
 </div>
 
-<div class="col-md-9 align-self-start px-0">
+<div class="col-md-9  px-0 ">
 	<slot />
 </div>
 
