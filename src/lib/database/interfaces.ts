@@ -68,7 +68,7 @@ export class DBFlightStack {
       maxScore: this.maxScore,
       nFlights: this.nFlights,
       nPilots: this.pilots.length,
-      pilots: '<br>' + this.pilots.map(v=>v==best_pilot ? `${best_pilot}*` : best_pilot ).join(', '),
+      pilots: '<br>' + this.pilots.map(v=>v==best_pilot ? `${v}*` : v ).join(',<br>'),
     }).map(([k, v]) => `${k}: ${v}`).join('<br>');
   }
 

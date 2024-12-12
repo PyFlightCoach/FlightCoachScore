@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Plot from 'svelte-plotly.js';
 	import { table_rows } from '$lib/stores/leaderboards';
-  import { type DBFlightRanked, DBFlightStack, stackFlights } from '$lib/database/interfaces';
+  import {  DBFlightStack, stackFlights } from '$lib/database/interfaces';
 
   let stacks: DBFlightStack[] = [];
   $: if ($table_rows) stacks=stackFlights($table_rows, 300);
@@ -21,7 +21,7 @@
   $: color=fArr(stacks, 'maxScore');
   $: lat=fArr(stacks, 'origin_lat');
   $: lon=fArr(stacks, 'origin_lng');
-  $: text=fArr(stacks, 'maxScore', v=>v.toFixed(2));
+  $: text=fArr(stacks, 'maxScore', v=>v.toFixed(1));
   $: hovertext=fArr(stacks, 'info');
   $: nflights=fArr(stacks, 'nFlights');
   $: if(nflights) size=fArr(stacks, 'nFlights', v=>7+20*v/Math.max(...nflights));
