@@ -15,7 +15,16 @@
 	const md = new MarkdownIt();
 
 	$: if ($page) {
-		const helpFileName = $page.url.pathname.replace('/', '').replaceAll('/', '_');
+    console.log($page.url.pathname);
+		
+    //'/FlightCoachScore/flight/create/data'
+    console.log('base:',base);
+    let helpFileName = $page.url.pathname.replace('/', '').replaceAll('/', '_');
+    console.log(helpFileName);
+    if (base) {
+      helpFileName = helpFileName.replace(`${base}_`, '');
+    }
+    console.log(helpFileName);
 		fetch(`${base}/help/${helpFileName || 'home'}.md`)
 			.then((response) => {
 				if (!response.ok) {
