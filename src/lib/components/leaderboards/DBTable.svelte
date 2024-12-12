@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { loadKnowns } from '$lib/schedules.js';
-	import { user } from '$lib/stores/user.js';
+	import { checkUser } from '$lib/stores/user.js';
 	import FlightInfo from './FlightInfo.svelte';
 	import { Flight } from '$lib/database/flight';
-  import {activeFlight} from '$lib/stores/shared';
-  import type { DBFlightRanked } from '$lib/database/interfaces';
+	import { activeFlight } from '$lib/stores/shared';
+	import type { DBFlightRanked } from '$lib/database/interfaces';
 	loadKnowns();
 
 	export let lastResponse: 'leaderboard' | 'flightlist' | undefined = undefined;
@@ -31,63 +31,73 @@
 		col_heads = ['Date', 'Pilot', 'Country', 'Score', 'Comment'];
 	}
 
-  $: loadedID = $activeFlight?.meta.flight_id
+	$: loadedID = $activeFlight?.meta.flight_id;
 
-  $: showID = loadedID;
-  let showFlight: Flight | undefined;
-	$: if (showID) Flight.load(showID).then(r=>{showFlight=r});
+	$: showID = loadedID;
+	let showFlight: Flight | undefined;
+	$: if (showID)
+		checkUser()
+			.then(() => {
+				Flight.load(showID!).then((r) => {
+					showFlight = r;
+				});
+			})
+			.catch(() => {
+				console.log('failed to load flight');
+			});
 
 	//  <a href="{base}/database/flight/?flight_id={row.flight_id}">View</a>
 </script>
 
-
-	{#if lastResponse}
-		<div class="table-responsive">
-			<table class="table table-striped text-center">
-				<thead class="table-dark" style="z-index:-1">
-					<tr>
+{#if lastResponse}
+	<div class="table-responsive">
+		<table class="table table-striped text-center">
+			<thead class="table-dark" style="z-index:-1">
+				<tr>
+					{#each col_heads as col_head}
+						<th scope="col">{col_head}</th>
+					{/each}
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each table_rows as row}
+					<tr
+						class={row.flight_id == $activeFlight?.meta.flight_id ? 'table-active' : ''}
+						role="button"
+						on:click={() => {
+							if (showID == row.flight_id) {
+								showID = undefined;
+								showFlight = undefined;
+							} else {
+								showID = row.flight_id;
+							}
+						}}
+					>
 						{#each col_heads as col_head}
-							<th scope="col">{col_head}</th>
+							<td>{row[col_map[col_head]]}</td>
 						{/each}
-						<th scope="col"></th>
+						<td>
+							{#if showID == row.flight_id}
+								<i class="bi bi-chevron-up"></i>
+							{:else}
+								<i class="bi bi-chevron-down"></i>
+							{/if}
+						</td>
 					</tr>
-				</thead>
-				<tbody>
-					{#each table_rows as row}
-						<tr class="{row.flight_id == $activeFlight?.meta.flight_id ? 'table-active': ''}" role="button" on:click={() => {
-              if (showID == row.flight_id) {
-                showID = undefined;
-                showFlight = undefined;
-              } else {
-                showID = row.flight_id;
-              }
-            }}
-            >
-							{#each col_heads as col_head}
-								<td>{row[col_map[col_head]]}</td>
-							{/each}
-							<td>
-                {#if showID == row.flight_id}
-                  <i class="bi bi-chevron-up"></i>
-                {:else}
-                  <i class="bi bi-chevron-down"></i>
-                {/if}
+					{#if showID == row.flight_id}
+						<tr>
+							<td colspan={col_heads.length + 1}>
+								{#if showFlight}
+									<FlightInfo bind:f={showFlight} />
+								{:else}
+									Loading
+								{/if}
 							</td>
 						</tr>
-						{#if showID == row.flight_id}
-							<tr>
-								<td colspan={col_heads.length + 1}>
-									{#if showFlight}
-										<FlightInfo bind:f={showFlight} />
-									{:else}
-										Loading
-									{/if}
-								</td>
-							</tr>
-						{/if}
-					{/each}
-				</tbody>
-			</table>
-		</div>
-	{/if}
-
+					{/if}
+				{/each}
+			</tbody>
+		</table>
+	</div>
+{/if}

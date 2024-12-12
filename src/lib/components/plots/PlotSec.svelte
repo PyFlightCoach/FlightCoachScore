@@ -23,7 +23,7 @@
 	export let showBefore: boolean = false;
 	export let showAfter: boolean = false;
 	export let scale: number = 1;
-	export let speed = 50;
+	export let speed = 20;
 	export let range: [number, number] = [0, flst.data.length];
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
@@ -173,7 +173,7 @@
 					class="btn btn-outline-secondary"
 					on:click={() => {
 						changeWhilePlaying(() => {
-							scale_multiplier = scale_multiplier + 0.1;
+							scale_multiplier = scale_multiplier *1.2;
 						});
 					}}>+</button
 				>
@@ -182,7 +182,7 @@
 					class="btn btn-outline-secondary"
 					on:click={() => {
 						changeWhilePlaying(() => {
-							scale_multiplier = Math.max(0.2, scale_multiplier - 0.2);
+							scale_multiplier = Math.max(0.2, scale_multiplier * 0.8);
 						});
 					}}>-</button
 				>
@@ -193,7 +193,7 @@
 					class="btn btn-outline-secondary"
 					on:click={() => {
 						changeWhilePlaying(() => {
-							speed = Math.min(200, speed * 1.6);
+							speed = Math.min(60, speed * 1.6);
 						});
 					}}>Slow</button
 				>
@@ -202,7 +202,7 @@
 					class="btn btn-outline-secondary"
 					on:click={() => {
 						changeWhilePlaying(() => {
-							speed = Math.max(20, speed / 1.6);
+							speed = Math.max(5, speed / 1.6);
 						});
 					}}>Fast</button
 				>
