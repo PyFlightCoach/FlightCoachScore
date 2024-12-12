@@ -10,21 +10,24 @@
 	import { dbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
-  import {base} from '$app/paths';
+	import { base } from '$app/paths';
 	import { loading, dev, help, showHelp } from '$lib/stores/shared';
 	const md = new MarkdownIt();
 
 	$: if ($page) {
-    const helpFileName = $page.url.pathname.replace('/', '').replaceAll('/', '_');
-
-    const helpPath = `${base}/help/${helpFileName || "home"}.md`;
-    
-    fetch(helpPath)
-      .then(response => {if (!response.ok) {throw new Error('no help available')}; return response.text()})
-      .then(text => $help = text)
-      .catch((error) => {$help = undefined});
-
-		
+		const helpFileName = $page.url.pathname.replace('/', '').replaceAll('/', '_');
+		fetch(`${base}/help/${helpFileName || 'home'}.md`)
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('no help available');
+				}
+				return response.text();
+			})
+			.then((text) => ($help = text))
+			.catch((error) => {
+        console.debug('no help available', error.message);
+				$help = undefined;
+			});
 	}
 
 	onMount(() => {
