@@ -5,7 +5,7 @@
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import SuperMenu from './SuperMenu.svelte';
 	import { user } from '$lib/stores/user';
-	import { dev, help, showHelp } from '$lib/stores/shared';
+	import { dev, help } from '$lib/stores/shared';
 	import AnalysisProgress from '$lib/components/progress/AnalysisProgress.svelte';
 </script>
 
@@ -29,7 +29,6 @@
 						data-bs-toggle="offcanvas"
 						data-bs-target="#help"
 						aria-controls="Offcanvas"
-						on:click={() => ($showHelp = !$showHelp)}
 					>
           <span><i class="bi bi-question"></i></span>
 					</button>

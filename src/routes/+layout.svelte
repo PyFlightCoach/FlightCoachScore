@@ -11,7 +11,7 @@
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
-	import { loading, dev, help, showHelp } from '$lib/stores/shared';
+	import { loading, dev, help } from '$lib/stores/shared';
 	const md = new MarkdownIt();
 
 	$: if ($page) {
