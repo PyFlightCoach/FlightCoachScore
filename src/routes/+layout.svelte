@@ -57,7 +57,7 @@
 		aria-labelledby="help"
 	>
 		<div class="offcanvas-header">
-			<h5>Help</h5>
+			<h5>Help for {$page.url.pathname}</h5>
 			<button
 				type="button"
 				class="btn-close text-reset"
