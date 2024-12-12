@@ -14,7 +14,6 @@ export const getHelp = (pathname: string) =>{
     case '/flight/create/data':
       return fcd;
     default:
-      console.log(pathname);
-      return 'no help availalbe';
+      console.log('no help for ', pathname);
   }
 }

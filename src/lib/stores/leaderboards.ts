@@ -38,7 +38,7 @@ export const updateTable = async () => {
       difficulty: get(difficulty),
       truncate: get(truncate),
       schedule_id: get(schedule_id),
-      one_per_pilot_flag: get(one_per_pilot_flag),
+      one_per_pilot_flag: get(sort_by_score_flag) ? get(one_per_pilot_flag) : false,
       version: get(version)
     },
     ...(get(singleman) ? { manoeuvre_ind: get(manoeuvre_ind) } : {}),

@@ -3,14 +3,24 @@
 	import 'bootstrap/dist/js/bootstrap.min.js';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
 
+  import MarkdownIt from 'markdown-it';
 	import MainNavBar from './MainNavBar.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
 	import { onMount } from 'svelte';
 	import { dbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
-	import { loading, dev } from '$lib/stores/shared';
-  
-  onMount(() => {
+  import {page} from '$app/stores';
+  import { getHelp } from '$lib/help';
+
+	import { loading, dev, help, showHelp } from '$lib/stores/shared';
+  const md = new MarkdownIt();
+
+  $: if ($page) {
+    console.log($page.url.pathname);
+    $help = getHelp($page.url.pathname);
+  }
+
+	onMount(() => {
 		dbServer
 			.get('/users/me')
 			.then((res) => {
@@ -32,14 +42,34 @@
 			{/if}
 		</MainNavBar>
 	</div>
-  {#if $loading}
+	{#if $loading}
 		<div class="position-absolute top-50 start-50 spinner-border" role="status"></div>
 	{/if}
-	<div class="row flex-grow-1 justify-content-center ">
+	<div class="row flex-grow-1 justify-content-center">
 		<slot />
 	</div>
 </div>
 
+	<div
+		class="offcanvas offcanvas-end position-fixed"
+		tabindex="-1"
+		id="help"
+		aria-labelledby="help"
+	>
+		<div class="offcanvas-header">
+			<h5>Help</h5>
+			<button
+				type="button"
+				class="btn-close text-reset"
+				data-bs-dismiss="offcanvas"
+				aria-label="Close"
+			></button>
+		</div>
+		<div class="offcanvas-body">
+			{@html md.render($help)}
+		</div>
+	</div>
+
 <svelte:head>
-    <title>FCScore{$dev ? ' dev' : '' }</title> 
+	<title>FCScore{$dev ? ' dev' : ''}</title>
 </svelte:head>

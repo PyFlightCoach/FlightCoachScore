@@ -2,7 +2,6 @@ import { writable, type Writable } from 'svelte/store';
 import { Flight } from '$lib/database/flight';
 import {dev as isdev} from '$app/environment';
 
-
 export const mouse = writable({ x: 0, y: 0 });
 
 export const lastErrorCode: Writable<number|undefined> = writable();
@@ -19,3 +18,5 @@ export const dataSource: Writable<string | undefined> = writable();
 export const dev: Writable<boolean> = writable(isdev);
 
 export const help: Writable<string | undefined> = writable();
+export const showHelp: Writable<boolean> = writable(false);
+
