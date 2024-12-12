@@ -1,26 +1,20 @@
-import home from '$lib/help/home.md?raw';
-import fcd from '$lib/help/flight_create_data.md?raw';
-import fcm from '$lib/help/flight_create_manoeuvres.md?raw';
+import home from '/help/home.md?raw';
+import fcd from '/help/flight_create_data.md?raw';
+import fcm from '/help/flight_create_manoeuvres.md?raw';
 
 const lookup = {
-  '/flight/create/data': '$lib/help/flight_create_data.md?raw', 
-}
+	'/flight/create/data': '$lib/help/flight_create_data.md?raw'
+};
 
-export const getHelp2 = async ( pathname: string) => {
-  return await import (lookup[pathname]);
-}
+export const getHelp2 = async (pathname: string) => {
+	return await import(lookup[pathname]);
+};
 
+export const getHelp = async (pathname: string) => {
+	const helpPath = `/help/${pathname.replace('/', '')}.md`;
 
-export const getHelp = (pathname: string) =>{
-  switch (pathname) {
-    case '/':
-    case '':
-      return home;
-    case '/flight/create/data':
-      return fcd;
-    case '/flight/create/manoeuvres':
-      return fcm;
-    default:
-      console.log('no help for ', pathname);
-  }
-}
+	return await fetch(helpPath)
+		.then((response) => {})
+		.catch((error) => console.log('error fetching help', error));
+
+};
