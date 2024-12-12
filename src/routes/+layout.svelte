@@ -15,12 +15,13 @@
 	const md = new MarkdownIt();
 
 	$: if ($page) {
-		console.log($page.url.pathname);
 
-		console.log('base:', base);
-		let helpFileName = $page.url.pathname.replace(`/${base}`, '').replaceAll('/', '_');
-				
-		console.log(helpFileName);
+		let helpFileName = $page.url.pathname
+			.replaceAll('/', '_')
+			.split(base.replace('/', '_'))
+			.join('')
+      .replace('_', '');
+
 		fetch(`${base}/help/${helpFileName || 'home'}.md`)
 			.then((response) => {
 				if (!response.ok) {
