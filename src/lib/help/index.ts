@@ -1,3 +1,4 @@
+import home from '$lib/help/home.md?raw';
 import fcd from '$lib/help/flight_create_data.md?raw';
 import fcm from '$lib/help/flight_create_manoeuvres.md?raw';
 
@@ -12,6 +13,9 @@ export const getHelp2 = async ( pathname: string) => {
 
 export const getHelp = (pathname: string) =>{
   switch (pathname) {
+    case '/':
+    case '':
+      return home;
     case '/flight/create/data':
       return fcd;
     case '/flight/create/manoeuvres':

@@ -66,7 +66,7 @@
 			></button>
 		</div>
 		<div class="offcanvas-body">
-			{@html md.render($help)}
+			{#if $help} {@html md.render($help)} {/if}
 		</div>
 	</div>
 

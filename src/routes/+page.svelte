@@ -10,7 +10,15 @@
 	<div class="row align-items-center ">
 		<p>
 			Flight Coach Score facilitates automatic judging of aerobatic flights and offers a place to
-			share your scores.      
+			share your scores. Use the tools above to get started or click 
+      <a 
+        href="#help"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#help"
+      >
+        here
+      </a>
+      for more info.
 		</p>
 	</div>
 

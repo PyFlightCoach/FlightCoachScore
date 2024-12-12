@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { dbServer, formDataFromDict, jsonEscapeUTF } from '$lib/api';
+	import { dbServer, formDataFromDict } from '$lib/api';
 	import { base } from '$app/paths';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { user } from '$lib/stores/user';
-  
-  let previousPage : string = base ;
+
+	let previousPage: string = base || '';
 
 	let form_state: string | undefined;
 
-  afterNavigate(({from}) => {
-   previousPage = from?.url.pathname || previousPage
-}) ;
+	afterNavigate(({ from }) => {
+		previousPage = from?.url.pathname || previousPage;
+	});
 
 	async function _handleSubmit(event: Event) {
 		try {
