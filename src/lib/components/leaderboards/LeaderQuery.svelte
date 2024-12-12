@@ -142,7 +142,7 @@
 	<label for="form-check-label">Only my flights</label>
 </div>
 
-  
+{#if $sort_by_score_flag}
 <div class="form-check p-2 px-4">
 	<input
 		type="checkbox"
@@ -153,7 +153,7 @@
 	/>
 	<label for="one_per_pilot_flag">Only best flight from each pilot</label>
 </div>
-
+{/if}
 
 <div class="form-check p-2 px-4">
 	<input
