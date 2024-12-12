@@ -12,6 +12,10 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { loading, dev, help } from '$lib/stores/shared';
+  import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
+
+  polyfillCountryFlagEmojis();
+  
 	const md = new MarkdownIt();
 
 	$: if ($page) {
