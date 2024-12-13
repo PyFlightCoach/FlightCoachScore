@@ -88,21 +88,21 @@
 						>
 						<button
 							class="form-control-sm btn btn-outline-secondary"
-							title="Run aligment optimisation"
+							title="Adjust split location forwards"
 							on:click={() => {
 								editsplit(Number(step), element);
 							}}>&#62</button
 						>
 						<button
 							class="form-control-sm btn btn-outline-secondary"
-							title="Recalculate score without optimisation"
+							title="Run aligment optimisation"
 							on:click={() => {
 								analyseManoeuvre($selManID, true, true);
 							}}>Optimise</button
 						>
 						<button
 							class="form-control-sm btn btn-outline-secondary"
-							title="Adjust split location forwards"
+							title="Recalculate score without optimisation"
 							on:click={() => {
 								analyseManoeuvre($selManID, true, false);
 							}}>Score</button
