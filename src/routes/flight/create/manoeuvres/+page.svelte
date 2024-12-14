@@ -16,23 +16,23 @@
 	let activeManId: number = $state(0);
 	let activeIndex: number = $state(0);
 
-	let lastAllowedIndex = $derived(
-		activeManId == mans.length - 1
-			? $states!.data.length - 1
-			: mans[activeManId + 1].stop || $states!.data.length - 1
-	);
+//	let lastAllowedIndex = $derived(
+//		activeManId == mans.length - 1
+//			? $states!.data.length - 1
+//			: mans[activeManId + 1].stop || $states!.data.length - 1
+//	);
 
-	const lastStop = $derived(activeManId == 0 ? 0 : mans[activeManId - 1].stop!);
+	let range: [number, number] = $state([0, Math.min(3000, $states!.data.length - 1)]);
 
-	let range: [number, number] = $state([0, $states!.data.length - 1]);
+  $inspect('range:', range);
 
-	$effect(() => {
-		if (range[1] > lastAllowedIndex) {
-			range[1] = lastAllowedIndex;
-		} else if (range[1] <= range[0]) {
-			range[1] = range[0] + 1;
-		}
-	});
+//	$effect(() => {
+//		if (range[1] > lastAllowedIndex) {
+//      range = [range[0], lastAllowedIndex];
+//		} else if (range[1] <= range[0]) {
+//      range = [range[0], range[0] + 1];
+//		}
+//	});
 
 	let canAdd: boolean = $derived(
 		Boolean(
@@ -45,15 +45,16 @@
 
 	const resetRange = () => {
 		let newStop = mans[activeManId].stop;
+    let newStart = activeManId == 0 ? 0 : mans[activeManId - 1].stop!;
 		if (!newStop) {
 			if (activeManId == 0) {
 				newStop = $states!.data.length / 8;
 			} else {
-				newStop = 2 * lastStop - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
+				newStop = 2 * newStart - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
 			}
-			range = [lastStop, Math.min(newStop + 500, $states!.data.length - 1)];
+			range = [newStart, Math.min(newStop + 500, $states!.data.length - 1)];
 		} else {
-			range = [lastStop, newStop];
+			range = [newStart, newStop];
 		}
 
 		activeIndex = newStop;
@@ -80,8 +81,18 @@
 	};
 
 	const setRange = () => {
-		mans[activeManId].stop = activeIndex;
-		resetRange();
+    const lastAllowedIndex = activeManId == mans.length - 1
+			? $states!.data.length - 1
+			: mans[activeManId + 1].stop || $states!.data.length - 1;
+	
+    if (activeIndex > lastAllowedIndex) {
+      alert ('Cannot set point beyone the end of the next manoeuvre');
+      activeIndex = lastAllowedIndex-1;
+    } else {
+      mans[activeManId].stop = activeIndex;
+      resetRange();
+    }
+		
 	};
 
 	const loadMansFromFCJ = async () => {

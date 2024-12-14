@@ -2,7 +2,6 @@
 	import { States } from '$lib/analysis/state';
 	import Plot from 'svelte-plotly.js';
 	import { ribbon, boxtrace } from '$lib/components/plots/traces';
-	import { layout3d } from '$lib/components/plots/layouts';
 	import DoubleSlider from '$lib/components/DoubleSlider.svelte';
 	import colddraft from '$lib/components/plots/colddraft';
 	import { isFullSize } from '$lib/stores/analysis';
@@ -18,7 +17,8 @@
 		'projection',
 		'modelClick',
 		'rangeEndClick',
-		'rangeStartClick'
+		'rangeStartClick',
+		'showBox'
 	];
 	export let showBefore: boolean = false;
 	export let showAfter: boolean = false;
@@ -28,6 +28,8 @@
 	export let greyUnselected: boolean = false;
 	export let fixRange: boolean = false;
 	export let showBox: boolean = false;
+	export let includeZero: boolean = false;
+	export let expand: number = 0;
 
 	let scale_multiplier = $isFullSize ? 15 : 5;
 
@@ -44,10 +46,64 @@
 		}
 	};
 
-	let layout = structuredClone(layout3d);
+	let layout = {
+		legend: { font: { size: 20 }, yanchor: 'top', y: 0.99, xanchor: 'left', x: 0.01 },
+		//autosize: true,
+		margin: { l: 0, r: 0, t: 0, b: 0 },
+		scene: {
+			aspectmode: 'data',
+			camera: {
+				up: { x: 0, y: 0, z: 1 },
+				center: { x: 0, y: 0, z: 0 },
+				eye: { x: 0, y: -2, z: -1 },
+				projection: { type: 'perspective' }
+			},
+			xaxis: {},
+			yaxis: {},
+			zaxis: {},
+			aspectratio: {}
+		}
+	};
+
+  const updateLayout = (sts: States, _zero: boolean, _expand: number) => {
+		let newlayout = structuredClone(layout);
+		const ranges = {
+			x: sts.plotRange('x', _zero, _expand),
+			y: sts.plotRange('y', _zero, _expand),
+			z: sts.plotRange('z', _zero, _expand)
+		};
+
+		newlayout.scene.xaxis = { range: ranges.x };
+		newlayout.scene.yaxis = { range: ranges.y };
+		newlayout.scene.zaxis = { range: ranges.z };
+		newlayout.scene.aspectmode = 'manual';
+
+		const max_range = Math.max(
+			ranges.x[1] - ranges.x[0],
+			ranges.y[1] - ranges.y[0],
+			ranges.z[1] - ranges.z[0]
+		);
+		//
+		newlayout.scene.aspectratio = {
+			x: (ranges.x[1] - ranges.x[0]) / max_range,
+			y: (ranges.y[1] - ranges.y[0]) / max_range,
+			z: (ranges.z[1] - ranges.z[0]) / max_range
+		};
+		return newlayout;
+	};
+
+	$: layout = updateLayout(flst, includeZero, expand);
+
+  const toggleProjection = () => {
+    console.debug('toggling projection');
+    const newlayout = structuredClone(layout);
+    newlayout.scene.camera.projection.type =
+      layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
+    layout = newlayout;
+  }
 
 	const createModelTrace = (st: States | undefined, i: number | undefined, sc: number) => {
-		if (st && (typeof i !== 'undefined') && i < st.data.length && st.data[i]) {
+		if (st && typeof i !== 'undefined' && i < st.data.length && st.data[i]) {
 			const fst = st.data[i];
 			return colddraft
 				.scale(sc * 0.6)
@@ -91,7 +147,7 @@
 
 	const play = () => {
 		player = setInterval(() => {
-			i != null && i < flst.data.length ? i++ : (i = 0);
+			i != undefined && i < flst.data.length ? i++ : (i = 0);
 		}, speed);
 	};
 
@@ -145,7 +201,12 @@
 		}}
 	>
 		{#if traces}
-			<Plot data={traces} {layout} fillParent={true} on:click={handleClick} />
+			<Plot
+				data={traces}
+				layout={layout}
+				fillParent={true}
+				on:click={handleClick}
+			/>
 		{/if}
 	</div>
 	<div id="buttons">
@@ -173,7 +234,7 @@
 					class="btn btn-outline-secondary"
 					on:click={() => {
 						changeWhilePlaying(() => {
-							scale_multiplier = scale_multiplier *1.2;
+							scale_multiplier = scale_multiplier * 1.2;
 						});
 					}}>+</button
 				>
@@ -211,14 +272,18 @@
 			{#if controls.includes('projection')}
 				<button
 					class="btn btn-outline-secondary"
-					on:click={() => {
-						const newlayout = structuredClone(layout3d);
-						console.debug(layout.scene.camera.projection.type);
-						newlayout.scene.camera.projection.type =
-							layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
-						layout = newlayout;
-					}}>{layout.scene.camera.projection.type}</button
+					on:click={toggleProjection}>{layout.scene.camera.projection.type}</button
 				>
+			{/if}
+			{#if controls.includes('showBox')}
+				<input
+					type="checkbox"
+					class="btn-check"
+					id="btn-check"
+					autocomplete="off"
+					bind:checked={showBox}
+				/>
+				<label class="btn btn-outline-secondary text-nowrap" for="btn-check">Show Box</label>
 			{/if}
 		</div>
 	</div>

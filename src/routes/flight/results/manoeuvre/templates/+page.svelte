@@ -17,38 +17,34 @@
 		return trs;
 	};
 
-	const make_traces = (bf: boolean, bi: boolean, bc: boolean) => {
+	const make_traces = (bf: boolean, bi: boolean) => {
 		const trs = [];
 		if (bf) {
 			trs.push(...make_trace($man!.flown!, true, 'flown', 'red'));
 		}
 		if (bi) {
-			trs.push(...make_trace($man!.template!, true, 'intended', 'blue'));
+			trs.push(...make_trace($man!.template!, true, 'template', 'blue'));
 		}
-		if (bc) {
-			trs.push(...make_trace($man!.corrected_template!, true, 'corrected', 'green'));
-		}
+
 		return trs;
 	};
 
 	let flown = true;
-	let intended = true;
-	let corrected = true;
+	let template = true;
 
-	$: all_traces = make_traces(flown, intended, corrected);
+	$: all_traces = make_traces(flown, template);
 </script>
 
-<div>
-	<div style:height="100%">
-		<Plot data={all_traces} layout={layout3d} fillParent={true} />
-	</div>
-	<nav class="navbar fixed-bottom navbar-dark bg-dark">
-		<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-			<div class="input-group">
-				<input id="Flown" type="checkbox" class="form-control-sm" bind:checked={flown}/><label for="Flown">Flown</label>
-				<input id="intended" type="checkbox" class="form-control-sm" bind:checked={intended}/><label for="intended">intended</label>
-				<input id="corrected" type="checkbox" class="form-control-sm" bind:checked={corrected}/><label for="corrected">corrected</label>
-			</div>
-		</ul>
-	</nav>
+<div class="column">
+	<Plot data={all_traces} layout={layout3d} fillParent={true}/>
 </div>
+<nav class="navbar fixed-bottom">
+	<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+		<input id="Flown" type="checkbox" class="form-control-sm" bind:checked={flown} /><label
+			for="Flown">Flown</label
+		>
+		<input id="intended" type="checkbox" class="form-control-sm" bind:checked={template} /><label
+			for="intended">intended</label
+		>
+	</ul>
+</nav>

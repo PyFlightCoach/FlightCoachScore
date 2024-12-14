@@ -19,11 +19,6 @@
 		</select>
   </div>
     
-  <div  class="form-check">
-    <input class="form-check-input" type="checkbox" id="showBox" bind:checked={showBox} />
-    <label class="input-check-label" for="showBox">Show Box</label>
-  </div>
-
 
 		<div class="row">
 			<table class="table-sm">
@@ -60,8 +55,8 @@
 <div class="col-10">
 	<PlotSec
 		flst={data.mans[activeManId]}
-		controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
-		bind:showBox
+		controls={['play', 'scale', 'speed', 'projection', 'modelClick', 'showBox']}
     fixRange
+    includeZero={true} expand={50}
 	/>
 </div>

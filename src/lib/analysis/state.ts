@@ -241,6 +241,18 @@ export class States {
 		);
 	}
 
+  plotRange(col: 'x' | 'y' | 'z', zero: boolean = false, pad: number = 0) {
+    const cmin = Math.min(...this.data.map((st) => st[col])) - pad;
+    const cmax = Math.max(...this.data.map((st) => st[col])) + pad;
+    if (zero) {
+      return [Math.min(0-pad, cmin), Math.max(0+pad, cmax)];
+    } else {
+      return [cmin, cmax];
+    }
+    
+
+  }
+
 	split() {
 		const states: Record<string, States> = {};
 		let last_el = '';
@@ -307,6 +319,8 @@ export function state_range(state: State[], col: string, extend: number = 0) {
 		)
 	];
 }
+
+
 
 export function state_centre(state: State[], col: string) {
 	const srange = state_range(state, col);
