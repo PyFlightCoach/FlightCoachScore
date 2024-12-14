@@ -3,11 +3,11 @@
   import {base} from '$app/paths';
 	$navBarContents = undefined;
 
-
 </script>
 
+
 <div class="container-fluid text-center mt-5" style="max-width:800px; ">
-	<div class="row align-items-center ">
+  <div class="row align-items-center ">
 		<p>
 			Flight Coach Score facilitates automatic judging of aerobatic flights and offers a place to
 			share your scores. Use the tools above to get started or click 
