@@ -1,6 +1,5 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
-	import { ManSplit, parseFCJMans, Splitting } from '$lib/analysis/splitting.svelte';
 	import { newAnalysis } from '$lib/analysis/analysis';
 	import { isCompFlight, states, fcj, bin } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
@@ -8,56 +7,117 @@
 	import { FCJson } from '$lib/analysis/fcjson';
 	import { loadManDef, library, loadKnowns } from '$lib/schedules';
 	import ManSelect from '$lib/components/manselect/ManSelect.svelte';
-	
+	import * as ms from '$lib/analysis/splitting';
 
 	loadKnowns();
 
-	let mans: ManSplit[] = $state([ManSplit.TakeOff()]);
+	let mans = $state([ms.takeOff()]);
+
 	let activeManId: number = $state(0);
-
 	let activeIndex: number = $state(0);
-  let lastStop = $derived(activeManId == 0 ? 0 : mans[activeManId - 1].stop!);
 
-  let lastAllowedIndex = $derived(
-    activeManId == mans.length - 1
-      ? $states!.data.length
-      : mans[activeManId + 1].stop || $states!.data.length
-  );
+	let lastAllowedIndex = $derived(
+		activeManId == mans.length - 1
+			? $states!.data.length - 1
+			: mans[activeManId + 1].stop || $states!.data.length - 1
+	);
 
+	const lastStop = $derived(activeManId == 0 ? 0 : mans[activeManId - 1].stop!);
 
-  $inspect(mans[activeManId]);
+	let range: [number, number] = $state([0, $states!.data.length - 1]);
 
-	let range: [number, number] = $state([0, Math.min($states!.data.length, 3000)]);
 	$effect(() => {
-		range = [lastStop, lastAllowedIndex];
+		if (range[1] > lastAllowedIndex) {
+			range[1] = lastAllowedIndex;
+		} else if (range[1] <= range[0]) {
+			range[1] = range[0] + 1;
+		}
 	});
 
+	let canAdd: boolean = $derived(
+		Boolean(
+			mans.length && (mans[mans.length - 1].manoeuvre ||
+				(mans[mans.length - 1].alternate_name &&
+					mans[mans.length - 1].alternate_name != 'Landing')) &&
+				mans[mans.length - 1].stop
+		)
+	);
+
+	const resetRange = () => {
+		let newStop = mans[activeManId].stop;
+		if (!newStop) {
+			if (activeManId == 0) {
+				newStop = $states!.data.length / 8;
+			} else {
+				newStop = 2 * lastStop - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
+			}
+			range = [lastStop, Math.min(newStop + 500, $states!.data.length - 1)];
+		} else {
+			range = [lastStop, newStop];
+		}
+
+		activeIndex = newStop;
+	};
+
+	const addMan = async (man: ms.Split | undefined = undefined) => {
+		if (mans[mans.length - 1].manoeuvre) {
+			mans[mans.length - 1].mdef = await loadManDef(mans[mans.length - 1].manoeuvre!.id);
+		}
+		mans.push(man || ms.next(mans[mans.length - 1]));
+
+		activeManId = mans.length - 1;
+		resetRange();
+	};
+
+	const reset = () => {
+		activeManId = 0;
+		
+    
+    mans.length = 1;
+    mans[0] = ms.takeOff();
+    resetRange();
+  
+	};
+
+	const setRange = () => {
+		mans[activeManId].stop = activeIndex;
+		resetRange();
+	};
+
+	const loadMansFromFCJ = async () => {
+		if ($fcj) {
+			reset();
+			const fcjsplits = await ms.parseFCJMans($fcj, $states!)
+      for (const man of fcjsplits) {
+        if (man.manoeuvre) {
+          await loadManDef(man.manoeuvre!.id).then(
+            md => {man.mdef = md}
+          );
+        } 
+        if (man.alternate_name == 'TakeOff') {
+          mans[0] = man;
+        } else {
+          mans.push(man);  
+        }
+        
+      }
+
+			activeManId = 1;
+			resetRange();
+		}
+	};
 
 	const parseFCJ = (file: File) => {
+		$fcj = undefined;
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			$fcj = FCJson.parse(JSON.parse(e.target?.result as string));
-
-			activeManId = 0;
-			mans = [ManSplit.TakeOff()];
-			parseFCJMans($fcj!, $states!).then((res) => {
-				mans = res;
-				activeManId = 1;
-			});
+			loadMansFromFCJ();
 		};
 		reader.readAsText(file);
 	};
 
-	const addMan = () => {
-		mans = [...mans, mans[activeManId].next($states?.data.length)];
-		activeManId = mans.length - 1;
-	};
-
-
-	const setRange = () => {
-    console.log('setting range of:', activeManId, ' to:', activeIndex);
-    mans[activeManId].stop = activeIndex;
-	};
+	loadMansFromFCJ();
 </script>
 
 <svelte:window
@@ -67,7 +127,7 @@
 				if (activeManId == mans.length - 1) {
 					if (!mans[activeManId].stop) {
 						setRange();
-					} else if (mans[mans.length - 1].name) {
+					} else if (mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name) {
 						addMan();
 					}
 				}
@@ -77,8 +137,7 @@
 />
 
 <div class="col-3 pt-2">
-  <p>{mans[activeManId].stop || 'undefined'}</p>
-	<div class="container bg-light border pt-2">
+	<div class="row bg-light border pt-2">
 		{#if $bin || $fcj}
 			<span>Source File: {$bin?.name || $fcj?.name || 'unknown'}</span>
 		{/if}
@@ -93,8 +152,9 @@
 							style="display: none;"
 							accept=" .json"
 							onchange={(e: Event) => {
-								if (e.target?.files?.length > 0) {
-									parseFCJ(e.target.files[0]);
+                const files = (e.target as HTMLInputElement).files!;
+								if (files.length > 0) {
+									parseFCJ(files[0]);
 								}
 							}}
 						/>
@@ -108,11 +168,7 @@
 				<button
 					id="clear-splitting"
 					class="btn btn-outline-secondary form-control-sm col-4"
-					onclick={() => {
-						$fcj = undefined;
-						activeManId = 0;
-						mans = [ManSplit.TakeOff()];
-					}}
+					onclick={reset}
 				>
 					Clear
 				</button>
@@ -120,9 +176,9 @@
 		{/if}
 	</div>
 
-	<div class="container bg-light border">
+	<div class="row bg-light border">
 		<small>Manoeuvres</small>
-		<table class="table-sm table-bordered align-middle container-fluid text-center">
+		<table class="table-sm align-middle text-center">
 			<thead>
 				<tr>
 					<th scope="col" class="col-1"></th>
@@ -138,72 +194,97 @@
 								class="radio"
 								type="radio"
 								name="manSelect"
-								value={i}
 								bind:group={activeManId}
+								onchange={resetRange}
+								value={i}
 							/></td
 						>
 
-						{#if man.fixed || activeManId != i}
-							<td>{man.name}</td>
+						{#if man.alternate_name || activeManId != i}
+							<td class="text-start">
+								{#if man.manoeuvre}{man.manoeuvre?.index}:
+								{/if}{man.manoeuvre?.short_name || man.alternate_name}
+							</td>
 						{:else if activeManId == i}
 							<td>
 								<ManSelect
 									library={$library}
 									old_man={man}
-									onselected={(nms: ManSplit) => {
-										Object.assign(mans[i], nms);
+									onselected={(nms: ms.Split) => {
+										console.debug('selected:', nms);
+										mans[i] = Object.assign(mans[i], nms);
+									}}
+									ondeselect={() => {
+										console.debug('deselected');
+										mans[i].manoeuvre = undefined;
+										mans[i].mdef = undefined;
 									}}
 								/>
 							</td>
 						{/if}
 						{#if activeManId == i}
 							{#if mans[activeManId].alternate_name != 'Landing'}
-								<td
-									role="button"
-									data-bs-toggle="tooltip"
-									title="Set the end point of this manoeuvre to the point identified by the little plane"
-									onclick={() => { mans[activeManId].stop = activeIndex; console.log('setting stop to:', activeIndex); }}
-								>
-									Set{mans[activeManId].stop ? '' : ' (⏎)'}
+								<td>
+									<button
+										class="btn btn-outline-secondary w-100"
+										data-bs-toggle="tooltip"
+										title="Set the end point of this manoeuvre to the point identified by the little plane"
+										onclick={() => {
+											setRange();
+										}}
+									>
+										{mans[activeManId].stop ? 'Update' : 'Set (⏎)'}
+									</button>
 								</td>
 							{/if}
 							{#if !man.fixed}
-								<td
-									role="button"
-									data-bs-toggle="tooltip"
-									title="Delete this manoeuvre"
-									onclick={() => {
-										activeManId = activeManId - 1;
-										mans.splice(activeManId + 1, 1);
-									}}>Delete</td
-								>
+								<td>
+									<button
+										class="btn btn-outline-secondary w-100"
+										data-bs-toggle="tooltip"
+										title="Delete this manoeuvre"
+										onclick={() => {
+											activeManId = activeManId - 1;
+											mans.splice(activeManId + 1, 1);
+											resetRange();
+										}}
+									>
+										Delete
+									</button>
+								</td>
 							{/if}
 						{:else}
-							<td colspan="3"></td>
+							<td colspan="2"></td>
 						{/if}
 					</tr>
 				{/each}
-				{#if (mans[mans.length - 1].manoeuvre || mans[mans.length - 1].alternate_name) && mans[mans.length - 1].alternate_name != 'Landing'}
-					{#if mans[mans.length - 1].stop}
-						<tr>
-							<td colspan="6" role="button" onclick={addMan}
-								>Add{mans[activeManId].stop && (mans[activeManId].manoeuvre || mans[activeManId].alternate_name)
-									? '(⏎)'
-									: ''}</td
+				{#if canAdd}
+					<tr>
+						<td colspan="6">
+							<button
+								class="btn btn-outline-secondary w-100"
+								onclick={() => {
+									addMan();
+								}}
 							>
-						</tr>
-					{/if}
+								Add{mans[activeManId].stop &&
+								(mans[activeManId].manoeuvre || mans[activeManId].alternate_name)
+									? '(⏎)'
+									: ''}
+							</button>
+						</td>
+					</tr>
 				{/if}
 			</tbody>
 		</table>
 	</div>
-	{#if mans[mans.length - 1].name == 'Landing'}
+	{#if mans.length && mans[mans.length - 1].alternate_name == 'Landing'}
 		<div class="container bg-light border">
 			<div class="row">
 				<button
 					class="btn btn-outline-primary form-control-sm"
 					onclick={() => {
-						newAnalysis($states!, new Splitting(mans));
+						newAnalysis($states!, new ms.Splitting(mans));
 						goto(base + '/flight/results');
 					}}
 				>

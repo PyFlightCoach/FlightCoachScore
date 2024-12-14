@@ -1,29 +1,10 @@
-import {
-	scores,
-	analyses,
-	manNames,
-	running,
-	runInfo,
-	selManID,
-	states,
-	isCompFlight,
-	bin,
-	origin,
-	selectedResult,
-	difficulty,
-	truncate,
-	fa_versions,
-	binData,
-	bootTime,
-	isComplete,
-	fcj
-} from '$lib/stores/analysis';
+import * as sts from '$lib/stores/analysis';
 import { activeFlight, isAnalysisModified, dataSource } from '$lib/stores/shared';
 import { MA } from '$lib/analysis/ma';
 import { get, writable } from 'svelte/store';
 import { analysisServer, faVersion } from '$lib/api';
 import { States } from '$lib/analysis/state';
-import { Splitting } from '$lib/analysis/splitting';
+import { Splitting, schedule as getScheduleFromSplit } from '$lib/analysis/splitting';
 import { ManDef } from '$lib/analysis/mandef';
 import { ScheduleInfo } from './fcjson';
 import { loadManDef, safeGetLibrary } from '$lib/schedules';
@@ -34,29 +15,29 @@ import { base } from '$app/paths';
 import { Flight } from '$lib/database/flight';
 
 export function checkComplete() {
-	return get(manNames)?.length && analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!]);
+	return Boolean(get(sts.manNames)?.length && sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!])) ;
 }
 
 function setupAnalysisArrays(mnames: string[]) {
-	manNames.set(mnames);
-	scores.set(new Array(mnames.length).fill(0));
-	running.set(new Array(mnames.length).fill(false));
-	analyses.length = mnames.length;
-	runInfo.length = mnames.length;
+	sts.manNames.set(mnames);
+	sts.scores.set(new Array(mnames.length).fill(0));
+	sts.running.set(new Array(mnames.length).fill(false));
+	sts.analyses.length = mnames.length;
+	sts.runInfo.length = mnames.length;
 	mnames.forEach((_, i) => {
-		runInfo[i] = writable();
-		analyses[i] = writable();
+		sts.runInfo[i] = writable();
+		sts.analyses[i] = writable();
 	});
 }
 
 function setAnalysis(i: number, man: MA) {
-	analyses[i].set(man);
+	sts.analyses[i].set(man);
 
-	analyses[i].subscribe((ma: MA | undefined) => {
-		scores.update((s) => {
+	sts.analyses[i].subscribe((ma: MA | undefined) => {
+		sts.scores.update((s) => {
 			if (ma) {
 				s![i] =
-					ma.get_score(get(selectedResult)!, get(difficulty), get(truncate)).total *
+					ma.get_score(get(sts.selectedResult)!, get(sts.difficulty), get(sts.truncate)).total *
 					(ma.mdef?.info.k || ma.k!);
 			} else {
 				s![i] = 0;
@@ -64,51 +45,51 @@ function setAnalysis(i: number, man: MA) {
 			return s;
 		});
 
-		fa_versions.update((v) => {
+		sts.fa_versions.update((v) => {
 			return [...new Set([...v, ...Object.keys(ma?.history || [])])];
 		});
 
-		isComplete.set(checkComplete());
+		sts.isComplete.set(checkComplete());
 	});
 }
 
 export function clearAnalysis() {
 	activeFlight.set(undefined);
-	selManID.set(undefined);
-	states.set(undefined);
-	manNames.set(undefined);
-	scores.set(undefined);
-	selectedResult.set(undefined);
-	fa_versions.set([]);
-	binData.set(undefined);
-	bootTime.set(undefined);
-	origin.set(undefined);
-	fcj.set(undefined);
-	bin.set(undefined);
-	analyses.length = 0;
-	running.set([]);
-	runInfo.length = 0;
+	sts.selManID.set(undefined);
+	sts.states.set(undefined);
+	sts.manNames.set(undefined);
+	sts.scores.set(undefined);
+	sts.selectedResult.set(undefined);
+	sts.fa_versions.set([]);
+	sts.binData.set(undefined);
+	sts.bootTime.set(undefined);
+	sts.origin.set(undefined);
+	sts.fcj.set(undefined);
+	sts.bin.set(undefined);
+	sts.analyses.length = 0;
+	sts.running.set([]);
+	sts.runInfo.length = 0;
 	activeFlight.set(undefined);
 	isAnalysisModified.set(undefined);
 	dataSource.set(undefined);
 }
 
-export async function newAnalysis(sts: States, split: Splitting) {
+export async function newAnalysis(states: States, split: Splitting) {
 	setupAnalysisArrays(split.manNames);
 
 	isAnalysisModified.set(false);
 
-	if (get(binData)) {
-		origin.update((orgn) => {
+	if (get(sts.binData)) {
+		sts.origin.update((orgn) => {
 			return Object.assign(orgn!, orgn!.noMove());
 		});
 	}
 
 	let direction: string = 'Infer';
-	if (get(isCompFlight)) {
+	if (get(sts.isCompFlight)) {
 		const ddef = split.directionDefinition();
 
-		const heading = sts.data[split.mans[ddef.manid - 1].stop!].direction_str();
+		const heading = states.data[split.mans[ddef.manid - 1].stop!].direction_str();
 		if (ddef.direction == 'DOWNWIND') {
 			direction = heading == 'RTOL' ? 'LTOR' : 'RTOL';
 		} else if (ddef.direction == 'UPWIND') {
@@ -119,21 +100,22 @@ export async function newAnalysis(sts: States, split: Splitting) {
 	}
 
 	split.analysisMans.forEach(async (id: number, i: number) => {
-		runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
+		sts.runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
+    const sch = getScheduleFromSplit(split.mans[id]);
 		setAnalysis(
 			i,
 			new MA(
-				split.mans[id].name!,
+				split.mans[id].manoeuvre!.short_name,
 				id,
-				id > 0 ? sts.data[split.mans[id - 1].stop!].t : 0,
-				sts.data[split.mans[id].stop!].t,
-				new ScheduleInfo(split.mans[id].schedule!.category_name, split.mans[id].schedule_name),
+				id > 0 ? states.data[split.mans[id - 1].stop!].t : 0,
+				states.data[split.mans[id].stop!].t,
+				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
-				get(fcj)?.manhistory(id) || {},
+				get(sts.fcj)?.manhistory(id) || {},
 				split.mans[id].manoeuvre!.k, // todo get K
-				get(binData)
+				get(sts.binData)
 					? undefined
-					: new States(sts.data.slice(split.mans[id - 1].stop, split.mans[id].stop)),
+					: new States(states.data.slice(split.mans[id - 1].stop, split.mans[id].stop)),
 				split.mans[id].mdef
 			)
 		);
@@ -142,12 +124,12 @@ export async function newAnalysis(sts: States, split: Splitting) {
 
 export async function createAnalysisExport(small: boolean = false) {
 	return {
-		origin: get(origin),
-		isComp: get(isCompFlight),
-		sourceBin: get(bin)?.name || undefined,
-		sourceFCJ: get(fcj)?.name || undefined,
-		bootTime: get(bootTime)?.toISOString() || undefined,
-		mans: analyses.map((_ma) => (small ? get(_ma)!.shortExport() : get(_ma)!.longExport()))
+		origin: get(sts.origin),
+		isComp: get(sts.isCompFlight),
+		sourceBin: get(sts.bin)?.name || undefined,
+		sourceFCJ: get(sts.fcj)?.name || undefined,
+		bootTime: get(sts.bootTime)?.toISOString() || undefined,
+		mans: sts.analyses.map((_ma) => (small ? get(_ma)!.shortExport() : get(_ma)!.longExport()))
 	};
 }
 
@@ -159,15 +141,15 @@ export async function exportAnalysis(small: boolean = false) {
 
 export async function importAnalysis(data: Record<string, any>) {
 	clearAnalysis();
-	origin.set(data.origin);
-	isCompFlight.set(data.isComp);
-	bootTime.set(data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);
+	sts.origin.set(data.origin);
+	sts.isCompFlight.set(data.isComp);
+	sts.bootTime.set(data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);
 
 	setupAnalysisArrays(data.mans.map((ma: MA) => ma.name));
 
 	await safeGetLibrary().then((library) => {
 		data.mans.forEach(async (ma: ManDef, i: number) => {
-			runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
+			sts.runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
 
 			MA.parse(ma).then(async (res) => {
 				if (res.mdef) {
@@ -233,7 +215,7 @@ export async function analyseAll(
 	force: boolean = false,
 	optimise: boolean | undefined = undefined
 ) {
-	analyses.forEach(async (ma, i) => {
+	sts.analyses.forEach(async (ma, i) => {
 		await analyseManoeuvre(i, force, optimise);
 	});
 }
@@ -243,7 +225,7 @@ export async function analyseManoeuvre(
 	force: boolean = false,
 	optimise: boolean | undefined = undefined
 ) {
-	const ma = get(analyses[id]);
+	const ma = get(sts.analyses[id]);
 
 	const isReRun = Object.keys(ma!.history).includes(await analysisServer.get('fa_version'));
 
@@ -251,19 +233,19 @@ export async function analyseManoeuvre(
 		optimise = !isReRun;
 	} //optimise if for new analysis version
 
-	if ((!ma!.scores || optimise || force) && !get(running)[id]) {
+	if ((!ma!.scores || optimise || force) && !get(sts.running)[id]) {
 		//if scores exist, only run if server version not in history
 
-		runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
+		sts.runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
 
-		running.update((v) => {
+		sts.running.update((v) => {
 			v[id] = true;
 			return v;
 		});
 
 		await ma!.run(optimise).then((res) => {
-			analyses[id].set(res);
-			running.update((v) => {
+			sts.analyses[id].set(res);
+			sts.running.update((v) => {
 				v[id] = false;
 				return v;
 			});

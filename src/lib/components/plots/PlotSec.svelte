@@ -46,8 +46,8 @@
 
 	let layout = structuredClone(layout3d);
 
-	const createModelTrace = (st: States | undefined, i: number, sc: number) => {
-		if (st != null && i < st.data.length) {
+	const createModelTrace = (st: States | undefined, i: number | undefined, sc: number) => {
+		if (st && (typeof i !== 'undefined') && i < st.data.length && st.data[i]) {
 			const fst = st.data[i];
 			return colddraft
 				.scale(sc * 0.6)

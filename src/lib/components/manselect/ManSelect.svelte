@@ -1,17 +1,20 @@
 <script lang="ts">
-	import { ManSplit } from '$lib/analysis/splitting.svelte';
+	import * as sp from '$lib/analysis/splitting';
 	import type { ScheduleLibrary } from '$lib/schedules';
-	
+	import { schedule_id } from '$lib/stores/leaderboards';
+
 	let {
 		library,
 		old_man,
-    stopLevel=2,
-		onselected = (new_man: ManSplit) => {}
+		stopLevel = 2,
+		onselected = (new_man: sp.Split) => {},
+		ondeselect = () => {}
 	}: {
 		library: ScheduleLibrary;
-		old_man: ManSplit;
-    stopLevel?: number;
-		onselected?: (new_man: ManSplit) => void;
+		old_man: sp.Split;
+		stopLevel?: number;
+		onselected?: (new_man: sp.Split) => void;
+		ondeselect?: () => void;
 	} = $props();
 
 	let man: {
@@ -40,7 +43,29 @@
 				.only.manoeuvres.map((m) => m.short_name)
 	];
 
-  
+	const checkSelected = () => {
+		if (level > 1) {
+			$schedule_id = library.subset({
+				category_name: man.category_name,
+				schedule_name: man.schedule_name
+			}).first.schedule_id;
+		}
+		const spo: sp.Split = {};
+		if (level > 0) {
+			spo.category_name = man.category_name;
+		}
+		if (level > 1) {
+			spo.schedule_name = man.schedule_name;
+		}
+		if (level > 2) {
+			spo.manoeuvre = library
+				.subset({ category_name: man.category_name, schedule_name: man.schedule_name })
+				.only.manoeuvres.find((v) => v.short_name == man.manoeuvre_name);
+		}
+		if (level > stopLevel) {
+			onselected(spo);
+		}
+	};
 
 	const getKey = (level: number) => {
 		return Object.keys(man)[level] as keyof typeof man;
@@ -53,53 +78,53 @@
 
 	const setValue = (level: number, value: string | undefined) => {
 		man[getKey(level)] = value || getEmpty(level);
+    checkSelected();
 	};
 
 	let level: number = $derived(getLevel(man));
 
-  let sLevel: number = $derived(Math.min(level, stopLevel))
-
-
-	$effect(() => {
-		onselected(
-			new ManSplit(
-				level > 0 ? man.category_name : undefined,
-				level > 1 ? man.schedule_name : undefined,
-				level > 2
-					? library
-							.subset({ category_name: man.category_name, schedule_name: man.schedule_name })
-							.only.manoeuvres.find((v) => v.short_name == man.manoeuvre_name)
-					: undefined
-			)
-		);
-	});
-
-
+	let sLevel: number = $derived(Math.min(level, stopLevel));
 
 </script>
 
-<div class="btn-group" style="width: 250px;">
+<div class="btn-group">
 	{#if level > 0}
 		<button
 			class="btn btn-outline-secondary"
-			style="max-width: 50px;"
 			onclick={() => {
 				setValue(sLevel, undefined);
 				setValue(sLevel - 1, undefined);
+				ondeselect();
 			}}
-			title="Select Category">^</button
+			title="Go back to {getKey(sLevel-1).split("_")[0]} selection"
+			aria-label="Deselect"><span><i class="bi-arrow-90deg-left"></i></span></button
 		>
 	{/if}
-	<select
-		class="btn btn-outline-secondary"
-		value={Object.values(man)[sLevel]}
-		onchange={(e) => {
-			setValue(sLevel, (e.target as HTMLSelectElement).value);
-		}}
+
+	<button
+		class="btn btn-outline-secondary dropdown-toggle"
+		data-bs-toggle="dropdown"
+		aria-expanded="false"
+		aria-label="Toggle Dropdown"
+    title="Select {man[getKey(sLevel-1)]} {getKey(sLevel).split("_")[0]}"
 	>
-		<option selected disabled value={getEmpty(sLevel)}>{getEmpty(sLevel)}</option>
+		{man[getKey(sLevel)]}
+	</button>
+	<ul class="dropdown-menu">
 		{#each getlists[sLevel]() as cat}
-			<option value={cat}>{cat}</option>
+			<li>
+				<button
+					class="dropdown-item"
+					onclick={(e) => {
+						setValue(level, cat);
+						if (level <= stopLevel) {
+							e.stopPropagation();
+						}
+					}}
+				>
+					{cat}
+				</button>
+			</li>
 		{/each}
-	</select>
+	</ul>
 </div>
