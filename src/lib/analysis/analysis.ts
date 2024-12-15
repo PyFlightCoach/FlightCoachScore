@@ -155,6 +155,12 @@ export async function importAnalysis(data: Record<string, any>) {
 				if (res.mdef) {
 					setAnalysis(i, res);
 				} else {
+          const mdef = await loadManDef(
+            library.subset({
+              category_name: res.schedule.category,
+              schedule_name: res.schedule.name
+            }).first!.manoeuvres[res.id - 1].id
+          );
 					setAnalysis(
 						i,
 						new MA(
@@ -165,14 +171,9 @@ export async function importAnalysis(data: Record<string, any>) {
 							res.schedule,
 							res.scheduleDirection,
 							res.history,
-							res.k,
+							mdef.info.k,
 							res.flown,
-							await loadManDef(
-								library.subset({
-									category_name: res.schedule.category,
-									schedule_name: res.schedule.name
-								}).first!.manoeuvres[res.id - 1].id
-							)
+							mdef
 						)
 					);
 				}
