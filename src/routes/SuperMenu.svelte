@@ -10,7 +10,7 @@
 <NavMenu tooltip="Super User Menu">
 	<span slot="icon"><i class="bi bi-star"></i> </span>
 
-	{#if $user?.is_superuser}
+	{#if $user?.is_superuser || $dev}
 		<ServerSelection
 			title="Analysis Server"
 			options={Object.keys(an_servers)}

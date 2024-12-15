@@ -11,7 +11,7 @@
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
-	import { loading, dev, help } from '$lib/stores/shared';
+	import { loading, dev, help, windowHeight, windowWidth } from '$lib/stores/shared';
 
 
 	const md = new MarkdownIt();
@@ -50,6 +50,8 @@
 			});
 	});
 </script>
+
+<svelte:window bind:innerWidth={$windowWidth} bind:innerHeight={$windowHeight}/>
 
 <div class="container-fluid justify-content-center min-vh-100 d-flex flex-column">
 	<div class="row">

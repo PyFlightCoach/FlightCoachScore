@@ -10,6 +10,7 @@
 	import { manNames } from '$lib/stores/analysis';
 	import { loading, activeFlight } from '$lib/stores/shared';
 	import { goto } from '$app/navigation';
+  import {windowWidth} from '$lib/stores/shared';
 
 	export let f: Flight;
 
@@ -41,6 +42,7 @@
 </script>
 
 <div class="row">
+  {#if $windowWidth>=768}
 	<div class="col-md-4" style="max-height:300px;">
 		<Plot
 			data={[
@@ -62,10 +64,13 @@
 				},
 				margin: { l: 0, r: 0, t: 0, b: 0 }
 			}}
-			fillParent={true}
+      fillParent={true}
+			fillParentWidth={true}
+      fillParentHeight={true}
 		/>
 	</div>
-	<div class="col-md-4" style="max-height:300px;">
+  {/if}
+	<div class="col-6 col-md-4 overflow-scroll" style="max-height:300px;">
 		<ul class="list-group">
 			<li class="input-group">
 				<label class="input-group-text" for="set-privacy">Privacy</label>
@@ -143,7 +148,7 @@
 			</li>
 		</ul>
 	</div>
-	<div class="col-md-4 overflow-scroll" style="max-height:300px;">
+	<div class="col-6 col-md-4 overflow-scroll" style="max-height:300px;">
 		<table class="table table-sm table-responsive">
 			<thead>
 				<tr>

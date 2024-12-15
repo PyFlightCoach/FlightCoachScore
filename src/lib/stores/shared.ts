@@ -20,3 +20,5 @@ export const dev: Writable<boolean> = writable(isdev);
 export const help: Writable<string | undefined> = writable();
 
 
+export const windowWidth: Writable<number> = writable(1000); 
+export const windowHeight: Writable<number> = writable(1000); 

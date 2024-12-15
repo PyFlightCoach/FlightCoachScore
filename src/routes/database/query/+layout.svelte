@@ -1,28 +1,31 @@
 <script lang="ts">
-	import DbTable from '$lib/components/leaderboards/DBTable.svelte';
+	
 	import LeaderQuery from '$lib/components/leaderboards/LeaderQuery.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
 	import DBMenu from './DBMenu.svelte';
 	import { base } from '$app/paths';
 	import {updateTable} from '$lib/stores/leaderboards';
-	
+	import {windowWidth} from '$lib/stores/shared';
+  import { table_rows } from '$lib/stores/leaderboards';
+  
   export let data;
  
 
-	$: innerWidth = 0;
-	$: md = innerWidth >= 768;
+
+	$: md = $windowWidth >= 768;
 
   $: if (md) {
     $navBarContents = DBMenu;
   } else {
     $navBarContents = undefined;
   }
-  	
+
+  
 </script>
 
-<svelte:window bind:innerWidth />
 
-<div id="sidebar" class="{!md ? 'offcanvas offcanvas-start' : 'col-md-3 '} bg-light border overflow-scroll">
+
+<div id="sidebar" class="{!md ? 'offcanvas offcanvas-start' : 'col-md-3 show'} bg-light border overflow-scroll">
 	{#if !md}
 		<div class="offcanvas-header">
 			<h5 class="offcanvas-title" id="offcanvasExampleLabel">Search Controls</h5>
@@ -38,8 +41,15 @@
   </div>
 </div>
 
-<div class="col-md-9  px-0 ">
-	<slot />
+<div class="col-md-9 px-0 justify-content-center text-center" >
+  {#if !md && !$table_rows.length}
+    <div class="pt-5">
+      <a class="alert alert-primary btn "  href='#sidebar' data-bs-toggle="offcanvas">Open Sidebar to Search</a>
+    </div>
+    
+  {:else}
+	  <slot />
+  {/if}
 </div>
 
 {#if !md}
@@ -52,7 +62,6 @@
 						data-bs-toggle="offcanvas"
 						href="#sidebar"
 						role="button"
-						aria-controls="offcanvasExample"
 						aria-label="Toggle sidebar"
 					>
 						<i class="bi bi-list bi-lg py-2 p-1"></i>
