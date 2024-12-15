@@ -7,7 +7,7 @@
 
 	$: man = analyses[$selManID!];
 
-	let step: number = 0.5;
+	let step: number = 0.2;
 
 	$: elements = $man?.flown?.element;
 	$: end_info = $man?.flown?.end_info();

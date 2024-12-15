@@ -18,21 +18,21 @@
       activeEls.forEach((els, j) => {
         if (els.includes(k)) {
           ribbs = ribbon(
-            v, sp, {}, 
+            v, sp * ($isFullSize ? 20 : 5), {}, 
             {opacity: 0.8, showlegend:false, color: d3Color(j), name: k}
           );
         }
       })
       if (ribbs == null) {
         ribbs = ribbon(
-          v, sp, {}, 
+          v, sp * ($isFullSize ? 20 : 5), {}, 
           {opacity: 0.2, showlegend:false, color: 'grey', name: k}
         );
       }
       return ribbs;
 //      return ribbon(v, sp, {}, {opacity: 0.8, showlegend:false, color: d3Color(i), name: k});
     } else {
-      return ribbon(v, sp * ($isFullSize ? 10 : 3), {}, {opacity: 0.2, showlegend:false, color: d3Color(i), name: k});
+      return ribbon(v, sp * ($isFullSize ? 20 : 5), {}, {opacity: 0.2, showlegend:false, color: d3Color(i), name: k});
     }
   })
 

@@ -48,6 +48,7 @@
 				controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
 				fixRange
 				scale={0.2}
+        expand={40}
 			/>
 		{/if}
 	{:else}
@@ -60,6 +61,7 @@
 					controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
 					fixRange
 					scale={0.4}
+          expand={40}
 				/>
 			</div>
 
