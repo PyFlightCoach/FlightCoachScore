@@ -19,7 +19,7 @@
 	$: score = f.getScore($difficulty, $truncate, selectedVersion);
 
 	let targetPrivacy = f.meta.privacy;
-	let newComment = f.meta.comment;
+	$: newComment = f.meta.comment;
 
 	$: isAnalysisLoaded = f.meta.flight_id == $activeFlight?.meta.flight_id;
 
