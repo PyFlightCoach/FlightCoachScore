@@ -1,6 +1,6 @@
 import { manNames, bin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
-import { dev } from '$lib/stores/shared';
+import { dev, dataSource } from '$lib/stores/shared';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { importAnalysis } from '$lib/analysis/analysis';
@@ -14,7 +14,10 @@ export async function load() {
 				.then(importAnalysis)
 				.then(()=>fetch(base + '/flight.BIN'))
         .then(r=>r.blob())
-        .then(r=>{bin.set(new File([r], 'flight.BIN'))});
+        .then(r=>{
+          bin.set(new File([r], 'flight.BIN'));
+          dataSource.set('dev test');
+        });
 		} else {
 			goto(base + '/flight/create/data');
 		}

@@ -26,12 +26,10 @@
 		$isAnalysisModified;
 	$: canI = isNew || $user?.is_superuser || $activeFlight?.isMine;
 
-
-
 	const upload = async () => {
 		$loading = true;
 
-		form_state = 'Uploading...';
+		form_state = 'Uploading Analysis, this can take some time...';
 		const form_data = new FormData();
 		form_data.append(
 			'files',

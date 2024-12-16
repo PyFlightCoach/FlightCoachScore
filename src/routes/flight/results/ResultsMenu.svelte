@@ -2,7 +2,7 @@
 	import { base } from '$app/paths';
 	import { manNames, isComplete, bin } from '$lib/stores/analysis';
 	import { activeFlight } from '$lib/stores/shared';
-	import { analyseAll, clearAnalysis } from '$lib/analysis/analysis';
+	import { analyseAll, clearAnalysis, clearDataLoading } from '$lib/analysis/analysis';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { user } from '$lib/stores/user';
@@ -17,21 +17,17 @@
 
 {#if $manNames && $manNames.length > 0}
 	<button
-		class="nav-link"
+		class="nav-item nav-link"
+    title="clear all analysis data"    
+    data-bs-toggle="tooltip"
 		on:click={() => {
-			clearAnalysis();
+			clearDataLoading();
 			goto(base + '/');
 		}}
 	>
 		Clear
 	</button>
 	<ul class="nav-item pagination">
-		{#if $isComplete && $user && (isNewFlight || ($user.is_superuser && isMyFlight))}
-			<a
-				class="page-item nav-link {$page.url.pathname.endsWith('upload') ? 'active' : ''}"
-				href={base + '/flight/results/upload'}>{$activeFlight ? 'Update' : 'Upload'}</a
-			>
-		{/if}
 		<a
 			class="page-item nav-link {$page.url.pathname.endsWith('results') ? 'active' : ''}"
 			href={base + '/flight/results'}>Results</a

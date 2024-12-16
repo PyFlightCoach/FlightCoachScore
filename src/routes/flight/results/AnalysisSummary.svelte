@@ -5,7 +5,7 @@
 </script>
 
 <table
-	class="table table-sm table-hover table-bordered border-primary"
+	class="table table-sm table-hover table-bordered"
 	data-sveltekit-preload-data="tap"
 >
 	<thead>
@@ -17,18 +17,19 @@
 			<th scope="col" class="text-center">Inter</th>
 			<th scope="col" class="text-center">Box</th>
 			<th scope="col" class="text-center">Score</th>
-			<th
-				role="button"
+      <th scope="col" class="p-0">
+			<button
 				data-toggle="tooltip"
 				title="Run Remaining"
-				scope="col"
-				class="bg-primary text-center"
+				
+				class="btn btn-outline-primary btn-sm text-nowrap w-100"
 				on:click={() => analyseAll()}
         on:dblclick={() => analyseAll(true)}
       >
-        Run
-      </th>
-			<th scope="col" style="width:400px">Status</th>
+        Run All
+      </button>
+    </th>
+			<th scope="col" style="max-width:200px">Status</th>
 		</tr>
 	</thead>
 	<tbody>

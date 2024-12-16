@@ -90,11 +90,11 @@
 	{#if isRunning}
 		<td class="bg-warning text-center">Busy</td>
 	{:else}
-		<td
+  <td class="p-0 text-center">
+		<button
 			data-toggle="tooltip"
-			title="ReRun {$ma?.name}"
-			role="button"
-			class="bg-secondary text-center"
+			title="Analyse {$ma?.name}"
+			class="btn btn-sm btn-outline-secondary w-100"
 			on:click={() => {
 				analyseManoeuvre(id);
 			}}
@@ -103,11 +103,13 @@
 			}}
 		>
 			Run
-		</td>
+		</button>
+  </td>
 	{/if}
 
 	<td>
-		<span class="small text-nowrap text-muted w-100">
+    <div style="max-width:300px" class="overflow-scroll">
+		<span class="small text-nowrap text-muted w-100 overflow-scroll">
 			{$info}
 			{#if $info && !isRunning && !$info.includes('Imported') && score == 0}
 				<a
@@ -118,13 +120,12 @@
 					role="button"
 					class="text-sm"
 					on:click={() => activate_man(id, 'alignment')}
-					title="Failed analyses or unexpectedly low scores may be a result of a poor element alignment. Go
-					the the alignment page to check and fix it for this manoeuvre. Alternatively try flying
-					better."
+					title="Failed analyses or unexpectedly low scores may be a result of a failed element alignment. Go to the the alignment page to check and fix it for this manoeuvre."
 				>
 					Check Alignment
 				</a>
 			{/if}
 		</span>
+  </div>
 	</td>
 </tr>

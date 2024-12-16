@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { GPS, Quaternion, Point } from '$lib/analysis/geometry';
 import { analysisServer } from '$lib/api';
 import _ from 'lodash';
@@ -35,7 +36,7 @@ export class Origin {
 
 	static load() {
 		if (
-			['orginLat', 'orginLon', 'orginAlt', 'orginHead']
+			browser && ['orginLat', 'orginLon', 'orginAlt', 'orginHead']
 				.map((key) => localStorage.getItem(key))
 				.every((v) => v)
 		) {
