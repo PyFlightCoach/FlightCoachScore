@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { binData, origin, fcj, bin, bootTime, states } from '$lib/stores/analysis';
+  import {clearDataLoading} from '$lib/analysis/analysis';
   import {dataSource} from '$lib/stores/shared';
 	import FlightDataReader from '$lib/components/FlightDataReader.svelte';
 	import { BoxReader } from '$lib/components/box';
@@ -7,25 +8,25 @@
 	import PlanViewPlot from '$lib/components/plots/PlanViewPlot.svelte';
 	import { base } from '$app/paths';
 	import { GPS } from '$lib/analysis/geometry';
-	import { Origin } from '$lib/analysis/fcjson';
+	
   
 	let inputMode: 'bin' | 'fcj' | 'state' = 'bin';
 	let form_state: string | undefined;
   let target: GPS | undefined;
   let isDuplicate: boolean = false;
 	$: if (inputMode) {
-		$bin = undefined;
-		$binData = undefined;
-		$bootTime = undefined;
-		$fcj = undefined;
-		$states = undefined;
+		//$bin = undefined;
+		//$binData = undefined;
+		//$bootTime = undefined;
+		//$fcj = undefined;
+		//$states = undefined;
 		if (inputMode != 'bin') {
 			form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
 		} else {
 			form_state = undefined;
 		}
 	}
-  $origin = Origin.load();
+  
   $: console.debug($origin);
   $: if ($binData) {
     target=new GPS($binData.pos.Lat[0], $binData.pos.Lng[0], $binData.pos.Alt[0]);
@@ -55,6 +56,7 @@
 			bind:states={$states}
 			bind:inputMode
       bind:isDuplicate
+      onBeforeLoad={clearDataLoading}
 		/>
 
 		{#if form_state}

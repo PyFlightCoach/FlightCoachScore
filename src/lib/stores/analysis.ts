@@ -4,6 +4,7 @@ import { States } from '$lib/analysis/state';
 import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { BinData } from '$lib/components/bin/bindata';
+import { type Split, takeOff } from '$lib/analysis/splitting';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 
@@ -23,6 +24,8 @@ states.subscribe((sts: States | undefined) => {
 			: false
 	);
 });
+
+export const manSplits: Writable<Split[]> = writable([takeOff()]);
 
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);

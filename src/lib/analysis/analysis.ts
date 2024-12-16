@@ -13,6 +13,8 @@ import JSZip from 'jszip';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { Flight } from '$lib/database/flight';
+import { takeOff } from '$lib/analysis/splitting';
+import { Origin } from '$lib/analysis/fcjson';
 
 export function checkComplete() {
 	return Boolean(get(sts.manNames)?.length && sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!])) ;
@@ -54,25 +56,38 @@ function setAnalysis(i: number, man: MA) {
 }
 
 export function clearAnalysis() {
+  console.log('clearing analysis');
 	activeFlight.set(undefined);
 	sts.selManID.set(undefined);
-	sts.states.set(undefined);
 	sts.manNames.set(undefined);
 	sts.scores.set(undefined);
 	sts.selectedResult.set(undefined);
 	sts.fa_versions.set([]);
-	sts.binData.set(undefined);
-	sts.bootTime.set(undefined);
-	sts.origin.set(undefined);
-	sts.fcj.set(undefined);
-	sts.bin.set(undefined);
 	sts.analyses.length = 0;
 	sts.running.set([]);
 	sts.runInfo.length = 0;
 	activeFlight.set(undefined);
 	isAnalysisModified.set(undefined);
-	dataSource.set(undefined);
 }
+
+
+export function clearDataLoading () {
+  console.log('clearing data loading');
+	sts.states.set(undefined);
+	sts.binData.set(undefined);
+	sts.bootTime.set(undefined);
+	sts.origin.set(Origin.load());
+	sts.fcj.set(undefined);
+	sts.bin.set(undefined);
+  sts.manSplits.set([takeOff()]);
+	dataSource.set(undefined);
+  clearAnalysis();
+}
+
+
+sts.manSplits.subscribe(() => {
+  clearAnalysis();
+});
 
 export async function newAnalysis(states: States, split: Splitting) {
 	setupAnalysisArrays(split.manNames);
@@ -140,7 +155,7 @@ export async function exportAnalysis(small: boolean = false) {
 }
 
 export async function importAnalysis(data: Record<string, any>) {
-	clearAnalysis();
+	clearDataLoading();
 	sts.origin.set(data.origin);
 	sts.isCompFlight.set(data.isComp);
 	sts.bootTime.set(data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined);

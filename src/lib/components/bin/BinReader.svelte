@@ -5,11 +5,11 @@
 	import { md5 } from 'js-md5';
 	const worker = new BINWorker();
 
-  let bin: File | undefined = $state();
 	let binData: BinData | undefined = $state();
 	let bootTime: Date | undefined = $state();
 	let md5Sum: string | undefined = $state();
 	let {
+    bin = undefined,
 		messages = $bindable(['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'ORGN']),
 		busy = $bindable(false),
 		download = false,
@@ -17,11 +17,12 @@
     loadOnChange = true,
 		onloaded = () => {}
 	}: {
-		messages: string[];
-		busy: boolean;
-		download: boolean;
-		clear: boolean;
-    loadOnChange: boolean;
+    bin?: File;
+		messages?: string[];
+		busy?: boolean;
+		download?: boolean;
+		clear?: boolean;
+    loadOnChange?: boolean;
 		onloaded: (bin: File, binData: BinData, bootTime: Date, md5Sum: string) => void;
 	} = $props();
 
@@ -99,12 +100,9 @@
 		for="bininput"
 		class="btn btn-outline-secondary form-control text-nowrap"
 		style:overflow="hidden"
-		>{#if files && files.length > 0}
-			{files[0].name}
-		{:else}
-			Select File
-		{/if}</label
-	>
+		>
+    {bin?.name || (files && files[0].name) || 'Select File'}
+  </label>
 	<input
 		id="bininput"
 		class="form-control"

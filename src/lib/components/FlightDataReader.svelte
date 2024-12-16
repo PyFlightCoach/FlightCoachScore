@@ -3,7 +3,7 @@
 	import { FCJson } from '$lib/analysis/fcjson';
 	import { States } from '$lib/analysis/state';
 	import { dbServer } from '$lib/api';
-
+  
 	export let binData: BinData | undefined;
 	export let bin: File | undefined;
 	export let bootTime: Date | undefined;
@@ -11,6 +11,7 @@
 	export let states: States | undefined;
 	export let inputMode = 'bin';
 	export let isDuplicate: boolean = false;
+  export let onBeforeLoad: () => void;
 	let md5: string | undefined = undefined;
 	let files: FileList | undefined;
 
@@ -53,7 +54,9 @@
 	<div class="col" style:overflow="hidden" id="data-file-input">
 		{#if inputMode === 'bin'}
 			<BinReader
+        bin={bin}
 				onloaded={(...data) => {
+          onBeforeLoad();
 					[bin, binData, bootTime, md5] = data;
 					dbServer
 						.get(`flight/check_duplicate/${md5}`)
@@ -63,7 +66,7 @@
             })
 						.catch(e => {
 							isDuplicate = true;
-							console.debug(e);
+							console.debug(e);parseFile
 						});
 				}}
 			/>
@@ -88,6 +91,7 @@
 				style="display:none"
 				on:change={() => {
 					if (files && files.length) {
+            onBeforeLoad();
 						parseFile(files[0]);
 					}
 				}}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/analysis/analysis';
-	import { isCompFlight, states, fcj, bin } from '$lib/stores/analysis';
+	import { states, fcj, bin, manSplits } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/analysis/fcjson';
@@ -11,28 +11,18 @@
 
 	loadKnowns();
 
-	let mans = $state([ms.takeOff()]);
+  let mans = $state($manSplits);
+
+  $effect(() => {
+    $manSplits = mans;
+  });
 
 	let activeManId: number = $state(0);
 	let activeIndex: number = $state(0);
 
-//	let lastAllowedIndex = $derived(
-//		activeManId == mans.length - 1
-//			? $states!.data.length - 1
-//			: mans[activeManId + 1].stop || $states!.data.length - 1
-//	);
-
 	let range: [number, number] = $state([0, Math.min(3000, $states!.data.length - 1)]);
 
   $inspect('range:', range);
-
-//	$effect(() => {
-//		if (range[1] > lastAllowedIndex) {
-//      range = [range[0], lastAllowedIndex];
-//		} else if (range[1] <= range[0]) {
-//      range = [range[0], range[0] + 1];
-//		}
-//	});
 
 	let canAdd: boolean = $derived(
 		Boolean(
@@ -71,13 +61,10 @@
 	};
 
 	const reset = () => {
-		activeManId = 0;
-		
-    
+		activeManId = 0;    
     mans.length = 1;
     mans[0] = ms.takeOff();
     resetRange();
-  
 	};
 
 	const setRange = () => {
@@ -179,7 +166,7 @@
 				<button
 					id="clear-splitting"
 					class="btn btn-outline-secondary form-control-sm col-4"
-					onclick={reset}
+					onclick={()=>{$fcj = undefined; reset();}}
 				>
 					Clear
 				</button>

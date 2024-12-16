@@ -3,10 +3,11 @@
 	import { base } from '$app/paths';
 	import { manNames, bin } from '$lib/stores/analysis';
 	import {
-		clearAnalysis,
 		exportAnalysis,
 		loadExample,
-		importAnalysis
+		importAnalysis,
+		clearDataLoading
+
 	} from '$lib/analysis/analysis';
 	import { goto } from '$app/navigation';
 	import { saveAs } from 'file-saver';
@@ -39,7 +40,7 @@
 		<button
 			class="dropdown-item"
 			on:click={() => {
-				clearAnalysis();
+				clearDataLoading();
         if ($page.url.pathname.includes('/flight/')) {
           goto(base +'/');
         }
