@@ -83,7 +83,7 @@
 			<div id="passwordhelp" class="form-text">Minimum of ten characters</div>
 		</div>
 
-		<div class="mb-3">
+		<div class="mb-3" style="font-family: 'Twemoji Country Flags', sans-serif !important" >
 			<label for="country" class="form-label">Country</label>
 			<select class="form-select" id="country" name="country" required>
 				{#each countries as c}

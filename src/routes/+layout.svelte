@@ -2,6 +2,7 @@
 	import 'bootstrap/dist/css/bootstrap.min.css';
 	import 'bootstrap/dist/js/bootstrap.min.js';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
+	import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 
 	import MarkdownIt from 'markdown-it';
 	import MainNavBar from './MainNavBar.svelte';
@@ -14,6 +15,8 @@
 	import { loading, dev, help, windowHeight, windowWidth } from '$lib/stores/shared';
 
 
+	polyfillCountryFlagEmojis();
+	
 	const md = new MarkdownIt();
 
 	$: if ($page) {
