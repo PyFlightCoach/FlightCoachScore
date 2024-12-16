@@ -11,7 +11,7 @@ export const isCompFlight: Writable<boolean> = writable(true);
 export const bin: Writable<File | undefined> = writable();
 export const binData: Writable<BinData | undefined> = writable();
 export const bootTime: Writable<Date | undefined> = writable();
-export const origin: Writable<Origin | undefined> = writable();
+export const origin: Writable<Origin | undefined> = writable(Origin.load());
 export const fcj: Writable<FCJson | undefined> = writable();
 export const states: Writable<States | undefined> = writable();
 

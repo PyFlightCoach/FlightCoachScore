@@ -18,10 +18,11 @@
   });
 
 	let activeManId: number = $state(0);
-	let activeIndex: number = $state(0);
+	
+  
 
-	let range: [number, number] = $state([0, Math.min(3000, $states!.data.length - 1)]);
-
+	let range: [number, number] = $state([0, mans[0].stop || Math.min(3000, $states!.data.length - 1)]);
+  let activeIndex: number = $state(range[1]);
   $inspect('range:', range);
 
 	let canAdd: boolean = $derived(
