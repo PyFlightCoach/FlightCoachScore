@@ -17,9 +17,9 @@ export class Flight {
 	static async load(flight_id: string) {
 		const meta = await dbServer.get(`flight/${flight_id}`);
 		const schedule = await safeGetLibrary().then(
-			(lib) => lib.subset({ schedule_id: meta.schedule_id }).only
+			(lib) => lib.subset({ schedule_id: meta.data.schedule_id }).only
 		);
-		return new Flight(meta, schedule);
+		return new Flight(meta.data, schedule);
 	}
 
 	getScore(difficulty: number, truncate: boolean, version: string): DBFlightScore {

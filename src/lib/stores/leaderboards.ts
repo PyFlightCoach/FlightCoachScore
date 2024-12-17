@@ -49,8 +49,9 @@ export const updateTable = async () => {
   console.debug(q);
   const _method = get(sort_by_score_flag) ? 'leaderboard' : 'flightlist';
   if (await checkUser()) {
-    dbServer.get('analysis/' + _method, q).then((res) => {
-      table_rows.set(res.results.map((row: DBFlightRanked | DBFlightScore) => {
+    
+    dbServer.get('analysis/' + _method + '?' + new URLSearchParams(q).toString()).then((res) => {
+      table_rows.set(res.data.results.map((row: DBFlightRanked | DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));
     });

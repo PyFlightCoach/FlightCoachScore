@@ -199,7 +199,7 @@ export async function importAnalysis(data: Record<string, any>) {
 
 export async function loadExample() {
 	await analysisServer.get('example').then((res) => {
-		importAnalysis(res);
+		importAnalysis(res.data);
     dataSource.set('example');
 	});
 }
@@ -208,8 +208,8 @@ export async function loadAnalysisFromDB(flight_id: string) {
 	const zip = new JSZip();
 
 	await dbServer
-		.get(`flight/ajson/${flight_id}`, undefined, 'arrayBuffer')
-		.then(response => zip.loadAsync(response))
+		.get(`flight/ajson/${flight_id}`, {responseType: 'arraybuffer'})
+		.then(response => zip.loadAsync(response.data))
 		.then(res => Object.values(res.files)[0].async('string'))
 		.then(ajson => JSON.parse(ajson))
 		.then(importAnalysis)
@@ -243,7 +243,7 @@ export async function analyseManoeuvre(
 ) {
 	const ma = get(sts.analyses[id]);
 
-	const isReRun = Object.keys(ma!.history).includes(await analysisServer.get('fa_version'));
+	const isReRun = Object.keys(ma!.history).includes((await analysisServer.get('fa_version')).data);
 
 	if (optimise === undefined) {
 		optimise = !isReRun;

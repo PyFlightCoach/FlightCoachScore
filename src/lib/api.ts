@@ -1,69 +1,11 @@
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type Writable, writable, get } from 'svelte/store';
 import { dev } from '$app/environment';
+import axios, {type AxiosInstance }  from 'axios';
 
-export class Server {
-	constructor(readonly address: string) {}
 
-	async handleResponse(response: Response, key: keyof Response = 'json') {
-		if (response.ok) {
-			console.debug(`${this.address}: OK`);
-			try {
-				return typeof response[key] === 'function' ? await response[key]() : response[key];
-			} catch {
-				return;
-			}
-		} else {
-			throw new Error(
-				`${this.address}: Error ${response.statusText}: ${(await response.json()).detail}`
-			);
-		}
-	}
 
-	async fetch(
-		method: string,
-		path: string,
-		cookie: string | undefined = undefined,
-		data: Record<string, unknown> | FormData | undefined = undefined,
-		key: keyof Response = 'json'
-	) {
-		const _path = `${this.address}/${path.replace(/^\/+/g, '')}`;
-		const _request: RequestInit = {
-			method: method,
-			headers: {
-				...(cookie ? { Cookie: cookie } : {}),
-				...(data && !(data instanceof FormData) ? { 'Content-Type': 'application/json' } : {})
-			},
-			credentials: 'include',
-			...(data ? { body: data instanceof FormData ? data : JSON.stringify(data) } : {})
-		};
-		return await this.handleResponse(await fetch(_path, _request), key);
-	}
-
-	async get(
-		path: string,
-		data: Record<string, string> | FormData | undefined = undefined,
-		key: keyof Response = 'json'
-	) {
-		if (data) {
-			path += '?' + new URLSearchParams(data).toString();
-		}
-		return await this.fetch('GET', path, undefined, undefined, key);
-	}
-
-	async post(path: string, data: Record<string, unknown> | FormData, key: keyof Response = 'json') {
-		return await this.fetch('POST', path, undefined, data, key);
-	}
-
-	async patch(
-		path: string,
-		data: Record<string, unknown> | FormData,
-		key: keyof Response = 'json'
-	) {
-		return await this.fetch('PATCH', path, undefined, data, key);
-	}
-}
-
+// The rest is all logic to handle the selection of analysis and db server addesses
 export function jsonEscapeUTF(s: string) {
 	return s.replace(
 		/[^\x20-\x7F]/g,
@@ -79,9 +21,8 @@ export function formDataFromDict(data: unknown) {
 	return fd;
 }
 
-// The rest is all logic to handle the selection of analysis and db server addesses
 
-export let analysisServer: Server;
+export let analysisServer: AxiosInstance;
 export const anServerAddress: Writable<string> = writable();
 
 export const customAnalysisServer = newCookieStore('customAnalysisServer', 'http://localhost:5000');
@@ -113,14 +54,16 @@ customAnalysisServer.subscribe((value) => {
 export const faVersion: Writable<string | undefined> = writable(undefined);
 
 anServerAddress.subscribe((value: string) => {
-	analysisServer = new Server(value);
-	analysisServer
+	analysisServer = axios.create({
+    baseURL: value,
+  });
+  analysisServer
 		.get('fa_version')
 		.then((res) => faVersion.set(res))
 		.catch(() => faVersion.set(undefined));
 });
 
-export let dbServer: Server;
+export let dbServer: AxiosInstance;
 export const dbServerAddress: Writable<string> = writable();
 
 export const customDbServer = newCookieStore('customDbServer', 'http://localhost:8000');
@@ -147,7 +90,11 @@ customDbServer.subscribe((value) => {
 });
 
 dbServerAddress.subscribe((value: string) => {
-	dbServer = new Server(value);
+	dbServer = axios.create({
+    baseURL: value,
+    withCredentials: true
+  });
+  
 });
 
 if (!dev) {

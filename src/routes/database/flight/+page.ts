@@ -9,7 +9,7 @@ export async function load({url}) {
     return { status: 404, error: new Error("Flight ID not found") };
   }
   const flight = await Flight.load(flight_id);
-  const mans = (await dbServer.get(`flight/view/${flight_id}`)).mans.map(v=>States.parse(v.flown));
+  const mans = (await dbServer.get(`flight/view/${flight_id}`)).data.mans.map(v=>States.parse(v.flown));
 
 
   return { flight: flight, mans: mans };

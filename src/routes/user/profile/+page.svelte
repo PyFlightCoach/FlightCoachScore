@@ -24,7 +24,7 @@
 			form_state = undefined;
 			const res = await dbServer.patch('users/me', userUpdate);
 
-			$user = await dbServer.get('users/me');
+			$user = (await dbServer.get('users/me')).data;
 			form_state = 'Your profile has been updated.';
 			await invalidateAll();
 		} catch (error) {

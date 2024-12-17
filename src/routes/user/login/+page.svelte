@@ -26,7 +26,7 @@
 				form_state = 'Sign in has failed; please check your credentials.';
 				return;
 			}
-			$user = await dbServer.get('users/me');
+			$user = (await dbServer.get('users/me')).data;
 
 			goto(previousPage);
 		} catch (error) {

@@ -51,7 +51,7 @@ export class MA {
 	async run(optimise: boolean ) {    
     
 		try {
-			const res = await analysisServer.post(
+			const res = (await analysisServer.post(
 				'analyse',
 				{
 					id: this.id,
@@ -61,7 +61,7 @@ export class MA {
 					origin: get(origin),
 					schedule_direction: this.scheduleDirection,
 				},
-			);
+			)).data;
 			selectedResult.set(res.fa_version);
 			runInfo[this.id - 1].set(res.info);
 

@@ -45,7 +45,7 @@
 			.get('/users/me')
 			.then((res) => {
 				if (res) {
-					user.set(res);
+					user.set(res.data);
 				}
 			})
 			.catch((e) => {

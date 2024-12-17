@@ -12,7 +12,8 @@ const userCheckInterval: Writable<undefined | number> = writable();
 export async function checkUser() {
 	return dbServer
 		.get('users/me')
-		.then((me: DBUser) => {
+		.then((res) => {
+      const me = res.data as DBUser;
 			user.set(me);
 			if (me.is_verified) {
 				return true;
@@ -42,7 +43,7 @@ user.subscribe((value) => {
 				dbServer
 					.get('users/me')
 					.then((me) => {
-						console.debug(`${me.first_name} ${me.last_name} still logged in`);
+						console.debug(`${me.data.first_name} ${me.data.last_name} still logged in`);
 					})
 					.catch(() => {
 						console.log('User logged out');

@@ -9,12 +9,10 @@ export async function load({ url }) {
 	}
 
 	console.debug(email);
-	try {
-		await dbServer.post('auth/request-verify-token', { email: email });
-		return {
+	await dbServer.post('auth/request-verify-token', { email: email })
+    .then(()=>{ return{
 			request_result: `An email has been sent to ${email}. Please follow the instructions in that email to verify your account.`
-		};
-	} catch {
-		return { request_result: `Verification for ${email} has failed.  Please try again later.` };
-	}
+		}})
+    .catch(()=>{ return { request_result: `Verification for ${email} has failed.  Please try again later.` }});
+
 }

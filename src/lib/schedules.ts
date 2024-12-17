@@ -21,8 +21,8 @@ export interface ScheduleRequest {
 }
 
 export async function loadSchedules(request: ScheduleRequest): Promise<DBSchedule[]> {
-	const schedules = await dbServer.get(`schedule/schedules`, request);
-	return schedules.results;
+	const schedules = await dbServer.get(`schedule/schedules`, request as Record<string, never>);
+	return schedules.data.results;
 }
 
 export class ScheduleLibrary {
@@ -105,7 +105,7 @@ export async function loadKnowns() {
 };
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
-	return dbServer.get(`schedule/manoeuvre/definition/${manoeuvre_id}`).then((r) => ManDef.parse(r));
+	return dbServer.get(`schedule/manoeuvre/definition/${manoeuvre_id}`).then((r) => ManDef.parse(r.data));
 }
 
 export async function safeGetLibrary() {

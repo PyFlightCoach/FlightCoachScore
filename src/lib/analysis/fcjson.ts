@@ -115,7 +115,7 @@ export class ScheduleInfo {
 
 	async to_pfc() {
 		return await analysisServer.post('/convert_schedule_info', this).then((sinfo) => {
-			return Object.setPrototypeOf(sinfo, ScheduleInfo.prototype);
+			return Object.setPrototypeOf(sinfo.data, ScheduleInfo.prototype);
 		});
 	}
 
@@ -124,7 +124,7 @@ export class ScheduleInfo {
 	}
 
 	async direction_definition() {
-		return await analysisServer.get(`/${this.category}/${this.name}/direction_definition`);
+		return (await analysisServer.get(`/${this.category}/${this.name}/direction_definition`)).data;
 	}
 }
 

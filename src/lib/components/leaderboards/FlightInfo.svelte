@@ -31,9 +31,9 @@
 		const fd = new FormData();
 		fd.append('privacy', targetPrivacy);
 		fd.append('comment', newComment);
-		dbServer.patch(`flight/${f.meta.flight_id}`, fd).then((res) => {
+		dbServer.patch(`flight/${f.meta.flight_id}`, fd).then(() => {
 			dbServer.get(`flight/${f.meta.flight_id}`).then((res) => {
-				f = new Flight(res, f.schedule);
+				f = new Flight(res.data, f.schedule);
 				targetPrivacy = f.meta.privacy;
 				newComment = f.meta.comment;
 			});

@@ -57,7 +57,7 @@
 			console.debug('1 - Uploading ', $bin?.name);
 			dbServer
 				.post('flight', form_data)
-				.then((r) => Flight.load(r.id))
+				.then((r) => Flight.load(r.data.id))
 				.then((f) => {
 					activeFlight.set(f);
 					form_state = 'Upload Successful';
