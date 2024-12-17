@@ -101,7 +101,7 @@
 			/>
 		</div>
 
-		<div class="mb-3">
+		<div class="mb-3" style="font-family: 'Twemoji Country Flags', sans-serif !important">
 			<label for="country" class="form-label">Country</label>
 			<select
 				class="form-select"

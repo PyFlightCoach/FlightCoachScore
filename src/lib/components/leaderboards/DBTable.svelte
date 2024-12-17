@@ -65,6 +65,7 @@
 					<tr
 						class={row.flight_id == $activeFlight?.meta.flight_id ? 'table-active' : ''}
 						role="button"
+						style="font-family: 'Twemoji Country Flags', sans-serif !important" 
 						on:click={() => {
 							if (showID == row.flight_id) {
 								showID = undefined;
