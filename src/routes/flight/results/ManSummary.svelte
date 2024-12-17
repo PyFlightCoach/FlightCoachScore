@@ -108,7 +108,7 @@
 	{/if}
 
 	<td>
-    <div style="max-width:300px" class="overflow-scroll">
+    <div >
 		<span class="small text-nowrap text-muted w-100 overflow-scroll">
 			{$info}
 			{#if $info && !isRunning && !$info.includes('Imported') && score == 0}
