@@ -26,7 +26,7 @@
 </script>
 
 <div class="row">
-<label for="box-file-input" class="col">Select Box File:</label>
+<label for="box-file-input" class="col col-form-label">Select Box File:</label>
 <div class="col" style:overflow="hidden" id="box-file-input">
 <label
 	for="boxfile"

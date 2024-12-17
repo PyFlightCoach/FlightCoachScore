@@ -11,32 +11,34 @@
 
 	loadKnowns();
 
-  let mans = $state($manSplits);
+	let mans = $state($manSplits);
 
-  $effect(() => {
-    $manSplits = mans;
-  });
+	$effect(() => {
+		$manSplits = mans;
+	});
 
 	let activeManId: number = $state(0);
-	
-  
 
-	let range: [number, number] = $state([0, mans[0].stop || Math.min(3000, $states!.data.length - 1)]);
-  let activeIndex: number = $state(range[1]);
-  $inspect('range:', range);
+	let range: [number, number] = $state([
+		0,
+		mans[0].stop || Math.min(3000, $states!.data.length - 1)
+	]);
+	let activeIndex: number = $state(range[1]);
+	$inspect('range:', range);
 
 	let canAdd: boolean = $derived(
 		Boolean(
-			mans.length && (mans[mans.length - 1].manoeuvre ||
-				(mans[mans.length - 1].alternate_name &&
-					mans[mans.length - 1].alternate_name != 'Landing')) &&
+			mans.length &&
+				(mans[mans.length - 1].manoeuvre ||
+					(mans[mans.length - 1].alternate_name &&
+						mans[mans.length - 1].alternate_name != 'Landing')) &&
 				mans[mans.length - 1].stop
 		)
 	);
 
 	const resetRange = () => {
 		let newStop = mans[activeManId].stop;
-    let newStart = activeManId == 0 ? 0 : mans[activeManId - 1].stop!;
+		let newStart = activeManId == 0 ? 0 : mans[activeManId - 1].stop!;
 		if (!newStop) {
 			if (activeManId == 0) {
 				newStop = $states!.data.length / 8;
@@ -62,44 +64,43 @@
 	};
 
 	const reset = () => {
-		activeManId = 0;    
-    mans.length = 1;
-    mans[0] = ms.takeOff();
-    resetRange();
+		activeManId = 0;
+		mans.length = 1;
+		mans[0] = ms.takeOff();
+		resetRange();
 	};
 
 	const setRange = () => {
-    const lastAllowedIndex = activeManId == mans.length - 1
-			? $states!.data.length - 1
-			: mans[activeManId + 1].stop || $states!.data.length - 1;
-	
-    if (activeIndex > lastAllowedIndex) {
-      alert ('Cannot set point beyone the end of the next manoeuvre');
-      activeIndex = lastAllowedIndex-1;
-    } else {
-      mans[activeManId].stop = activeIndex;
-      resetRange();
-    }
-		
+		const lastAllowedIndex =
+			activeManId == mans.length - 1
+				? $states!.data.length - 1
+				: mans[activeManId + 1].stop || $states!.data.length - 1;
+
+		if (activeIndex > lastAllowedIndex) {
+			alert('Cannot set point beyone the end of the next manoeuvre');
+			activeIndex = lastAllowedIndex - 1;
+		} else {
+			mans[activeManId].stop = activeIndex;
+			resetRange();
+		}
 	};
 
 	const loadMansFromFCJ = async () => {
 		if ($fcj) {
 			reset();
-			const fcjsplits = await ms.parseFCJMans($fcj, $states!)
-      for (const man of fcjsplits) {
-        if (man.manoeuvre) {
-          await loadManDef(man.manoeuvre!.id).then(
-            md => {man.mdef = md}
-          );
-        } 
-        if (man.alternate_name == 'TakeOff') {
-          mans[0] = man;
-        } else {
-          mans.push(man);  
-        }
-        
-      }
+			const fcjsplits = await ms.parseFCJMans($fcj, $states!);
+			for (const man of fcjsplits) {
+				if (man.manoeuvre) {
+					await loadManDef(man.manoeuvre!.id).then((md) => {
+						man.mdef = md;
+					});
+				}
+				if (man.alternate_name == 'TakeOff') {
+					mans[0] = man;
+				} else {
+					mans.push(man);
+				}
+			}
 
 			activeManId = 1;
 			resetRange();
@@ -135,11 +136,14 @@
 	}}
 />
 
-<div class="col-3 pt-2">
-	<div class="row bg-light border pt-2">
-		{#if $bin || $fcj}
-			<span>Source File: {$bin?.name || $fcj?.name || 'unknown'}</span>
+<div class="col-md-4 pt-3 bg-light border mh-100 d-flex flex-column overflow-scroll"  style="max-height: 100%;">
+	<div class="row">
+  {#if $bin || $fcj}
+      <span class="col-auto">Source File:</span>
+			<span class="col text-nowrap overflow-scroll">{$bin?.name || $fcj?.name || 'unknown'}</span>
 		{/if}
+  </div>
+  <div class="row pt-2">
 		{#if mans.length == 1}
 			<div class="row mb-2">
 				<label for="load-fcj" class="col-8 col-form-label">Load FC Json File:</label>
@@ -151,37 +155,39 @@
 							style="display: none;"
 							accept=" .json"
 							onchange={(e: Event) => {
-                const files = (e.target as HTMLInputElement).files!;
+								const files = (e.target as HTMLInputElement).files!;
 								if (files.length > 0) {
 									parseFCJ(files[0]);
 								}
 							}}
 						/>
-						<span>Parse FCJ</span>
+						<span>Browse</span>
 					</label>
 				</div>
 			</div>
 		{:else}
-			<div class="row">
-				<label for="clear-splitting" class="col-8">Clear Manoeuvres:</label>
+			<div class="row pt-2">
+				<label for="clear-splitting" class="col col-form-label">Clear Manoeuvres:</label>
 				<button
 					id="clear-splitting"
-					class="btn btn-outline-secondary form-control-sm col-4"
-					onclick={()=>{$fcj = undefined; reset();}}
+					class="btn btn-outline-secondary form-control-sm col"
+					onclick={() => {
+						$fcj = undefined;
+						reset();
+					}}
 				>
 					Clear
 				</button>
 			</div>
 		{/if}
 	</div>
-
-	<div class="row bg-light border">
-		<small>Manoeuvres</small>
+	<hr />
+	<div class="row">
 		<table class="table-sm align-middle text-center">
 			<thead>
 				<tr>
 					<th scope="col" class="col-1"></th>
-					<th scope="col" class="col-2">Manoeuvre</th>
+					<th scope="col" class="col-2 text-start">Manoeuvre</th>
 					<th colspan="2" scope="col" class="col-7">Action</th>
 				</tr>
 			</thead>
@@ -277,24 +283,24 @@
 			</tbody>
 		</table>
 	</div>
+
 	{#if mans.length && mans[mans.length - 1].alternate_name == 'Landing'}
-		<div class="container bg-light border">
-			<div class="row">
-				<button
-					class="btn btn-outline-primary form-control-sm"
-					onclick={() => {
-						newAnalysis($states!, new ms.Splitting(mans));
-						goto(base + '/flight/results');
-					}}
-				>
-					Complete
-				</button>
-			</div>
+		<hr />
+		<div class="row">
+			<button
+				class="btn btn-outline-primary form-control-sm"
+				onclick={() => {
+					newAnalysis($states!, new ms.Splitting(mans));
+					goto(base + '/flight/results');
+				}}
+			>
+				Complete
+			</button>
 		</div>
 	{/if}
 </div>
 
-<div class="col-9">
+<div class="col-md-8">
 	{#if $states}
 		<PlotSec
 			bind:i={activeIndex}

@@ -7,6 +7,7 @@
 	import PilotHeading from './PilotHeading.svelte';
 	import FCSites from './FCSites.svelte';
 	import { GPS } from '$lib/analysis/geometry';
+  import {siteInputMode} from '$lib/stores/shared';
 	const { saveAs } = pkg;
 
 	export let origin: Origin | undefined;
@@ -19,33 +20,33 @@
 		}
 	}
 
-	let inputMode = origin ? 'ph' : 'fcsites';
-
 	const inputNames: Record<string, string> = {
 		fcsites: 'Flight Coach Sites',
 		pc: 'Pilot, Centre',
 		ph: 'Pilot, Heading',
 		fcj: 'F3A Zone / FC JSON File',
-		bin: 'BIN File'
+		//bin: 'BIN File'
 	};
 </script>
 
-<div class="row mt-2 mb-3">
-	<label class="col" for="box-input-mode">Select Box Input Mode: </label>
-	<select class="col form-select" id="data-input-mode" bind:value={inputMode}>
+<div class="row p-2">
+	<label class="col" for="col-form-label box-input-mode">Input Mode:</label>
+	<select class="col col-from-control form-select" id="data-input-mode" bind:value={$siteInputMode}>
 		{#each Object.entries(inputNames) as [k, v]}
 			<option value={k}>{v}</option>
 		{/each}
 	</select>
 </div>
-{#if inputMode === 'fcsites'}
+<div class="row p-2">
+{#if $siteInputMode === 'fcsites'}
 	<FCSites bind:origin bind:target />
-{:else if inputMode === 'fcj'}
+{:else if $siteInputMode === 'fcj'}
 	<BoxFile bind:origin bind:fcjson />
-{:else if inputMode === 'bin'}
+{:else if $siteInputMode === 'bin'}
 	<BinFileBox bind:origin />
-{:else if inputMode === 'pc'}
+{:else if $siteInputMode === 'pc'}
 	<PilotCentre bind:origin />
-{:else if inputMode === 'ph'}
+{:else if $siteInputMode === 'ph'}
 	<PilotHeading bind:origin />
 {/if}
+</div>

@@ -1,6 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
 import { Flight } from '$lib/database/flight';
 import {dev as isdev} from '$app/environment';
+import { newCookieStore } from '$lib/utils/cookieStore';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -22,3 +23,5 @@ export const help: Writable<string | undefined> = writable();
 
 export const windowWidth: Writable<number> = writable(1000); 
 export const windowHeight: Writable<number> = writable(1000); 
+
+export const siteInputMode = newCookieStore('siteInputMode', 'fcsites');

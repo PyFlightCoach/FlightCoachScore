@@ -31,10 +31,11 @@
 	}
 </script>
 
-{#if sites}
-	<select class="form-select" size="3" bind:value={selectedSiteId}>
-		{#each sites as site, i}
-			<option value={i + 1}>{site.description()}</option>
-		{/each}
-	</select>
-{/if}
+<select class="form-select" size="3" bind:value={selectedSiteId}>
+  {#if sites}
+  {#each sites as site, i}
+    <option value={i + 1}>{site.description()}</option>
+  {/each}
+  {/if}
+</select>
+

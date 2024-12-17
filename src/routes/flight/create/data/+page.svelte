@@ -44,8 +44,8 @@
 
 </script>
 
-<div class="col-4 pt-5">
-	<div class="container bg-light border">
+<div class="col-md-4 pt-3 bg-light border">
+	
 		<small>Load Flight Data</small>
 
 		<FlightDataReader
@@ -64,24 +64,23 @@
 				<p><mark>{form_state}</mark></p>
 			</div>
 		{/if}
-	</div>
+	<hr/>
 
 	{#if inputMode == 'bin'}
-		<div class="container bg-light border">
+		
 			<small>Define The Box</small>
 			<BoxReader
 				bind:origin={$origin}
-				bind:fcjson={$fcj}
 				bind:target
 			/>
-		</div>
+
+		<hr/>
 	{/if}
 
 	{#if ($binData && $origin) || $states}
-		<div class="container bg-light border">
-			<small>Select Manoeuvres</small>
+		
 			<div class="row">
-				<label class="col" for="select-manoeuvres">Move on to the next stage:</label>
+				<label class="col col-form-label" for="select-manoeuvres">Select Manoeuvres:</label>
 				<a
 					id="select-manoeuvres"
 					class="btn btn-outline-primary col"
@@ -94,14 +93,15 @@
 					Next
 				</a>
 			</div>
-		</div>
+		
 	{/if}
 </div>
 
-<div class="col-8">
-	{#if $origin || $binData}
+<div class="col-md-8">
+	{#if ($origin && !$states) || $binData}
 		<MapPlot bind:origin={$origin} bind:binData={$binData} />
 	{:else if $states}
 		<PlanViewPlot />
+
 	{/if}
 </div>

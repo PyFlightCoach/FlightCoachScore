@@ -65,7 +65,7 @@
 		}
 	};
 
-  const updateLayout = (sts: States, _zero: boolean, _expand: number) => {
+	const updateLayout = (sts: States, _zero: boolean, _expand: number) => {
 		let newlayout = structuredClone(layout);
 		const ranges = {
 			x: sts.plotRange('x', _zero, _expand),
@@ -94,13 +94,13 @@
 
 	$: layout = updateLayout(flst, includeZero, expand);
 
-  const toggleProjection = () => {
-    console.debug('toggling projection');
-    const newlayout = structuredClone(layout);
-    newlayout.scene.camera.projection.type =
-      layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
-    layout = newlayout;
-  }
+	const toggleProjection = () => {
+		console.debug('toggling projection');
+		const newlayout = structuredClone(layout);
+		newlayout.scene.camera.projection.type =
+			layout.scene.camera.projection.type == 'perspective' ? 'orthographic' : 'perspective';
+		layout = newlayout;
+	};
 
 	const createModelTrace = (st: States | undefined, i: number | undefined, sc: number) => {
 		if (st && typeof i !== 'undefined' && i < st.data.length && st.data[i]) {
@@ -187,40 +187,36 @@
 	};
 </script>
 
-<div style:height="100%" id="parent">
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		style:height="100%"
-		on:mousedown={() => {
-			clearInterval(player);
-		}}
-		on:mouseup={() => {
-			if (player) {
-				play();
-			}
-		}}
-	>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div
+	class="container-fluid h-100 d-flex flex-column"
+	on:mousedown={() => {
+		clearInterval(player);
+	}}
+	on:mouseup={() => {
+		if (player) {
+			play();
+		}
+	}}
+>
+	<div class="col">
 		{#if traces}
-			<Plot
-				data={traces}
-				layout={layout}
-				fillParent={true}
-				on:click={handleClick}
-			/>
+			<Plot data={traces} {layout} fillParent={true} on:click={handleClick} />
 		{/if}
 	</div>
-	<div id="buttons">
-		<div>
-			{#if controls.includes('slider')}
-				<DoubleSlider
-					min={0}
-					max={flst.data.length}
-					bind:lhandle={range[0]}
-					bind:rhandle={range[1]}
-				/>
-			{/if}
-		</div>
-		<div class="btn-group">
+
+	<div class="col-auto d-flex flex-row justify-content-end">
+		<div class="col">
+    {#if controls.includes('slider')}
+			<DoubleSlider
+				min={0}
+				max={flst.data.length}
+				bind:lhandle={range[0]}
+				bind:rhandle={range[1]}
+			/>
+		{/if}
+  </div>
+		<div class="col-auto btn-group">
 			{#if controls.includes('play')}
 				{#if player}
 					<button class="btn btn-outline-secondary" on:click={pause}>Pause</button>
@@ -270,9 +266,8 @@
 			{/if}
 
 			{#if controls.includes('projection')}
-				<button
-					class="btn btn-outline-secondary"
-					on:click={toggleProjection}>{layout.scene.camera.projection.type}</button
+				<button class="btn btn-outline-secondary" on:click={toggleProjection}
+					>{layout.scene.camera.projection.type}</button
 				>
 			{/if}
 			{#if controls.includes('showBox')}
@@ -288,17 +283,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	#parent {
-		position: relative;
-	}
-	#buttons {
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		width: 100%;
-		display: grid;
-		grid-template-columns: 1fr repeat(7, min-content);
-	}
-</style>
