@@ -4,7 +4,6 @@ import { dev } from '$app/environment';
 import axios, {type AxiosInstance }  from 'axios';
 
 
-
 // The rest is all logic to handle the selection of analysis and db server addesses
 export function jsonEscapeUTF(s: string) {
 	return s.replace(
@@ -20,6 +19,7 @@ export function formDataFromDict(data: unknown) {
 	});
 	return fd;
 }
+
 
 
 export let analysisServer: AxiosInstance;
@@ -55,11 +55,11 @@ export const faVersion: Writable<string | undefined> = writable(undefined);
 
 anServerAddress.subscribe((value: string) => {
 	analysisServer = axios.create({
-    baseURL: value,
+    baseURL: value
   });
   analysisServer
 		.get('fa_version')
-		.then((res) => faVersion.set(res))
+		.then((res) => faVersion.set(res.data))
 		.catch(() => faVersion.set(undefined));
 });
 

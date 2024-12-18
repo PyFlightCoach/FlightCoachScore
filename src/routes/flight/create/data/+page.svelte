@@ -15,11 +15,6 @@
   let target: GPS | undefined;
   let isDuplicate: boolean = false;
 	$: if (inputMode) {
-		//$bin = undefined;
-		//$binData = undefined;
-		//$bootTime = undefined;
-		//$fcj = undefined;
-		//$states = undefined;
 		if (inputMode != 'bin') {
 			form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
 		} else {
@@ -27,7 +22,6 @@
 		}
 	}
   
-  $: console.debug($origin);
   $: if ($binData) {
     target=new GPS($binData.pos.Lat[0], $binData.pos.Lng[0], $binData.pos.Alt[0]);
   }
@@ -71,7 +65,8 @@
 			<small>Define The Box</small>
 			<BoxReader
 				bind:origin={$origin}
-				bind:target
+        bind:fcjson={$fcj}
+        bind:target
 			/>
 
 		<hr/>

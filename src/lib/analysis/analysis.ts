@@ -1,5 +1,5 @@
 import * as sts from '$lib/stores/analysis';
-import { activeFlight, isAnalysisModified, dataSource } from '$lib/stores/shared';
+import { activeFlight, isAnalysisModified, dataSource, blockProgress, unblockProgress, loading } from '$lib/stores/shared';
 import { MA } from '$lib/analysis/ma';
 import { get, writable } from 'svelte/store';
 import { analysisServer, faVersion } from '$lib/api';
@@ -17,7 +17,10 @@ import { takeOff } from '$lib/analysis/splitting';
 import { Origin } from '$lib/analysis/fcjson';
 
 export function checkComplete() {
-	return Boolean(get(sts.manNames)?.length && sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!])) ;
+	return Boolean(
+		get(sts.manNames)?.length &&
+			sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!])
+	);
 }
 
 function setupAnalysisArrays(mnames: string[]) {
@@ -33,6 +36,7 @@ function setupAnalysisArrays(mnames: string[]) {
 }
 
 function setAnalysis(i: number, man: MA) {
+
 	sts.analyses[i].set(man);
 
 	sts.analyses[i].subscribe((ma: MA | undefined) => {
@@ -56,7 +60,7 @@ function setAnalysis(i: number, man: MA) {
 }
 
 export function clearAnalysis() {
-  console.log('clearing analysis');
+	console.log('clearing analysis');
 	activeFlight.set(undefined);
 	sts.selManID.set(undefined);
 	sts.manNames.set(undefined);
@@ -70,23 +74,21 @@ export function clearAnalysis() {
 	isAnalysisModified.set(undefined);
 }
 
-
-export function clearDataLoading () {
-  console.log('clearing data loading');
+export function clearDataLoading() {
+	console.log('clearing data loading');
 	sts.states.set(undefined);
 	sts.binData.set(undefined);
 	sts.bootTime.set(undefined);
 	sts.origin.set(Origin.load());
 	sts.fcj.set(undefined);
 	sts.bin.set(undefined);
-  sts.manSplits.set([takeOff()]);
+	sts.manSplits.set([takeOff()]);
 	dataSource.set(undefined);
-  clearAnalysis();
+	clearAnalysis();
 }
 
-
 sts.manSplits.subscribe(() => {
-  clearAnalysis();
+	clearAnalysis();
 });
 
 export async function newAnalysis(states: States, split: Splitting) {
@@ -116,7 +118,7 @@ export async function newAnalysis(states: States, split: Splitting) {
 
 	split.analysisMans.forEach(async (id: number, i: number) => {
 		sts.runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
-    const sch = getScheduleFromSplit(split.mans[id]);
+		const sch = getScheduleFromSplit(split.mans[id]);
 		setAnalysis(
 			i,
 			new MA(
@@ -170,12 +172,12 @@ export async function importAnalysis(data: Record<string, any>) {
 				if (res.mdef) {
 					setAnalysis(i, res);
 				} else {
-          const mdef = await loadManDef(
-            library.subset({
-              category_name: res.schedule.category,
-              schedule_name: res.schedule.name
-            }).first!.manoeuvres[res.id - 1].id
-          );
+					const mdef = await loadManDef(
+						library.subset({
+							category_name: res.schedule.category,
+							schedule_name: res.schedule.name
+						}).first!.manoeuvres[res.id - 1].id
+					);
 					setAnalysis(
 						i,
 						new MA(
@@ -198,27 +200,32 @@ export async function importAnalysis(data: Record<string, any>) {
 }
 
 export async function loadExample() {
-	await analysisServer.get('example').then((res) => {
-		importAnalysis(res.data);
-    dataSource.set('example');
-	});
+	await analysisServer
+		.get('example', blockProgress('Downloading Example'))
+		.then((res) => {
+			importAnalysis(res.data);
+			dataSource.set('example');
+		}).finally(unblockProgress);
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
 	const zip = new JSZip();
-
+  loading.set(true);  
 	await dbServer
-		.get(`flight/ajson/${flight_id}`, {responseType: 'arraybuffer'})
-		.then(response => zip.loadAsync(response.data))
-		.then(res => Object.values(res.files)[0].async('string'))
-		.then(ajson => JSON.parse(ajson))
+		.get(`flight/ajson/${flight_id}`, {
+			responseType: 'arraybuffer',
+			...blockProgress('Loading Analysis from Database')
+		})
+		.then((response) => zip.loadAsync(response.data))
+		.then((res) => Object.values(res.files)[0].async('string'))
+		.then((ajson) => JSON.parse(ajson))
 		.then(importAnalysis)
 		.then(() => Flight.load(flight_id))
-		.then(flight => {
+		.then((flight) => {
 			dataSource.set('db');
-      activeFlight.set(flight);
+			activeFlight.set(flight);
 			goto(`${base}/flight/results`);
-		});
+		}).finally(()=>{unblockProgress(); loading.set(false)});
 }
 
 export async function analyseMans(ids: number[]) {
@@ -231,8 +238,8 @@ export async function analyseAll(
 	force: boolean = false,
 	optimise: boolean | undefined = undefined
 ) {
-	sts.analyses.forEach(async (ma, i) => {
-		await analyseManoeuvre(i, force, optimise);
+	sts.analyses.forEach((ma, i) => {
+		analyseManoeuvre(i, force, optimise);
 	});
 }
 
@@ -243,7 +250,7 @@ export async function analyseManoeuvre(
 ) {
 	const ma = get(sts.analyses[id]);
 
-	const isReRun = Object.keys(ma!.history).includes((await analysisServer.get('fa_version')).data);
+	const isReRun = Object.keys(ma!.history).includes(get(faVersion)!);
 
 	if (optimise === undefined) {
 		optimise = !isReRun;
@@ -259,12 +266,13 @@ export async function analyseManoeuvre(
 			return v;
 		});
 
-		await ma!.run(optimise).then((res) => {
-			sts.analyses[id].set(res);
-			sts.running.update((v) => {
-				v[id] = false;
-				return v;
-			});
+		ma!.run(optimise).then((res) => {
+      sts.analyses[id].set(res);
+      sts.running.update((v) => {
+        v[id] = false;
+        return v;
+      });
+  
 		});
 	}
 }

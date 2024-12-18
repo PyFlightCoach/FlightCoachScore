@@ -2,8 +2,8 @@
 	import 'bootstrap/dist/css/bootstrap.min.css';
 	import 'bootstrap/dist/js/bootstrap.min.js';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
-	import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
-
+	import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
+  import Progress from './Progress.svelte';
 	import MarkdownIt from 'markdown-it';
 	import MainNavBar from './MainNavBar.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
@@ -12,11 +12,10 @@
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
-	import { loading, dev, help, windowHeight, windowWidth } from '$lib/stores/shared';
-
+	import { dev, help, windowHeight, windowWidth} from '$lib/stores/shared';
 
 	polyfillCountryFlagEmojis();
-	
+
 	const md = new MarkdownIt();
 
 	$: if ($page) {
@@ -54,7 +53,9 @@
 	});
 </script>
 
-<svelte:window bind:innerWidth={$windowWidth} bind:innerHeight={$windowHeight}/>
+<svelte:window bind:innerWidth={$windowWidth} bind:innerHeight={$windowHeight} />
+
+<Progress />
 
 <div class="container-fluid justify-content-center min-vh-100 d-flex flex-column">
 	<div class="row">
@@ -64,20 +65,12 @@
 			{/if}
 		</MainNavBar>
 	</div>
-	{#if $loading}
-		<div class="position-absolute top-50 start-50 spinner-border" role="status"></div>
-	{/if}
 	<div class="row flex-grow-1 justify-content-center">
 		<slot />
 	</div>
 </div>
 
-<div 
-  class="offcanvas offcanvas-end position-fixed" 
-  tabindex="-1" 
-  id="help" 
-
->
+<div class="offcanvas offcanvas-end position-fixed" tabindex="-1" id="help">
 	<div class="offcanvas-header">
 		<h5>Help for {$page.url.pathname}</h5>
 		<button

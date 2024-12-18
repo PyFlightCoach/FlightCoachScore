@@ -16,7 +16,6 @@
 			onclick={() => {
         dbServer.post('auth/jwt/logout', {});
         $user =undefined;
-        goto(base + '/');
       }}>Logout
     </button>
 	{:else}

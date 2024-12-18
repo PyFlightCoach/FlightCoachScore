@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { nMans, nRunning } from '$lib/stores/analysis';
-
-
+  import {faVersion} from '$lib/api';
+  
 	$: n = $nMans - $nRunning;
 </script>
 

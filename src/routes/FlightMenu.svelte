@@ -89,12 +89,12 @@
 		{/if}
 		<button
 			class="dropdown-item"
+      data-sveltekit-preload-data="tap"
 			on:click={() => {
 				$loading = true;
 				loadExample().then(() => {
 					goto(base + '/flight/results');
-					$loading = false;
-				});
+				}).finally(()=>$loading = false);
 			}}
 		>
 			Example

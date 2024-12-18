@@ -94,24 +94,25 @@
 
 			{#if canEdit && (targetPrivacy != f.meta.privacy || newComment != f.meta.comment)}
 				<li>
-					<button class="btn btn-outline-secondary w-100" on:click={patchMeta}> Update </button>
+					<button class="btn btn-outline-secondary w-100" on:click={patchMeta}>Update </button>
 				</li>
 			{/if}
 			<li class="input-group">
 				<a
 					class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
-					href="{base}/database/flight/?flight_id={f.meta.flight_id}">View Flight</a
-				>
+					href="{base}/database/flight/?flight_id={f.meta.flight_id}"
+          data-sveltekit-preload-data="tap"
+        >
+          View Flight
+        </a>
 				<button
 					class="form-control btn btn-outline-secondary {canAnalyse ? '' : 'disabled'}"
+          data-sveltekit-preload-data="tap"
 					on:click={() => {
 						if (isAnalysisLoaded) {
 							goto(base + '/flight/results');
 						} else if (!$manNames || confirm('This will clear the current analysis. Continue?')) {
-							$loading = true;
-							loadAnalysisFromDB(f.meta.flight_id).finally(() => {
-								$loading = false;
-							});
+							loadAnalysisFromDB(f.meta.flight_id);
 						}
 					}}
 				>

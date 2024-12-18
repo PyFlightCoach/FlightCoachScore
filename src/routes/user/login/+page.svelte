@@ -3,8 +3,8 @@
 	import { base } from '$app/paths';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { user } from '$lib/stores/user';
-
-	let previousPage: string = base || '';
+	
+	let previousPage: string = base || '/';
 
 	let form_state: string | undefined;
 
@@ -27,7 +27,6 @@
 				return;
 			}
 			$user = (await dbServer.get('users/me')).data;
-
 			goto(previousPage);
 		} catch (error) {
 			form_state = 'Oops...something has gone wrong. Please try again later.';

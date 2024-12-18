@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AnalysisSummary from './AnalysisSummary.svelte';
 	import { totalScore, bin, selectedResult, fa_versions, bootTime, isComplete, difficulty, truncate } from '$lib/stores/analysis';
-	import { dataSource, activeFlight, isAnalysisModified, loading } from '$lib/stores/shared';
+	import { dataSource, activeFlight, isAnalysisModified, loading, blockProgress, unblockProgress } from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
 	import { privacyOptions } from '$lib/database/interfaces';
@@ -30,12 +30,10 @@
 		$isAnalysisModified);
 	$: canI = $user?.is_verified && (isMine || isNew || $user?.is_superuser);
 
-  $: console.log('isMine', isMine, 'isNew', isNew, 'isUpdated', isUpdated, 'canI', canI);
+  $: console.log('isMine', isMine, 'isNew', isNew, 'isUpdated', isUpdated, 'canI', canI, 'isComplete', $isComplete);
 
 	const upload = async () => {
-		$loading = true;
-
-		form_state = 'Uploading Analysis, this can take some time...';
+		
 		const form_data = new FormData();
 		form_data.append(
 			'files',
@@ -54,9 +52,12 @@
 		if (include_bin && $bin) form_data.append('files', $bin);
 
 		if (await checkUser()) {
+      form_state = 'Uploading Analysis, this can take some time...';
+      $loading = true;
+
 			console.debug('1 - Uploading ', $bin?.name);
 			dbServer
-				.post('flight', form_data)
+				.post('flight', form_data, blockProgress("Uploading Analysis to Database", 'upload'))
 				.then((r) => Flight.load(r.data.id))
 				.then((f) => {
 					activeFlight.set(f);
@@ -65,11 +66,12 @@
 					goto(base + '/database/query/leaderboards');
 				})
 				.catch((e) => {
-					form_state = 'Upload Failed';
+					form_state = 'Upload Failed: ' + e.response?.data?.detail?.detail || '';
 					console.error(e);
 				})
 				.finally(() => {
 					$loading = false;
+          unblockProgress();
 				});
 		} else {
 			form_state = undefined;

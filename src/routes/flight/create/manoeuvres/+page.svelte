@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/analysis/analysis';
-	import { states, fcj, bin, manSplits } from '$lib/stores/analysis';
+	import { states, fcj, bin, manSplits, updateSplits } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/analysis/fcjson';
@@ -9,9 +9,11 @@
 	import ManSelect from '$lib/components/manselect/ManSelect.svelte';
 	import * as ms from '$lib/analysis/splitting';
 
+  const { data } = $props();
+
 	loadKnowns();
 
-	let mans = $state($manSplits);
+	let mans = $state(data.baseSplits);
 
 	$effect(() => {
 		$manSplits = mans;
@@ -21,8 +23,9 @@
 
 	let range: [number, number] = $state([
 		0,
-		mans[0].stop || Math.min(3000, $states!.data.length - 1)
+		data.baseSplits[0].stop || Math.min(3000, $states!.data.length - 1)
 	]);
+
 	let activeIndex: number = $state(range[1]);
 	$inspect('range:', range);
 
@@ -85,39 +88,19 @@
 		}
 	};
 
-	const loadMansFromFCJ = async () => {
-		if ($fcj) {
-			reset();
-			const fcjsplits = await ms.parseFCJMans($fcj, $states!);
-			for (const man of fcjsplits) {
-				if (man.manoeuvre) {
-					await loadManDef(man.manoeuvre!.id).then((md) => {
-						man.mdef = md;
-					});
-				}
-				if (man.alternate_name == 'TakeOff') {
-					mans[0] = man;
-				} else {
-					mans.push(man);
-				}
-			}
-
-			activeManId = 1;
-			resetRange();
-		}
-	};
 
 	const parseFCJ = (file: File) => {
 		$fcj = undefined;
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			$fcj = FCJson.parse(JSON.parse(e.target?.result as string));
-			loadMansFromFCJ();
+      updateSplits($fcj)
+        .then((res)=>{mans=res});
 		};
 		reader.readAsText(file);
 	};
 
-	loadMansFromFCJ();
+
 </script>
 
 <svelte:window

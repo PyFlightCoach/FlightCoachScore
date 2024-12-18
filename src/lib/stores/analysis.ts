@@ -4,8 +4,8 @@ import { States } from '$lib/analysis/state';
 import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { BinData } from '$lib/components/bin/bindata';
-import { type Split, takeOff } from '$lib/analysis/splitting';
-
+import { type Split, takeOff, parseFCJMans } from '$lib/analysis/splitting';
+import { loadManDef } from '$lib/schedules';
 export const isCompFlight: Writable<boolean> = writable(true);
 
 export const bin: Writable<File | undefined> = writable();
@@ -18,14 +18,30 @@ export const states: Writable<States | undefined> = writable();
 export const isFullSize: Writable<boolean> = writable(false);
 
 states.subscribe((sts: States | undefined) => {
-	isFullSize.set(
-		sts
-			? Math.max(sts.range('z'), sts.range('x'), sts.range('y')) > 1000
-			: false
-	);
+	isFullSize.set(sts ? Math.max(sts.range('z'), sts.range('x'), sts.range('y')) > 1000 : false);
 });
 
 export const manSplits: Writable<Split[]> = writable([takeOff()]);
+
+export async function updateSplits(_fcj: FCJson, force: boolean = false): Promise<Split[]> {
+	if (force || get(manSplits).length <= 1) {
+		await parseFCJMans(_fcj, get(states)!).then(async (mans) => {
+			const oMans: Split[] = [];
+			for (const man of mans) {
+				if (man.manoeuvre) {
+					await loadManDef(man.manoeuvre!.id).then((md) => {
+						man.mdef = md;
+					});
+				}
+				oMans.push(man);
+			}
+			manSplits.set(oMans);
+		});
+	}
+  return get(manSplits);
+  
+
+}
 
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);

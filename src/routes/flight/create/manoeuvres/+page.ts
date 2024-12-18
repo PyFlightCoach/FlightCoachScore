@@ -1,4 +1,4 @@
-import { binData, origin, states } from '$lib/stores/analysis';
+import { binData, origin, states, fcj, updateSplits, manSplits } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
@@ -17,5 +17,8 @@ export async function load({fetch}) {
     } else {
 			goto(base + '/flight/create/data');
 		}
-	}  
+	} 
+  if (get(fcj)) (await updateSplits(get(fcj)!));
+  
+  return {baseSplits: get(manSplits)};
 }

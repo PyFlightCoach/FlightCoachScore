@@ -2,16 +2,15 @@
 	import { FCJson, Origin } from '$lib/analysis/fcjson';
 	import PilotCentre from './PilotCentre.svelte';
 	import BoxFile from './BoxFile.svelte';
-	import pkg from 'file-saver';
 	import BinFileBox from './BinFileBox.svelte';
 	import PilotHeading from './PilotHeading.svelte';
 	import FCSites from './FCSites.svelte';
 	import { GPS } from '$lib/analysis/geometry';
   import {siteInputMode} from '$lib/stores/shared';
-	const { saveAs } = pkg;
+  
 
 	export let origin: Origin | undefined;
-	export let fcjson: FCJson | undefined;
+	export let fcjson: FCJson | undefined = undefined;
 	export let target: GPS | undefined;
 
 	$: if (target) {

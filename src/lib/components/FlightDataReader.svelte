@@ -3,6 +3,7 @@
 	import { FCJson } from '$lib/analysis/fcjson';
 	import { States } from '$lib/analysis/state';
 	import { dbServer } from '$lib/api';
+	import { updateSplits } from '$lib/stores/analysis';
   
 	export let binData: BinData | undefined;
 	export let bin: File | undefined;
@@ -33,7 +34,7 @@
 				states = States.read_csv(reader.result as string);
 			} else {
 				fcj = FCJson.parse(JSON.parse(reader.result! as string));
-				states = States.from_fcj(fcj);
+        states = States.from_fcj(fcj);
 			}
 		};
 		reader.readAsText(file);
@@ -61,12 +62,11 @@
 					dbServer
 						.get(`flight/check_duplicate/${md5}`)
 						.then(r => {
-              console.debug(r);
-              isDuplicate = false;
+              isDuplicate = r.statusText != 'OK';
             })
 						.catch(e => {
-							isDuplicate = true;
-							console.debug(e);parseFile
+							console.debug(e);
+              isDuplicate = true;
 						});
 				}}
 			/>

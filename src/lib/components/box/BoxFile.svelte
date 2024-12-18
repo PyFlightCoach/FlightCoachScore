@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { FCJson, Origin } from '$lib/analysis/fcjson';
 	import pkg from 'file-saver';
-
+  import {updateSplits, manSplits} from '$lib/stores/analysis';
 	const { saveAs } = pkg;
 
 	let files: FileList;
@@ -16,6 +16,7 @@
 				origin = Object.assign(origin || new Origin(0, 0, 0, 0), _norg);
 			} else {
 				fcjson = FCJson.parse(JSON.parse(reader.result as string));
+
 				if (fcjson) {
 					origin = Object.assign(origin || new Origin(0, 0, 0, 0), fcjson.origin);
 				}
