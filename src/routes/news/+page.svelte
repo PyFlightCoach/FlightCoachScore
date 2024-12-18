@@ -13,10 +13,10 @@
                 form_state = undefined;
                 if (current) {
                     const res = await dbServer.patch('news/' + current.id, new FormData(event.currentTarget as HTMLFormElement));
-                    form_state = "News item " + current.id + " successfully patched.";
+                    form_state = "News item " + res.data.id + " successfully patched.";
                 } else {
                     const res = await dbServer.post('news', new FormData(event.currentTarget as HTMLFormElement));
-                    form_state = "News item " + res.id + " successfully created.";
+                    form_state = "News item " + res.data.id + " successfully created.";
                 }
                 current = undefined;
                 showID = undefined;
@@ -31,14 +31,14 @@
 </script>
 
 
-<div class="container" style="max-width:1024px">
+<div class="container border rounded bg-light" style="max-width:1024px">
     {#if form_state}
         <div class="row mt-4">
             <p><mark>{form_state}</mark></p>
         </div>
     {/if}
 
-	<form class="row mt-4 border rounded" method="POST" on:submit|preventDefault={_handleSubmit}>
+	<form class="row mt-4" method="POST" on:submit|preventDefault={_handleSubmit}>
 		<div class="col">
             {#if current}
                 <div class="mb-3">
@@ -71,7 +71,7 @@
                     <input type="url" class="form-control" id="link" name="link"/>
                 </div>
             {/if}
-            <div class="mb-3">
+            <div>
                 <button type="submit" class="btn btn-primary">{#if current}Update{:else}Create{/if}</button>
                 <button type="button" class="btn btn-secondary"
                     on:click={(event) => {
@@ -83,8 +83,10 @@
             </div>
         </div>
 	</form>
+</div>
 
-    <div class="mt-3 border rounded">
+<div class="container mt-3 border rounded bg-light" style="max-width:1024px">
+    <div class="mt-3">
         {#if data.news}
             <table class="table">
                 <thead> <tr>
