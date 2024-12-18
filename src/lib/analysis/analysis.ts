@@ -266,7 +266,7 @@ export async function analyseManoeuvre(
 			return v;
 		});
 
-		ma!.run(optimise).then((res) => {
+		await ma!.run(optimise).then((res) => {
       sts.analyses[id].set(res);
       sts.running.update((v) => {
         v[id] = false;
