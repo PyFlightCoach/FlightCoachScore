@@ -1,6 +1,7 @@
 <script lang="ts">
 	import NavMenu from '$lib/components/NavMenu.svelte';
 	import ServerSelection from '$lib/components/ServerSelection.svelte';
+	import { base } from '$app/paths';
 	import { dev } from '$lib/stores/shared';
 	import { an_servers, anSOption, customAnalysisServer, dbServer } from '$lib/api';
 	import { dbSOption, customDbServer } from '$lib/api';
@@ -40,6 +41,7 @@
 	>
 		Make Me Normal
 	</button>
+	<a class="dropdown-item" href="{base}/news">News</a>
 	{#if dev}
 		<button
 			class="dropdown-item"
