@@ -119,7 +119,7 @@
                                     <button type="button" class="btn btn-primary"
                                     on:click={async () => {
                                         try {
-                                            const res = await dbServer.delete('news', n.id);
+                                            const res = await dbServer.delete('news/' + n.id);
                                             form_state = "News item " + n.id + " deleted.";
                                             showID = undefined;
                                             invalidateAll();
@@ -140,11 +140,11 @@
                         </tr>
                         {#if showID == n.id}
                             <tr>
-                                <td></td>
+                                <td>Body:</td>
                                 <td style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; max-width:1px;">{n.body}</td>
                             </tr>
                             <tr>
-                                <td></td>
+                                <td>Link:</td>
                                 <td style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; max-width:1px;">{n.link}</td>
                             </tr>
                         {/if}
