@@ -1,11 +1,11 @@
 <p>
-  This is the first public release of an automatic judging process which has been in development for over 10 years. 
-  FCScore is free to use for flight data recorded in Ardupilot dataflash log files and Flight Coach JSON files. 
-  The judging process is entirely deterministic based on the rules for the relevant aerobatic category, allowing
+  FCScore is the first public release of an automatic judging process which has been in development for over 10 years. 
+  The application is free to use for flight data recorded in Ardupilot dataflash log files and Flight Coach JSON files. 
+  The automatic judging process is entirely deterministic based on the rules for the relevant aerobatic category, allowing
   you to see exactly how every score is calculated and hence how to improve.
 </p>
 <p>
-  Alongside the judging process, this application includes a flight data and score sharing platform, offering 
+  Alongside the judging process, FCScore includes a flight data and score sharing platform. This means that FCScore offers 
   the new possiblity of registering world records in aerobatics. We encourage all pilots to share as many flights as possible 
   as we can use this to improve the judging process in the future. 
 </p>
