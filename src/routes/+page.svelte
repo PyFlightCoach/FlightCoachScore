@@ -1,57 +1,107 @@
 <script lang="ts">
 	import navBarContents from '$lib/stores/navBarContents';
-  import {base} from '$app/paths';
-	$navBarContents = undefined;
+	import { base } from '$app/paths';
+  import {news} from '$lib/stores/shared';
 
+
+	$navBarContents = undefined;
+	let activeNews = $state(0);
+	const imgs = [
+		{
+			img: '/images/fcs_1_results.png',
+			description: 'Automatically calculated scores for an F3A P25 sequence'
+		},
+		{
+			img: '/images/fcs_2_elements.png',
+			description: 'Elements automatically identified by the FCScore judging algorithm'
+		},
+		{
+			img: '/images/fcs_3_intra_detail.png',
+			description: 'Details of one of the downgrades calculated for an element'
+		},
+		{
+			img: '/images/fcs_4_intra_table.png',
+			description: 'Breakdown of downgrades applicable to each element within a manoeuvre'
+		},
+		{
+			img: '/images/fcs_5_rankings.png',
+			description: 'Rankings of flight scores shared to the database'
+		},
+		{
+			img: '/images/fcs_6_view_flights.png',
+			description: 'View of a flight shared by another pilot'
+		},
+		{
+			img: '/images/fcs_7_view_map.png',
+			description:
+				'Map visualising the number of flights submitted from each site and the maximum score achieved'
+		}
+	];
 </script>
 
-
-<div class="container-fluid text-center mt-5" style="max-width:800px; ">
-  <div class="row align-items-center ">
-		<p>
-			Flight Coach Score facilitates automatic judging of aerobatic flights and offers a place to
-			share your scores. Use the tools above to get started or click 
-      <a 
-        href="#help"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#help"
-      >
-        here
-      </a>
-      for more info.
-		</p>
+<div class="row justify-content-around">
+	<div class="col-lg-6">
+		<div class="row mb-3">
+			<h1 class="text-center pt-5 display-1">Flight Coach Score</h1>
+			<p class="lead text-center">Automatic judging and score sharing for precision aerobatics.</p>
+		</div>
+		<hr />
+		{#if $news.length}
+			<div
+				class="row flex-grow-1 bg-light rounded border"
+			>
+				<div class="row pt-1 d-flex">
+					<small class="col-auto">{#if activeNews==0}Latest{/if} News</small>
+					<h3 class="col text-center">{$news[activeNews].headline}</h3>
+					<small class="col-auto text-body-secondary">{$news[activeNews].updated_when}</small>
+				</div>
+				<div class="row overflow-auto" style="height:300px;">{@html $news[activeNews].body}</div>
+				<div class="row d-flex flex-row justify-content-between">
+					<button
+						class="btn btn-link col-auto link"
+            disabled={activeNews == $news.length - 1}
+            onclick={() => {activeNews=Math.min($news.length - 1, activeNews+1)}}
+					  >previous</button
+					>
+					<button class="btn btn-link col-auto"
+            disabled={activeNews == 0}
+            onclick={() => {activeNews=Math.max(0, activeNews-1)}}
+          >next</button>
+				</div>
+			</div>
+			<hr />
+		{/if}
 	</div>
 
-  <div class="row pt-5">
-  <div id="carouselExample" class="carousel slide carousel-dark">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="{base}/images/leaderboard.png" class="d-block w-100" alt="...">
-        <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>See how your flights compare to other pilots'.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="{base}/images/intra_analysis.png" class="d-block w-100" alt="...">
-        <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>Understand why you received every downgrade.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="{base}/images/templates.png" class="d-block w-100" alt="...">
-        <div class="carousel-caption d-none d-md-block  bg-light">
-          <p>View your flights alongside aligned perfect templates.</p>
-        </div>
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="false"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="false"></span>
-      <span class="visually-hidden">next</span>
-    </button>
-  </div>
-</div>
+	<div class="col-lg-6 justify-content-center pt-5 px-5">
+		<div id="ExamplesCarousel" class="carousel carousel-dark slide px-5">
+			<div class="carousel-inner">
+				{#each imgs as img, i}
+					<div class="carousel-item {i == 0 ? 'active' : ''}">
+						<img src="{base}{img.img}" class="d-block w-100 mb-3" alt="..." />
+
+						<span class="lead text-center pt-5">{img.description}</span>
+					</div>
+				{/each}
+			</div>
+			<button
+				class="carousel-control-prev"
+				type="button"
+				data-bs-target="#ExamplesCarousel"
+				data-bs-slide="prev"
+				aria-label="Previous"
+			>
+				<span class="carousel-control-prev-icon" aria-hidden="false"></span>
+			</button>
+			<button
+				class="carousel-control-next"
+				type="button"
+				data-bs-target="#ExamplesCarousel"
+				data-bs-slide="next"
+				aria-label="Next"
+			>
+				<span class="carousel-control-next-icon" aria-hidden="false"></span>
+			</button>
+		</div>
+	</div>
 </div>

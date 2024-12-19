@@ -32,11 +32,11 @@
 			: undefined;
 </script>
 
-<div class="col-4 pt-3 border">
+<div class="col-md-6 pt-3 border">
 	<ColouredTable data={summaries} bind:activeRow={activeDGName} bind:activeCol={activeCriteria} />
 </div>
 
-<div class="col-8 d-flex flex-column border">
+<div class="col-md-6 d-flex flex-column border">
 	{#if !activeCriteria}
 		{#if !activeED}
 			<PlotDTW sts={states} bind:activeEl={activeED} sp={$isFullSize ? 10 : 4} />

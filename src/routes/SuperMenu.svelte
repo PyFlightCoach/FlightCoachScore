@@ -28,6 +28,11 @@
 			bind:selected={$dbSOption}
 		/>
 	{/if}
+  <hr/>
+  <small class="dropdown-header">Management</small>
+  <a class="dropdown-item" href="{base}/news">News</a>
+  <hr/>
+  <small class="dropdown-header">Debugging</small>
 	<button
 		class="dropdown-item"
 		title="Temporarily make me a normal user to see how it looks."
@@ -41,7 +46,6 @@
 	>
 		Make Me Normal
 	</button>
-	<a class="dropdown-item" href="{base}/news">News</a>
 	{#if dev}
 		<button
 			class="dropdown-item"

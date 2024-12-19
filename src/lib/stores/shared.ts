@@ -3,6 +3,8 @@ import { Flight } from '$lib/database/flight';
 import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
+import {user} from '$lib/stores/user';
+import { dbServer } from '$lib/api';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -46,3 +48,16 @@ export const unblockProgress = () => {
 	blockingProgressTitle.set(undefined);
 	blockingProgress.set(undefined);
 };
+
+
+export const news: Writable<[]> = writable([]);
+
+user.subscribe((u) => {
+  dbServer
+    .get('news', { validateStatus: (status) => status == 200 })
+    .then((res) => {news.set(res.data.results)})
+    .catch((err) => {
+      console.error(err);
+      news.set([]);
+    })
+});
