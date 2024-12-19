@@ -1,11 +1,18 @@
 <script lang="ts">
 	import navBarContents from '$lib/stores/navBarContents';
 	import { base } from '$app/paths';
-  import {news} from '$lib/stores/shared';
-
+	import { news } from '$lib/stores/shared';
+  import {user} from '$lib/stores/user';
+  import About from './About.svelte';
 
 	$navBarContents = undefined;
 	let activeNews = $state(0);
+	let show = $state('About');
+
+  $effect(()=>{
+    show = $user && $news.length ? 'News' : 'About';
+  });
+
 	const imgs = [
 		{
 			img: '/images/fcs_1_results.png',
@@ -46,31 +53,67 @@
 			<p class="lead text-center">Automatic judging and score sharing for precision aerobatics.</p>
 		</div>
 		<hr />
-		{#if $news.length}
-			<div
-				class="row flex-grow-1 bg-light rounded border"
-			>
-				<div class="row pt-1 d-flex">
-					<small class="col-auto">{#if activeNews==0}Latest{/if} News</small>
-					<h3 class="col text-center">{$news[activeNews].headline}</h3>
-					<small class="col-auto text-body-secondary">{$news[activeNews].updated_when}</small>
-				</div>
-				<div class="row overflow-auto" style="height:300px;">{@html $news[activeNews].body}</div>
-				<div class="row d-flex flex-row justify-content-between">
-					<button
-						class="btn btn-link col-auto link"
-            disabled={activeNews == $news.length - 1}
-            onclick={() => {activeNews=Math.min($news.length - 1, activeNews+1)}}
-					  >previous</button
-					>
-					<button class="btn btn-link col-auto"
-            disabled={activeNews == 0}
-            onclick={() => {activeNews=Math.max(0, activeNews-1)}}
-          >next</button>
-				</div>
+
+		{#if $user && $news.length}
+			<div class="button-grp">
+				<input
+					type="radio"
+					class="btn-check"
+					name="options-base"
+					value="About"
+					id="about"
+					autocomplete="off"
+					bind:group={show}
+				/>
+				<label class="btn" for="about">About</label>
+
+				<input
+					type="radio"
+					class="btn-check"
+					name="options-base"
+					value="News"
+					id="news"
+					autocomplete="off"
+					bind:group={show}
+				/>
+				<label class="btn" for="news">News</label>
 			</div>
-			<hr />
+
+			{#if show == 'News'}
+				<div class="row bg-light rounded border">
+					<div class="row pt-1 d-flex">
+						<small class="col-auto"
+							>{#if activeNews == 0}Latest{/if} News</small
+						>
+						<h3 class="col text-center">{$news[activeNews].headline}</h3>
+						<small class="col-auto text-body-secondary">{$news[activeNews].updated_when}</small>
+					</div>
+					<div class="row overflow-auto" style="height:300px;">{@html $news[activeNews].body}</div>
+					<div class="row d-flex flex-row justify-content-between">
+						<button
+							class="btn btn-link col-auto link"
+							disabled={activeNews == $news.length - 1}
+							onclick={() => {
+								activeNews = Math.min($news.length - 1, activeNews + 1);
+							}}>previous</button
+						>
+						<button
+							class="btn btn-link col-auto"
+							disabled={activeNews == 0}
+							onclick={() => {
+								activeNews = Math.max(0, activeNews - 1);
+							}}>next</button
+						>
+					</div>
+				</div>
+				<hr />
+			{/if}
 		{/if}
+    {#if show == "About"}
+        <div class="pt-3">
+        <About />
+      </div>
+    {/if}
 	</div>
 
 	<div class="col-lg-6 justify-content-center pt-5 px-5">
