@@ -100,5 +100,5 @@
 				{/each}
 			</tbody>
 		</table>
-	</div>
-{/if}
+</div>
+  {/if}

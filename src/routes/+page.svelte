@@ -2,16 +2,16 @@
 	import navBarContents from '$lib/stores/navBarContents';
 	import { base } from '$app/paths';
 	import { news } from '$lib/stores/shared';
-  import {user} from '$lib/stores/user';
-  import About from './About.svelte';
+	import { user } from '$lib/stores/user';
+	import About from './About.svelte';
 
 	$navBarContents = undefined;
 	let activeNews = $state(0);
 	let show = $state('About');
 
-  $effect(()=>{
-    show = $user && $news.length ? 'News' : 'About';
-  });
+	$effect(() => {
+		show = $user && $news.length ? 'News' : 'About';
+	});
 
 	const imgs = [
 		{
@@ -47,40 +47,36 @@
 </script>
 
 <div class="row justify-content-around">
-	<div class="col-lg-6">
+	<div class="col-lg-6 px-lg-3 px-0">
 		<div class="row mb-3">
-			<h1 class="text-center pt-5 display-1">Flight Coach Score</h1>
-			<p class="lead text-center">Automatic judging and score sharing for precision aerobatics.</p>
+			<h1 class="text-center pt-3 h-1">Flight Coach Score</h1>
+			<lead class="lead text-center text-muted">Automatic judging and score sharing for precision aerobatics</lead>
 		</div>
 		<hr />
 
 		{#if $user && $news.length}
-			<div class="button-grp">
+			<div class="button-grp-sm mb-2">
 				<input
 					type="radio"
 					class="btn-check"
-					name="options-base"
 					value="About"
 					id="about"
-					autocomplete="off"
 					bind:group={show}
 				/>
-				<label class="btn" for="about">About</label>
+				<label class="btn btn-outline-secondary btn-sm" for="about">About</label>
 
 				<input
 					type="radio"
 					class="btn-check"
-					name="options-base"
 					value="News"
 					id="news"
-					autocomplete="off"
 					bind:group={show}
 				/>
-				<label class="btn" for="news">News</label>
+				<label class="btn btn-outline-secondary btn-sm" for="news">News</label>
 			</div>
 
 			{#if show == 'News'}
-				<div class="row bg-light rounded border">
+				<div class="row bg-light rounded border p-1">
 					<div class="row pt-1 d-flex">
 						<small class="col-auto"
 							>{#if activeNews == 0}Latest{/if} News</small
@@ -88,7 +84,9 @@
 						<h3 class="col text-center">{$news[activeNews].headline}</h3>
 						<small class="col-auto text-body-secondary">{$news[activeNews].updated_when}</small>
 					</div>
-					<div class="row overflow-auto" style="height:300px;">{@html $news[activeNews].body}</div>
+					<div class="row overflow-auto px-3" style="height:300px;">
+						{@html $news[activeNews].body}
+					</div>
 					<div class="row d-flex flex-row justify-content-between">
 						<button
 							class="btn btn-link col-auto link"
@@ -109,21 +107,36 @@
 				<hr />
 			{/if}
 		{/if}
-    {#if show == "About"}
-        <div class="pt-3">
-        <About />
-      </div>
-    {/if}
+		{#if show == 'About'}
+			<div class=" overflow-auto">
+				<About />
+			</div>
+			<hr />
+		{/if}
 	</div>
 
-	<div class="col-lg-6 justify-content-center pt-5 px-5">
-		<div id="ExamplesCarousel" class="carousel carousel-dark slide px-5">
-			<div class="carousel-inner">
+	<div
+		class="col-lg-6 justify-content-center pt-lg-5 px-lg-2 px-0"
+		style="height:100%; position:relative;"
+	>
+		<div
+			id="ExamplesCarousel"
+			class="carousel carousel-dark slide px-lg-3 px-0"
+			style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; "
+		>
+			<div class="carousel-inner h-100">
 				{#each imgs as img, i}
-					<div class="carousel-item {i == 0 ? 'active' : ''}">
-						<img src="{base}{img.img}" class="d-block w-100 mb-3" alt="..." />
+					<div class="carousel-item {i == 0 ? 'active' : ''} ">
+						<img
+							src="{base}{img.img}"
+							class="mb-3 img-fluid img-thumbnail"
+							style="max-height: 100%;"
+							alt="..."
+						/>
 
-						<span class="lead text-center pt-5">{img.description}</span>
+						<div class="carousel-caption d-none d-md-block">
+							<p class="bg-light p-0">{img.description}</p>
+						</div>
 					</div>
 				{/each}
 			</div>
