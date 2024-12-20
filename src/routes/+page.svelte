@@ -84,7 +84,7 @@
 						<h3 class="col text-center">{$news[activeNews].headline}</h3>
 						<small class="col-auto text-body-secondary">{$news[activeNews].updated_when}</small>
 					</div>
-					<div class="row overflow-auto px-3" style="height:300px;">
+					<div class="row overflow-auto px-3">
 						{@html $news[activeNews].body}
 					</div>
 					<div class="row d-flex flex-row justify-content-between">
@@ -117,14 +117,12 @@
 
 	<div
 		class="col-lg-6 justify-content-center pt-lg-5 px-lg-2 px-0"
-		style="height:100%; position:relative;"
 	>
 		<div
 			id="ExamplesCarousel"
 			class="carousel carousel-dark slide px-lg-3 px-0"
-			style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; "
 		>
-			<div class="carousel-inner h-100">
+			<div class="carousel-inner">
 				{#each imgs as img, i}
 					<div class="carousel-item {i == 0 ? 'active' : ''} ">
 						<img
