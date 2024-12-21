@@ -10,13 +10,18 @@
 		try {
 			const fdata = new FormData(event.currentTarget as HTMLFormElement);
 
+			if (fdata.get('new-password') != fdata.get('password-confirm')) {
+				form_state = 'Passwords do not match, please try again.';
+				return;
+			}
+
 			const s_country = split_country(fdata.get('country'));
 
 			const user = {
 				first_name: fdata.get('first_name'),
 				last_name: fdata.get('last_name'),
 				email: fdata.get('email'),
-				password: fdata.get('password'),
+				password: fdata.get('new-password'),
 				country: s_country[0],
 				country_emoji: s_country[1]
 			};
@@ -70,17 +75,30 @@
 		</div>
 
 		<div class="mb-3">
-			<label for="password" class="form-label">Password</label>
+			<label for="new-password" class="form-label">Password</label>
 			<input
 				type="password"
 				class="form-control"
-				id="password"
-				name="password"
+				id="new-password"
+				name="new-password"
+				autocomplete="new-password"
 				minlength="10"
 				required
 				aria-describedby="passwordhelp"
 			/>
 			<div id="passwordhelp" class="form-text">Minimum of ten characters</div>
+		</div>
+
+		<div class="mb-3">
+			<input
+				type="password"
+				class="form-control"
+				id="password-confirm"
+				name="password-confirm"
+				placeholder="Confirm your password"
+				minlength="10"
+				required
+			/>
 		</div>
 
 		<div class="mb-3" style="font-family: 'Twemoji Country Flags', sans-serif !important" >

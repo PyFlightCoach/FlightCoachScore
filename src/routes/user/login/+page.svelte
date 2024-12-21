@@ -18,7 +18,7 @@
 
 			const fd = formDataFromDict({
 				username: fdata.get('email'),
-				password: fdata.get('password')
+				password: fdata.get('current-password')
 			});
 			try {
 				await dbServer.post('auth/jwt/login', fd);
@@ -44,12 +44,12 @@
 	<form class="row mt-4" method="POST" on:submit|preventDefault={_handleSubmit}>
 		<div class="mb-3">
 			<label for="email" class="form-label">Email address</label>
-			<input type="email" class="form-control" id="email" name="email" required />
+			<input type="email" class="form-control" id="email" name="email" autocomplete="username" required/>
 		</div>
 
 		<div class="mb-3">
-			<label for="password" class="form-label">Password</label>
-			<input type="password" class="form-control" id="password" name="password" required />
+			<label for="current-password" class="form-label">Password</label>
+			<input type="password" class="form-control" id="current-password" name="current-password" autocomplete="current-password" required />
 		</div>
 
 		<div class="row mb-3">
