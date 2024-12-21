@@ -34,7 +34,6 @@
 			})
 			.then((text) => ($help = text))
 			.catch((error) => {
-				console.debug('no help available', error.message);
 				$help = undefined;
 			});
 	}

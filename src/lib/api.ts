@@ -2,6 +2,7 @@ import { newCookieStore } from '$lib/utils/cookieStore';
 import { type Writable, writable, get } from 'svelte/store';
 import { dev } from '$app/environment';
 import axios, {type AxiosInstance }  from 'axios';
+import { user } from '$lib/stores/user';
 
 
 // The rest is all logic to handle the selection of analysis and db server addesses
@@ -33,7 +34,7 @@ export const an_servers = {
 };
 
 export const anSOption = newCookieStore('anSOption', 'uk', (value) => {
-  if (dev) {
+  if (dev || get(user)?.is_superuser) {
     if (Object.keys(an_servers).includes(value)) {
       anServerAddress.set(an_servers[value as keyof typeof an_servers]);
     } else {
@@ -70,7 +71,7 @@ export const customDbServer = newCookieStore('customDbServer', 'http://localhost
 export const ukDBServer = 'https://madeupmodels.com:5012';
 
 export const dbSOption = newCookieStore('dbSOption', 'uk', (value) => {
-	if (dev) {
+	if (dev || get(user)?.is_superuser) {
 		switch (value) {
 			case 'uk':
 				dbServerAddress.set(ukDBServer);
