@@ -13,9 +13,12 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { dev, help, windowHeight, windowWidth} from '$lib/stores/shared';
-	import '@beyonk/gdpr-cookie-consent-banner/banner.css'
-	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner'
+  import '@beyonk/gdpr-cookie-consent-banner/banner.css'
+  import GdprBanner from '@beyonk/gdpr-cookie-consent-banner'
 
+	
+
+	
 	export const gpdc = {
 		cookieName: 'fcscore_cookie_consent',
 		heading: "Cookie Consent",
@@ -53,7 +56,7 @@
 				}
 				return response.text();
 			})
-			.then((text) => ($help = text))
+			.then((text) => ($help = text.replace('/fcscorebase', base)))
 			.catch((error) => {
 				$help = undefined;
 			});
