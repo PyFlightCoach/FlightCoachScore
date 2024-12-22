@@ -35,7 +35,13 @@
 	async function _handleSubmitPassword(event: Event) {
 		try {
 			const fdata = new FormData(event.currentTarget as HTMLFormElement);
-			const userUpdate = { password: fdata.get('password') };
+
+			if (fdata.get('new-password') != fdata.get('password-confirm')) {
+				form_state = 'Passwords do not match, please try again.';
+				return;
+			}
+
+			const userUpdate = { password: fdata.get('new-password') };
 			form_state = undefined;
 
 			const res = await dbServer.patch('users/me', userUpdate);
@@ -127,17 +133,30 @@
 		on:submit|preventDefault={_handleSubmitPassword}
 	>
 		<div class="mt-3 mb-3">
-			<label for="password" class="form-label">Password</label>
+			<label for="new-password" class="form-label">Password</label>
 			<input
 				type="password"
 				class="form-control"
-				id="password"
-				name="password"
+				id="new-password"
+				name="new-password"
+				autocomplete="new-password"
 				minlength="10"
 				required
 				aria-describedby="passwordhelp"
 			/>
 			<div id="passwordhelp" class="form-text">Minimum of ten characters</div>
+		</div>
+
+		<div class="mb-3">
+			<input
+				type="password"
+				class="form-control"
+				id="password-confirm"
+				name="password-confirm"
+				placeholder="Confirm your new password"
+				minlength="10"
+				required
+			/>
 		</div>
 
 		<div class="mb-3">
