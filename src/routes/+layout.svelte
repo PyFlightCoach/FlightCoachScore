@@ -109,6 +109,7 @@
 	</div>
 </div>
 
+
 <svelte:head>
 	<title>FCScore{$dev ? ' dev' : ''}</title>
 </svelte:head>

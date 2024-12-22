@@ -3,6 +3,9 @@ The table in the middle of the page shows the sum of each group of downgrade (In
 
 Once an analysis has been completed you can click on a row of the table to see more information about the analysis for that manoeuvre. 
 
+### Alignment
+Supplementary information about the element alignment process is available [here](/fcscore/info/elements). Read this if you are interested in how it works or if you are wondering why some scores are lower you expected.
+
 ## Downgrades
 The downgrades are classified into three groups, you can click on a table cell to see more information on how the downgrade is calculated.
 - **Intra** - downgrades relating to the execution of a single element (deviations in roll angle, track, loop curvature etc.)
