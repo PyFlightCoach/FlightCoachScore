@@ -3,7 +3,7 @@
 	import 'bootstrap/dist/js/bootstrap.min.js';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
 	import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
-  import Progress from './Progress.svelte';
+	import Progress from './Progress.svelte';
 	import MarkdownIt from 'markdown-it';
 	import MainNavBar from './MainNavBar.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
@@ -13,7 +13,28 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { dev, help, windowHeight, windowWidth} from '$lib/stores/shared';
+	import '@beyonk/gdpr-cookie-consent-banner/banner.css'
+	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner'
 
+	export const gpdc = {
+		cookieName: 'fcscore_cookie_consent',
+		heading: "Cookie Consent",
+		visible: "true",
+		buttonText: "Accept Cookies",
+		description: "The only cookies used by this website are for its correct operation. We do not use advertising, marketing or third-party tracking cookies.",
+		choices: {
+			necessary: {
+				label: 'Necessary cookies',
+				description: "Cookies to make this website work. Can't be turned off.",
+				value: true
+				},
+			tracking: false,
+			analytics: false,
+			marketing: false
+			},
+		showEditIcon: false
+	};
+	
 	polyfillCountryFlagEmojis();
 
 	const md = new MarkdownIt();
@@ -55,6 +76,8 @@
 <svelte:window bind:innerWidth={$windowWidth} bind:innerHeight={$windowHeight} />
 
 <Progress />
+
+<GdprBanner {...gpdc} />
 
 <div class="container-fluid justify-content-center min-vh-100 d-flex flex-column">
 	<div class="row">
