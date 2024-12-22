@@ -1,10 +1,13 @@
-import { writable, type Writable } from 'svelte/store';
+import { derived, writable, type Writable } from 'svelte/store';
 import { Flight } from '$lib/database/flight';
 import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
-import {user} from '$lib/stores/user';
+import { user } from '$lib/stores/user';
 import { dbServer } from '$lib/api';
+import { base } from '$app/paths';
+import MarkdownIt from 'markdown-it';
+const md = new MarkdownIt();
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -39,9 +42,7 @@ export const blockProgress = (
 	const fun = (progressEvent: AxiosProgressEvent) => {
 		blockingProgress.set(progressEvent.progress);
 	};
-	return direction == 'upload'
-		? { onUploadProgress: fun }
-		: { onDownloadProgress: fun };
+	return direction == 'upload' ? { onUploadProgress: fun } : { onDownloadProgress: fun };
 };
 
 export const unblockProgress = () => {
@@ -49,15 +50,16 @@ export const unblockProgress = () => {
 	blockingProgress.set(undefined);
 };
 
-
 export const news: Writable<[]> = writable([]);
 
 user.subscribe((u) => {
-  dbServer
-    .get('news', { validateStatus: (status) => status == 200 })
-    .then((res) => {news.set(res.data.results)})
-    .catch((err) => {
-      console.error(err);
-      news.set([]);
-    })
+	dbServer
+		.get('news', { validateStatus: (status) => status == 200 })
+		.then((res) => {
+			news.set(res.data.results);
+		})
+		.catch(() => {
+			news.set([]);
+		});
 });
+
