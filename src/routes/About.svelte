@@ -21,8 +21,8 @@
 		closer integration with the Flight Coach plotter.
 	</p>
   <p class="d-none">
-    Click <a class="link" href="info">here</a> for information on how the automatic judging process 
-    works.
+    Click <a class="link" href="https://pyflightcoach.github.io/ScoringInfo/elements">here</a> for 
+    information on how the automatic judging process works.
   </p>
 	
 	<p>Developers:</p>

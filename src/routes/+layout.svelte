@@ -12,35 +12,37 @@
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
-	import { dev, help, windowHeight, windowWidth} from '$lib/stores/shared';
-  import '@beyonk/gdpr-cookie-consent-banner/banner.css'
-  import GdprBanner from '@beyonk/gdpr-cookie-consent-banner'
+	import { dev, help, windowHeight, windowWidth } from '$lib/stores/shared';
+	import '@beyonk/gdpr-cookie-consent-banner/banner.css';
+	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner';
 
-	
-
-	
 	export const gpdc = {
 		cookieName: 'fcscore_cookie_consent',
-		heading: "Cookie Consent",
-		visible: "true",
-		buttonText: "Accept Cookies",
-		description: "The only cookies used by this website are for its correct operation. We do not use advertising, marketing or third-party tracking cookies.",
+		heading: 'Cookie Consent',
+		visible: 'true',
+		buttonText: 'Accept Cookies',
+		description:
+			'The only cookies used by this website are for its correct operation. We do not use advertising, marketing or third-party tracking cookies.',
 		choices: {
 			necessary: {
 				label: 'Necessary cookies',
 				description: "Cookies to make this website work. Can't be turned off.",
 				value: true
-				},
+			},
 			tracking: false,
 			analytics: false,
 			marketing: false
-			},
+		},
 		showEditIcon: false
 	};
-	
+
 	polyfillCountryFlagEmojis();
 
-	const md = new MarkdownIt();
+	const md = new MarkdownIt({
+		html: true,
+		linkify: true,
+		typographer: true
+	});
 
 	$: if ($page) {
 		let helpFileName = $page.url.pathname
@@ -111,7 +113,6 @@
 		{/if}
 	</div>
 </div>
-
 
 <svelte:head>
 	<title>FCScore{$dev ? ' dev' : ''}</title>
