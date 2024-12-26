@@ -68,19 +68,21 @@ export let dbServer: AxiosInstance;
 export const dbServerAddress: Writable<string> = writable();
 
 export const customDbServer = newCookieStore('customDbServer', 'http://localhost:8000');
-export const ukDBServer = 'https://flightcoachscore.org:5012';
+
+export const db_servers = {
+	uk: 'https://flightcoachscore.org:5012',
+	pre: 'https://flightcoachscore.org:5022'
+};
 
 export const dbSOption = newCookieStore('dbSOption', 'uk', (value) => {
 	if (dev || get(user)?.is_superuser) {
-		switch (value) {
-			case 'uk':
-				dbServerAddress.set(ukDBServer);
-				break;
-			default:
-				dbServerAddress.set(get(customDbServer));
-		} 
+    if (Object.keys(db_servers).includes(value)) {
+      dbServerAddress.set(db_servers[value as keyof typeof db_servers]);
+    } else {
+      dbServerAddress.set(get(customDbServer));
+    } 
 	} else { 
-    dbServerAddress.set(ukDBServer);
+    dbServerAddress.set(db_servers.uk);
   }
 });
 
