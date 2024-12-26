@@ -3,7 +3,7 @@
 	import ServerSelection from '$lib/components/ServerSelection.svelte';
 	import { base } from '$app/paths';
 	import { dev } from '$lib/stores/shared';
-	import { an_servers, anSOption, customAnalysisServer, dbServer } from '$lib/api';
+	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api';
 	import { dbSOption, customDbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
 </script>
@@ -18,21 +18,19 @@
 			bind:custom={$customAnalysisServer}
 			bind:selected={$anSOption}
 		/>
-	{/if}
-	{#if $dev}
 		<div class="dropdown-divider"></div>
 		<ServerSelection
 			title="Database Server"
-			options={['uk']}
+			options={Object.keys(db_servers)}
 			bind:custom={$customDbServer}
 			bind:selected={$dbSOption}
 		/>
 	{/if}
-  <hr/>
-  <small class="dropdown-header">Management</small>
-  <a class="dropdown-item" href="{base}/news">News</a>
-  <hr/>
-  <small class="dropdown-header">Debugging</small>
+	<hr />
+	<small class="dropdown-header">Management</small>
+	<a class="dropdown-item" href="{base}/news">News</a>
+	<hr />
+	<small class="dropdown-header">Debugging</small>
 	<button
 		class="dropdown-item"
 		title="Temporarily make me a normal user to see how it looks."
@@ -55,10 +53,15 @@
 		>
 			Invalidate Token
 		</button>
-    <button class="dropdown-item"
-      on:click={()=>{if ($user) {$user.is_verified=false}}}
-    >
-      Uverify me
-    </button>
+		<button
+			class="dropdown-item"
+			on:click={() => {
+				if ($user) {
+					$user.is_verified = false;
+				}
+			}}
+		>
+			Uverify me
+		</button>
 	{/if}
 </NavMenu>
