@@ -29,8 +29,8 @@ export const anServerAddress: Writable<string> = writable();
 export const customAnalysisServer = newCookieStore('customAnalysisServer', 'http://localhost:5000');
 
 export const an_servers = {
-	uk: 'https://madeupmodels.com:5010',
-	pre: 'https://madeupmodels.com:5020'
+	uk: 'https://flightcoachscore.org:5010',
+	pre: 'https://flightcoachscore.org:5020'
 };
 
 export const anSOption = newCookieStore('anSOption', 'uk', (value) => {
@@ -68,7 +68,7 @@ export let dbServer: AxiosInstance;
 export const dbServerAddress: Writable<string> = writable();
 
 export const customDbServer = newCookieStore('customDbServer', 'http://localhost:8000');
-export const ukDBServer = 'https://madeupmodels.com:5012';
+export const ukDBServer = 'https://flightcoachscore.org:5012';
 
 export const dbSOption = newCookieStore('dbSOption', 'uk', (value) => {
 	if (dev || get(user)?.is_superuser) {
