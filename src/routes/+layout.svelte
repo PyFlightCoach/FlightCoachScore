@@ -51,7 +51,7 @@
 			.join('')
 			.replace('_', '');
 
-		fetch(`${base}/help/${helpFileName || 'home'}.md`)
+		fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
 			.then((response) => {
 				if (!response.ok) {
 					throw new Error('no help available');
