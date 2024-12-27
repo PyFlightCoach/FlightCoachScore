@@ -9,17 +9,9 @@
 	$: manEnabled = $origin && $binData ? '' : 'disabled';
 </script>
 
-<li class="nav-item">
-	<ul class="pagination">
-		<li class="page-item">
-			<a class="nav-link {datActive} {datEnabled}" href={base + '/flight/create/data'}
-				>1 Load Flight Data</a
-			>
-		</li>
-		<li class="page-item">
-			<a class="nav-link {manActive} {manEnabled}" href={base + '/flight/create/manoeuvres'}
-				>2 Select Manoeuvres</a
-			>
-		</li>
-	</ul>
-</li>
+<a class="col-auto nav-link {datActive} {datEnabled}" href={base + '/flight/create/data'}
+  >1 Load Flight Data</a
+>
+<a class="col-auto nav-link {manActive} {manEnabled}" href={base + '/flight/create/manoeuvres'}
+  >2 Select Manoeuvres</a
+>

@@ -6,7 +6,6 @@
 	import Progress from './Progress.svelte';
 	import MarkdownIt from 'markdown-it';
 	import MainNavBar from './MainNavBar.svelte';
-	import navBarContents from '$lib/stores/navBarContents';
 	import { onMount } from 'svelte';
 	import { dbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
@@ -84,13 +83,9 @@
 
 <GdprBanner {...gpdc} />
 
-<div class="container-fluid justify-content-center min-vh-100 d-flex flex-column">
+<div class="container-fluid justify-content-center min-vh-80 d-flex flex-column overflow-auto">
 	<div class="row">
-		<MainNavBar>
-			{#if $navBarContents}
-				<svelte:component this={$navBarContents} />
-			{/if}
-		</MainNavBar>
+		<MainNavBar/>
 	</div>
 	<div class="row flex-grow-1 justify-content-center">
 		<slot />

@@ -17,7 +17,7 @@
 
 {#if $manNames && $manNames.length > 0}
 	<button
-		class="nav-item nav-link"
+		class="col-auto nav-item nav-link"
     title="clear all analysis data"    
     data-bs-toggle="tooltip"
 		on:click={() => {
@@ -27,15 +27,15 @@
 	>
 		Clear
 	</button>
-	<ul class="nav-item pagination">
+	
 		<a
-			class="page-item nav-link {$page.url.pathname.endsWith('results') ? 'active' : ''}"
+			class="col-auto page-item nav-link {$page.url.pathname.endsWith('results') ? 'active' : ''}"
 			href={base + '/flight/results'}>Results</a
 		>
-	</ul>
+	
 	{#if $user?.is_superuser}
 		<button
-			class="nav-link"
+			class="col-auto nav-link"
 			on:click={() => {
 				analyseAll(true, true);
 			}}

@@ -4,6 +4,7 @@
 	import { analyseAll } from '$lib/analysis/analysis';
 </script>
 
+<div class="table-responsive">
 <table
 	class="table table-sm table-hover table-bordered"
 	data-sveltekit-preload-data="tap"
@@ -40,3 +41,4 @@
 		{/if}
 	</tbody>
 </table>
+</div>

@@ -13,19 +13,14 @@
 
 </script>
 
-<li class="nav-item">
-	<ul class="pagination">
-		{#if $man || !isRunning}
-			
-				<li class="page-item"><a class="nav-link {isLoaded('manoeuvre')}" href={plink('')}>Summary</a></li>
-				<li class="page-item"><a class="nav-link {isLoaded('alignment')}" href={plink('alignment')}>Alignment</a></li>
-				{#if $man?.scores}
-					<li class="page-item"><a class="nav-link {isLoaded('intra')}" href={plink('intra')}>Intra</a></li>
-					<li class="page-item"><a class="nav-link {isLoaded('inter')}" href={plink('inter')}>Inter</a></li>
-					<li class="page-item"><a class="nav-link {isLoaded('positioning')}" href={plink('positioning')}>Positioning</a></li>
-					<li class="page-item"><a class="nav-link {isLoaded('templates')}" href={plink('templates')}>Templates</a></li>
-				{/if}
-		{/if}
-		<li class="page-item"><a class="nav-link" href={base + '/flight/results'}>Back</a></li>
-	</ul>
-</li>
+{#if $man || !isRunning}
+    <a class="col-auto nav-link {isLoaded('manoeuvre')}" href={plink('')}>Summary</a>
+    <a class="col-auto nav-link {isLoaded('alignment')}" href={plink('alignment')}>Alignment</a>
+    {#if $man?.scores}
+      <a class="col-auto nav-link {isLoaded('intra')}" href={plink('intra')}>Intra</a>
+      <a class="col-auto nav-link {isLoaded('inter')}" href={plink('inter')}>Inter</a>
+      <a class="col-auto nav-link {isLoaded('positioning')}" href={plink('positioning')}>Positioning</a>
+      <a class="col-auto nav-link {isLoaded('templates')}" href={plink('templates')}>Templates</a>
+    {/if}
+{/if}
+<a class="col-auto nav-link" href={base + '/flight/results'}>Back</a>

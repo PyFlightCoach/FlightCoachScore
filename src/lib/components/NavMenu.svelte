@@ -16,7 +16,7 @@
 	>
 		<slot name="icon" />
 	</a>
-  <ul class="dropdown-menu" aria-labelledby="navbarDropdown" >
+  <ul class="dropdown-menu" style="position:absolute;" aria-labelledby="navbarDropdown" >
     <slot />
   </ul>
   

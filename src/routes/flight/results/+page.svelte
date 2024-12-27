@@ -79,7 +79,7 @@
 	};
 </script>
 
-<div class="col-md-4 bg-light border pt-3">
+<div class="col-lg-4 bg-light border pt-3">
 	{#if form_state}
 		<div class="row mt-4">
 			<p><mark>{form_state}</mark></p>
@@ -185,9 +185,9 @@
 </div>
 </div>
 
-<div class="col-md-8 align-self pt-3">
+<div class="col-lg-8 align-self pt-3">
 	<div class="row px-md-5">
-		<div class="col-md-6">
+		<div class="col-auto">
 			<AnalysisSummary />
 		</div>
 

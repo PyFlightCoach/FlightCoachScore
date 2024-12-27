@@ -6,7 +6,7 @@
 </script>
 
 {#if $nRunning}
-  <div class="progress w-100 align-self-center">
+  <div class="col-auto progress w-100 align-self-center d-none d-sm-block">
     <div
       class="progress-bar"
       style="width: {Math.round((100 * n) / $nMans)}%"
