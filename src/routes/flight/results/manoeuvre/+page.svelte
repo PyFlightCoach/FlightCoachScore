@@ -7,7 +7,18 @@
   
 </script>  
 <div class="col">
-  {#if $man} 
-    <PlotSec flst={$man.flown} i={1}, expand={50} includeZero/>
+  {#if $man && $man.flown} 
+    <PlotSec flst={$man.flown} i={1} expand={50} includeZero 
+    controls={[
+      'slider',
+      'play',
+      'scale',
+      'speed',
+      'projection',
+      'modelClick',
+      'rangeEndClick',
+      'rangeStartClick',
+      'showBox'
+    ]}/>
   {/if}
 </div>

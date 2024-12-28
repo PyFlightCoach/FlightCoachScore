@@ -189,7 +189,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="container-fluid h-100 d-flex flex-column"
+	class="container-fluid h-100 d-flex flex-column p-0"
 	on:mousedown={() => {
 		clearInterval(player);
 	}}
@@ -205,80 +205,93 @@
 		{/if}
 	</div>
 
-	<div class="col-auto d-flex flex-row justify-content-end">
-		<div class="col">
-    {#if controls.includes('slider')}
-			<DoubleSlider
-				min={0}
-				max={flst.data.length}
-				bind:lhandle={range[0]}
-				bind:rhandle={range[1]}
-			/>
-		{/if}
-  </div>
-		<div class="col-auto btn-group">
+	<div class="col-auto d-flex flex-row justify-content-center">
+		<div class="row w-100 justify-content-center">
+			{#if controls.includes('slider')}
+				<div class="col" style="min-width:200px;">
+					<DoubleSlider
+						min={0}
+						max={flst.data.length}
+						bind:lhandle={range[0]}
+						bind:rhandle={range[1]}
+					/>
+				</div>
+			{/if}
+
 			{#if controls.includes('play')}
 				{#if player}
-					<button class="btn btn-outline-secondary" on:click={pause}>Pause</button>
+					<button class="col-auto btn btn-outline-secondary" on:click={pause} aria-label="Pause">
+            <i class="bi bi-pause"></i>
+          </button>
 				{:else}
-					<button class="btn btn-outline-secondary" on:click={play}>Play</button>
+					<button class="col-auto btn btn-outline-secondary" on:click={play} aria-label="Play">
+            <i class="bi bi-play"></i>
+          </button>
 				{/if}
 			{/if}
 
 			{#if controls.includes('scale')}
-				<button
-					class="btn btn-outline-secondary"
-					on:click={() => {
-						changeWhilePlaying(() => {
-							scale_multiplier = scale_multiplier * 1.2;
-						});
-					}}>+</button
-				>
+				<div class="col-auto btn-group p-0">
+					<button
+						class="btn btn-outline-secondary"
+						on:click={() => {
+							changeWhilePlaying(() => {
+								scale_multiplier = scale_multiplier * 1.2;
+							});
+						}} title="Increase Wingspan">+</button
+					>
 
-				<button
-					class="btn btn-outline-secondary"
-					on:click={() => {
-						changeWhilePlaying(() => {
-							scale_multiplier = Math.max(0.2, scale_multiplier * 0.8);
-						});
-					}}>-</button
-				>
+					<button
+						class="btn btn-outline-secondary"
+						on:click={() => {
+							changeWhilePlaying(() => {
+								scale_multiplier = Math.max(0.2, scale_multiplier * 0.8);
+							});
+						}} title="Reduce Wingspan">-</button
+					>
+				</div>
 			{/if}
 
 			{#if controls.includes('speed')}
-				<button
-					class="btn btn-outline-secondary"
-					on:click={() => {
-						changeWhilePlaying(() => {
-							speed = Math.min(60, speed * 1.6);
-						});
-					}}>Slow</button
-				>
+				<div class="btn-group col-auto p-0">
+					<button
+						class="btn btn-outline-secondary"
+						on:click={() => {
+							changeWhilePlaying(() => {
+								speed = Math.min(60, speed * 1.6);
+							});
+						}} aria-label="Slower" title="Slower">
+            <i class="bi bi-rewind"></i>
+            </button
+					>
 
-				<button
-					class="btn btn-outline-secondary"
-					on:click={() => {
-						changeWhilePlaying(() => {
-							speed = Math.max(5, speed / 1.6);
-						});
-					}}>Fast</button
-				>
+					<button
+						class="btn btn-outline-secondary"
+						on:click={() => {
+							changeWhilePlaying(() => {
+								speed = Math.max(5, speed / 1.6);
+							});
+						}} aria-label="Faster" title="Faster"><i class="bi bi-fast-forward"></i></button
+					>
+				</div>
 			{/if}
 
 			{#if controls.includes('projection')}
-				<button class="btn btn-outline-secondary" on:click={toggleProjection}
+				<button class="col-auto btn btn-outline-secondary" on:click={toggleProjection}
 					>{layout.scene.camera.projection.type}</button
 				>
 			{/if}
 			{#if controls.includes('showBox')}
 				<input
 					type="checkbox"
-					class="btn-check"
+					class="col-auto btn-check"
 					id="btn-check"
 					autocomplete="off"
 					bind:checked={showBox}
 				/>
-				<label class="btn btn-outline-secondary text-nowrap" for="btn-check">Show Box</label>
+				<label class="col-auto btn btn-outline-secondary text-nowrap" for="btn-check"
+					>Show Box</label
+				>
 			{/if}
 		</div>
 	</div>

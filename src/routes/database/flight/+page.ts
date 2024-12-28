@@ -2,6 +2,8 @@ import { dbServer } from '$lib/api.js';
 import { Flight } from '$lib/database/flight';
 import { States } from '$lib/analysis/state';
 import { blockProgress, unblockProgress, loading } from '$lib/stores/shared.js';
+
+
 export async function load({ url }) {
 	loading.set(true);
 	const flight_id = url.searchParams.get('flight_id');
