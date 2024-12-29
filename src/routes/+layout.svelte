@@ -83,11 +83,11 @@
 
 <GdprBanner {...gpdc} />
 
-<div class="container-fluid justify-content-center min-vh-100 d-flex flex-column overflow-auto">
-	<div class="row">
-		<MainNavBar/>
-	</div>
-	<div class="row flex-grow-1 justify-content-center">
+<div class="container-fluid  min-vh-100 d-flex flex-column overflow-auto  ">
+  <div class="row justify-self-start">
+    <MainNavBar/>
+  </div>
+	<div class="row flex-grow-1 justify-content-center ">
 		<slot />
 	</div>
 </div>

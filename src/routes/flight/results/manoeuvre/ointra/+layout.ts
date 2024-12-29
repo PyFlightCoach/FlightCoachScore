@@ -6,11 +6,12 @@ import { goto } from '$app/navigation';
 
 export async function load() {
 
-	await analyseManoeuvre(get(selManID)!, false, false).then(() => {
+	await analyseManoeuvre(get(selManID)!).then(() => {
 		if (!get(analyses[get(selManID) as number])?.scores) {
 			alert('Analysis failed, cannot load results');
 			goto(base + '/flight/results/manoeuvre');
 		}
 	}).catch(() => {goto(base + '/flight/results')});
 
+  
 }

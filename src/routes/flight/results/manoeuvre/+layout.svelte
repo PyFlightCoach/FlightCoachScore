@@ -7,12 +7,12 @@
   $navBarContents = Menu;
 
   let man = analyses[$selManID!];
-  let isRunning = running[$selManID!]
+  let isRunning = $running[$selManID!];
   
 </script>
 
 {#if $man}
-  {#if !$isRunning}
+  {#if !isRunning}
     <slot />
   {:else}
     <p>Running ...</p>
@@ -20,4 +20,3 @@
 {:else}
   <p>No Internal Data</p>
 {/if}
-

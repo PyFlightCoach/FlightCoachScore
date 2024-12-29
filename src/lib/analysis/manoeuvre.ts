@@ -89,7 +89,7 @@ export class Manoeuvre {
 	}
 
 	getEl(elName: string | undefined): Line | Loop | Snap | Spin | StallTurn | undefined{
-		for (let el of this.elements) {
+		for (const el of this.elements) {
 			if (el.uid == elName) {
 				switch (el.kind) {
           case 'Line':

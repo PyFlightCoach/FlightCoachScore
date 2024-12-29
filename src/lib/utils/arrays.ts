@@ -1,4 +1,9 @@
 
+export function objmap(obj: Record<string, any>, fun: (a: any)=>any) {
+  return Object.fromEntries(Object.entries(obj).map(([k, v])=>[k, fun(v)]));
+}
+
+
 export function linspace(start: number, stop: number, num: number) {
 	const step = (stop - start) / (num - 1);
 	const arr: number[] = [];

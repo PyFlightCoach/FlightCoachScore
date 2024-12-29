@@ -103,6 +103,11 @@ export class Results {
     }
     return res;
   }
+
+  values() {
+    return Object.fromEntries(Object.entries(this.data).map(([k, v])=>[k, v.total]));
+  }
+
 }
 
 export class ElementsResults {
@@ -118,12 +123,22 @@ export class ElementsResults {
 
   all_fields() {
     const af: string[] = [];
-    $: Object.values(this.data).forEach((results) => {
+    Object.values(this.data).forEach((results) => {
       Object.values(results.data).forEach((result) => {
         af.push(result.name);
       });
     });
     return Array.from(new Set(af));
+  }
+
+  field_totals () {
+    const fields = Object.fromEntries(this.all_fields().map(k=>[k, 0]));
+    Object.values(this.data).forEach(results => {
+      Object.entries(results.data).forEach(([k, v]) => {
+        fields[k] = fields[k] + v.total;
+      });
+    });
+    return fields;
   }
 
   get_downgrades(field = 'Total') {
@@ -157,7 +172,7 @@ export class ElementsResults {
   }
 
   summaries() {
-    const summaries: Record<string, Record<string, number | null>> = {};
+    const summaries: Record<string, Record<string, number | undefined>> = {};
     const allfields: string[] = this.all_fields();
 
     Object.entries(this.data).forEach(([k, v]) => {
@@ -166,13 +181,15 @@ export class ElementsResults {
         if (f in v.data) {
           summaries[k][f] = v.data[f].total;
         } else {
-          summaries[k][f] = null;
+          summaries[k][f] = undefined;
         }
       });
       summaries[k]['Total'] = v.total;
     });
     return summaries;
   }
+
+
 
   factoredDG(difficulty: (v: number) => number, trunc = false) {
     if (trunc) {

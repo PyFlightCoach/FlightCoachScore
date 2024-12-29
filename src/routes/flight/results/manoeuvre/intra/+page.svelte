@@ -1,105 +1,170 @@
 <script lang="ts">
-	import PlotSec from '$lib/components/plots/PlotSec.svelte';
+	import { selManID, analyses, isFullSize } from '$lib/stores/analysis';
 	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
-	import { analyses, selManID, isFullSize } from '$lib/stores/analysis';
-	import type { States } from '$lib/analysis/state';
-	import CriteriaPlot from './CriteriaPlot.svelte';
-	import VisPlot from './VisPlot.svelte';
+	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import DGPlot from './DGPlot.svelte';
-	import ColouredTable from '$lib/components/ColouredTable.svelte';
+	import CriteriaPlot from './CriteriaPlot.svelte';
+	import { d3Color } from '$lib/components/plots/styling';
+	import { objmap } from '$lib/utils/arrays';
+	import { windowWidth } from '$lib/stores/shared';
+	import VisPlot from './VisPlot.svelte';
 
-	$: man = analyses[$selManID!];
+	const md = $derived($windowWidth >= 768);
 
-	$: summaries = $man!.scores!.intra.summaries();
+	const man = analyses[$selManID!];
 
-	let states: Record<string, States>;
-	let templates: Record<string, States>;
-	$: states = $man!.flown!.split();
-	$: templates = $man!.template!.split();
+	let activeIndex = $state(0);
 
-	let activeCriteria: undefined | string;
-	let activeDGName: undefined | string;
-	let activeIndex: undefined | number = 0;
+	let states = $derived($man!.flown!.split());
+	let templates = $derived($man!.template!.split());
+	let selectedElement: string = $state('All');
+	let selectedDg: string | undefined = $state(undefined);
 
-	$: activeED = $man!.mdef!.getEd(activeDGName);
-	$: dg = activeED?.getDG(activeCriteria);
+	let elres = $derived(selectedElement ? $man!.scores?.intra.data[selectedElement] : undefined);
+	let resdg = $derived(elres && selectedDg ? elres.data[selectedDg] : undefined);
+	let el = $derived(selectedElement ? $man!.mdef?.eds[selectedElement] : undefined);
+	let eldg = $derived(selectedDg && el ? el?.dgs[selectedDg] : undefined);
+	let field_totals = $derived($man!.scores?.intra.field_totals());
+	let dgs = $derived(elres?.values() || field_totals);
 
-	$: element = $man!.manoeuvre!.getEl(activeED?.name);
+	let summaries = $derived($man!.scores?.intra.summaries());
 
-	$: result =
-		activeDGName && activeCriteria
-			? $man?.scores!.intra.data[activeDGName].data[activeCriteria]
-			: undefined;
+	let eltotals = $derived(
+		summaries ? objmap(summaries, (v: Record<string, number>) => v[selectedDg || 'Total']): undefined
+	);
 </script>
 
-<div class="col-md-6 pt-3 border">
-	<ColouredTable data={summaries} bind:activeRow={activeDGName} bind:activeCol={activeCriteria} />
+<div class="col-md-4 pt-3 bg-light border">
+	<div class="row">
+		<label class="col col-form-label" for="select-element">Select Element:</label>
+		<select
+			class="col form-select"
+			bind:value={selectedElement}
+			onchange={() => {
+				if (!Object.keys($man!.scores!.intra.data).includes(selectedElement)) {
+					selectedDg = undefined;
+				}
+			}}
+		>
+			<option value="All">All</option>
+      {#if $man!.scores}
+			{#each Object.keys($man!.scores!.intra.data) as elName, i}
+				<option value={elName} style="background-color: {d3Color(i)};">{elName}</option>
+			{/each}
+      {/if}
+		</select>
+	</div>
+	<div class="row pt-2">
+		<label class="col col-form-label" for="criteriaTable">Select Criteria:</label>
+		{#if selectedDg}
+			<button
+				class="col btn btn-sm btn-outline-secondary"
+				onclick={() => {
+					selectedDg = undefined;
+				}}>Clear Criteria</button
+			>
+		{/if}
+	</div>
+	<div class="row pt-2">
+		<table class="small table table-sm" id="criteriaTable">
+			<thead
+				><tr>
+					<th></th>
+					<th>Name</th>
+					<th>Value</th>
+				</tr></thead
+			>
+			<tbody>
+				{#each dgs ? Object.entries(dgs) : [] as [name, value]}
+					<tr>
+						<td>
+							<input
+								class="form-check-input"
+								type="radio"
+								name="manSelect"
+								bind:group={selectedDg}
+								value={name}
+							/>
+						</td>
+						<td>{name}</td>
+						<td>{value?.toFixed(2)}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
+	{#if resdg && eldg}
+		<div class="row">
+			<div class="table-responsive small">
+				<table class="table table-sm">
+					<tbody>
+						<tr><td>Measurement:</td> <td> {eldg?.measure}</td></tr>
+						<tr
+							><td>Element:</td>
+							<td> {$man?.manoeuvre?.getEl(selectedElement)?.describe()}</td></tr
+						>
+						<tr><td>Sample:</td> <td> {eldg?.describe_selectors()}</td></tr>
+						<tr>
+							<td>Smoothing: </td>
+							<td> {eldg.smoothers.length > 0 ? eldg.smoothers : 'None'}</td>
+						</tr>
+						<tr><td>Criteria: </td> <td> {eldg?.criteria_description(resdg)}</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{/if}
 </div>
 
-<div class="col-md-6 d-flex flex-column border">
-	{#if !activeCriteria}
-		{#if !activeED}
-			<PlotDTW sts={states} bind:activeEl={activeED} sp={$isFullSize ? 10 : 4} />
-		{:else}
-			<PlotSec
-				flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
-				tpst={templates[activeED.name]}
-				bind:i={activeIndex}
-				controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
-				fixRange
-				scale={0.2}
-        expand={40}
-			/>
-		{/if}
-	{:else}
-		<div class="col-12 flex-grow-1 border d-flex flex-row border">
-			<div class="col-6 border">
-				<PlotSec
-					flst={states[activeED.name].move(templates[activeED.name].data[0].pos)}
-					tpst={templates[activeED.name]}
-					bind:i={activeIndex}
-					controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
-					fixRange
-					scale={0.4}
-          expand={40}
-				/>
-			</div>
+{#snippet plotsec()}
+	<PlotSec
+		flst={states[selectedElement].move(templates[selectedElement].data[0].pos)}
+		tpst={templates[selectedElement]}
+		bind:i={activeIndex}
+		controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
+		fixRange
+		scale={0.4}
+		expand={40}
+	/>
+{/snippet}
 
-			<div class="col-6 d-flex flex-column border">
-				<div class="col-12 border">
-					{#if activeCriteria && dg && element && result}
-						<table>
-							<tbody>
-								<tr><td>Measurement: </td> <td> {dg.measure}</td></tr>
-								<tr><td>Element: </td> <td> {element.describe()}</td></tr>
-								<tr><td>Sample: </td> <td> {dg.describe_selectors()}</td></tr>
-								<tr>
-									<td>Smoothing: </td>
-									<td> {dg.smoothers.length > 0 ? dg.smoothers : 'None'}</td>
-								</tr>
-								<tr><td>Criteria: </td> <td> {dg.criteria_description(result)}</td></tr>
-							</tbody>
-						</table>
-					{/if}
+<div class="col-md-8 flex-grow-1 d-flex flex-column">
+	{#if selectedElement == 'All' || !selectedDg}
+		<div class="row flex-grow-1" style="min-height:450px">
+			{#if selectedElement == 'All'}
+				<PlotDTW
+					sts={states}
+					sp={$isFullSize ? 10 : 4}
+					bind:activeEl={selectedElement}
+					defaultValue="All"
+					labels={eltotals ? objmap(eltotals, (v) => v?.toFixed(2)) : {}}
+				/>
+			{:else if !selectedDg}
+				{@render plotsec()}
+			{/if}
+		</div>
+	{/if}
+
+	{#if selectedElement != 'All' && resdg}
+		<div class="row flex-grow-1">
+			<div class="col-md-8" style="min-height: 400px;">
+				{@render plotsec()}
+			</div>
+			<div class="col-md-4 d-flex flex-col">
+				<div class="row flex-grow-1" style="min-height: 200px;">
+					<CriteriaPlot result={resdg} downgrade={eldg} />
 				</div>
-				<div class="col-12 flex-grow-1 d-flex flex-row border">
-					<div class="col-6 border">
-						<VisPlot
-							{result}
-							downgrade={dg}
-							vis={activeIndex ? result?.measurement.visibility[activeIndex] : undefined}
-						/>
-					</div>
-					<div class="col-6 border">
-						<CriteriaPlot {result} downgrade={dg} />
-					</div>
+				<div class="row flex-grow-1" style="min-height: 200px;">
+					<VisPlot
+						result={resdg}
+						downgrade={eldg}
+						vis={activeIndex ? resdg?.measurement.visibility[activeIndex] : 1}
+					/>
 				</div>
 			</div>
 		</div>
-		<div class="col-12 flex-grow-1 border">
-			{#if result && dg && activeCriteria}
-				<DGPlot {result} bind:activeIndex />
-			{/if}
+		<div class="row" style="min-height:250px;">
+			<DGPlot result={resdg} bind:activeIndex />
 		</div>
 	{/if}
 </div>

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { max } from '$lib/utils/arrays';
 	import { d3Colors, colscale, redsColors } from '$lib/components/plots/styling';
+  import {createEventDispatcher} from 'svelte';
+
+  const dispatch = createEventDispatcher();
 
 	export let data: Record<string, Record<string, number>>;
 	export let activeRow: null | string = null;
@@ -22,6 +25,7 @@
 			activeRow = row;
 			activeCol = col;
 		}
+    dispatch('select', {row, col});
 	};
 
 	const getColor = (row: string, col: string) => {
@@ -34,7 +38,7 @@
 </script>
 
 <div class="table-responsive">
-	<table class="table table-sm table-hover table-bordered border-primary text-center">
+	<table class="table table-sm table-hover table-bordered border-primary text-center ">
 		<thead>
 			<tr>
 				<th role="button" class="text-center" on:click={() => activateCell(null, null)}
