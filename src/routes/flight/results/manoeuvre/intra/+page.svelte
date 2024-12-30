@@ -30,9 +30,35 @@
 	let summaries = $derived($man!.scores?.intra.summaries());
 
 	let eltotals = $derived(
-		summaries ? objmap(summaries, (v: Record<string, number>) => v[selectedDg || 'Total']): undefined
+		summaries
+			? objmap(summaries, (v: Record<string, number>) => v[selectedDg || 'Total'])
+			: undefined
 	);
 </script>
+
+{#snippet plotsec()}
+	<PlotSec
+		flst={states[selectedElement].move(templates[selectedElement].data[0].pos)}
+		tpst={templates[selectedElement]}
+		bind:i={activeIndex}
+		controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
+		fixRange
+		scale={0.4}
+		expand={40}
+	/>
+{/snippet}
+
+{#snippet critplot()}
+	<CriteriaPlot result={resdg} downgrade={eldg} />
+{/snippet}
+
+{#snippet visplot()}
+	<VisPlot
+		result={resdg}
+		downgrade={eldg}
+		vis={activeIndex ? resdg?.measurement.visibility[activeIndex] : 1}
+	/>
+{/snippet}
 
 <div class="col-md-4 pt-3 bg-light border">
 	<div class="row">
@@ -47,11 +73,11 @@
 			}}
 		>
 			<option value="All">All</option>
-      {#if $man!.scores}
-			{#each Object.keys($man!.scores!.intra.data) as elName, i}
-				<option value={elName} style="background-color: {d3Color(i)};">{elName}</option>
-			{/each}
-      {/if}
+			{#if $man!.scores}
+				{#each Object.keys($man!.scores!.intra.data) as elName, i}
+					<option value={elName} style="background-color: {d3Color(i)};">{elName}</option>
+				{/each}
+			{/if}
 		</select>
 	</div>
 	<div class="row pt-2">
@@ -66,7 +92,7 @@
 		{/if}
 	</div>
 	<div class="row pt-2">
-		<table class="small table table-sm" id="criteriaTable">
+		<table class=" table {!md ? 'small table-sm' : ''}" id="criteriaTable">
 			<thead
 				><tr>
 					<th></th>
@@ -95,8 +121,8 @@
 	</div>
 	{#if resdg && eldg}
 		<div class="row">
-			<div class="table-responsive small">
-				<table class="table table-sm">
+			<div class="table-responsive">
+				<table class="table {!md ? 'small table-sm' : ''}">
 					<tbody>
 						<tr><td>Measurement:</td> <td> {eldg?.measure}</td></tr>
 						<tr
@@ -115,18 +141,6 @@
 		</div>
 	{/if}
 </div>
-
-{#snippet plotsec()}
-	<PlotSec
-		flst={states[selectedElement].move(templates[selectedElement].data[0].pos)}
-		tpst={templates[selectedElement]}
-		bind:i={activeIndex}
-		controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
-		fixRange
-		scale={0.4}
-		expand={40}
-	/>
-{/snippet}
 
 <div class="col-md-8 flex-grow-1 d-flex flex-column">
 	{#if selectedElement == 'All' || !selectedDg}
@@ -150,18 +164,26 @@
 			<div class="col-md-8" style="min-height: 400px;">
 				{@render plotsec()}
 			</div>
-			<div class="col-md-4 d-flex flex-col">
-				<div class="row flex-grow-1" style="min-height: 200px;">
-					<CriteriaPlot result={resdg} downgrade={eldg} />
+			{#if md}
+        <div class="col-md-4 d-flex flex-column">
+          <div class="col">
+            {@render critplot()}
+          </div>
+          <div class="col">
+            {@render visplot()}
+          </div>
+        </div>
+      
+      {:else}
+				<div class="col-md-4 d-flex flex-col">
+					<div class="row flex-grow-1" style="min-height: 200px;">
+						{@render critplot()}
+					</div>
+					<div class="row flex-grow-1" style="min-height: 200px;">
+						{@render visplot()}
+					</div>
 				</div>
-				<div class="row flex-grow-1" style="min-height: 200px;">
-					<VisPlot
-						result={resdg}
-						downgrade={eldg}
-						vis={activeIndex ? resdg?.measurement.visibility[activeIndex] : 1}
-					/>
-				</div>
-			</div>
+			{/if}
 		</div>
 		<div class="row" style="min-height:250px;">
 			<DGPlot result={resdg} bind:activeIndex />
