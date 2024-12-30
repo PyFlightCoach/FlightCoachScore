@@ -92,7 +92,8 @@
 		{/if}
 	</div>
 	<div class="row pt-2">
-		<table class=" table {!md ? 'small table-sm' : ''}" id="criteriaTable">
+    <div class="table-responsive">
+		<table class=" table {!md ? 'small table-sm' : ''} border" id="criteriaTable">
 			<thead
 				><tr>
 					<th></th>
@@ -118,11 +119,12 @@
 				{/each}
 			</tbody>
 		</table>
+  </div>
 	</div>
 	{#if resdg && eldg}
 		<div class="row">
 			<div class="table-responsive">
-				<table class="table {!md ? 'small table-sm' : ''}">
+				<table class="table border {!md ? 'small table-sm' : ''}">
 					<tbody>
 						<tr><td>Measurement:</td> <td> {eldg?.measure}</td></tr>
 						<tr

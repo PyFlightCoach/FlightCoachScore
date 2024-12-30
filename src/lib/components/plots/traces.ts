@@ -93,7 +93,7 @@ export const single_point = (x = 0, y = 0, z = 0) => {
 	};
 };
 
-export const points = (pos: Point[], text: string[] | null = null): Record<string, any>[] => {
+export const points = (pos: Point[], text: string[] | undefined = undefined): Record<string, any>[] => {
 	let trs: Record<string, any>[] = [];
 	for (let i = 0; i < pos.length; i++) {
 		trs.push({
@@ -101,10 +101,10 @@ export const points = (pos: Point[], text: string[] | null = null): Record<strin
 			x: [pos[i].x],
 			y: [pos[i].y],
 			z: [pos[i].z],
-			mode: 'markers',
+			mode: 'markers' + (text ? '+text' : ''),
 			marker: { color: 'black', size: 3 },
 			showlegend: false,
-			text: text == null ? '' : text[i]
+			text: text ? text[i] : `point ${i}`
 		});
 	}
 
