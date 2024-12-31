@@ -10,6 +10,9 @@
 
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
+    if (previousPage.includes('user')) {
+      previousPage = base;
+    }
 	});
 
 	async function _handleSubmit(event: Event) {
