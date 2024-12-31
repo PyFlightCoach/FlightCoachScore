@@ -18,7 +18,7 @@
 
 			const user = {
 				token: data.token,
-				password: fdata.get('password')
+				password: fdata.get('new-password')
 			};
       
       await dbServer.post('auth/reset-password', user);
