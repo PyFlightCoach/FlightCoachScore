@@ -1,8 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: Mixing old (on:change) and new syntaxes for event handling is not allowed. Use only the onchange syntax -->
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
-	import { safeGetLibrary, ScheduleLibrary } from '$lib/schedules.js';
+	import { library } from '$lib/schedules.js';
 	import {
 		n_results,
 		n_days_val,
@@ -18,39 +16,32 @@
 		version,
 		manoeuvre_ind,
 		singleman,
-		getDays
+		getDays,
+		includeMyBest,
+		includeMyLatest,
+		includeActive
 	} from '$lib/stores/leaderboards';
-	import { lib } from 'markdown-it/lib/common/utils.mjs';
+	import { activeFlight } from '$lib/stores/shared';
 
-	interface Props {
-		fa_versions: string[];
-	}
+	let { fa_versions, schedule_ids }: { fa_versions: string[]; schedule_ids: string[] } = $props();
 
-	let { fa_versions }: Props = $props();
+	let lib = $derived($library.downselect(schedule_ids));
 
-	let library: ScheduleLibrary | undefined = $state();
-	let selectedCategory: string | undefined = $state();
-	let selectedSchedule: string | undefined = $state();
+	let categories = $derived(lib.unique('category_name') || []);
 
-	let categories = $derived(library?.unique('category_name') || []);
-
-	let schedules = $derived(
-		selectedCategory && library
-			? library?.subset({ category_name: selectedCategory }).unique('schedule_name')
-			: []
+	let selectedCategory: string | undefined = $state(
+		$schedule_id ? lib.subset({ schedule_id: $schedule_id }).first?.category_name : categories[0]
 	);
 
-	safeGetLibrary().then((lib) => {
-		library = lib;
-		selectedCategory = $schedule_id
-			? library?.subset({ schedule_id: $schedule_id }).first?.category_name
-			: undefined;
+	let schedules = $derived(
+		selectedCategory ? lib?.subset({ category_name: selectedCategory }).unique('schedule_name') : []
+	);
 
-		selectedSchedule =
-			$schedule_id && library
-				? library?.subset({ schedule_id: $schedule_id }).first?.schedule_name
-				: undefined;
-	});
+	let selectedSchedule: string | undefined = $state(
+		$schedule_id
+			? lib?.subset({ schedule_id: $schedule_id }).first?.schedule_name
+			: lib?.subset({ category_name: selectedCategory }).unique('schedule_name')[0]
+	);
 
 	let n_days = $derived({ 0: 1, 370: 720, 380: 10000 }[$n_days_val] || $n_days_val);
 
@@ -60,10 +51,8 @@
 			$date_after = new Date(new Date().getTime() - 24 * getDays(n_days) * 3600 * 1000)
 				.toISOString()
 				.split('T')[0]; // restrict to flights after this date yyyy-mm-dd
-		} 
+		}
 	});
-
-
 </script>
 
 <div class="p-2 row">
@@ -112,9 +101,9 @@
 		bind:value={selectedSchedule}
 		onchange={(e) => {
 			const value = (e.target as HTMLSelectElement).value;
-			if (library && selectedCategory && value) {
-				$schedule_id = library.subset({ category_name: selectedCategory, schedule_name: value })
-					.first?.schedule_id;
+			if (selectedCategory && value) {
+				$schedule_id = lib.subset({ category_name: selectedCategory, schedule_name: value }).first
+					?.schedule_id;
 			}
 		}}
 	>
@@ -234,5 +223,68 @@
 			max="380"
 			step="10"
 		/>
+	</div>
+{/if}
+
+<div class="row p-2">
+	<label class="col col-form-label" for="nflights">Include the top {$n_results} results:</label>
+	<input
+		type="range"
+		class="form-range"
+		bind:value={$n_results}
+		id="nflights"
+		name="n_flights"
+		min="1"
+		max="100"
+		step="1"
+	/>
+</div>
+
+{#if $sort_by_score_flag && !$one_per_pilot_flag}
+	<div class="row p-2">
+		<div class="row"><label class="col col-form-label" for="version">Include My:</label></div>
+		<div class="btn-group">
+			<input
+				type="checkbox"
+				class="btn-check"
+				id="incBest"
+				autocomplete="off"
+				checked={$includeMyBest > 0}
+				onchange={(e) => {
+					$includeMyBest = (e.target as HTMLInputElement).checked ? 1 : 0;
+				}}
+			/>
+			<label class="btn btn-outline-secondary" for="incBest" title="Include your best flight"
+				>Best</label
+			>
+			<input
+				type="checkbox"
+				class="btn-check"
+				id="incLatest"
+				autocomplete="off"
+				checked={$includeMyLatest > 0}
+				onchange={(e) => {
+					$includeMyLatest = (e.target as HTMLInputElement).checked ? 1 : 0;
+				}}
+			/>
+			<label class="btn btn-outline-secondary" for="incLatest" title="Include your latest flight"
+				>Latest</label
+			>
+			<input
+				type="checkbox"
+				class="btn-check"
+				id="incActive"
+				autocomplete="off"
+				checked={$includeActive > 0 && $activeFlight?.isMine}
+				onchange={(e) => {
+					$includeActive = (e.target as HTMLInputElement).checked ? 1 : 0;
+				}}
+			/>
+			<label
+				class="btn btn-outline-secondary {$activeFlight?.isMine ? '' : 'disabled'}"
+				for="incActive"
+				title="Include the active flight if it is yours">Active</label
+			>
+		</div>
 	</div>
 {/if}

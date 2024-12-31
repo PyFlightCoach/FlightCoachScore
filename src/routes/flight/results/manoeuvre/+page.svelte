@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { selManID, analyses, selectedResult, difficulty, truncate } from '$lib/stores/analysis';
   import PlotSec from '$lib/components/plots/PlotSec.svelte';
-  $: man = analyses[$selManID!]
+  let man = $derived(analyses[$selManID!]);
 //  $: result = $man?.history[$selectedResult!]?.get_score($difficulty, $truncate)?.score;
 
   

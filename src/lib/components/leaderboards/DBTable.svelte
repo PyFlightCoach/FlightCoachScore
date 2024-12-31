@@ -26,7 +26,7 @@
 
 	let col_heads: string[];
 	$: if (lastResponse == 'leaderboard') {
-		col_heads = ['Position', 'Rank', 'Pilot', 'Country', 'Date', 'Score'];
+		col_heads = ['Position', 'Pilot', 'Country', 'Date', 'Score'];
 	} else if (lastResponse == 'flightlist') {
 		col_heads = ['Date', 'Pilot', 'Country', 'Score', 'Comment'];
 	}
@@ -46,7 +46,6 @@
 				console.log('failed to load flight');
 			});
 
-	//  <a href="{base}/database/flight/?flight_id={row.flight_id}">View</a>
 </script>
 
 {#if lastResponse}
@@ -61,7 +60,10 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each table_rows as row}
+				{#each table_rows as row, i}
+          {#if i > 0 &&  row.table_rank - table_rows[i-1].table_rank > 1 }
+          <tr><td colspan="{col_heads.length+1}" class="p-0 bg-secondary">...</td></tr>
+          {/if}
 					<tr
 						class={row.flight_id == $activeFlight?.meta.flight_id ? 'table-active' : ''}
 						role="button"
@@ -90,7 +92,7 @@
 						<tr class="p-0">
 							<td colspan={col_heads.length + 1} class="p-1">
 								{#if showFlight}
-									<FlightInfo bind:f={showFlight} />
+									<FlightInfo bind:f={showFlight} rank={row.rank}/>
 								{:else}
 									Loading
 								{/if}

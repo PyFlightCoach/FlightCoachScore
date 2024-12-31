@@ -10,9 +10,10 @@
 	import { manNames } from '$lib/stores/analysis';
 	import { loading, activeFlight } from '$lib/stores/shared';
 	import { goto } from '$app/navigation';
-  import {windowWidth} from '$lib/stores/shared';
+	import { windowWidth } from '$lib/stores/shared';
 
 	export let f: Flight;
+	export let rank: number | undefined;
 
 	let selectedVersion = Object.keys(f.meta.scores)[0];
 	let score: DBFlightScore;
@@ -42,34 +43,34 @@
 </script>
 
 <div class="row px-2 py-0">
-  {#if $windowWidth>=768}
-	<div class="col-md-4 py-0 px-1" style="max-height:300px;">
-		<Plot
-			data={[
-				{
-					lat: [f.meta.origin_lat],
-					lon: [f.meta.origin_lng],
-					type: 'scattermap',
-					mode: 'markers',
-					marker: { size: 10, color: 'red' },
-					showlegend: false
-				}
-			]}
-			layout={{
-				map: {
-					bearing: 0,
-					center: { lat: f.meta.origin_lat, lon: f.meta.origin_lng },
-					pitch: 0,
-					zoom: 4
-				},
-				margin: { l: 0, r: 0, t: 0, b: 0 }
-			}}
-      fillParent={true}
-			fillParentWidth={true}
-      fillParentHeight={true}
-		/>
-	</div>
-  {/if}
+	{#if $windowWidth >= 768}
+		<div class="col-md-4 py-0 px-1" style="max-height:300px;">
+			<Plot
+				data={[
+					{
+						lat: [f.meta.origin_lat],
+						lon: [f.meta.origin_lng],
+						type: 'scattermap',
+						mode: 'markers',
+						marker: { size: 10, color: 'red' },
+						showlegend: false
+					}
+				]}
+				layout={{
+					map: {
+						bearing: 0,
+						center: { lat: f.meta.origin_lat, lon: f.meta.origin_lng },
+						pitch: 0,
+						zoom: 4
+					},
+					margin: { l: 0, r: 0, t: 0, b: 0 }
+				}}
+				fillParent={true}
+				fillParentWidth={true}
+				fillParentHeight={true}
+			/>
+		</div>
+	{/if}
 	<div class="col-6 col-md-4 overflow-auto py-0 px-1" style="max-height:300px;">
 		<ul class="list-group">
 			<li class="input-group">
@@ -101,13 +102,13 @@
 				<a
 					class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
 					href="{base}/database/flight/?flight_id={f.meta.flight_id}"
-          data-sveltekit-preload-data="tap"
-        >
-          View Flight
-        </a>
+					data-sveltekit-preload-data="tap"
+				>
+					View Flight
+				</a>
 				<button
 					class="form-control btn btn-outline-secondary {canAnalyse ? '' : 'disabled'}"
-          data-sveltekit-preload-data="tap"
+					data-sveltekit-preload-data="tap"
 					on:click={() => {
 						if (isAnalysisLoaded) {
 							goto(base + '/flight/results');
@@ -118,48 +119,59 @@
 				>
 					View Analysis
 				</button>
-        {#if $user?.is_superuser}
-          <button
-            class="form-control btn btn-outline-secondary"
-            on:click={() => {
-
-              if (confirm('Are you sure you want to delete this flight?')) {
-                 dbServer.delete(`flight/${f.meta.flight_id}`);
-                 $activeFlight = undefined;
-              }
-            }}
-          >
-            Delete
-          </button>
-        {/if}
+				{#if $user?.is_superuser}
+					<button
+						class="form-control btn btn-outline-secondary"
+						on:click={() => {
+							if (confirm('Are you sure you want to delete this flight?')) {
+								dbServer.delete(`flight/${f.meta.flight_id}`);
+								$activeFlight = undefined;
+							}
+						}}
+					>
+						Delete
+					</button>
+				{/if}
 			</li>
 			<li class="list-group-item">
-				<table class="table-sm table-responsive">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Version</th>
-							<th>Score</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each Object.keys(f.meta.scores) as version}
-							<tr>
-								<td
-									><input
-										class="radio"
-										type="radio"
-										name="manSelect"
-										value={version}
-										bind:group={selectedVersion}
-									/></td
-								>
-								<td>{version}</td>
-								<td>{f.getScore($difficulty, $truncate, version).score.toFixed(2)}</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col">
+							<table class="table-sm table-responsive">
+								<thead>
+									<tr>
+										<th></th>
+										<th>Version</th>
+										<th>Score</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each Object.keys(f.meta.scores) as version}
+										<tr>
+											<td
+												><input
+													class="radio"
+													type="radio"
+													name="manSelect"
+													value={version}
+													bind:group={selectedVersion}
+												/></td
+											>
+											<td>{version}</td>
+											<td>{f.getScore($difficulty, $truncate, version).score.toFixed(2)}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+						{#if rank}
+							<div class="col align-content-center border rounded">
+								<small>Overall Ranking</small>
+								<h4>{rank}</h4>
+							</div>
+						{/if}
+					</div>
+				</div>
 			</li>
 		</ul>
 	</div>

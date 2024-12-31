@@ -11,8 +11,9 @@
 	import { Flight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+  import {postUploadSearch} from '$lib/stores/leaderboards';
 
-	$navBarContents = AnalysisMenu;
+  $navBarContents = AnalysisMenu;
 
   $: userId = $user?.id.replaceAll('-', '');
 
@@ -61,6 +62,7 @@
 				.then((r) => Flight.load(r.data.id))
 				.then((f) => {
 					activeFlight.set(f);
+          postUploadSearch();
 					form_state = 'Upload Successful';
 					$bin = undefined;
 					goto(base + '/database/query/leaderboards');

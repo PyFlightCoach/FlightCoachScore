@@ -6,6 +6,7 @@
 	import { updateTable } from '$lib/stores/leaderboards';
 	import { windowWidth } from '$lib/stores/shared';
 	import { table_rows } from '$lib/stores/leaderboards';
+	import { onMount } from 'svelte';
 
 	export let data;
 
@@ -16,6 +17,12 @@
 	} else {
 		$navBarContents = undefined;
 	}
+
+  onMount(() => {
+    if ($table_rows.length === 0) {
+      updateTable();
+    }
+  });
 </script>
 
 <div

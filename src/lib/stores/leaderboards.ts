@@ -5,8 +5,9 @@ import { get } from 'svelte/store';
 import { dbServer } from '$lib/api';
 import { checkUser } from '$lib/stores/user';
 import type { DBFlightRanked, DBFlightScore } from '$lib/database/interfaces';
+import { activeFlight } from '$lib/stores/shared';
 
-export const n_results = newCookieStoreInt('n_results', 1000);
+export const n_results = newCookieStoreInt('n_results', 10);
 export const n_days_val = newCookieStoreInt('search_n_days', 30);
 export const me_only_flag = newCookieStoreBool('me_only_flag', false);
 export const difficulty = newCookieStoreInt('difficulty', 3);
@@ -23,6 +24,10 @@ export const date_before = newCookieStore('date_before', '')
 
 export const version = writable(get(faVersion));
 
+export const includeMyBest = newCookieStoreInt('includeMyBest', 0);
+export const includeMyLatest = newCookieStoreInt('includeMyLatest', 0);
+export const includeActive = newCookieStoreInt('includeActive', 0);
+
 export const table_rows: Writable<DBFlightRanked[]> = writable([]);
 export const lastResponse: Writable<'leaderboard' | 'flightlist' | undefined> = writable();
 
@@ -30,6 +35,19 @@ export const lastResponse: Writable<'leaderboard' | 'flightlist' | undefined> = 
 export function getDays(ndval: number) {
   return { 0: 1, 370: 720, 380: 10000 }[ndval] || ndval;
 }
+
+export const postUploadSearch = () => {
+  const fl = get(activeFlight)!;
+  select_by_date.set(false);
+  n_days_val.set(380);
+  schedule_id.set(fl.meta.schedule_id || '');
+  sort_by_score_flag.set(true);
+  version.set(get(faVersion)!);
+  includeActive.set(3);
+  updateTable();
+}
+
+
 
 export const updateTable = async () => {
   const q = {
@@ -43,7 +61,9 @@ export const updateTable = async () => {
       version: get(version)
     },
     ...(get(singleman) ? { manoeuvre_ind: get(manoeuvre_ind) } : {}),
-    ...(get(sort_by_score_flag) ? { sort_by_score_flag: get(sort_by_score_flag) } : {}),
+    ...(get(sort_by_score_flag) && get(includeMyBest) ? { include_my_best: get(includeMyBest)-1 } : {}),
+    ...(get(sort_by_score_flag) && get(includeMyLatest) ? { include_my_latest: get(includeMyLatest)-1 } : {}),
+    ...(get(sort_by_score_flag) && get(includeActive) && get(activeFlight)?.isMine ? { include_my_flight_id: `${get(activeFlight)?.meta.flight_id}+${get(includeActive)-1}` } : {}),
     ...(get(select_by_date) ? { date_after: get(date_after), date_before: get(date_before) } : { n_days: getDays(get(n_days_val)) })
   };
   console.debug(q);
@@ -54,7 +74,7 @@ export const updateTable = async () => {
       table_rows.set(res.data.results.map((row: DBFlightRanked | DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));
-    });
+    }).catch((e) => {console.error(e);});
     lastResponse.set(_method);
   }
 }
