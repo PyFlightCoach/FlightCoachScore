@@ -1,4 +1,7 @@
+<!-- @migration-task Error while migrating Svelte code: Mixing old (on:change) and new syntaxes for event handling is not allowed. Use only the onchange syntax -->
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { safeGetLibrary, ScheduleLibrary } from '$lib/schedules.js';
 	import {
 		n_results,
@@ -17,27 +20,25 @@
 		singleman,
 		getDays
 	} from '$lib/stores/leaderboards';
+	import { lib } from 'markdown-it/lib/common/utils.mjs';
 
-	export let fa_versions: string[];
-
-	let library: ScheduleLibrary | undefined;
-	let categories: string[] = [];
-	let selectedCategory: string | undefined;
-	let schedules: string[] = [];
-	let selectedSchedule: string | undefined;
-
-	$: categories = library?.unique('category_name') || [];
-
-	$: schedules = selectedCategory
-		? library?.subset({ category_name: selectedCategory }).unique('schedule_name')
-		: [];
-
-	$: if (selectedCategory && library && selectedSchedule) {
-		$schedule_id = library.subset({
-			category_name: selectedCategory,
-			schedule_name: selectedSchedule
-		}).first?.schedule_id;
+	interface Props {
+		fa_versions: string[];
 	}
+
+	let { fa_versions }: Props = $props();
+
+	let library: ScheduleLibrary | undefined = $state();
+	let selectedCategory: string | undefined = $state();
+	let selectedSchedule: string | undefined = $state();
+
+	let categories = $derived(library?.unique('category_name') || []);
+
+	let schedules = $derived(
+		selectedCategory && library
+			? library?.subset({ category_name: selectedCategory }).unique('schedule_name')
+			: []
+	);
 
 	safeGetLibrary().then((lib) => {
 		library = lib;
@@ -51,26 +52,30 @@
 				: undefined;
 	});
 
-	$: n_days = { 0: 1, 370: 720, 380: 10000 }[$n_days_val] || $n_days_val;
+	let n_days = $derived({ 0: 1, 370: 720, 380: 10000 }[$n_days_val] || $n_days_val);
 
-	$: if (n_days) {
-		$date_before = new Date().toISOString().split('T')[0]; // restrict to flights before this date yyyy-mm-dd
-		$date_after = new Date(new Date().getTime() - 24 * getDays(n_days) * 3600 * 1000)
-			.toISOString()
-			.split('T')[0]; // restrict to flights after this date yyyy-mm-dd
-	}
+	$effect(() => {
+		if (n_days && !$select_by_date) {
+			$date_before = new Date().toISOString().split('T')[0]; // restrict to flights before this date yyyy-mm-dd
+			$date_after = new Date(new Date().getTime() - 24 * getDays(n_days) * 3600 * 1000)
+				.toISOString()
+				.split('T')[0]; // restrict to flights after this date yyyy-mm-dd
+		} 
+	});
+
+
 </script>
 
 <div class="p-2 row">
 	<button
 		class="col btn btn-outline-secondary {$sort_by_score_flag ? 'active' : ''}"
-		on:click={() => {
+		onclick={() => {
 			$sort_by_score_flag = true;
 		}}>Leaderboard</button
 	>
 	<button
 		class="col btn btn-outline-secondary {$sort_by_score_flag ? '' : 'active'}"
-		on:click={() => {
+		onclick={() => {
 			$sort_by_score_flag = false;
 		}}>History</button
 	>
@@ -102,7 +107,17 @@
 
 <div class="row p-2">
 	<label class="col col-form-label" for="version">Schedule</label>
-	<select class="col form-select text-center" bind:value={selectedSchedule}>
+	<select
+		class="col form-select text-center"
+		bind:value={selectedSchedule}
+		onchange={(e) => {
+			const value = (e.target as HTMLSelectElement).value;
+			if (library && selectedCategory && value) {
+				$schedule_id = library.subset({ category_name: selectedCategory, schedule_name: value })
+					.first?.schedule_id;
+			}
+		}}
+	>
 		{#each schedules as sch}
 			<option value={sch}>{sch}</option>
 		{/each}

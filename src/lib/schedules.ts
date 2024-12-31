@@ -47,6 +47,10 @@ export class ScheduleLibrary {
     return this.schedules.length === 0;
   }
 
+  downselect(ids: string[]): ScheduleLibrary {
+    return new ScheduleLibrary(this.schedules.filter(s => ids.includes(s.schedule_id)));
+  }
+
 	unique(key: string): string[] {
 		return Array.from(new Set(this.schedules.map((s) => s[key as keyof DBSchedule] as string)));
 	}

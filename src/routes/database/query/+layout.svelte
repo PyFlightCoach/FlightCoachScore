@@ -30,7 +30,7 @@
 		</div>
 	{/if}
 
-	<LeaderQuery fa_versions={data.fa_versions} />
+	<LeaderQuery fa_versions={data.fa_versions} schedule_ids={data.active_schedule_ids}/>
 
 	<div class="row p-2 justify-content-end">
 		<button class="w-50 btn btn-primary" on:click={updateTable} data-bs-dismiss="offcanvas"
