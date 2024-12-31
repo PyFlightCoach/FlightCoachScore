@@ -240,7 +240,7 @@
 	/>
 </div>
 
-{#if $sort_by_score_flag && !$one_per_pilot_flag}
+{#if $sort_by_score_flag }
 	<div class="row p-2">
 		<div class="row"><label class="col col-form-label" for="version">Include My:</label></div>
 		<div class="btn-group">
