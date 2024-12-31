@@ -6,8 +6,8 @@ import { goto } from '$app/navigation';
 
 export async function load() {
 
-	await analyseManoeuvre(get(selManID)!, false, false).then(() => {
-		if (!get(analyses[get(selManID) as number])?.scores) {
+	await analyseManoeuvre(get(selManID)!, false).then(() => {
+		if (!get(analyses[get(selManID) as number])?.template) {
 			alert('Analysis failed, cannot load results');
 			goto(base + '/flight/results/manoeuvre');
 		}
