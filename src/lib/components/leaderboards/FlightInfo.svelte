@@ -41,9 +41,9 @@
 	};
 </script>
 
-<div class="row">
+<div class="row px-2 py-0">
   {#if $windowWidth>=768}
-	<div class="col-md-4" style="max-height:300px;">
+	<div class="col-md-4 py-0 px-1" style="max-height:300px;">
 		<Plot
 			data={[
 				{
@@ -70,7 +70,7 @@
 		/>
 	</div>
   {/if}
-	<div class="col-6 col-md-4 overflow-scroll" style="max-height:300px;">
+	<div class="col-6 col-md-4 overflow-auto py-0 px-1" style="max-height:300px;">
 		<ul class="list-group">
 			<li class="input-group">
 				<label class="input-group-text" for="set-privacy">Privacy</label>
@@ -118,6 +118,20 @@
 				>
 					View Analysis
 				</button>
+        {#if $user?.is_superuser}
+          <button
+            class="form-control btn btn-outline-secondary"
+            on:click={() => {
+
+              if (confirm('Are you sure you want to delete this flight?')) {
+                 dbServer.delete(`flight/${f.meta.flight_id}`);
+                 $activeFlight = undefined;
+              }
+            }}
+          >
+            Delete
+          </button>
+        {/if}
 			</li>
 			<li class="list-group-item">
 				<table class="table-sm table-responsive">
@@ -149,7 +163,7 @@
 			</li>
 		</ul>
 	</div>
-	<div class="col-6 col-md-4 overflow-scroll" style="max-height:300px;">
+	<div class="col-6 col-md-4 overflow-auto py-0 px-1" style="max-height:300px;">
 		<table class="table table-sm table-responsive">
 			<thead>
 				<tr>

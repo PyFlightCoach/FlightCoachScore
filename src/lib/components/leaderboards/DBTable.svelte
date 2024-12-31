@@ -87,8 +87,8 @@
 						</td>
 					</tr>
 					{#if showID == row.flight_id}
-						<tr>
-							<td colspan={col_heads.length + 1}>
+						<tr class="p-0">
+							<td colspan={col_heads.length + 1} class="p-1">
 								{#if showFlight}
 									<FlightInfo bind:f={showFlight} />
 								{:else}
