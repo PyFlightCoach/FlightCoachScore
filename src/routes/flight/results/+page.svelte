@@ -1,7 +1,23 @@
 <script lang="ts">
 	import AnalysisSummary from './AnalysisSummary.svelte';
-	import { totalScore, bin, selectedResult, fa_versions, bootTime, isComplete, difficulty, truncate } from '$lib/stores/analysis';
-	import { dataSource, activeFlight, isAnalysisModified, loading, blockProgress, unblockProgress } from '$lib/stores/shared';
+	import {
+		totalScore,
+		bin,
+		selectedResult,
+		fa_versions,
+		bootTime,
+		isComplete,
+		difficulty,
+		truncate
+	} from '$lib/stores/analysis';
+	import {
+		dataSource,
+		activeFlight,
+		isAnalysisModified,
+		loading,
+		blockProgress,
+		unblockProgress
+	} from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
 	import { privacyOptions } from '$lib/database/interfaces';
@@ -11,11 +27,11 @@
 	import { Flight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-  import {postUploadSearch} from '$lib/stores/leaderboards';
+	import { postUploadSearch } from '$lib/stores/leaderboards';
 
-  $navBarContents = AnalysisMenu;
+	$navBarContents = AnalysisMenu;
 
-  $: userId = $user?.id.replaceAll('-', '');
+	$: userId = $user?.id.replaceAll('-', '');
 
 	let form_state: string | undefined;
 
@@ -24,17 +40,30 @@
 	let include_bin = true;
 
 	$: isNew = $bin && !$activeFlight;
-  $: isMine = userId && (userId == $activeFlight?.meta.pilot_id || userId == $activeFlight?.meta.contributor_id);
-	
-	$: isUpdated = ($activeFlight?.meta.comment != comment ||
+	$: isMine =
+		userId &&
+		(userId == $activeFlight?.meta.pilot_id || userId == $activeFlight?.meta.contributor_id);
+
+	$: isUpdated =
+		$activeFlight?.meta.comment != comment ||
 		$activeFlight?.meta.privacy != privacy ||
-		$isAnalysisModified);
+		$isAnalysisModified;
 	$: canI = $user?.is_verified && (isMine || isNew || $user?.is_superuser);
 
-  $: console.log('isMine', isMine, 'isNew', isNew, 'isUpdated', isUpdated, 'canI', canI, 'isComplete', $isComplete);
+	$: console.log(
+		'isMine',
+		isMine,
+		'isNew',
+		isNew,
+		'isUpdated',
+		isUpdated,
+		'canI',
+		canI,
+		'isComplete',
+		$isComplete
+	);
 
 	const upload = async () => {
-		
 		const form_data = new FormData();
 		form_data.append(
 			'files',
@@ -50,19 +79,32 @@
 		);
 		if (comment) form_data.append('comment', comment);
 		if (privacy) form_data.append('privacy', privacy);
-		if (include_bin && $bin) form_data.append('files', $bin);
+		if (include_bin && $bin && isNew) form_data.append('files', $bin);
 
 		if (await checkUser()) {
-      form_state = 'Uploading Analysis, this can take some time...';
-      $loading = true;
+			form_state = 'Uploading Analysis, this can take some time...';
+			$loading = true;
 
 			console.debug('1 - Uploading ', $bin?.name);
-			dbServer
-				.post('flight', form_data, blockProgress("Uploading Analysis to Database", 'upload'))
-				.then((r) => Flight.load(r.data.id))
+
+			(async () => {
+				if (!$activeFlight) {
+					return await dbServer.post(
+						'flight',
+						form_data,
+						blockProgress('Uploading Analysis to Database', 'upload')
+					);
+				} else {
+					return await dbServer.patch(
+						`flight/${$activeFlight.meta.flight_id}`,
+						form_data,
+						blockProgress('Uploading Analysis to Database', 'upload')
+					);
+				}
+			})().then((r) => Flight.load(r.data.id))
 				.then((f) => {
 					activeFlight.set(f);
-          postUploadSearch();
+					postUploadSearch();
 					form_state = 'Upload Successful';
 					$bin = undefined;
 					goto(base + '/database/query/leaderboards');
@@ -73,7 +115,7 @@
 				})
 				.finally(() => {
 					$loading = false;
-          unblockProgress();
+					unblockProgress();
 				});
 		} else {
 			form_state = undefined;
@@ -145,8 +187,8 @@
 		<label for="truncate">Truncate</label>
 	</div>
 
-  <hr/>
-  
+	<hr />
+
 	<div class="row p-2">
 		<label class="col col-form-label" for="set-privacy">Privacy</label>
 		<select class="col form-select" disabled={!canI} id="set-privacy" bind:value={privacy}>
@@ -157,34 +199,40 @@
 	</div>
 	<div class="row p-2">
 		<label class="form-label" for="comments">Comments</label>
-		<textarea id="comments" class="pt-0 form-control"  disabled={!canI} name="comments" rows="3" bind:value={comment}
+		<textarea
+			id="comments"
+			class="pt-0 form-control"
+			disabled={!canI}
+			name="comments"
+			rows="3"
+			bind:value={comment}
 		></textarea>
 	</div>
-  
-  <div class="row mb-2">
-	{#if canI && $isComplete && ( isNew || isUpdated )}
-    <div class="row justify-content-end p-2">
-      <button class="btn btn-primary" type="submit" on:click={upload}
-        >{isNew ? 'Upload' : 'Update'}</button
-      >
-    </div>
-  {:else if !canI}
-    {#if !$user}
-      <span>Log in to upload</span>
-    {:else if !$user.is_verified}
-      <span>Verify your email to upload</span>
-    {:else if !isMine || !isNew}
-      <span>Only the pilot or contributor can edit a flight record</span>
-    {/if}
-  {:else if !(isNew || isUpdated)}
-    {#if isNew && !isUpdated}
-      <span>No change from stored analysis</span>
-    {/if}
-    <span>Nothing to update</span>
-  {:else if !$isComplete}
-    <span>Run all analyses for the latest analysis version before uploading</span>
-	{/if}
-</div>
+
+	<div class="row mb-2">
+		{#if canI && $isComplete && (isNew || isUpdated)}
+			<div class="row justify-content-end p-2">
+				<button class="btn btn-primary" type="submit" on:click={upload}
+					>{isNew ? 'Upload' : 'Update'}</button
+				>
+			</div>
+		{:else if !canI}
+			{#if !$user}
+				<span>Log in to upload</span>
+			{:else if !$user.is_verified}
+				<span>Verify your email to upload</span>
+			{:else if !isMine || !isNew}
+				<span>Only the pilot or contributor can edit a flight record</span>
+			{/if}
+		{:else if !(isNew || isUpdated)}
+			{#if isNew && !isUpdated}
+				<span>No change from stored analysis</span>
+			{/if}
+			<span>Nothing to update</span>
+		{:else if !$isComplete}
+			<span>Run all analyses for the latest analysis version before uploading</span>
+		{/if}
+	</div>
 </div>
 
 <div class="col-lg-8 align-self pt-3">
