@@ -49,7 +49,7 @@
 			.split(base.replace('/', '_'))
 			.join('')
 			.replace('_', '');
-
+    helpFileName = helpFileName.endsWith('_') ? helpFileName.slice(0, -1) : helpFileName;
 		fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
 			.then((response) => {
 				if (!response.ok) {
