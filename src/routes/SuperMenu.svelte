@@ -29,6 +29,7 @@
 	<hr />
 	<small class="dropdown-header">Management</small>
 	<a class="dropdown-item" href="{base}/news">News</a>
+	<a class="dropdown-item" href="{base}/user/manage/list">Users</a>
 	<hr />
 	<small class="dropdown-header">Debugging</small>
 	<button
