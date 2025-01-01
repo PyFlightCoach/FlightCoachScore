@@ -36,6 +36,10 @@ export function getDays(ndval: number) {
   return { 0: 1, 370: 720, 380: 10000 }[ndval] || ndval;
 }
 
+export function getNFlights(nfval: number) {
+  return { 101: 200, 102: 1000 }[nfval] || nfval;
+}
+
 export const postUploadSearch = () => {
   const fl = get(activeFlight)!;
   select_by_date.set(false);
@@ -52,7 +56,7 @@ export const postUploadSearch = () => {
 export const updateTable = async () => {
   const q = {
     ...{
-      n_results: get(n_results),
+      n_results: getNFlights(get(n_results)),
       me_only_flag: get(me_only_flag),
       difficulty: get(difficulty),
       truncate: get(truncate),

@@ -19,7 +19,8 @@
 		getDays,
 		includeMyBest,
 		includeMyLatest,
-		includeActive
+		includeActive,
+    getNFlights
 	} from '$lib/stores/leaderboards';
 	import { activeFlight } from '$lib/stores/shared';
 
@@ -226,7 +227,7 @@
 {/if}
 
 <div class="row p-2">
-	<label class="col col-form-label" for="nflights">Include the top {$n_results} results:</label>
+	<label class="col col-form-label" for="nflights">Include the top {getNFlights($n_results)} results:</label>
 	<input
 		type="range"
 		class="form-range"
@@ -234,7 +235,7 @@
 		id="nflights"
 		name="n_flights"
 		min="1"
-		max="100"
+		max="102"
 		step="1"
 	/>
 </div>
