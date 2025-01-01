@@ -50,24 +50,10 @@
 		$isAnalysisModified;
 	$: canI = $user?.is_verified && (isMine || isNew || $user?.is_superuser);
 
-	$: console.log(
-		'isMine',
-		isMine,
-		'isNew',
-		isNew,
-		'isUpdated',
-		isUpdated,
-		'canI',
-		canI,
-		'isComplete',
-		$isComplete
-	);
-
 	const upload = async () => {
 		const form_data = new FormData();
-		form_data.append(
-			'files',
-			new File(
+
+    const ajson = new File(
 				[
 					new Blob([JSON.stringify(await createAnalysisExport(true), null, 2)], {
 						type: 'application/octet-stream'
@@ -76,25 +62,27 @@
 				'analysis.ajson',
 				{ type: 'application/octet-stream' }
 			)
-		);
+
+		
 		if (comment) form_data.append('comment', comment);
 		if (privacy) form_data.append('privacy', privacy);
-		if (include_bin && $bin && isNew) form_data.append('files', $bin);
-
+		
 		if (await checkUser()) {
 			form_state = 'Uploading Analysis, this can take some time...';
 			$loading = true;
 
-			console.debug('1 - Uploading ', $bin?.name);
-
 			(async () => {
 				if (!$activeFlight) {
+          form_data.append('files', ajson);
+          if (include_bin && $bin && isNew) form_data.append('files', $bin);
+
 					return await dbServer.post(
 						'flight',
 						form_data,
 						blockProgress('Uploading Analysis to Database', 'upload')
 					);
 				} else {
+          if (isUpdated) form_data.append('files',ajson);
 					return await dbServer.patch(
 						`flight/${$activeFlight.meta.flight_id}`,
 						form_data,
