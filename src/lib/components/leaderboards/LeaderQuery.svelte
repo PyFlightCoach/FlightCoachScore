@@ -25,23 +25,22 @@
 
 	let { fa_versions, schedule_ids }: { fa_versions: string[]; schedule_ids: string[] } = $props();
 
-	let lib = $derived($library.downselect(schedule_ids));
-
+	let lib = $derived(schedule_ids ? $library.downselect(schedule_ids) : $library);
 	let categories = $derived(lib.unique('category_name') || []);
-
-	let selectedCategory: string | undefined = $state(
-		$schedule_id ? lib.subset({ schedule_id: $schedule_id }).first?.category_name : categories[0]
-	);
-
+	let selectedCategory: string | undefined = $state();
 	let schedules = $derived(
 		selectedCategory ? lib?.subset({ category_name: selectedCategory }).unique('schedule_name') : []
 	);
 
-	let selectedSchedule: string | undefined = $state(
-		$schedule_id
-			? lib?.subset({ schedule_id: $schedule_id }).first?.schedule_name
-			: lib?.subset({ category_name: selectedCategory }).unique('schedule_name')[0]
-	);
+  $effect(()=>{
+    selectedCategory = $schedule_id ? lib.subset({ schedule_id: $schedule_id }).first?.category_name : categories[0];
+  })
+
+	let selectedSchedule: string | undefined = $state();
+
+  $effect(()=>{
+    selectedSchedule = $schedule_id ? lib.subset({ schedule_id: $schedule_id }).first?.schedule_name : schedules[0];
+  })
 
 	let n_days = $derived({ 0: 1, 370: 720, 380: 10000 }[$n_days_val] || $n_days_val);
 
@@ -50,7 +49,7 @@
 			$date_before = new Date().toISOString().split('T')[0]; // restrict to flights before this date yyyy-mm-dd
 			$date_after = new Date(new Date().getTime() - 24 * getDays(n_days) * 3600 * 1000)
 				.toISOString()
-				.split('T')[0]; // restrict to flights after this date yyyy-mm-dd
+				.split('T')[0]; 
 		}
 	});
 </script>
