@@ -1,8 +1,7 @@
 <script lang="ts">
     import { dbServer } from '$lib/api';
 	import { invalidateAll } from '$app/navigation';
-	import type { Dictionary } from 'lodash';
-
+	
 	let showID: string | undefined = undefined;
     let pageMode: string = "list";
 	let formState: string | undefined;
@@ -97,33 +96,31 @@
                     </tr>
 					{#if showID == u.id}
 						<tr>
-							<td>
-                                {#if u.is_active}
-                                    <button type="button" class="btn btn-primary" on:click={() => {_patch({is_active: false});}}>Deactivate</button>
-                                    {#if u.is_cd}
-                                        <button type="button" class="btn btn-primary" on:click={() => {_patch({is_cd: false});}}>Remove CD</button>
-                                    {:else}
-                                        <button type="button" class="btn btn-primary" on:click={() => {_patch({is_cd: true});}}>Make CD</button>
-                                    {/if}
-                                    {#if u.is_superuser}
-                                        <button type="button" class="btn btn-primary" on:click={() => {_patch({is_superuser: false});}}>Remove S-User</button>
-                                    {:else}
-                                        <button type="button" class="btn btn-primary" on:click={() => {_patch({is_superuser: true});}}>Make S-User</button>
-                                    {/if}
+							<td colspan="6">
+                {#if u.is_active}
+                  <button type="button" class="btn btn-primary" on:click={() => {_patch({is_active: false});}}>Deactivate</button>
+                  {#if u.is_cd}
+                      <button type="button" class="btn btn-primary" on:click={() => {_patch({is_cd: false});}}>Remove CD</button>
+                  {:else}
+                      <button type="button" class="btn btn-primary" on:click={() => {_patch({is_cd: true});}}>Make CD</button>
+                  {/if}
+                  {#if u.is_superuser}
+                      <button type="button" class="btn btn-primary" on:click={() => {_patch({is_superuser: false});}}>Remove S-User</button>
+                  {:else}
+                      <button type="button" class="btn btn-primary" on:click={() => {_patch({is_superuser: true});}}>Make S-User</button>
+                  {/if}
 
-                                {:else}
-                                    <button type="button" class="btn btn-primary" on:click={() => {_patch({is_active: true});}}>Activate</button>
-                                    {#if !areYouSure}
-                                        <button type="button" class="btn btn-primary" on:click={() => {areYouSure=true;}}>Delete</button>
-                                    {:else}
-                                        <button type="button" class="btn btn-primary" on:click={() => {areYouSure=false;}}>No Don't Delete</button>
-                                        <button type="button" class="btn btn-primary" on:click={_delete}>Yes DELETE!</button>
-                                    {/if}
-                                {/if}
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-primary" on:click={() => {pageMode = "email"; invalidateAll();}}>Email</button>
-                            </td>
+                {:else}
+                  <button type="button" class="btn btn-primary" on:click={() => {_patch({is_active: true});}}>Activate</button>
+                  {#if !areYouSure}
+                      <button type="button" class="btn btn-primary" on:click={() => {areYouSure=true;}}>Delete</button>
+                  {:else}
+                      <button type="button" class="btn btn-primary" on:click={() => {areYouSure=false;}}>No Don't Delete</button>
+                      <button type="button" class="btn btn-primary" on:click={_delete}>Yes DELETE!</button>
+                  {/if}
+                {/if}
+                <button type="button" class="btn btn-primary" on:click={() => {pageMode = "email"; invalidateAll();}}>Email</button>
+              </td>
 						</tr>
 					{/if}
                 {/each}
