@@ -1,6 +1,7 @@
 <script lang="ts">
     import { dbServer } from '$lib/api';
 	import { invalidateAll } from '$app/navigation';
+	import type { Dictionary } from 'lodash';
 
 	let showID: string | undefined = undefined;
     let pageMode: string = "list";
@@ -9,7 +10,7 @@
 
 	export let data;
 
-    async function _patch(item) {
+    async function _patch(item: any) {
         const res = await dbServer.patch('users/'+showID, item);
         if (res.status != 200) {
             formState = 'Something went wrong!';
