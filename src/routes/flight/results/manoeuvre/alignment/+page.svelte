@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
 	import { analyseManoeuvre } from '$lib/analysis/analysis';
-	import { base } from '$app/paths';
 	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
 	import { MA } from '$lib/analysis/ma';
 
@@ -12,9 +11,9 @@
 	$: elements = $man?.flown?.element;
 	$: end_info = $man?.flown?.end_info();
 
-	let element: string | null = null;
+	let element: string | undefined;
 
-	const editsplit = (stp: number, elname: string | null) => {
+	const editsplit = (stp: number, elname: string | undefined) => {
 		if (elname == null) return;
 		const elindex = elements!.lastIndexOf(elname);
 		let i = 0;
@@ -98,14 +97,14 @@
 					class="btn btn-outline-secondary"
 					title="Run aligment optimisation"
 					on:click={() => {
-						analyseManoeuvre($selManID, true, true);
+						if ($selManID) analyseManoeuvre($selManID, true, true);
 					}}>Optimise</button
 				>
 				<button
 					class="btn btn-outline-secondary"
 					title="Recalculate score without optimisation"
 					on:click={() => {
-						analyseManoeuvre($selManID, true, false);
+						if ($selManID) analyseManoeuvre($selManID, true, false);
 					}}>Score</button
 				>
       </div>
