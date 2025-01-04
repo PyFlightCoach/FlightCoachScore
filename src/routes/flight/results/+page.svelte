@@ -109,6 +109,7 @@
 			form_state = undefined;
 		}
 	};
+  $: console.log($isComplete);
 </script>
 
 <div class="col-lg-4 bg-light border pt-3">

@@ -19,7 +19,7 @@ import { Origin } from '$lib/analysis/fcjson';
 export function checkComplete() {
 	return Boolean(
 		get(sts.manNames)?.length &&
-			sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!])
+			sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!]?.results?.length)
 	);
 }
 
