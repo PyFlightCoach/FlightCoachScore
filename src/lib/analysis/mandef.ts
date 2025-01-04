@@ -212,6 +212,10 @@ export class ElDef {
 		readonly props: Record<string, never>,
 		readonly dgs: Record<string, DownGrade>
 	) {}
+
+  get describe() {
+    return `${this.name} (${this.Kind}) `;
+  }
 	static parse(data: Record<string, never>) {
 		const dgs = Object.fromEntries(
 			Object.entries(data.dgs).map(([k, v]) => {

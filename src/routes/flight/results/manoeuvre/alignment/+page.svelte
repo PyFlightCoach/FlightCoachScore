@@ -64,8 +64,8 @@
 					title="Select element to edit (or click ribbon)"
 					bind:value={element}
 				>
-					{#each ['Select Element'].concat(...Object.keys(states)) as el}
-						<option value={el}>{el}</option>
+					{#each ['Select Element'].concat(...Object.keys(states)) as el, i}
+						<option value={el}>{$man?.mdef?.eds[el]?.describe || el}</option>
 					{/each}
 				</select>
 				<input
