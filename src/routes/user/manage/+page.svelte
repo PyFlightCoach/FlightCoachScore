@@ -10,16 +10,20 @@
 	export let data;
 
     async function _patch(item: any) {
-        const res = await dbServer.patch('users/'+showID, item);
+        if (confirm(`Are you sure you want to ${Object.keys(item)[0]} ${Object.values(item)[0]} user ${showID}?`)) {
+          const res = await dbServer.patch('users/'+showID, item);
         if (res.status != 200) {
             formState = 'Something went wrong!';
             return;
         }
         formState = undefined;
         invalidateAll();
+        };
+        
     }
 
     async function _delete(event: Event) {
+      if (confirm(`Are you sure you want to delete user ${showID}?`)) {
         const res = await dbServer.delete('users/'+showID);
         if (res.status != 204) {
             formState = 'Something went wrong!';
@@ -27,9 +31,11 @@
         }
         formState = undefined;
         invalidateAll();
+      }
     }
     
     async function _handleSubmitEmail(event: Event) {
+      if (confirm(`Are you sure you want to email user ${showID}?`)) {
         const fdata = new FormData(event.currentTarget as HTMLFormElement);
 
         const res = await dbServer.patch('users/send_email/'+showID, fdata);
@@ -40,6 +46,7 @@
         formState = 'Email Sent'
         pageMode = 'list';
         invalidateAll();
+      }
     }
 
 </script>
@@ -172,5 +179,6 @@
 			<button type="submit" class="btn btn-primary me-3">Send Email</button>
 		</div>
     </form>
+    <button type="button" class="btn btn-primary" on:click={() => {pageMode = "list"; invalidateAll();}}>Back</button>
 {/if}
 </div>
