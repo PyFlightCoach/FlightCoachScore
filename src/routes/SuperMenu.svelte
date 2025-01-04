@@ -30,6 +30,7 @@
 	<small class="dropdown-header">Management</small>
 	<a class="dropdown-item" href="{base}/news">News</a>
 	<a class="dropdown-item" href="{base}/user/manage">Users</a>
+  <a class="dropdown-item" href="{base}/telemetry">Telemetry</a>
 	<hr />
 	<small class="dropdown-header">Debugging</small>
 	<button
