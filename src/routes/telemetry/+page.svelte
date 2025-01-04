@@ -4,7 +4,8 @@
 	import { user } from '$lib/stores/user';
 
 	let telemetry: Record<string, string[]> | undefined = $state();
-	if ($user?.is_superuser) {
+
+  if ($user?.is_superuser) {
 		analysisServer.get('telemetry').then((res) => {
 			telemetry = res.data;
 		});
