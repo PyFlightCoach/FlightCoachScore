@@ -10,13 +10,15 @@
 		activeEl = $bindable(),
 		sp = 3,
 		defaultValue = undefined,
-		labels = {}
+		labels = {},
+    showModels = false
 	}: {
 		sts: Record<string, States>;
 		activeEl?: string | undefined;
 		sp?: number;
 		defaultValue?: string | undefined;
 		labels?: Record<string, string>;
+    showModels?: boolean;
 	} = $props();
 
 	let last_changed = $state(Date.now());

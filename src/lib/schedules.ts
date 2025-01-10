@@ -3,6 +3,8 @@ import { ManDef, ManOpt } from '$lib/analysis/mandef';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { type DBSchedule } from '$lib/database/interfaces';
+import { Manoeuvre } from '$lib/analysis/manoeuvre';
+import { States } from '$lib/analysis/state';
 
 
 export function scheduleRepr(s :DBSchedule|undefined): string {
@@ -115,4 +117,26 @@ export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt>
 export async function safeGetLibrary() {
   await loadKnowns();
   return get(library);
+}
+
+export class Olan {
+  constructor(
+    readonly draw: string[],
+    readonly rawfig: string,
+    readonly figure: Record<string, unknown>,
+    readonly mdef: ManDef,
+    readonly manoeuvre: Manoeuvre,
+    readonly template: States,
+  ) {}
+
+  static parse(data: Record<string, unknown>) {
+    return new Olan(
+      data.draw as string[],
+      data.rawfig as string,
+      data.figure as Record<string, unknown>,
+      ManDef.parse(data.mdef as Record<string, never>) as ManDef,
+      Manoeuvre.parse(data.manoeuvre as Record<string, never>),
+      States.parse(data.template as Record<string, never>)
+    );
+  }
 }
