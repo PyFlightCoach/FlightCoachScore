@@ -20,6 +20,7 @@
 		'rangeStartClick',
 		'showBox'
 	];
+  export let exclude_controls: string[] = [];
 	export let showBefore: boolean = false;
 	export let showAfter: boolean = false;
 	export let scale: number = 1;
@@ -30,6 +31,8 @@
 	export let showBox: boolean = false;
 	export let includeZero: boolean = false;
 	export let expand: number = 0;
+
+  let showcontrols = controls.filter(c=>!exclude_controls.includes(c))
 
 	let scale_multiplier = $isFullSize ? 15 : 5;
 
@@ -176,11 +179,11 @@
 
 		//const offset = e.detail.points[0].curveNumber <= 1 ? range[0] : 0;
 		if (offset != undefined) {
-			if (controls.includes('modelClick')) {
+			if (showcontrols.includes('modelClick')) {
 				i = offset + Math.floor(e.detail.points[0].pointNumber / 2);
-			} else if (controls.includes('rangeEndClick')) {
+			} else if (showcontrols.includes('rangeEndClick')) {
 				range[1] = offset + Math.floor(e.detail.points[0].pointNumber / 2);
-			} else if (controls.includes('rangeStartClick')) {
+			} else if (showcontrols.includes('rangeStartClick')) {
 				range[0] = offset + Math.floor(e.detail.points[0].pointNumber / 2);
 			}
 		}
@@ -207,7 +210,7 @@
 
 	<div class="col-auto d-flex flex-row justify-content-center">
 		<div class="row w-100 justify-content-center">
-			{#if controls.includes('slider')}
+			{#if showcontrols.includes('slider')}
 				<div class="col" style="min-width:200px;">
 					<DoubleSlider
 						min={0}
@@ -218,7 +221,7 @@
 				</div>
 			{/if}
 
-			{#if controls.includes('play')}
+			{#if showcontrols.includes('play')}
 				{#if player}
 					<button class="col-auto btn btn-outline-secondary" on:click={pause} aria-label="Pause">
             <i class="bi bi-pause"></i>
@@ -230,7 +233,7 @@
 				{/if}
 			{/if}
 
-			{#if controls.includes('scale')}
+			{#if showcontrols.includes('scale')}
 				<div class="col-auto btn-group p-0">
 					<button
 						class="btn btn-outline-secondary"
@@ -252,7 +255,7 @@
 				</div>
 			{/if}
 
-			{#if controls.includes('speed')}
+			{#if showcontrols.includes('speed')}
 				<div class="btn-group col-auto p-0">
 					<button
 						class="btn btn-outline-secondary"
@@ -276,12 +279,12 @@
 				</div>
 			{/if}
 
-			{#if controls.includes('projection')}
+			{#if showcontrols.includes('projection')}
 				<button class="col-auto btn btn-outline-secondary" on:click={toggleProjection}
 					>{layout.scene.camera.projection.type}</button
 				>
 			{/if}
-			{#if controls.includes('showBox')}
+			{#if showcontrols.includes('showBox')}
 				<input
 					type="checkbox"
 					class="col-auto btn-check"

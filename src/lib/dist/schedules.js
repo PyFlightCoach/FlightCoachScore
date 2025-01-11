@@ -197,16 +197,15 @@ function safeGetLibrary() {
 }
 exports.safeGetLibrary = safeGetLibrary;
 var Olan = /** @class */ (function () {
-    function Olan(draw, rawfig, figure, mdef, manoeuvre, template) {
-        this.draw = draw;
-        this.rawfig = rawfig;
-        this.figure = figure;
-        this.mdef = mdef;
+    function Olan(olan, aresti, definition, manoeuvre, template) {
+        this.olan = olan;
+        this.aresti = aresti;
+        this.definition = definition;
         this.manoeuvre = manoeuvre;
         this.template = template;
     }
     Olan.parse = function (data) {
-        return new Olan(data.draw, data.rawfig, data.figure, mandef_1.ManDef.parse(data.mdef), manoeuvre_1.Manoeuvre.parse(data.manoeuvre), state_1.States.parse(data.template));
+        return new Olan(data.olan, data.aresti, mandef_1.ManDef.parse(data.definition), manoeuvre_1.Manoeuvre.parse(data.manoeuvre), state_1.States.parse(data.template));
     };
     return Olan;
 }());

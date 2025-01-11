@@ -121,20 +121,18 @@ export async function safeGetLibrary() {
 
 export class Olan {
   constructor(
-    readonly draw: string[],
-    readonly rawfig: string,
-    readonly figure: Record<string, unknown>,
-    readonly mdef: ManDef,
+    readonly olan: Record<string, unknown>,
+    readonly aresti: Record<string, unknown>,
+    readonly definition: ManDef,
     readonly manoeuvre: Manoeuvre,
     readonly template: States,
   ) {}
 
   static parse(data: Record<string, unknown>) {
     return new Olan(
-      data.draw as string[],
-      data.rawfig as string,
-      data.figure as Record<string, unknown>,
-      ManDef.parse(data.mdef as Record<string, never>) as ManDef,
+      data.olan as Record<string, unknown>,
+      data.aresti as Record<string, unknown>,
+      ManDef.parse(data.definition as Record<string, never>) as ManDef,
       Manoeuvre.parse(data.manoeuvre as Record<string, never>),
       States.parse(data.template as Record<string, never>)
     );

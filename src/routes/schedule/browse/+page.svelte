@@ -2,8 +2,9 @@
 	import { library, loadKnowns } from '$lib/schedules';
 
 	loadKnowns();
-	let selectedCategory: string | undefined = undefined;
-	let selectedSchedule: string | undefined = undefined;
+
+	let selectedCategory: string | undefined = $state();
+	let selectedSchedule: string | undefined = $state();
 </script>
 
 <div class="col-lg-2 pt-5">
@@ -31,7 +32,7 @@
 							name="z"
 							value={catlib.first.category_name}
 							bind:group={selectedCategory}
-							on:change={() => {
+							onchange={() => {
 								selectedSchedule = undefined;
 							}}
 						/>
