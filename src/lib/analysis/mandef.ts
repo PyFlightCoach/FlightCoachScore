@@ -12,29 +12,46 @@ export type Position = (typeof Positions)[number];
 
 export class BoxLocation {
 	constructor(
-		readonly height: Height,
-		readonly direction: Direction,
-		readonly orientation: Orientation
+		readonly height: Height | undefined = undefined,
+		readonly direction: Direction | undefined = undefined,
+		readonly orientation: Orientation | undefined = undefined,
 	) {}
 }
 
 export class ManInfo {
+  short_name: string
+  k: number | undefined
+  name: string | undefined
+  position: Position | undefined
+  start: BoxLocation | undefined
+  end: BoxLocation | undefined
+  centre_points: number[] | undefined
+  centred_els: number[][] | undefined
 	constructor(
-		readonly name: string,
-		readonly short_name: string,
-		readonly k: number,
-		readonly position: Position,
-		readonly start: BoxLocation,
-		readonly end: BoxLocation,
-		readonly centre_points: number[],
-		readonly centred_els: number[][]
-	) {}
+		short_name: string,
+		k: number | undefined = undefined,
+    name: string | undefined = undefined,
+		position: Position | undefined = undefined,
+		start: BoxLocation | undefined = undefined,
+		end: BoxLocation | undefined = undefined,
+		centre_points: number[] | undefined = undefined,
+		centred_els: number[][] | undefined = undefined,
+	) {
+    this.short_name = short_name
+    this.name = name
+    this.k = k
+    this.position = position
+    this.start = start
+    this.end = end
+    this.centre_points = centre_points
+    this.centred_els = centred_els
+  }
 
 	static parse(data: ManInfo) {
 		return new ManInfo(
-			data.name,
 			data.short_name,
 			data.k,
+      data.name,
 			data.position,
 			Object.setPrototypeOf(data.start, BoxLocation.prototype),
 			Object.setPrototypeOf(data.end, BoxLocation.prototype),
@@ -43,18 +60,6 @@ export class ManInfo {
 		);
 	}
 
-	static default() {
-		return new ManInfo(
-			'new manoeuvre',
-			'man',
-			0,
-			'CENTRE',
-			new BoxLocation('BTM', 'UPWIND', 'UPRIGHT'),
-			new BoxLocation('BTM', 'DRIVEN', 'DRIVEN'),
-			[],
-			[]
-		);
-	}
 }
 
 export class ManParm {

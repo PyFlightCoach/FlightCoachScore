@@ -1,3 +1,4 @@
+import type { States } from '$lib/analysis/state';
 import {max, min} from '$lib/utils/arrays';
 
 
@@ -19,6 +20,36 @@ export const layout3d = {
         aspectratio: {},
     }
 };
+
+export const create3DLayout = (sts: States, includeZero: boolean = false, expand: number=0) => {
+
+  const newlayout = structuredClone(layout3d);
+  const ranges = {
+    x: sts.plotRange('x', includeZero, expand),
+    y: sts.plotRange('y', includeZero, expand),
+    z: sts.plotRange('z', includeZero, expand)
+  };
+
+  newlayout.scene.xaxis = { range: ranges.x };
+  newlayout.scene.yaxis = { range: ranges.y };
+  newlayout.scene.zaxis = { range: ranges.z };
+  newlayout.scene.aspectmode = 'manual';
+
+  const max_range = Math.max(
+    ranges.x[1] - ranges.x[0],
+    ranges.y[1] - ranges.y[0],
+    ranges.z[1] - ranges.z[0]
+  );
+  //
+  newlayout.scene.aspectratio = {
+    x: (ranges.x[1] - ranges.x[0]) / max_range,
+    y: (ranges.y[1] - ranges.y[0]) / max_range,
+    z: (ranges.z[1] - ranges.z[0]) / max_range
+  };
+  return newlayout;
+
+}
+
 
 
 export const get_ar = (data: Record<string, any>[], offset: number=20) => {
