@@ -1,12 +1,12 @@
 import { type FCJson, type FCJMan } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
-import { loadManDef, safeGetLibrary } from '$lib/schedules';
+import { loadManDef, library } from '$lib/schedules';
 import { type DBManoeuvre } from '$lib/database/interfaces';
-import { library } from '$lib/schedules';
 import { get } from 'svelte/store';
 import {schedule_id} from '$lib/stores/leaderboards';
 import type { ManDef, ManOpt } from './mandef';
+
 
 export interface Split {
   category_name?: string | undefined;
@@ -135,9 +135,7 @@ export async function parseFCJMans(fcj: FCJson, states: States) {
 	const stTime = states.t;
 	const sinfo = await fcj.sinfo.to_pfc();
 
-	const schedule = await safeGetLibrary().then(
-		(lib) => lib.subset({ category_name: sinfo.category, schedule_name: sinfo.name }).first
-	);
+	const schedule = get(library).subset({ category_name: sinfo.category, schedule_name: sinfo.name }).first;
 
 	return fcj.mans.map((man: FCJMan, i: number) => {
 		const stStop = lookupMonotonic(fcj.data[man.stop].time / 1e6, stTime);

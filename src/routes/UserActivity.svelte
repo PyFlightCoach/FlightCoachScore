@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { dbServer } from '$lib/api';
 	import { library } from '$lib/schedules';
-	import { onMount } from 'svelte';
-  import {userActivity, type UserActivityResponse} from '$lib/stores/userActivity';
+  import {scheduleRepr, type DBSchedule} from '$lib/database/interfaces';
+	import {userActivity} from '$lib/stores/userActivity';
+  import {nth} from '$lib/utils/numbers';
 
 	let schedule_id: string | undefined = $state(undefined);
 	let category_id: string | undefined = $state(undefined);
@@ -23,8 +23,12 @@
 		return '?' + parms.join('&');
 	});
 
-
 </script>
+
+{#snippet rankinfo(rank: number, schedule: DBSchedule, normalised: boolean = false)}
+  <td class="text-nowrap">{nth(normalised ? Math.round(schedule.num_flights * rank) : rank)} of {schedule.num_flights}</td>
+  <td class="text-nowrap">{scheduleRepr(schedule)}</td>
+{/snippet}
 
 <div class="row justify-content-center pt-0">
 	<div class="col-auto text-center">
@@ -37,8 +41,8 @@
 						<th>Pilot</th>
 						<th>Flights</th>
 						<th>Country</th>
-            <th>Best Rank</th>
-            <th>Best Schedule</th>
+            <th colspan="2">Best Rank</th>
+            <!--<th colspan="2">Best Normalised</th>-->
 					</tr>
 				</thead>
 				<tbody>
@@ -48,8 +52,10 @@
 							<td>{row.name}</td>
 							<td>{row.total_n}</td>
 							<td>{row.country}</td>
-              <td>{row.best_rank}</td>
-              <td>{$library.subset({schedule_id: row.best_rank_schedule_id}).first.schedule_name}</td>
+              {@render rankinfo(row.best_rank, $library.subset({schedule_id: row.best_rank_schedule_id}).first, false)}
+              <!--
+              {@render rankinfo(row.best_norm_rank, $library.subset({schedule_id: row.best_norm_rank_schedule_id}).first, true)}
+            -->
 						</tr>
 					{/each}
 				</tbody>

@@ -1,5 +1,5 @@
 import { analysisServer, dbServer, dbServerAddress } from '$lib/api';
-import { BoxLocation, Heights, ManDef, ManInfo, ManOpt } from '$lib/analysis/mandef';
+import { ManDef, ManInfo, ManOpt } from '$lib/analysis/mandef';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { type DBSchedule } from '$lib/database/interfaces';
@@ -79,7 +79,7 @@ export class ScheduleLibrary {
 	}
 
 	async update(request: ScheduleRequest): Promise<ScheduleLibrary> {
-		return this.append(await loadSchedules(request));
+		return this.append(await loadSchedules(request)).sort(['rule_name', 'category_name', 'schedule_name']);
 	}
 
 	sort(keys: string[]) {
@@ -99,17 +99,14 @@ export class ScheduleLibrary {
 
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
 
-export async function loadKnowns() {
+export async function loadSchedulesforUser(owner: string) {
   console.log("loading knowns")
-	const lib = get(library);
-	if (lib.subset({ owner_name: 'Fcscore Admin' }).empty) {
-		await lib.update({ owner: 'admin@fcscore.org' }).then((newlib) => {
-			library.set(newlib.sort(['rule_name', 'category_name', 'schedule_name']));
-		});
-	}
+  get(library).update({ owner: owner })
+    .then(newlib => {library.set(newlib)})
+    .catch(() => {library.set(new ScheduleLibrary());});
 }
 
-dbServerAddress.subscribe(loadKnowns);
+dbServerAddress.subscribe(loadSchedulesforUser);
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
 	return dbServer
@@ -117,10 +114,6 @@ export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt>
 		.then((r) => ManDef.parse(r.data));
 }
 
-export async function safeGetLibrary() {
-	await loadKnowns();
-	return get(library);
-}
 
 export class ManoeuvreHandler {
 	aresti: Figure;

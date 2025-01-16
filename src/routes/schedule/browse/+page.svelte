@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { library, loadKnowns } from '$lib/schedules';
-
-	loadKnowns();
+	import { library} from '$lib/schedules';
 
 	let selectedCategory: string | undefined = $state();
 	let selectedSchedule: string | undefined = $state();

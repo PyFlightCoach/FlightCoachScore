@@ -25,7 +25,7 @@ export interface St {
 }
 
 
-export class State {
+export class State{
 	constructor(data: St) {
 		return Object.setPrototypeOf(data, State.prototype);
 	}

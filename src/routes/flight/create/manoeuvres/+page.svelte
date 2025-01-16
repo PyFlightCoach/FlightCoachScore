@@ -5,13 +5,11 @@
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/analysis/fcjson';
-	import { loadManDef, library, loadKnowns } from '$lib/schedules';
+	import { loadManDef, library } from '$lib/schedules';
 	import ManSelect from '$lib/components/manselect/ManSelect.svelte';
 	import * as ms from '$lib/analysis/splitting';
 
   const { data } = $props();
-
-	loadKnowns();
 
 	let mans = $state(data.baseSplits);
 

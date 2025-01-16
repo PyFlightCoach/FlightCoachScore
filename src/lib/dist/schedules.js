@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.ManOptionHandler = exports.ManoeuvreHandler = exports.safeGetLibrary = exports.loadManDef = exports.loadKnowns = exports.library = exports.ScheduleLibrary = exports.loadSchedules = exports.scheduleRepr = void 0;
+exports.ManOptionHandler = exports.ManoeuvreHandler = exports.loadManDef = exports.loadSchedulesforUser = exports.library = exports.ScheduleLibrary = exports.loadSchedules = exports.scheduleRepr = void 0;
 var api_1 = require("$lib/api");
 var mandef_1 = require("$lib/analysis/mandef");
 var store_1 = require("svelte/store");
@@ -133,7 +133,7 @@ var ScheduleLibrary = /** @class */ (function () {
                     case 0:
                         _a = this.append;
                         return [4 /*yield*/, loadSchedules(request)];
-                    case 1: return [2 /*return*/, _a.apply(this, [_b.sent()])];
+                    case 1: return [2 /*return*/, _a.apply(this, [_b.sent()]).sort(['rule_name', 'category_name', 'schedule_name'])];
                 }
             });
         });
@@ -157,28 +157,18 @@ var ScheduleLibrary = /** @class */ (function () {
 }());
 exports.ScheduleLibrary = ScheduleLibrary;
 exports.library = store_1.writable(new ScheduleLibrary());
-function loadKnowns() {
+function loadSchedulesforUser(owner) {
     return __awaiter(this, void 0, void 0, function () {
-        var lib;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    console.log("loading knowns");
-                    lib = store_2.get(exports.library);
-                    if (!lib.subset({ owner_name: 'Fcscore Admin' }).empty) return [3 /*break*/, 2];
-                    return [4 /*yield*/, lib.update({ owner: 'admin@fcscore.org' }).then(function (newlib) {
-                            exports.library.set(newlib.sort(['rule_name', 'category_name', 'schedule_name']));
-                        })];
-                case 1:
-                    _a.sent();
-                    _a.label = 2;
-                case 2: return [2 /*return*/];
-            }
+            console.log("loading knowns");
+            store_2.get(exports.library).update({ owner: owner })
+                .then(function (newlib) { exports.library.set(newlib); })["catch"](function () { exports.library.set(new ScheduleLibrary()); });
+            return [2 /*return*/];
         });
     });
 }
-exports.loadKnowns = loadKnowns;
-api_1.dbServerAddress.subscribe(loadKnowns);
+exports.loadSchedulesforUser = loadSchedulesforUser;
+api_1.dbServerAddress.subscribe(loadSchedulesforUser);
 function loadManDef(manoeuvre_id) {
     return __awaiter(this, void 0, Promise, function () {
         return __generator(this, function (_a) {
@@ -189,19 +179,6 @@ function loadManDef(manoeuvre_id) {
     });
 }
 exports.loadManDef = loadManDef;
-function safeGetLibrary() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, loadKnowns()];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/, store_2.get(exports.library)];
-            }
-        });
-    });
-}
-exports.safeGetLibrary = safeGetLibrary;
 var ManoeuvreHandler = /** @class */ (function () {
     function ManoeuvreHandler(aresti, olan, definition, manoeuvre, template) {
         if (olan === void 0) { olan = undefined; }

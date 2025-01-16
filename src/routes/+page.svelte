@@ -4,7 +4,7 @@
 	import { news } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
 	import About from './About.svelte';
-  import UserActivity from '$lib/components/UserActivity.svelte';
+  import UserActivity from './UserActivity.svelte';
 
 	$navBarContents = undefined;
 	let activeNews = $state(0);

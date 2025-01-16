@@ -169,3 +169,7 @@ export interface DBSchedule {
 	manoeuvres: DBManoeuvre[];
 	num_flights: number;
 }
+
+export function scheduleRepr(s: DBSchedule | undefined): string {
+  return s ? `${s.category_name} ${s.schedule_name}`.toUpperCase() : ''
+}

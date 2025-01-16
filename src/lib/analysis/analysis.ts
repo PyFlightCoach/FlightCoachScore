@@ -7,7 +7,7 @@ import { States } from '$lib/analysis/state';
 import { Splitting, schedule as getScheduleFromSplit } from '$lib/analysis/splitting';
 import { ManDef } from '$lib/analysis/mandef';
 import { ScheduleInfo } from './fcjson';
-import { loadManDef, safeGetLibrary } from '$lib/schedules';
+import { loadManDef, library } from '$lib/schedules';
 import { dbServer } from '$lib/api';
 import JSZip from 'jszip';
 import { goto } from '$app/navigation';
@@ -164,7 +164,6 @@ export async function importAnalysis(data: Record<string, any>) {
 
 	setupAnalysisArrays(data.mans.map((ma: MA) => ma.name));
 
-	await safeGetLibrary().then((library) => {
 		data.mans.forEach(async (ma: ManDef, i: number) => {
 			sts.runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
 
@@ -173,7 +172,7 @@ export async function importAnalysis(data: Record<string, any>) {
 					setAnalysis(i, res);
 				} else {
 					const mdef = await loadManDef(
-						library.subset({
+						get(library).subset({
 							category_name: res.schedule.category,
 							schedule_name: res.schedule.name
 						}).first!.manoeuvres[res.id - 1].id
@@ -196,7 +195,7 @@ export async function importAnalysis(data: Record<string, any>) {
 				}
 			});
 		});
-	});
+
 }
 
 export async function loadExample() {

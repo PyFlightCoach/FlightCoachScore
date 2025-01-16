@@ -97,7 +97,6 @@ dbServerAddress.subscribe((value: string) => {
     baseURL: value,
     withCredentials: true
   });
-  
 });
 
 if (!dev) {

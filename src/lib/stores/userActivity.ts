@@ -25,6 +25,7 @@ export const request_activity = () => {
       userActivity.set(res.data.results as UserActivityResponse[]);
     })
     .catch((err) => {
+      userActivity.set([]);
       console.log(err);
     });
 };

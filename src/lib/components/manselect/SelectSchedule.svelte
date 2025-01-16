@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { library, loadKnowns } from '$lib/schedules.js';
+	import { library } from '$lib/schedules.js';
 	import { schedule_id } from '$lib/stores/leaderboards';
 	import { onMount } from 'svelte';
-
-	loadKnowns();
 
 	let {
 		only_with_flights = false,
@@ -16,10 +14,6 @@
 		schedule_name?: string | undefined;
 		onselected: (new_schedule_name: string) => void;
 	} = $props();
-
-	onMount(() => {
-		loadKnowns();
-	});
 
 	const schedules = $derived(
 		$library && category_name ? $library.subset({ category_name }).unique('schedule_name') : []
