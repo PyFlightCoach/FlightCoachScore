@@ -4,6 +4,7 @@
 	import { news } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
 	import About from './About.svelte';
+  import UserActivity from '$lib/components/UserActivity.svelte';
 
 	$navBarContents = undefined;
 	let activeNews = $state(0);
@@ -50,28 +51,18 @@
 	<div class="col-lg-6 px-lg-3 px-0">
 		<div class="row mb-3">
 			<h1 class="text-center pt-3 h-1">Flight Coach Score</h1>
-			<lead class="lead text-center text-muted">Automatic judging and score sharing for precision aerobatics</lead>
+			<lead class="lead text-center text-muted"
+				>Automatic judging and score sharing for precision aerobatics</lead
+			>
 		</div>
 		<hr />
 
 		{#if $user && $news.length}
 			<div class="button-grp-sm mb-2">
-				<input
-					type="radio"
-					class="btn-check"
-					value="About"
-					id="about"
-					bind:group={show}
-				/>
+				<input type="radio" class="btn-check" value="About" id="about" bind:group={show} />
 				<label class="btn btn-outline-secondary btn-sm" for="about">About</label>
 
-				<input
-					type="radio"
-					class="btn-check"
-					value="News"
-					id="news"
-					bind:group={show}
-				/>
+				<input type="radio" class="btn-check" value="News" id="news" bind:group={show} />
 				<label class="btn btn-outline-secondary btn-sm" for="news">News</label>
 			</div>
 
@@ -115,47 +106,46 @@
 		{/if}
 	</div>
 
-	<div
-		class="col-lg-6 justify-content-center pt-lg-5 px-lg-2 px-0"
-	>
-		<div
-			id="ExamplesCarousel"
-			class="carousel carousel-dark slide px-lg-3 px-0"
-		>
-			<div class="carousel-inner">
-				{#each imgs as img, i}
-					<div class="carousel-item {i == 0 ? 'active' : ''} ">
-						<img
-							src="{base}{img.img}"
-							class="mb-3 img-fluid img-thumbnail"
-							style="max-height: 100%;"
-							alt="..."
-						/>
+	<div class="col-lg-6 justify-content-center px-lg-2 px-0">
+		{#if $user}
+      <UserActivity />
+    {:else}
+			<div id="ExamplesCarousel" class="carousel carousel-dark slide px-lg-3 px-0 pt-lg-5">
+				<div class="carousel-inner">
+					{#each imgs as img, i}
+						<div class="carousel-item {i == 0 ? 'active' : ''} ">
+							<img
+								src="{base}{img.img}"
+								class="mb-3 img-fluid img-thumbnail"
+								style="max-height: 100%;"
+								alt="..."
+							/>
 
-						<div class="carousel-caption d-none d-md-block">
-							<p class="bg-light p-0">{img.description}</p>
+							<div class="carousel-caption d-none d-md-block">
+								<p class="bg-light p-0">{img.description}</p>
+							</div>
 						</div>
-					</div>
-				{/each}
+					{/each}
+				</div>
+				<button
+					class="carousel-control-prev"
+					type="button"
+					data-bs-target="#ExamplesCarousel"
+					data-bs-slide="prev"
+					aria-label="Previous"
+				>
+					<span class="carousel-control-prev-icon" aria-hidden="false"></span>
+				</button>
+				<button
+					class="carousel-control-next"
+					type="button"
+					data-bs-target="#ExamplesCarousel"
+					data-bs-slide="next"
+					aria-label="Next"
+				>
+					<span class="carousel-control-next-icon" aria-hidden="false"></span>
+				</button>
 			</div>
-			<button
-				class="carousel-control-prev"
-				type="button"
-				data-bs-target="#ExamplesCarousel"
-				data-bs-slide="prev"
-				aria-label="Previous"
-			>
-				<span class="carousel-control-prev-icon" aria-hidden="false"></span>
-			</button>
-			<button
-				class="carousel-control-next"
-				type="button"
-				data-bs-target="#ExamplesCarousel"
-				data-bs-slide="next"
-				aria-label="Next"
-			>
-				<span class="carousel-control-next-icon" aria-hidden="false"></span>
-			</button>
-		</div>
+		{/if}
 	</div>
 </div>
