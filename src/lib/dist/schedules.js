@@ -163,6 +163,7 @@ function loadKnowns() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    console.log("loading knowns");
                     lib = store_2.get(exports.library);
                     if (!lib.subset({ owner_name: 'Fcscore Admin' }).empty) return [3 /*break*/, 2];
                     return [4 /*yield*/, lib.update({ owner: 'admin@fcscore.org' }).then(function (newlib) {

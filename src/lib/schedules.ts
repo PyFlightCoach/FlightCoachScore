@@ -100,6 +100,7 @@ export class ScheduleLibrary {
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
 
 export async function loadKnowns() {
+  console.log("loading knowns")
 	const lib = get(library);
 	if (lib.subset({ owner_name: 'Fcscore Admin' }).empty) {
 		await lib.update({ owner: 'admin@fcscore.org' }).then((newlib) => {
