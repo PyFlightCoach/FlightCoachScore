@@ -2,6 +2,7 @@
 	import { dbServer } from '$lib/api';
 	import { library } from '$lib/schedules';
 	import { onMount } from 'svelte';
+  import {userActivity, type UserActivityResponse} from '$lib/stores/userActivity';
 
 	let schedule_id: string | undefined = $state(undefined);
 	let category_id: string | undefined = $state(undefined);
@@ -22,35 +23,7 @@
 		return '?' + parms.join('&');
 	});
 
-	interface UserActivityResponse {
-		id: string;
-		name: string;
-		country: string;
-		top_schedule_id: string;
-		top_schedule_n: number;
-		best_rank_schedule_id: string;
-		best_rank: number;
-		best_norm_rank_schedule_id: string;
-		best_norm_rank: number;
-		total_n: number;
-	}
 
-	const request_activity = () => {
-		dbServer
-			.get('/analysis/user_activity' + query_parameters)
-			.then((res) => {
-				data = res.data.results as UserActivityResponse[];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	};
-
-	let data: UserActivityResponse[] = $state([]);
-
-	onMount(() => {
-		request_activity();
-	});
 </script>
 
 <div class="row justify-content-center pt-0">
@@ -69,7 +42,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each data as row, i}
+					{#each $userActivity as row, i}
 						<tr class="align-middle">
 							<td>{i + 1}</td>
 							<td>{row.name}</td>

@@ -1,4 +1,4 @@
-import { analysisServer, dbServer } from '$lib/api';
+import { analysisServer, dbServer, dbServerAddress } from '$lib/api';
 import { BoxLocation, Heights, ManDef, ManInfo, ManOpt } from '$lib/analysis/mandef';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
@@ -107,6 +107,8 @@ export async function loadKnowns() {
 		});
 	}
 }
+
+dbServerAddress.subscribe(loadKnowns);
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
 	return dbServer

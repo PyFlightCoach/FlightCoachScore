@@ -31,7 +31,6 @@ export const includeActive = newCookieStoreInt('includeActive', 0);
 export const table_rows: Writable<DBFlightRanked[]> = writable([]);
 export const lastResponse: Writable<'leaderboard' | 'flightlist' | undefined> = writable();
 
-
 export function getDays(ndval: number) {
   return { 0: 1, 370: 720, 380: 10000 }[ndval] || ndval;
 }
@@ -50,8 +49,6 @@ export const postUploadSearch = () => {
   includeActive.set(3);
   updateTable();
 }
-
-
 
 export const updateTable = async () => {
   const q = {
