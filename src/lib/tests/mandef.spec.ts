@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {  split_arg_string, ManDef, ManOpt } from '$lib/analysis/mandef';
+import {  split_arg_string, ManDef, ManOpt } from '$lib/schedules/mandef';
 import { Server } from '$lib/api';
 
 const server = new Server('http://localhost:5000');

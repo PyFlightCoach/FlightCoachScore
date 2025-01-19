@@ -21,7 +21,7 @@ export const layout3d = {
     }
 };
 
-export const create3DLayout = (sts: States, includeZero: boolean = false, expand: number=0) => {
+export const create3DLayout = (sts: States, includeZero: boolean = false, expand: number=0, hideAxes: boolean=false) => {
 
   const newlayout = structuredClone(layout3d);
   const ranges = {
@@ -30,9 +30,9 @@ export const create3DLayout = (sts: States, includeZero: boolean = false, expand
     z: sts.plotRange('z', includeZero, expand)
   };
 
-  newlayout.scene.xaxis = { range: ranges.x };
-  newlayout.scene.yaxis = { range: ranges.y };
-  newlayout.scene.zaxis = { range: ranges.z };
+  newlayout.scene.xaxis = { range: ranges.x, visible: !hideAxes };
+  newlayout.scene.yaxis = { range: ranges.y, visible: !hideAxes };
+  newlayout.scene.zaxis = { range: ranges.z, visible: !hideAxes };
   newlayout.scene.aspectmode = 'manual';
 
   const max_range = Math.max(

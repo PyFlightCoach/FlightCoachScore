@@ -5,7 +5,7 @@
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/analysis/fcjson';
-	import { loadManDef, library } from '$lib/schedules';
+	import { loadManDef, library } from '$lib/schedules/library.js';
 	import ManSelect from '$lib/components/manselect/ManSelect.svelte';
 	import * as ms from '$lib/analysis/splitting';
 

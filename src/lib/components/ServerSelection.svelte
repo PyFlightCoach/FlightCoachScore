@@ -1,8 +1,20 @@
 <script lang="ts">
-	export let title: string;
-  export let options: string[];
-	export let custom: string;
-	export let selected: string;
+
+	interface Props {
+		title: string;
+		options: string[];
+		custom: string;
+		selected: string;
+    onselected?: (value: string) => void;
+	}
+
+	let {
+		title,
+		options,
+		custom = $bindable(),
+		selected = $bindable(),
+    onselected = () => {},
+	}: Props = $props();
 
 </script>
 
@@ -17,6 +29,7 @@
         id={option}
         value={option}
         bind:group={selected}
+        onchange={() => onselected(selected)}
       />
       <label class="form-check-label" for="ukAnalysisServer">{option}</label>
     </div>
@@ -29,6 +42,7 @@
 			id="custom"
 			value="custom"
 			bind:group={selected}
+      onchange={() => onselected(selected)}
 		/>
 		<input type="text" class="form-control small-text text-nowrap" bind:value={custom} />
 	</div>

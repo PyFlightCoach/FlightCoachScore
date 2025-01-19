@@ -1,13 +1,11 @@
-import { derived, writable, type Writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import { Flight } from '$lib/database/flight';
 import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
 import { user } from '$lib/stores/user';
-import { dbServer } from '$lib/api';
-import { base } from '$app/paths';
-import MarkdownIt from 'markdown-it';
-const md = new MarkdownIt();
+import { dbServer} from '$lib/api';
+import { loadSchedulesforUser } from '$lib/schedules/library';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -52,14 +50,33 @@ export const unblockProgress = () => {
 
 export const news: Writable<[]> = writable([]);
 
+export const allFAVersions: Writable<string[]> = writable([]);
+export const activeScheduleIDs: Writable<string[]> = writable([]);
+
+export async function loadGuiLists() {
+  console.info("Loading gui_lists");
+	dbServer
+		.get('analysis/guilists')
+		.then((res) => {
+			allFAVersions.set(res.data.fa_versions);
+			activeScheduleIDs.set(res.data.active_schedule_ids);
+		})
+		.catch(() => {
+      alert("Failed to load gui_lists from db, check you internet connection");
+			allFAVersions.set([]);
+			activeScheduleIDs.set([]);
+		});
+}
+
 user.subscribe((u) => {
 	dbServer
 		.get('news', { validateStatus: (status) => status == 200 })
-		.then((res) => {
+    .then((res) => {
 			news.set(res.data.results);
 		})
 		.catch(() => {
 			news.set([]);
 		});
+  if (u) loadSchedulesforUser(u.email);
+  
 });
-

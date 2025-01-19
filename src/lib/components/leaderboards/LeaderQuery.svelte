@@ -1,6 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: Mixing old (on:change) and new syntaxes for event handling is not allowed. Use only the onchange syntax -->
 <script lang="ts">
-	import { library } from '$lib/schedules.js';
+	import { library } from '$lib/schedules/library';
 	import {
 		n_results,
 		n_days_val,
@@ -25,7 +24,7 @@
 	import { activeFlight } from '$lib/stores/shared';
 
 	let { fa_versions, schedule_ids }: { fa_versions: string[]; schedule_ids: string[] } = $props();
-
+  
 	let lib = $derived(schedule_ids ? $library.downselect(schedule_ids) : $library);
 	let categories = $derived(lib.unique('category_name') || []);
 	let selectedCategory: string | undefined = $state();

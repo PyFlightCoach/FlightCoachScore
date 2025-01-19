@@ -1,7 +1,7 @@
 import { type Writable, writable } from "svelte/store";
 import { dbServer } from "$lib/api";
 import {user} from "$lib/stores/user";
-import { library } from "$lib/schedules";
+import { library } from "$lib/schedules/library";
 
 export interface UserActivityResponse {
   id: string;

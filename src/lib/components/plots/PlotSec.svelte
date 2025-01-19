@@ -31,6 +31,8 @@
 	export let showBox: boolean = false;
 	export let includeZero: boolean = false;
 	export let expand: number = 0;
+  export let hideAxes: boolean = false;
+
 
   let showcontrols = controls.filter(c=>!exclude_controls.includes(c))
 
@@ -61,9 +63,9 @@
 				eye: { x: 0, y: -2, z: -1 },
 				projection: { type: 'perspective' }
 			},
-			xaxis: {},
-			yaxis: {},
-			zaxis: {},
+			xaxis: {visible:!hideAxes},
+			yaxis: {visible:!hideAxes},
+			zaxis: {visible:!hideAxes},
 			aspectratio: {}
 		}
 	};
@@ -76,9 +78,9 @@
 			z: sts.plotRange('z', _zero, _expand)
 		};
 
-		newlayout.scene.xaxis = { range: ranges.x };
-		newlayout.scene.yaxis = { range: ranges.y };
-		newlayout.scene.zaxis = { range: ranges.z };
+		newlayout.scene.xaxis.range = ranges.x ;
+		newlayout.scene.yaxis.range = ranges.y ;
+		newlayout.scene.zaxis.range = ranges.z ;
 		newlayout.scene.aspectmode = 'manual';
 
 		const max_range = Math.max(

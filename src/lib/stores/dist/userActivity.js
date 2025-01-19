@@ -4,7 +4,7 @@ exports.request_activity = exports.userActivity = void 0;
 var store_1 = require("svelte/store");
 var api_1 = require("$lib/api");
 var user_1 = require("$lib/stores/user");
-var schedules_1 = require("$lib/schedules");
+var schedules_1 = require("$lib/schedules/library");
 exports.userActivity = store_1.writable([]);
 exports.request_activity = function () {
     api_1.dbServer

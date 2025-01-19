@@ -1,11 +1,9 @@
-import { analysisServer, dbServer, dbServerAddress } from '$lib/api';
-import { ManDef, ManInfo, ManOpt } from '$lib/analysis/mandef';
+import { dbServer, dbServerAddress } from '$lib/api';
+import { ManDef, ManOpt } from '$lib/schedules/mandef';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { type DBSchedule } from '$lib/database/interfaces';
-import { Manoeuvre } from '$lib/analysis/manoeuvre';
-import { States } from '$lib/analysis/state';
-import { Figure } from '$lib/analysis/aresti';
+import type { schedule_id } from '$lib/stores/leaderboards';
 
 export function scheduleRepr(s: DBSchedule | undefined): string {
 	if (!s) {
@@ -57,7 +55,7 @@ export class ScheduleLibrary {
 		return Array.from(new Set(this.schedules.map((s) => s[key as keyof DBSchedule] as string)));
 	}
 
-	subset(conditions: Record<string, string>): ScheduleLibrary {
+	subset(conditions: Record<string, string | undefined>): ScheduleLibrary {
 		const checkConditions = (s: DBSchedule) => {
 			for (const key in conditions) {
 				if (s[key as keyof DBSchedule] !== conditions[key]) {
@@ -100,13 +98,15 @@ export class ScheduleLibrary {
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
 
 export async function loadSchedulesforUser(owner: string) {
-  console.log("loading knowns")
+  console.log("loading schedules for ", owner)
   get(library).update({ owner: owner })
     .then(newlib => {library.set(newlib)})
-    .catch(() => {library.set(new ScheduleLibrary());});
+    .catch(() => {
+      alert("Failed to load schedules from DB, check your internet connection");
+      library.set(new ScheduleLibrary());
+    });
 }
 
-dbServerAddress.subscribe(loadSchedulesforUser);
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
 	return dbServer
@@ -114,82 +114,3 @@ export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt>
 		.then((r) => ManDef.parse(r.data));
 }
 
-
-export class ManoeuvreHandler {
-	aresti: Figure;
-	olan: Record<string, unknown> | undefined;
-	definition: ManDef | ManOpt | undefined;
-	manoeuvre: Manoeuvre | undefined;
-	template: States | undefined = undefined;
-	constructor(
-		aresti: Figure,
-		olan: Record<string, unknown> | undefined = undefined,
-		definition: ManDef | ManOpt | undefined = undefined,
-		manoeuvre: Manoeuvre | undefined = undefined,
-		template: States | undefined = undefined
-	) {
-		this.aresti = aresti;
-		this.olan = olan;
-		this.definition = definition;
-		this.manoeuvre = manoeuvre;
-		this.template = template;
-	}
-
-	static parseOlan(data: Record<string, unknown>) {
-		return new ManoeuvreHandler(
-			data.aresti as Figure,
-			data.olan as Record<string, unknown>,
-			ManDef.parse(data.definition as Record<string, never>),
-			Manoeuvre.parse(data.manoeuvre as Record<string, never>),
-			States.parse(data.template as Record<string, never>)
-		);
-	}
-
-	static async parseDB(manoeuvre_id: string) {
-		const aresti = Figure.parse(
-			(await dbServer.get(`schedule/manoeuvre/aresti/${manoeuvre_id}`)).data
-		);
-		const definition = ManDef.parse(
-			(await dbServer.get(`schedule/manoeuvre/definition/${manoeuvre_id}`)).data
-		);
-		const res = (await analysisServer.post('create_template', { mdef: definition })).data;
-
-		if (Array.isArray(aresti)) {
-			return new ManOptionHandler(
-				aresti.map(
-					(a, i) =>
-						new ManoeuvreHandler(
-							a,
-							undefined,
-							(definition as ManOpt).options[i],
-							Manoeuvre.parse(res[i].manoeuvre),
-							States.parse(res[i].template)
-						)
-				)
-			);
-		} else {
-			return new ManoeuvreHandler(
-				aresti,
-				undefined,
-				definition,
-				Manoeuvre.parse(res[0].manoeuvre),
-				States.parse(res[0].template)
-			);
-		}
-	}
-
-	static empty(short_name: string) {
-		return new ManoeuvreHandler(new Figure(new ManInfo(short_name)));
-	}
-}
-
-export class ManOptionHandler {
-	active: number = 0;
-	constructor(readonly options: ManoeuvreHandler[]) {
-		this.options = options;
-	}
-  get info() {return this.options[this.active].aresti.info;}
-  get definition() {return this.options[this.active].definition;}
-  get manoeuvre() {return this.options[this.active].manoeuvre;}
-  get template() {return this.options[this.active].template;}
-}

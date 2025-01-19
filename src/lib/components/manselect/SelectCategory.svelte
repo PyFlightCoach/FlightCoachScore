@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { ScheduleLibrary, library } from '$lib/schedules.js';
-	import { schedule_id } from '$lib/stores/leaderboards';
-	import { onMount } from 'svelte';
-
+	import { library } from '$lib/schedules/library';
+	
 	let {
 		only_with_flights = false,
 		category_name = undefined,

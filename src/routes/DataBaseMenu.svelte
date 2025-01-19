@@ -11,5 +11,5 @@
   {#if $user?.is_verified}
     <a class="dropdown-item" href="{base}/database/query/leaderboards">Leaderboard</a>
   {/if}
-  <a class="dropdown-item" href="{base}/schedule/browse">Schedules</a>
+  <a class="dropdown-item" href="{base}/schedule">Schedules</a>
 </NavMenu>

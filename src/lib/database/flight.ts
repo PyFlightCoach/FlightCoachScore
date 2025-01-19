@@ -1,6 +1,6 @@
 import type { DBFlightMeta, DBSchedule, DBFlightScore } from './interfaces';
 import { dbServer } from '$lib/api';
-import { library } from '$lib/schedules';
+import { library } from '$lib/schedules/library';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 

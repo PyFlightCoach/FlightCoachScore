@@ -11,7 +11,10 @@
 		sp = 3,
 		defaultValue = undefined,
 		labels = {},
-		expand = 0
+		expand = 0,
+    hideAxes = false,
+    canSelect = true,
+    hoverinfo = "all"
 	}: {
 		sts: Record<string, States>;
 		activeEl?: string | undefined;
@@ -19,6 +22,9 @@
 		defaultValue?: string | undefined;
 		labels?: Record<string, string>;
 		expand?: number;
+    hideAxes?: boolean;
+    canSelect?: boolean;
+    hoverinfo?: string;
 	} = $props();
 
 	let last_changed = $state(Date.now());
@@ -26,9 +32,9 @@
 	const traces = $derived.by(() => {
 		let traces: Record<string, any>[] = Object.entries(sts).map(([k, v], i) => {
 			if (k == activeEl || !activeEl || !Object.keys(sts).includes(activeEl)) {
-				return ribbon(v, sp, {}, { opacity: 0.8, showlegend: false, color: d3Color(i), name: k });
+				return ribbon(v, sp, {}, { opacity: 0.8, showlegend: false, color: d3Color(i), name: k, hoverinfo });
 			} else {
-				return ribbon(v, sp, {}, { opacity: 0.2, showlegend: false, color: d3Color(i), name: k });
+				return ribbon(v, sp, {}, { opacity: 0.2, showlegend: false, color: d3Color(i), name: k, hoverinfo });
 			}
 		});
 
@@ -36,7 +42,7 @@
 	});
 
 	let layout = $derived.by(() => {
-		let lay = create3DLayout(new States(Object.values(sts).map(st=>st.data).flat()), false, expand);
+		let lay = create3DLayout(new States(Object.values(sts).map(st=>st.data).flat()), false, expand, hideAxes);
 
 		lay.scene.annotations = [];
 		if (Object.keys(labels).length) {
@@ -49,7 +55,7 @@
 						z: pos.z,
 						text: v,
 						font: { size: 18 },
-						showarrow: false
+						showarrow: false,
 					});
 				}
 			});
@@ -60,12 +66,15 @@
 	//  let layout = $state(structuredClone(layout3d));
 </script>
 
+<div
+	class="container-fluid h-100 d-flex flex-column p-0">
+  <div class="col">
 <Plot
 	data={traces}
 	{layout}
 	fillParent={true}
 	on:click={(e) => {
-		if (Date.now() - last_changed > 100) {
+		if (Date.now() - last_changed > 100 && canSelect) {
 			if (activeEl != e.detail.points[0].data.name) {
 				activeEl = e.detail.points[0].data.name;
 			} else {
@@ -75,3 +84,5 @@
 		}
 	}}
 />
+</div>
+</div>

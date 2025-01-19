@@ -1,7 +1,7 @@
 import { States } from '$lib/analysis/state';
-import { Manoeuvre } from '$lib/analysis/manoeuvre';
-import { ManDef, ManOpt } from '$lib/analysis/mandef';
-import { ManoeuvreResult } from '$lib/analysis/scores';
+import { Manoeuvre } from '$lib/schedules/manoeuvre';
+import { ManDef, ManOpt } from '$lib/schedules/mandef';
+import { ManoeuvreResult } from '$lib/schedules/scores';
 import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/analysis/fcjson';
 import { analysisServer } from '$lib/api';
 import { selectedResult, runInfo, binData, origin } from '$lib/stores/analysis';

@@ -4,11 +4,9 @@
 	import DBMenu from './DBMenu.svelte';
 	import { base } from '$app/paths';
 	import { updateTable } from '$lib/stores/leaderboards';
-	import { windowWidth } from '$lib/stores/shared';
+	import { windowWidth, activeScheduleIDs, allFAVersions } from '$lib/stores/shared';
 	import { table_rows } from '$lib/stores/leaderboards';
 	import { onMount } from 'svelte';
-
-	export let data;
 
 	$: md = $windowWidth >= 768;
 
@@ -37,7 +35,7 @@
 		</div>
 	{/if}
 
-	<LeaderQuery fa_versions={data.fa_versions} schedule_ids={data.active_schedule_ids}/>
+	<LeaderQuery fa_versions={$allFAVersions} schedule_ids={$activeScheduleIDs}/>
 
 	<div class="row p-2 justify-content-end">
 		<button class="w-50 btn btn-primary" on:click={updateTable} data-bs-dismiss="offcanvas"

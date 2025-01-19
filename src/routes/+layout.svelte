@@ -51,16 +51,8 @@
 			.replace('_', '');
     helpFileName = helpFileName.endsWith('_') ? helpFileName.slice(0, -1) : helpFileName;
 		fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('no help available');
-				}
-				return response.text();
-			})
-			.then((text) => ($help = text.replace('/fcscorebase', base)))
-			.catch((error) => {
-				$help = undefined;
-			});
+			.then((response) =>  response.ok ? response.text() : undefined)
+			.then((text) => ($help = text?.replace('/fcscorebase', base)));
 	}
 
 	onMount(() => {

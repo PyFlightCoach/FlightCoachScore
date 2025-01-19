@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Result } from '$lib/analysis/scores';
+	import type { Result } from '$lib/schedules/scores';
 	import Plot from 'svelte-plotly.js';
 	import { linspace } from '$lib/utils/arrays';
 	export let result: Result;

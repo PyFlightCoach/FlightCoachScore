@@ -1,4 +1,4 @@
-import { ManInfo } from '$lib/analysis/mandef';
+import { ManInfo } from '$lib/schedules/maninfo';
 
 export class PE {
 	constructor(
@@ -20,7 +20,7 @@ export class Figure {
 		this.relax_back = relax_back;
 	}
 
-	static parse(data: Record<string, any>): Figure | Figure[] {
+	static parse(data: Record<string, any>): Figure | FigOption {
 		if (data.figures) {
 			return new FigOption(data.figures.map(d => Figure.parse(d) as Figure));
 		} else {

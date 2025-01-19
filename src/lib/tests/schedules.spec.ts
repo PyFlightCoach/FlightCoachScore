@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {loadSchedules, ScheduleLibrary} from '$lib/schedules';
+import {loadSchedules, ScheduleLibrary} from '$lib/schedules/library';
 import { dbServerAddress, dbServer } from '$lib/api';
 
 

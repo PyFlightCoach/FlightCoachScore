@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as sp from '$lib/analysis/splitting';
-	import type { ScheduleLibrary } from '$lib/schedules';
+	import type { ScheduleLibrary } from '$lib/schedules/library';
 	import { schedule_id } from '$lib/stores/leaderboards';
 
 	let {

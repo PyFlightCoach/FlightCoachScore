@@ -1,4 +1,4 @@
-import { ElementsResults, Results, Result } from './scores';
+import { ElementsResults, Results, Result } from '../schedules/scores';
 import { Point } from './geometry';
 
 

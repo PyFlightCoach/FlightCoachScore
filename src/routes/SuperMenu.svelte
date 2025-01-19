@@ -6,6 +6,8 @@
 	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api';
 	import { dbSOption, customDbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
+  import {library, loadSchedulesforUser, ScheduleLibrary} from '$lib/schedules/library';
+  import {loadGuiLists} from '$lib/stores/shared';
 </script>
 
 <NavMenu tooltip="Super User Menu">
@@ -24,6 +26,13 @@
 			options={Object.keys(db_servers)}
 			bind:custom={$customDbServer}
 			bind:selected={$dbSOption}
+      onselected={() => {
+        console.log("DB Server address changed, reloading info...");
+        $library = new ScheduleLibrary();
+        loadSchedulesforUser("admin@fcscore.org");
+        $user = undefined;
+        loadGuiLists();
+      }}
 		/>
 	{/if}
 	<hr />
@@ -36,10 +45,10 @@
 	<button
 		class="dropdown-item"
 		title="Temporarily make me a normal user to see how it looks."
-		on:click={() => {
+		onclick={() => {
 			$dev = false;
 			user.update((u) => {
-				u.is_superuser = false;
+        if (u) u.is_superuser = false;
 				return u;
 			});
 		}}
@@ -49,7 +58,7 @@
 	{#if dev}
 		<button
 			class="dropdown-item"
-			on:click={() => {
+			onclick={() => {
 				dbServer.post('auth/jwt/logout', {});
 			}}
 		>
@@ -57,7 +66,7 @@
 		</button>
 		<button
 			class="dropdown-item"
-			on:click={() => {
+			onclick={() => {
 				if ($user) {
 					$user.is_verified = false;
 				}

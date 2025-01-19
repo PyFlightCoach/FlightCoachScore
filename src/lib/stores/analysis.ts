@@ -5,7 +5,7 @@ import { MA } from '$lib/analysis/ma';
 import { get } from 'svelte/store';
 import { BinData } from '$lib/components/bin/bindata';
 import { type Split, takeOff, parseFCJMans } from '$lib/analysis/splitting';
-import { loadManDef } from '$lib/schedules';
+import { loadManDef } from '$lib/schedules/library';
 
 
 export const isCompFlight: Writable<boolean> = writable(true);

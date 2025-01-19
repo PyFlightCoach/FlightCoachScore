@@ -1,11 +1,11 @@
 import { type FCJson, type FCJMan } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
-import { loadManDef, library } from '$lib/schedules';
+import { loadManDef, library } from '$lib/schedules/library';
 import { type DBManoeuvre } from '$lib/database/interfaces';
 import { get } from 'svelte/store';
 import {schedule_id} from '$lib/stores/leaderboards';
-import type { ManDef, ManOpt } from './mandef';
+import type { ManDef, ManOpt } from '../schedules/mandef';
 
 
 export interface Split {

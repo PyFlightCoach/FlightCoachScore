@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { DBSchedule } from '$lib/database/interfaces';
-	import { library } from '$lib/schedules.js';
+	import { library } from '$lib/schedules/library';
 		import { onMount } from 'svelte';
 
 	let {
