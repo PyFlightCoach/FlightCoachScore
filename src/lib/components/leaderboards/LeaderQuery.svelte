@@ -19,12 +19,12 @@
 		includeMyBest,
 		includeMyLatest,
 		includeActive,
-    getNFlights
+		getNFlights
 	} from '$lib/stores/leaderboards';
 	import { activeFlight } from '$lib/stores/shared';
 
 	let { fa_versions, schedule_ids }: { fa_versions: string[]; schedule_ids: string[] } = $props();
-  
+
 	let lib = $derived(schedule_ids ? $library.downselect(schedule_ids) : $library);
 	let categories = $derived(lib.unique('category_name') || []);
 	let selectedCategory: string | undefined = $state();
@@ -32,15 +32,19 @@
 		selectedCategory ? lib?.subset({ category_name: selectedCategory }).unique('schedule_name') : []
 	);
 
-  $effect(()=>{
-    selectedCategory = $schedule_id ? lib.subset({ schedule_id: $schedule_id }).first?.category_name : categories[0];
-  })
+	$effect(() => {
+		selectedCategory = $schedule_id
+			? lib.subset({ schedule_id: $schedule_id }).first?.category_name
+			: categories[0];
+	});
 
 	let selectedSchedule: string | undefined = $state();
 
-  $effect(()=>{
-    selectedSchedule = $schedule_id ? lib.subset({ schedule_id: $schedule_id }).first?.schedule_name : schedules[0];
-  })
+	$effect(() => {
+		selectedSchedule = $schedule_id
+			? lib.subset({ schedule_id: $schedule_id }).first?.schedule_name
+			: schedules[0];
+	});
 
 	let n_days = $derived({ 0: 1, 370: 720, 380: 10000 }[$n_days_val] || $n_days_val);
 
@@ -49,7 +53,7 @@
 			$date_before = new Date().toISOString().split('T')[0]; // restrict to flights before this date yyyy-mm-dd
 			$date_after = new Date(new Date().getTime() - 24 * getDays(n_days) * 3600 * 1000)
 				.toISOString()
-				.split('T')[0]; 
+				.split('T')[0];
 		}
 	});
 </script>
@@ -226,7 +230,9 @@
 {/if}
 
 <div class="row p-2">
-	<label class="col col-form-label" for="nflights">Include the top {getNFlights($n_results)} results:</label>
+	<label class="col col-form-label" for="nflights"
+		>Include the top {getNFlights($n_results)} results:</label
+	>
 	<input
 		type="range"
 		class="form-range"
@@ -239,7 +245,7 @@
 	/>
 </div>
 
-{#if $sort_by_score_flag }
+{#if $sort_by_score_flag}
 	<div class="row p-2">
 		<div class="row"><label class="col col-form-label" for="version">Include My:</label></div>
 		<div class="btn-group">

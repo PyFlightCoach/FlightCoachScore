@@ -6,6 +6,7 @@ import { dbServer } from '$lib/api';
 import { checkUser } from '$lib/stores/user';
 import type { DBFlightRanked, DBFlightScore } from '$lib/database/interfaces';
 import { activeFlight } from '$lib/stores/shared';
+import { library } from '$lib/schedules/library';
 
 export const n_results = newCookieStoreInt('n_results', 10);
 export const n_days_val = newCookieStoreInt('search_n_days', 30);
@@ -49,6 +50,10 @@ export const postUploadSearch = () => {
   includeActive.set(3);
   updateTable();
 }
+
+library.subscribe((lib)=>{
+  if (!get(schedule_id)) {schedule_id.set(lib?.first?.schedule_id || '')}
+})
 
 export const updateTable = async () => {
   const q = {
