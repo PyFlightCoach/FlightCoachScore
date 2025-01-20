@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
+	import { library, ScheduleLibrary, loadSchedulesforUser } from '$lib/schedules/library';
 	import { mans, dbSchedule, canIEdit } from '$lib/schedules/schedule_builder';
-	import { toUpper } from 'lodash';
+	import {user} from '$lib/stores/user';
 
   const clear = () => {
     $mans = [];
@@ -24,6 +25,11 @@
 			onclick={() => {
 				if (confirm('Are you sure you want to delete this schedule?')) {
 					dbServer.delete(`schedule/${$dbSchedule!.schedule_id}`);
+          $mans = [];
+          $dbSchedule = undefined;
+          $library = new ScheduleLibrary();
+          loadSchedulesforUser("admin@fcscore.org");
+          if ($user) loadSchedulesforUser($user.email);
 				}
 			}}
 		>
