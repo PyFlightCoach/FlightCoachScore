@@ -1,5 +1,15 @@
 import { ManInfo } from '$lib/schedules/maninfo';
 
+
+export function formatArg(val: number | string) {
+  if (typeof val === 'string') {
+    return val;
+  } else {
+    return (val *180 / (Math.PI)).toFixed(2) + '°';
+  }
+}
+
+
 export class PE {
 	constructor(
 		readonly kind: string,

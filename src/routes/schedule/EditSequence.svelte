@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
 	import { mans, dbSchedule, canIEdit } from '$lib/schedules/schedule_builder';
+	import { toUpper } from 'lodash';
 
   const clear = () => {
     $mans = [];
@@ -8,6 +9,14 @@
   };
 </script>
 
+
+{#if $dbSchedule}
+  <div class="row pt-2">
+    <h2 class="h2">
+      {$dbSchedule.category_name.toUpperCase()} {$dbSchedule.schedule_name}
+    </h2>
+  </div>
+{/if}
 <div class="row pt-2">
 	{#if $dbSchedule && $canIEdit && $dbSchedule.num_flights == 0}
 		<button

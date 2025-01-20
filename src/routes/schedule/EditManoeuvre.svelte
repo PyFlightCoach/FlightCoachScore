@@ -1,16 +1,22 @@
 <script lang="ts">
 	import { type ManoeuvreHandler } from '$lib/schedules/schedule_builder';
 	import * as mi from '$lib/schedules/maninfo';
+	import { PE, formatArg } from '$lib/schedules/aresti';
 	import EnumSelect from '$lib/components/EnumSelect.svelte';
-	
+	import { dbServer } from '$lib/api';
+	import { loadSchedulesforUser } from '$lib/schedules/library';
+	import { user } from '$lib/stores/user';
+
 	let {
 		manoeuvre,
 		entry = undefined,
-		canEdit = false
+		canEdit = false,
+		ondelete = () => {}
 	}: {
 		manoeuvre: ManoeuvreHandler;
 		entry?: mi.BoxLocation | undefined;
 		canEdit?: boolean;
+		ondelete?: () => void;
 	} = $props();
 
 	let entryHeight = $state(manoeuvre.info.start?.height || 'Infer');
@@ -24,9 +30,26 @@
 <div class="container-fluid">
 	{#if canEdit}
 		<div class="row">
-			<button class="col btn btn-outline-secondary">Patch</button>
-			<button class="col btn btn-outline-secondary">Reload</button>
-			<button class="col btn btn-outline-secondary">Delete</button>
+			<button class="col btn btn-outline-secondary" disabled>Patch</button>
+			<button class="col btn btn-outline-secondary" disabled>Reload</button>
+			<button
+				class="col btn btn-outline-secondary"
+				onclick={() => {
+					if (
+						confirm(
+							'Are you sure you want to delete this manoeuvre? Please check the next manoeuvre will link to the previous one first.'
+						)
+					) {
+						if (manoeuvre.dbManoeuvre) {
+							dbServer.delete(`schedule/manoeuvre/${manoeuvre.dbManoeuvre.id}`).then(() => {
+								loadSchedulesforUser('admin@fcscore.org');
+								if ($user) loadSchedulesforUser($user.email);
+							});
+						}
+						ondelete();
+					}
+				}}>Delete</button
+			>
 		</div>
 	{/if}
 
@@ -86,4 +109,27 @@
 			</tbody>
 		</table>
 	</div>
+
+	{#if manoeuvre.aresti}
+		<div class="row pt-2">
+			<table class="table table-sm table-borderless">
+				<thead>
+					<tr>
+						<th>element</th>
+						<th>props</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each manoeuvre.aresti.elements as pe, i}
+						<tr>
+							{#if pe instanceof PE}
+								<td>{pe.kind}</td>
+								<td>{pe.args.map((a) => formatArg(a)).join(', ')}</td>
+							{/if}
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{/if}
 </div>

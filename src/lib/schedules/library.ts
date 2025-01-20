@@ -69,7 +69,7 @@ export class ScheduleLibrary {
 	}
 
 	append(schedules: DBSchedule[]): ScheduleLibrary {
-		const lib = new ScheduleLibrary(this.schedules.concat(schedules));
+		const lib = new ScheduleLibrary(schedules.concat(this.schedules));
 		const unique_ids = lib.unique('schedule_id');
 		return new ScheduleLibrary(
 			unique_ids.map((id: string) => lib.subset({ schedule_id: id }).first)

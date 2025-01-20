@@ -6,6 +6,9 @@
 		parseDB,
 		parseOlan,
 		lastSelectedScheduleID,
+		mans,
+		ManoeuvreHandler,
+    addEmptyManoeuvre
 	} from '$lib/schedules/schedule_builder';
 	import type { DBSchedule } from '$lib/database/interfaces';
 
@@ -55,7 +58,6 @@
 		library={$library}
 		schedule_id={$lastSelectedScheduleID}
 		onselected={(category_name, schedule) => {
-			console.log(category_name);
 			if (category_name) {
 				$rule = $library.subset({ category_name }).first.rule_name;
 			}
@@ -65,22 +67,24 @@
 	/>
 {/if}
 
-{#if inputmode != 'manual'}
-	<div class="row pt-2">
-		<div class="col"></div>
-		<button
-			class="col col-form-control btn btn-outline-secondary mx-2"
-			onclick={() => {
-				switch (inputmode) {
-					case 'OLAN':
-						if ($rule) parseOlan(olan, $rule);
-						break;
-					case 'DB':
-						if (selectedSchedule) parseDB(selectedSchedule);
-						break;
-				}
-			}}
-			>{#if inputmode == 'DB'}Load{:else}Create{/if}</button
-		>
-	</div>
-{/if}
+<div class="row pt-2">
+  <div class="col"></div>
+  <button
+    class="col col-form-control btn btn-outline-secondary mx-2"
+    onclick={() => {
+      switch (inputmode) {
+        case 'OLAN':
+          if ($rule) parseOlan(olan, $rule);
+          break;
+        case 'DB':
+          if (selectedSchedule) parseDB(selectedSchedule);
+          break;
+        case 'manual':
+          addEmptyManoeuvre('new');
+          break;
+      }
+    }}
+    >{#if inputmode == 'DB'}Load{:else}Create{/if}</button
+  >
+</div>
+

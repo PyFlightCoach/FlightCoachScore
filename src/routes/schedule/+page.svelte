@@ -1,7 +1,7 @@
 <script lang="ts">
 	import LoadSequence from './LoadSequence.svelte';
 	import CreateManoeuvres from './EditManoeuvres.svelte';
-  import EditSequence from './EditSequence.svelte';
+	import EditSequence from './EditSequence.svelte';
 	import { mans } from '$lib/schedules/schedule_builder';
 	import PlotAll from './PlotAll.svelte';
 	import EditManoeuvre from './ManoeuvrePage.svelte';
@@ -24,14 +24,15 @@
 					<p><mark>{form_state}</mark></p>
 				</div>
 			{/if}
-        {#if $mans.length == 0}
-				<LoadSequence  />
-				{:else}
-        <EditSequence />
-        {/if}
-				<CreateManoeuvres bind:activeManId />
-      
-    </div>
+			{#if $mans.length == 0}
+				<LoadSequence />
+			{:else}
+				<EditSequence />
+        <CreateManoeuvres bind:activeManId />
+			{/if}
+
+			
+		</div>
 	</div>
 </div>
 <div class="col-md-8 pt-3">

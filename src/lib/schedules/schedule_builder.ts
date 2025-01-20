@@ -6,7 +6,7 @@ import { ManInfo } from '$lib/schedules/maninfo';
 import { Manoeuvre } from '$lib/schedules/manoeuvre';
 import { States } from '$lib/analysis/state';
 import { type Writable, writable, derived, type Readable } from 'svelte/store';
-import type { DBSchedule } from '../database/interfaces';
+import type { DBSchedule, DBManoeuvre } from '../database/interfaces';
 import { user } from '$lib/stores/user';
 
 export class ManoeuvreHandler {
@@ -16,13 +16,15 @@ export class ManoeuvreHandler {
 	definition: ManDef | ManOpt | undefined;
 	manoeuvre: Manoeuvre | undefined;
 	template: States | undefined = undefined;
+  dbManoeuvre: DBManoeuvre | undefined = undefined;
 	constructor(
 		info: ManInfo,
 		aresti: Figure | FigOption | undefined = undefined,
 		olan: Record<string, unknown> | undefined = undefined,
 		definition: ManDef | ManOpt | undefined = undefined,
 		manoeuvre: Manoeuvre | undefined = undefined,
-		template: States | undefined = undefined
+		template: States | undefined = undefined,
+    dbManoeuvre: DBManoeuvre | undefined = undefined
 	) {
 		this.info = info;
 		this.aresti = aresti;
@@ -30,6 +32,7 @@ export class ManoeuvreHandler {
 		this.definition = definition;
 		this.manoeuvre = manoeuvre;
 		this.template = template;
+    this.dbManoeuvre = dbManoeuvre;
 	}
 
 	static parseOlan(data: Record<string, unknown>) {
@@ -43,9 +46,9 @@ export class ManoeuvreHandler {
 		);
 	}
 
-	static async parseDB(manoeuvre_id: string) {
+	static async parseDB(manoeuvre: DBManoeuvre) {
 		const aresti = await dbServer
-			.get(`schedule/manoeuvre/aresti/${manoeuvre_id}`)
+			.get(`schedule/manoeuvre/aresti/${manoeuvre.id}`)
 			.then((res) => Figure.parse(res.data))
 			.catch((e) => {
 				console.error(e);
@@ -53,7 +56,7 @@ export class ManoeuvreHandler {
 			});
 
 		const definition = await dbServer
-			.get(`schedule/manoeuvre/definition/${manoeuvre_id}`)
+			.get(`schedule/manoeuvre/definition/${manoeuvre.id}`)
 			.then((res) => ManDef.parse(res.data));
 
 		const res = await analysisServer
@@ -70,7 +73,8 @@ export class ManoeuvreHandler {
 							undefined,
 							(definition as ManOpt).options[i],
 							Manoeuvre.parse(res[i].manoeuvre),
-							States.parse(res[i].template)
+							States.parse(res[i].template),
+              manoeuvre
 						)
 				)
 			);
@@ -81,7 +85,8 @@ export class ManoeuvreHandler {
 				undefined,
 				definition,
 				Manoeuvre.parse(res[0].manoeuvre),
-				States.parse(res[0].template)
+				States.parse(res[0].template),
+        manoeuvre
 			);
 		}
 	}
@@ -115,6 +120,9 @@ export class ManOptionHandler {
 	get olan() {
 		return this.options[this.active].olan;
 	}
+  get dbManoeuvre() {
+    return this.options[this.active].dbManoeuvre;
+  }
 }
 
 export class ScheduleBuilder {
@@ -132,7 +140,7 @@ export class ScheduleBuilder {
 	static async read_from_db(schedule: DBSchedule) {
 		const manoeuvres = new Array(schedule.manoeuvres.length);
 		for (const manoeuvre of schedule.manoeuvres) {
-			manoeuvres[manoeuvre.index - 1] = ManoeuvreHandler.parseDB(manoeuvre.id);
+			manoeuvres[manoeuvre.index - 1] = ManoeuvreHandler.parseDB(manoeuvre);
 		}
 		return new ScheduleBuilder(await Promise.all(manoeuvres), schedule);
 	}
@@ -182,8 +190,22 @@ export const parseDB = async (schedule: DBSchedule) => {
 	const new_mans = new Array(schedule.manoeuvres.length);
 	dbSchedule.set(schedule);
 	for (const manoeuvre of schedule.manoeuvres) {
-		new_mans[manoeuvre.index - 1] = ManoeuvreHandler.parseDB(manoeuvre.id);
+		new_mans[manoeuvre.index - 1] = ManoeuvreHandler.parseDB(manoeuvre);
 	}
 	mans.set(await Promise.all(new_mans));
 	loading.set(false);
 };
+
+export const addEmptyManoeuvre = (short_name: string) => {
+  let count = 0;
+  mans.update((_mans) => {
+    for (const m of _mans) {
+      if (m.info.short_name.startsWith(short_name)) {
+        count+=1;
+      }
+    }
+    
+    _mans.push(ManoeuvreHandler.empty(`${short_name}_${count + 1}`));
+    return _mans;
+  });
+}
