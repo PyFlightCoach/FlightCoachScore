@@ -30,6 +30,7 @@
 	//let newFigure: Figure | undefined = $derived(Figure.parse(newFig!));
 
 	const reset = () => {
+    activeElID = undefined;
 		newInfo = structuredClone($mans[id].info);
 		newElements = structuredClone($mans[id].aresti?.elements);
 		newNdMps = structuredClone($mans[id].aresti?.ndmps);
