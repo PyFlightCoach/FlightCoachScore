@@ -8,6 +8,7 @@
 	import { user } from '$lib/stores/user';
   import {library, loadSchedulesforUser, ScheduleLibrary} from '$lib/schedules/library';
   import {loadGuiLists} from '$lib/stores/shared';
+	import { loadRules } from '$lib/schedules/schedule_builder';
 </script>
 
 <NavMenu tooltip="Super User Menu">
@@ -19,6 +20,10 @@
 			options={Object.keys(an_servers)}
 			bind:custom={$customAnalysisServer}
 			bind:selected={$anSOption}
+      onselected={() => {
+        console.log("Analysis Server address changed, reloading info...");
+        loadRules();
+      }}
 		/>
 		<div class="dropdown-divider"></div>
 		<ServerSelection

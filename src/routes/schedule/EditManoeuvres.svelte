@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { mans, rule } from '$lib/schedules/schedule_builder';
-	import { canIEdit, ManoeuvreHandler, addEmptyManoeuvre } from '$lib/schedules/schedule_builder';
+	import { canIEdit, addEmptyManoeuvre } from '$lib/schedules/schedule_builder';
+  import { ManoeuvreHandler } from '$lib/schedules/manoeuvre_handler';
 	import { endsWith, split } from 'lodash';
 	import EditManoeuvre from './EditManoeuvre.svelte';
 
@@ -13,6 +14,8 @@
 		$mans.push(ManoeuvreHandler.empty('new'));
 		activeManId = $mans.length - 1;
 	};
+
+
 </script>
 
 <div class="row p-2 pt-0">
@@ -82,7 +85,7 @@
 							<tr>
 								<td colspan="5">
 									<EditManoeuvre
-										manoeuvre={$mans[activeManId]}
+										id={activeManId}
 										entry={i > 0 ? $mans[i - 1].info.end : undefined}
 										canEdit={$canIEdit}
 										ondelete={() => {

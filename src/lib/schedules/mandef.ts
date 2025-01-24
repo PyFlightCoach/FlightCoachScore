@@ -2,6 +2,8 @@ import { parse_dict } from '$lib/utils/arrays';
 import { Result } from './scores';
 import { ManInfo } from './maninfo';
 
+
+
 export class ManParm {
 	constructor(
 		readonly name: string,

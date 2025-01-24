@@ -9,11 +9,18 @@ export type Orientation = (typeof Orientations)[number];
 export type Position = (typeof Positions)[number];
 
 export class BoxLocation {
+  height: Height | undefined
+  direction: Direction | undefined
+  orientation: Orientation | undefined
   constructor(
-    readonly height: Height | undefined = undefined,
-    readonly direction: Direction | undefined = undefined,
-    readonly orientation: Orientation | undefined = undefined,
-  ) {}
+    height: Height | undefined = undefined,
+    direction: Direction | undefined = undefined,
+    orientation: Orientation | undefined = undefined,
+  ) {
+    this.height = height
+    this.direction = direction
+    this.orientation = orientation
+  }
 }
 
 export class ManInfo {
@@ -21,8 +28,8 @@ export class ManInfo {
   k: number | undefined
   name: string | undefined
   position: Position | undefined
-  start: BoxLocation | undefined
-  end: BoxLocation | undefined
+  start: BoxLocation
+  end: BoxLocation
   centre_points: number[] | undefined
   centred_els: number[][] | undefined
   constructor(
@@ -30,8 +37,8 @@ export class ManInfo {
     k: number | undefined = undefined,
     name: string | undefined = undefined,
     position: Position | undefined = undefined,
-    start: BoxLocation | undefined = undefined,
-    end: BoxLocation | undefined = undefined,
+    start: BoxLocation | undefined = new BoxLocation(),
+    end: BoxLocation | undefined = new BoxLocation(),
     centre_points: number[] | undefined = undefined,
     centred_els: number[][] | undefined = undefined,
   ) {

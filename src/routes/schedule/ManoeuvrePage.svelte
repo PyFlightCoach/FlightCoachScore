@@ -6,5 +6,5 @@
 </script>
 
 {#if man.template}
-	<PlotSec flst={man.template} expand={50} exclude_controls={['slider']} fixRange hideAxes/>
+	<PlotSec flst={man.template} expand={50} exclude_controls={['slider', 'showBox']} fixRange hideAxes/>
 {/if}
