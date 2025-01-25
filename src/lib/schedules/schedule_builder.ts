@@ -7,6 +7,7 @@ import { user } from '$lib/stores/user';
 import { ScheduleLibrary, library, loadSchedulesforUser } from './library';
 import { get } from 'svelte/store';
 import { ManOptionHandler, ManoeuvreHandler } from './manoeuvre_handler';
+import type { BoxLocation } from './maninfo';
 
 
 export class ScheduleBuilder {
@@ -147,7 +148,7 @@ export const parseDB = async (schedule: DBSchedule) => {
 	loading.set(false);
 };
 
-export const addEmptyManoeuvre = (short_name: string) => {
+export const addEmptyManoeuvre = (short_name: string, start: BoxLocation) => {
 	let count = 0;
 	mans.update((_mans) => {
 		for (const m of _mans) {
@@ -156,7 +157,7 @@ export const addEmptyManoeuvre = (short_name: string) => {
 			}
 		}
 
-		_mans.push(ManoeuvreHandler.empty(`${short_name}_${count + 1}`));
+		_mans.push(ManoeuvreHandler.empty(`${short_name}_${count + 1}`, start));
 		return _mans;
 	});
 };

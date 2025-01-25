@@ -1,20 +1,9 @@
 <script lang="ts">
-	import { mans, rule } from '$lib/schedules/schedule_builder';
+	import { mans } from '$lib/schedules/schedule_builder';
 	import { canIEdit, addEmptyManoeuvre } from '$lib/schedules/schedule_builder';
-  import { ManoeuvreHandler } from '$lib/schedules/manoeuvre_handler';
-	import { endsWith, split } from 'lodash';
 	import EditManoeuvre from './EditManoeuvre.svelte';
 
 	let { activeManId = $bindable() } = $props();
-
-	const addManoeuvre = () => {
-		if (!mans) {
-			$mans = [];
-		}
-		$mans.push(ManoeuvreHandler.empty('new'));
-		activeManId = $mans.length - 1;
-	};
-
 
 </script>
 
@@ -98,21 +87,20 @@
 						{/if}
 					{/each}
 				{/if}
-				{#if $canIEdit}
-					<tr>
-						<td colspan="5" class="p-0">
-							<button
-								class="btn btn-outline-secondary w-100"
-								onclick={() => {
-									addEmptyManoeuvre('new');
-								}}
-							>
-								Add Manoeuvre
-							</button>
-						</td>
-					</tr>
-				{/if}
 			</tbody>
 		</table>
 	</div>
 </div>
+
+{#if $canIEdit}
+	<div class="row p-2 pt-0">
+		<button
+			class="btn btn-outline-secondary w-100"
+			onclick={() => {
+				addEmptyManoeuvre('new', $mans[$mans.length - 1].info.end );
+			}}
+		>
+			Add Manoeuvre
+		</button>
+	</div>
+{/if}

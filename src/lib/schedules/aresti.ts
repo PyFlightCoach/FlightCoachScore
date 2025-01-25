@@ -30,8 +30,10 @@ export const peSummary = (pe: PE, builder: ElementBuilder) => {
 };
 
 
-export const peCompare = (one: PE, other: PE) => {
-  if (one.kind !== other.kind) {
+export const peCompare = (one: PE|undefined, other: PE|undefined) => {
+  if (!one || !other) {
+    return false;
+  } else if (one.kind !== other.kind) {
     return false;
   } else if (one.args.some((a, i) => !equals(other.args[i], a))) {
     console.log('arg missmatch', one.args, other.args);
@@ -104,7 +106,5 @@ export class FigOption {
 		return this.options[this.active].relax_back;
 	}
 
-	clone() {
-		return Figure.parse(structuredClone(this));
-	}
+
 }

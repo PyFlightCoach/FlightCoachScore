@@ -12,14 +12,14 @@
 
 	let {
 		value = $bindable(),
-		refvalue = $bindable(),
+		refvalue,
 		rollInput,
 		canEdit = false,
 		mps,
 		onchange = () => {}
 	}: {
 		value: number | string | (number | string)[];
-		refvalue: number | string | (number | string)[];
+		refvalue: number | string | (number | string)[] | undefined;
 		rollInput: RInp;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
@@ -28,7 +28,7 @@
 
 	const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
 
-	let inputMode = $state(rollInput.checkOption(value));
+	let inputMode = $state(rollInput.checkOption(value) || 'value');
 
 	const alternateUnits = unitOptions.rad;
 	let selectedUnit = $state(alternateUnits[0]);
@@ -54,7 +54,7 @@
 		onchange={(e) => {
 			const old_mode = rollInput.checkOption(value);
       const newInputMode = (e.target as HTMLSelectElement).value;
-      console.log(`switch from ${old_mode} to ${inputMode}`);
+      console.log(`switch from ${inputMode} to ${newInputMode}`);
 			switch (newInputMode) {
 				case 'MP':
 					if (Array.isArray(value) && typeof value[0] === 'string') {
@@ -71,7 +71,7 @@
 					}
 					break;
 				case 'point':
-					value = '0x0';
+					value = '2x2';
 					break;
 				case 'array':
 					if (['value', 'MP'].includes(old_mode as string)) {

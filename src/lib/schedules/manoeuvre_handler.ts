@@ -1,7 +1,7 @@
 import { FigOption, Figure } from './aresti';
 import { dbServer, analysisServer } from '$lib/api';
 import { ManDef, ManOpt } from '$lib/schedules/mandef';
-import { ManInfo } from '$lib/schedules/maninfo';
+import { BoxLocation, ManInfo } from '$lib/schedules/maninfo';
 import { Manoeuvre } from '$lib/schedules/manoeuvre';
 import { States } from '$lib/analysis/state';
 import type { DBManoeuvre } from '../database/interfaces';
@@ -112,8 +112,8 @@ export class ManoeuvreHandler {
 		return ManoeuvreHandler.build(aresti, definition, manoeuvre);
 	}
 
-	static empty(short_name: string) {
-		const info = new ManInfo(short_name);
+	static empty(short_name: string, start: BoxLocation) {
+		const info = new ManInfo(short_name, 0, short_name, undefined, start);
 		return new ManoeuvreHandler(info, new Figure(info));
 	}
 }

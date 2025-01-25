@@ -23,24 +23,27 @@
 	} = $props();
 
 	let activeElID: number | undefined = $state(undefined);
-	let newInfo = $state(structuredClone($mans[id].info));
-	let newElements = $state(structuredClone($mans[id].aresti?.elements));
-	let newNdMps = $state(structuredClone($mans[id].aresti?.ndmps));
+	let newInfo = $state($state.snapshot($mans[id].info));
+	let newElements = $state($state.snapshot($mans[id].aresti?.elements));
+	let newNdMps = $state($state.snapshot($mans[id].aresti?.ndmps));
 
 	//let newFigure: Figure | undefined = $derived(Figure.parse(newFig!));
 
 	const reset = () => {
-    activeElID = undefined;
-		newInfo = structuredClone($mans[id].info);
-		newElements = structuredClone($mans[id].aresti?.elements);
-		newNdMps = structuredClone($mans[id].aresti?.ndmps);
+		activeElID = undefined;
+		newInfo = $state.snapshot($mans[id].info);
+		newElements = $state.snapshot($mans[id].aresti?.elements);
+		newNdMps = $state.snapshot($mans[id].aresti?.ndmps);
 	};
 
 	const reload = () => {
 		if ($mans[id].dbManoeuvre) {
 			$loading = true;
 			ManoeuvreHandler.parseDB($mans[id].dbManoeuvre)
-				.then((res) => {$mans[id] = res; reset();})        
+				.then((res) => {
+					$mans[id] = res;
+					reset();
+				})
 				.catch((e) => console.error(e))
 				.finally(() => ($loading = false));
 		} else if ($mans[id].olan) {
@@ -59,7 +62,10 @@
 				$mans[id].dbManoeuvre,
 				$mans[id].olan
 			)
-				.then((res) => ($mans[id] = res))
+				.then((res) => {
+					$mans[id] = res;
+					reset();
+				})
 				.catch((e) => console.error(e))
 				.finally(() => ($loading = false));
 		}
@@ -73,6 +79,7 @@
 				class="col btn btn-outline-secondary"
 				title="Reload from the database"
 				onclick={reload}
+				disabled={$mans[id].dbManoeuvre === undefined}
 			>
 				Reload
 			</button>
@@ -82,8 +89,10 @@
 			<button
 				class="col btn btn-outline-secondary"
 				title="Rebuild the definition and template and store active changes. This will not update the database entry."
-				onclick={update}>Update</button
+				onclick={update}
 			>
+				Update
+			</button>
 			<button class="col btn btn-outline-secondary" title="Update the database entry" disabled
 				>Patch</button
 			>
@@ -191,7 +200,7 @@
 				<EditElements
 					bind:pes={newElements}
 					{canEdit}
-					bind:refpes={$mans[id].aresti.elements}
+					refpes={$mans[id].aresti.elements}
 					bind:activeElID
 				/>
 			</div>

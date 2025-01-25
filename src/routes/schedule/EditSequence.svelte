@@ -21,11 +21,8 @@
 		'New'
 	]);
 
-	let selected_category: string | undefined = $state(
-		$dbSchedule?.category_name || (categories.length > 1 ? categories[0] : undefined)
-	);
-  $inspect($dbSchedule?.category_name);
-	let category_name: string | undefined = $state(selected_category || $rule);
+	let selected_category: string | undefined = $state($dbSchedule?.category_name || 'New');
+  let category_name: string | undefined = $state(selected_category || $rule);
 	let schedule_name: string | undefined = $state($dbSchedule?.schedule_name || 'new');
 	let owner_name: string = $derived(
 		$dbSchedule?.owner_name || ($user ? `${$user?.first_name} ${$user?.last_name}` : 'NA')

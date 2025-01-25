@@ -4,7 +4,7 @@
 		value = $bindable(),
 		canEdit = $bindable(false),
 		undefValue = 'Select',
-    refValue = $bindable(null)
+    refValue = $bindable()
 	}: {
 		options: string[];
 		value: string | undefined;

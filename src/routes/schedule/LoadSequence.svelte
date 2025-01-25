@@ -10,8 +10,8 @@
     addEmptyManoeuvre
 	} from '$lib/schedules/schedule_builder';
 	import type { DBSchedule } from '$lib/database/interfaces';
+	import { BoxLocation } from '$lib/schedules/maninfo';
 
-  $inspect($rule);
 	let inputmode: string = $state('DB');
 	let olan: string = $state('88c24');
 	let selectedSchedule: DBSchedule | undefined = $state($library.subset({ schedule_id: $lastSelectedScheduleID }).first || $library.first);
@@ -80,7 +80,7 @@
           if (selectedSchedule) parseDB(selectedSchedule);
           break;
         case 'manual':
-          addEmptyManoeuvre('new');
+          addEmptyManoeuvre('new', new BoxLocation('BTM', 'UPWIND', 'UPRIGHT'));
           break;
       }
     }}

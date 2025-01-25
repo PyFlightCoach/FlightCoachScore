@@ -7,14 +7,14 @@
 	let {
 		name,
 		value = $bindable(),
-		refvalue = $bindable(),
+		refvalue,
 		canEdit = false,
 		mps,
 		onchange = () => {}
 	}: {
 		name: keyof typeof inputs.inputMap;
 		value: inputs.Arg;
-		refvalue: inputs.Arg;
+		refvalue: inputs.Arg | undefined;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
 		onchange?: (newvalue: inputs.Arg) => void;
@@ -29,7 +29,7 @@
 {#if input instanceof inputs.NumberInput}
 	<MPNumberInput
 		bind:value={value as string | number}
-    bind:refvalue={refvalue as string | number}
+    refvalue={refvalue as string | number | undefined}
 		numInput={input}
 		{canEdit}
 		{mps}
@@ -67,7 +67,7 @@
 {:else if input instanceof inputs.RollInput}
 	<RollInput
 		bind:value={value as number | string | (number | string)[]}
-		bind:refvalue={refvalue as number | string | (number | string)[]}
+		refvalue={refvalue as number | string | (number | string)[] | undefined}
 		rollInput={input}
 		{canEdit}
 		{mps}

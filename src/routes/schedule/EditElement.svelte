@@ -6,24 +6,22 @@
 
 	const {
 		pe = $bindable(),
-		refpe = $bindable(),
+		refpe,
 		builder,
 		canEdit = false,
 		onchange = () => {}
 	}: {
 		pe: PE;
-		refpe: PE;
+		refpe: PE | undefined;
 		builder: ManBuilder;
 		canEdit?: boolean;
 		onchange?: (newpe: PE) => void;
 	} = $props();
 
 	const elbuilder = $derived(builder.element_builders[pe.kind]);
-
   let allkwargs = $derived({...elbuilder.kwargs, ...pe.kwargs});
-
-  $inspect("allkwargs", allkwargs);
-
+  $inspect('pe', pe);
+  $inspect('refpe', refpe);
 </script>
 
 <hr />
@@ -35,7 +33,7 @@
 				<ValueInput
 					name={arg as keyof typeof inputs.inputMap}
 					bind:value={pe.args[i]}
-					bind:refvalue={refpe.args[i]}
+					refvalue={refpe?.args[i]}
 					{canEdit}
 					mps={builder.parameters}
 				/>
@@ -47,7 +45,7 @@
 				<ValueInput
 					name={k as keyof typeof inputs.inputMap}
 					bind:value={allkwargs[k]}
-					refvalue={refpe.kwargs[k] == undefined ? elbuilder.kwargs[k] : refpe.kwargs[k] }
+					refvalue={refpe?.kwargs[k] == undefined ? elbuilder.kwargs[k] : refpe.kwargs[k] }
 					{canEdit}
 					mps={builder.parameters}
           onchange={(newval) => {

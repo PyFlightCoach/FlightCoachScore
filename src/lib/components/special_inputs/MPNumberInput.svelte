@@ -9,14 +9,14 @@
 
 	let {
 		value = $bindable(),
-    refvalue = $bindable(),
+    refvalue,
 		numInput,
 		canEdit = false,
 		mps,
     onchange = () => {}
 	}: {
 		value: number | string;
-    refvalue: number | string;
+    refvalue: number | string | undefined;
 		numInput: NumberInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
