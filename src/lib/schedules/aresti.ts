@@ -1,16 +1,17 @@
 import { ManInfo } from '$lib/schedules/maninfo';
-import { type Arg } from '$lib/components/special_inputs/inputs';
-import type { ElementBuilder, ManBuilder } from './schedule_builder';
+import { type Arg, equals } from '$lib/components/special_inputs/inputs';
+import type { ElementBuilder } from './schedule_builder';
 import * as inputs from '$lib/components/special_inputs/inputs';
+
 
 export class PE {
 	kind: string;
-	args: (number | string | (number | string)[])[];
+	args: Arg[];
 	kwargs: Record<string, Arg>;
 	centred: boolean;
 	constructor(
 		kind: string,
-		args: (number | string | (number | string)[])[],
+		args: Arg[],
 		kwargs: Record<string, Arg>,
 		centred: boolean = false
 	) {
@@ -19,9 +20,8 @@ export class PE {
 		this.kwargs = kwargs;
 		this.centred = centred;
 	}
-
-
 }
+
 
 export const peSummary = (pe: PE, builder: ElementBuilder) => {
 	return `${pe.kind} ${builder.args
@@ -33,11 +33,14 @@ export const peSummary = (pe: PE, builder: ElementBuilder) => {
 export const peCompare = (one: PE, other: PE) => {
   if (one.kind !== other.kind) {
     return false;
-  } else if (one.args.some((a, i) => other.args[i] !== a)) {
+  } else if (one.args.some((a, i) => !equals(other.args[i], a))) {
+    console.log('arg missmatch', one.args, other.args);
     return false;
-  } else if (Object.keys(one.kwargs).some((k) => one.kwargs[k] !== other.kwargs[k])) {
+  } else if (Object.keys(one.kwargs).some((k) => !equals(one.kwargs[k], other.kwargs[k]))) {
+    console.log('kwarg missmatch', one.kwargs, other.kwargs);
     return false;
-  } else if (Object.keys(other.kwargs).filter((k) => !one.kwargs[k]).length) {
+  } else if (Object.keys(other.kwargs).filter((k) => !Object.keys(one.kwargs).includes(k)).length) {
+    console.log('missing kwarg', one.kwargs, other.kwargs);
     return false;
   } else {
     return true;

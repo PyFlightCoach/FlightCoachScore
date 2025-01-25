@@ -2,31 +2,34 @@
 	import {
 		type NumberInput,
 		unitOptions,
-		unitMultipliers
+		unitMultipliers,
+    equals
 	} from '$lib/components/special_inputs/inputs';
 	import type { ManParm } from '$lib/schedules/mandef';
 
 	let {
 		value = $bindable(),
+    refvalue = $bindable(),
 		numInput,
 		canEdit = false,
 		mps,
     onchange = () => {}
 	}: {
 		value: number | string;
+    refvalue: number | string;
 		numInput: NumberInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
     onchange?: (newVal: number | string) => void;
 	} = $props();
 
-	let inputMode = $state(numInput.checkOption(value));
-
-	const alternateUnits = $derived(unitOptions[numInput.unit]);
 
 	const allowedMPS = Object.values(mps)
 		.filter((mp) => mp.unit == numInput.unit)
 		.map((mp) => mp.name);
+
+  let inputMode = $state(numInput.checkOption(value));
+	const alternateUnits = $derived(unitOptions[numInput.unit]);
 
 	// svelte-ignore state_referenced_locally
 	let selectedUnit = $state(alternateUnits[0]);
@@ -36,9 +39,10 @@
 	// svelte-ignore state_referenced_locally
 	let rawValue = $state(typeof value == 'number' ? value / multiplier : value);
 
+  const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
 </script>
 
-<td class="p-0"
+<td class="p-0 {hasChanged}"
 	><select
 		class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
 		bind:value={inputMode}
@@ -51,13 +55,15 @@
 			rawValue = typeof value == 'number' ? value / multiplier : value;
 		}}
 	>
-		<option value="MP">MP</option>
+    {#if allowedMPS.length > 0}
+      <option value="MP">MP</option>
+    {/if}
 		<option value="value">value</option>
 		<option value="eqn">eqn</option>
 	</select></td
 >
 {#if inputMode == 'MP'}
-	<td class="p-0"
+	<td class="p-0 {hasChanged}"
 		><select
 			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
 			bind:value
@@ -70,7 +76,7 @@
 		</select></td
 	>
 {:else if inputMode == 'value'}
-	<td class="p-0"
+	<td class="p-0 {hasChanged}"
 		><input
 			class="w-100 form-control form-control-sm"
 			type="number"
@@ -80,7 +86,7 @@
 			disabled={!canEdit}
 		/></td
 	>
-	<td class="p-0"
+	<td class="p-0 {hasChanged}"
 		><select
 			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
 			bind:value={selectedUnit}
@@ -94,7 +100,7 @@
 		</select></td
 	>
 {:else if inputMode == 'eqn'}
-	<td class="p-0" colspan="2"
+	<td class="p-0 {hasChanged}" colspan="2"
 		><input
 			class="w-100 form-control form-control-sm"
 			type="text"

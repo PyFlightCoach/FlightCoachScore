@@ -3,6 +3,18 @@
 
 export type Arg = number | string | (number | string)[] | boolean;
 
+export const equals = (a: Arg, b: Arg): boolean => {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      return false;
+    }
+    return a.every((v, i) => equals(v, b[i]));
+  } else {
+    return a === b;
+  }
+}
+
+
 export const unitMultipliers = {
 	'm': 1,
 	'm/s': 1,

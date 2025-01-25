@@ -1,35 +1,32 @@
 <script lang="ts">
 	import {
-		type RollInput,
+		type RollInput as RInp,
 		unitOptions,
 		unitMultipliers,
-		re_point_roll
+		re_point_roll,
+		equals,
 	} from '$lib/components/special_inputs/inputs';
 	import type { ManParm } from '$lib/schedules/mandef';
-  
+	import ArrayInput from './ArrayInput.svelte';
+	import MpNumberInput from './MPNumberInput.svelte';
+
 	let {
 		value = $bindable(),
-    refvalue = $bindable(),
+		refvalue = $bindable(),
 		rollInput,
 		canEdit = false,
 		mps,
-    onchange = () => {}
+		onchange = () => {}
 	}: {
 		value: number | string | (number | string)[];
-    refvalue: number | string | (number | string)[];
-		rollInput: RollInput;
+		refvalue: number | string | (number | string)[];
+		rollInput: RInp;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
-    onchange?: (newVal: number | string | (number | string)[]) => void;
+		onchange?: (newVal: number | string | (number | string)[]) => void;
 	} = $props();
 
-  const hasChanged = $derived.by(()=>{
-    if (Array.isArray(value)) {
-      return value.every((v,i)=>v==(refvalue as (string|number)[])[i]) ? '' : 'table-warning'
-    } else {
-      return value != refvalue ? 'table-warning' : ''
-    }
-  });
+	const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
 
 	let inputMode = $state(rollInput.checkOption(value));
 
@@ -49,11 +46,48 @@
 		.map((mp) => mp.name);
 </script>
 
-<td class="p-0 {hasChanged}"
+<td class="p-0"
 	><select
 		class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
-		bind:value={inputMode}
+		value={inputMode}
 		disabled={!canEdit}
+		onchange={(e) => {
+			const old_mode = rollInput.checkOption(value);
+      const newInputMode = (e.target as HTMLSelectElement).value;
+      console.log(`switch from ${old_mode} to ${inputMode}`);
+			switch (newInputMode) {
+				case 'MP':
+					if (Array.isArray(value) && typeof value[0] === 'string') {
+						value = value[0];
+					} else {
+						value = 0;
+					}
+					break;
+				case 'value':
+					if (Array.isArray(value) && typeof value[0] === 'number') {
+						value = value[0];
+					} else {
+						value = 0;
+					}
+					break;
+				case 'point':
+					value = '0x0';
+					break;
+				case 'array':
+					if (['value', 'MP'].includes(old_mode as string)) {
+						value = [value as string | number];
+					} else {
+            const newValue = [];
+            const angle = (2 * Math.PI / parseInt((value as string).slice(-1)))
+            for (let i = 0; i < parseInt((value as string).slice(0)); i++) {
+              newValue.push(angle);
+            }
+						value = newValue;
+					}
+					break;
+			}
+      inputMode = newInputMode;
+		}}
 	>
 		<option value="value">value</option>
 		<option value="point">point</option>
@@ -65,7 +99,7 @@
 		><select
 			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
 			bind:value
-      onchange={() => onchange(value)}
+			onchange={() => onchange(value)}
 			disabled={!canEdit}
 		>
 			{#each allowedMPS as mp}
@@ -74,24 +108,27 @@
 		</select></td
 	>
 {:else if inputMode == 'value'}
-	<td class="p-0  {hasChanged}"
+	<td class="p-0 {hasChanged}"
 		><input
 			class="w-100 form-control form-control-sm"
 			type="number"
 			step={Math.PI / (4 * multiplier)}
 			bind:value={rawValue}
-			onchange={() => {value = (rawValue as number) * multiplier; onchange(value);}}
+			onchange={() => {
+				value = (rawValue as number) * multiplier;
+				onchange(value);
+			}}
 			disabled={!canEdit}
 		/></td
 	>
-	<td class="p-0  {hasChanged}"
+	<td class="p-0 {hasChanged}"
 		><select
 			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
 			bind:value={selectedUnit}
 			onchange={() => {
 				rawValue = (value as number) / multiplier;
 			}}
-      disabled={!canEdit}
+			disabled={!canEdit}
 		>
 			{#each alternateUnits as ug}
 				<option value={ug}>{ug}</option>
@@ -99,14 +136,23 @@
 		</select></td
 	>
 {:else if inputMode == 'point'}
-	<td class="p-0  {hasChanged}" colspan="2"
+	<td class="p-0 {hasChanged}" colspan="2"
 		><input
 			class="form-control form-control-sm text-center {isValidPointRoll ? '' : 'bg-danger'}"
 			type="text"
 			maxlength="3"
 			bind:value
-      disabled={!canEdit}
-      onchange={() => onchange(value)}
+			disabled={!canEdit}
+			onchange={() => onchange(value)}
 		/>
 	</td>
+{:else if inputMode == 'array'}
+	<ArrayInput
+		value={value as (number | string)[]}
+		refvalue={refvalue as (number | string)[]}
+		input={rollInput}
+		{canEdit}
+		{mps}
+		{onchange}
+	/>
 {/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import LoadSequence from './LoadSequence.svelte';
-	import CreateManoeuvres from './EditManoeuvres.svelte';
+	import EditManoeuvres from './EditManoeuvres.svelte';
 	import EditSequence from './EditSequence.svelte';
 	import { mans } from '$lib/schedules/schedule_builder';
 	import PlotAll from './PlotAll.svelte';
@@ -27,8 +27,8 @@
 			{#if $mans.length == 0}
 				<LoadSequence />
 			{:else}
-				<EditSequence />
-        <CreateManoeuvres bind:activeManId />
+				<EditSequence bind:activeManId />
+        <EditManoeuvres bind:activeManId />
 			{/if}
 
 			

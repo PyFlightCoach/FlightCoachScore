@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as inputs from '$lib/components/special_inputs/inputs';
 	import type { ManParm } from '$lib/schedules/mandef';
-	import { arrayReplaceAt } from 'markdown-it/lib/common/utils.mjs';
 	import MPNumberInput from './MPNumberInput.svelte';
 	import RollInput from './RollInput.svelte';
 
@@ -23,13 +22,14 @@
 
 	const input = $derived(inputs.inputMap[name]);
   
-	const hasChanged = $derived(value != refvalue ? 'table-warning' : '');
+	const hasChanged = $derived(inputs.equals(value, refvalue) ? '' : 'table-warning');
 </script>
 
 <td class="text-start">{name}</td>
 {#if input instanceof inputs.NumberInput}
 	<MPNumberInput
 		bind:value={value as string | number}
+    bind:refvalue={refvalue as string | number}
 		numInput={input}
 		{canEdit}
 		{mps}

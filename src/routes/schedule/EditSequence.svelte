@@ -9,7 +9,10 @@
 	} from '$lib/schedules/schedule_builder';
 	import { user } from '$lib/stores/user';
 
+  let {activeManId = $bindable()}: {activeManId?: number} = $props();
+
 	const clear = () => {
+    activeManId = undefined;
 		$mans = [];
 		$dbSchedule = undefined;
 	};
