@@ -12,7 +12,7 @@
 		onchange = () => {}
 	}: {
 		value: (number | string)[];
-		refvalue: (number | string)[];
+		refvalue: (number | string)[] | undefined;
 		input: RollInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
@@ -20,6 +20,7 @@
 	} = $props();
   
   const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning')
+
 </script>
 
 <td class="p-0 {hasChanged}" colspan="2">
@@ -40,7 +41,7 @@
 						<tr
 							><MpNumberInput
 								bind:value={value[i]}
-                bind:refvalue={refvalue[i]}
+                refvalue={refvalue ? refvalue[i] : undefined}
 								numInput={new NumberInput('rad', Math.PI / 4)}
 								{canEdit}
 								{mps}

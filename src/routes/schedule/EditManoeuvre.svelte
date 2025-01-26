@@ -9,6 +9,7 @@
 	import { Figure } from '$lib/schedules/aresti';
 	import { rule, mans } from '$lib/schedules/schedule_builder';
 	import { loading } from '$lib/stores/shared';
+	import { faVersion } from '$lib/api';
 
 	let {
 		id,
@@ -70,6 +71,42 @@
 				.finally(() => ($loading = false));
 		}
 	};
+	const patch = async () => {
+		if (confirm('Are you sure you want to update this manoeuvre?')) {
+			if ($mans[id].aresti && $mans[id].definition && $mans[id].dbManoeuvre && faVersion && $user) {
+				$loading = true;
+				dbServer
+					.patch(`schedule/manoeuvre/${$mans[id].dbManoeuvre.id}`, {
+						version: faVersion,
+						aresti: $mans[id].aresti,
+						definition: $mans[id].definition
+					})
+					.then(async (res) => {
+						await loadSchedulesforUser('admin@fcscore.org');
+						await loadSchedulesforUser($user.email);
+					})
+					.then(reload)
+					.catch((e) => console.error(e))
+					.finally(() => ($loading = false));
+			}
+		}
+	};
+
+	const deleteMan = async () => {
+		if (
+			confirm(
+				'Are you sure you want to delete this manoeuvre? Please check the next manoeuvre will link to the previous one first.'
+			)
+		) {
+			if ($mans[id].dbManoeuvre) {
+				dbServer.delete(`schedule/$mans[id]/${$mans[id].dbManoeuvre.id}`).then(() => {
+					loadSchedulesforUser('admin@fcscore.org');
+					if ($user) loadSchedulesforUser($user.email);
+				});
+			}
+		}
+		ondelete();
+	};
 </script>
 
 <div class="container-fluid">
@@ -83,7 +120,7 @@
 			>
 				Reload
 			</button>
-			<button class="col btn btn-outline-secondary" title="Undo active changes" onclick={reset}>
+			<button class="col btn btn-outline-secondary" title="Undo active changes to match the stored manoeuvre" onclick={reset}>
 				Reset
 			</button>
 			<button
@@ -93,27 +130,17 @@
 			>
 				Update
 			</button>
-			<button class="col btn btn-outline-secondary" title="Update the database entry" disabled
-				>Patch</button
-			>
 			<button
 				class="col btn btn-outline-secondary"
-				title="delete database entry"
-				onclick={() => {
-					if (
-						confirm(
-							'Are you sure you want to delete this $mans[id]? Please check the next $mans[id] will link to the previous one first.'
-						)
-					) {
-						if ($mans[id].dbManoeuvre) {
-							dbServer.delete(`schedule/$mans[id]/${$mans[id].dbManoeuvre.id}`).then(() => {
-								loadSchedulesforUser('admin@fcscore.org');
-								if ($user) loadSchedulesforUser($user.email);
-							});
-						}
-						ondelete();
-					}
-				}}>Delete</button
+				title="Update the database entry based on the stored manouevre. You should rebuild the definition and store active changes by clicking update first."
+				onclick={patch}
+			>
+				Patch
+			</button>
+			<button
+				class="col btn btn-outline-secondary"
+				title="Delete this manoeuvre and the database entry"
+				onclick={deleteMan}>Delete</button
 			>
 		</div>
 	{/if}
@@ -136,7 +163,7 @@
 								bind:value={newInfo.start.height}
 								bind:canEdit
 								undefValue="Infer"
-								bind:refValue={$mans[id].info.start.height}
+								refValue={$mans[id].info.start.height}
 							/>
 						</td>
 						<td class="p-0">
@@ -145,7 +172,7 @@
 								bind:value={newInfo.end.height}
 								bind:canEdit
 								undefValue="Infer"
-								bind:refValue={$mans[id].info.end.height}
+								refValue={$mans[id].info.end.height}
 							/>
 						</td>
 					</tr>
@@ -157,7 +184,7 @@
 								bind:value={newInfo.start.direction}
 								bind:canEdit
 								undefValue="Infer"
-								bind:refValue={$mans[id].info.start.direction}
+								refValue={$mans[id].info.start.direction}
 							/>
 						</td>
 						<td class="p-0">
@@ -166,7 +193,7 @@
 								bind:value={newInfo.end.direction}
 								bind:canEdit
 								undefValue="Infer"
-								bind:refValue={$mans[id].info.end.direction}
+								refValue={$mans[id].info.end.direction}
 							/>
 						</td>
 					</tr>
@@ -178,7 +205,7 @@
 								bind:value={newInfo.start.orientation}
 								bind:canEdit
 								undefValue="Infer"
-								bind:refValue={$mans[id].info.start.orientation}
+								refValue={$mans[id].info.start.orientation}
 							/>
 						</td>
 						<td class="p-0">
@@ -187,7 +214,7 @@
 								bind:value={newInfo.end.orientation}
 								bind:canEdit
 								undefValue="Infer"
-								bind:refValue={$mans[id].info.end.orientation}
+								refValue={$mans[id].info.end.orientation}
 							/>
 						</td>
 					</tr>

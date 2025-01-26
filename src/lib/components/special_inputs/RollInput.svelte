@@ -42,8 +42,9 @@
 	);
 
 	const allowedMPS = Object.values(mps)
-		.filter((mp) => mp.unit == 'rad')
+		.filter((mp) => mp.criteria.kind == 'combination')
 		.map((mp) => mp.name);
+
 </script>
 
 <td class="p-0"
@@ -89,7 +90,10 @@
       inputMode = newInputMode;
 		}}
 	>
-		<option value="value">value</option>
+  {#if allowedMPS.length}
+    <option value="MP">MP</option>	
+  {/if}
+    <option value="value">value</option>
 		<option value="point">point</option>
 		<option value="array">array</option>
 	</select></td
@@ -101,6 +105,7 @@
 			bind:value
 			onchange={() => onchange(value)}
 			disabled={!canEdit}
+      title={rollInput.description}
 		>
 			{#each allowedMPS as mp}
 				<option value={mp}>{mp}</option>
@@ -119,6 +124,7 @@
 				onchange(value);
 			}}
 			disabled={!canEdit}
+      title={rollInput.description}
 		/></td
 	>
 	<td class="p-0 {hasChanged}"
@@ -144,12 +150,13 @@
 			bind:value
 			disabled={!canEdit}
 			onchange={() => onchange(value)}
+      title={rollInput.description}
 		/>
 	</td>
 {:else if inputMode == 'array'}
 	<ArrayInput
-		value={value as (number | string)[]}
-		refvalue={refvalue as (number | string)[]}
+		bind:value={value as (number | string)[]}
+		refvalue={refvalue as (number | string)[] | undefined}
 		input={rollInput}
 		{canEdit}
 		{mps}

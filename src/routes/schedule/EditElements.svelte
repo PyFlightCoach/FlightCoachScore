@@ -20,57 +20,52 @@
 	let isPeUpdated = $derived(
 		pes.map((pe, i) => (typeof pe == 'number' ? false : !peCompare(refpes[i] as PE, pe as PE)))
 	);
-
 </script>
 
 {#each pes as pe, i}
 	{#if typeof pe != 'number'}
-		<div class="btn-group">
-			<div class="container-fluid">
-				<div class="row">
-					<button
-						class="col btn btn-outline-secondary"
-						onclick={() => {
-							if (activeElID == i) {
-								activeElID = undefined;
-							} else {
-								activeElID = i;
-							}
-						}}
-					>
-						{peSummary(pe, $builder!.element_builders[pe.kind])}
-						{#if activeElID == i}
-							<i class="bi bi-chevron-up"></i>
-						{:else}
-							<i class="bi bi-chevron-down"></i>
-						{/if}
-						{#if isPeUpdated[i]}
-							<span class="badge bg-warning">Updated</span>
-						{/if}
-					</button>
-					<button
-						class=" col-auto btn btn-outline-danger"
-						disabled={!canEdit}
-						onclick={() => {
+		<div class="container-fluid">
+			<div class="row">
+				<button
+					class="col btn btn-outline-secondary"
+					onclick={() => {
+						if (activeElID == i) {
 							activeElID = undefined;
-							pes.splice(i, 1);
-						}}
-						aria-label="Delete"
-					>
-						<i class="bi bi-trash"></i>
-					</button>
-				</div>
+						} else {
+							activeElID = i;
+						}
+					}}
+				>
+					{peSummary(pe, $builder!.element_builders[pe.kind])}
+					{#if activeElID == i}
+						<i class="bi bi-chevron-up"></i>
+					{:else}
+						<i class="bi bi-chevron-down"></i>
+					{/if}
+					{#if isPeUpdated[i]}
+						<span class="badge bg-warning">Updated</span>
+					{/if}
+				</button>
+        {#if canEdit}
+				<button
+					class=" col-auto btn btn-outline-secondary"
+					disabled={!canEdit}
+					onclick={() => {
+						activeElID = undefined;
+						pes.splice(i, 1);
+					}}
+					aria-label="Delete"
+          title="Delete this Element"
+				>
+					<i class="bi bi-trash"></i>
+				</button>
+        {/if}
 			</div>
 		</div>
 	{/if}
 
 	{#if activeElID == i && typeof pe != 'number'}
-		<EditElement
-			bind:pe={pes[i] as PE}
-			refpe={refpes[i] as PE}
-			builder={$builder!}
-			{canEdit}
-		/>
+		<EditElement bind:pe={pes[i] as PE} refpe={refpes[i] as PE} builder={$builder!} {canEdit} />
 	{/if}
 {/each}
 
@@ -84,11 +79,13 @@
 				data-sveltekit-preload-data="tap"
 				onclick={() => {
 					pes.push(
-						$state.snapshot(new PE(
-							elkind,
-							Array.from({ length: $builder!.element_builders[elkind].args.length }),
-							{}
-						))
+						$state.snapshot(
+							new PE(
+								elkind,
+								Array.from({ length: $builder!.element_builders[elkind].args.length }),
+								{}
+							)
+						)
 					);
 				}}
 			>

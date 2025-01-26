@@ -21,7 +21,7 @@
 	} = $props();
 
 	const input = $derived(inputs.inputMap[name]);
-  
+
 	const hasChanged = $derived(inputs.equals(value, refvalue) ? '' : 'table-warning');
 </script>
 
@@ -29,7 +29,7 @@
 {#if input instanceof inputs.NumberInput}
 	<MPNumberInput
 		bind:value={value as string | number}
-    refvalue={refvalue as string | number | undefined}
+		refvalue={refvalue as string | number | undefined}
 		numInput={input}
 		{canEdit}
 		{mps}
@@ -42,6 +42,7 @@
 			bind:value={value as string}
 			disabled={!canEdit}
 			onchange={() => onchange(value)}
+      title={input.description}
 		>
 			{#each input.options as option}
 				<option value={option}>{option}</option>
@@ -61,6 +62,7 @@
 			}}
 			checked={value as boolean}
 			disabled={!canEdit}
+      title={input.description}
 		/>
 		<label class="w-100 btn btn-sm btn-outline-secondary" for="btn-check-{name}">{value}</label>
 	</td>
@@ -71,8 +73,19 @@
 		rollInput={input}
 		{canEdit}
 		{mps}
-    {onchange}
+		{onchange}
 	/>
+{:else if input instanceof inputs.RollTypeInput}
+	<td class="p-0 {hasChanged}" colspan="3"
+		><input
+			type="text"
+			class="w-100 form-control form-control-sm text-center {input.checkValue(value as string) ? '' : 'bg-warning'}"
+      title={input.description}
+			bind:value
+			disabled={!canEdit}
+      onchange={() => onchange(value)}
+		/></td
+	>
 {:else}
 	<td colspan="3">{name}({value})</td>
 {/if}

@@ -69,6 +69,7 @@
 			bind:value
 			disabled={!canEdit}
       onchange={()=>onchange(value)}
+      title={numInput.description}
 		>
 			{#each allowedMPS as mp}
 				<option value={mp}>{mp}</option>
@@ -78,12 +79,13 @@
 {:else if inputMode == 'value'}
 	<td class="p-0 {hasChanged}"
 		><input
-			class="w-100 form-control form-control-sm"
+			class="w-100 form-control form-control-sm text-center"
 			type="number"
 			step={numInput.step / multiplier}
 			bind:value={rawValue}
 			onchange={() => {value = (rawValue as number) * multiplier; onchange(value);}}
 			disabled={!canEdit}
+      title={numInput.description}
 		/></td
 	>
 	<td class="p-0 {hasChanged}"
