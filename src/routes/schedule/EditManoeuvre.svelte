@@ -11,6 +11,8 @@
 	import { faVersion } from '$lib/api';
 	import EditManinfo from './EditManinfo.svelte';
 	import EditManParms from './EditManParms.svelte';
+  import { objmap } from '$lib/utils/arrays';
+  import {extractComboNdMps} from '$lib/schedules/aresti';
 
 	let {
 		id,
@@ -29,6 +31,8 @@
 	let newElements = $state($state.snapshot($mans[id].aresti?.elements));
 	let newNdMps = $state($state.snapshot($mans[id].aresti?.ndmps));
 
+  let comboDefaults: Record<string, number> = $state(newNdMps ? objmap(extractComboNdMps(newNdMps), (v) => 0) : {});
+
 	//let newFigure: Figure | undefined = $derived(Figure.parse(newFig!));
 
 	const reset = () => {
@@ -36,6 +40,7 @@
 		newInfo = $state.snapshot($mans[id].info);
 		newElements = $state.snapshot($mans[id].aresti?.elements);
 		newNdMps = $state.snapshot($mans[id].aresti?.ndmps);
+    //comboDefaults = newNdMps ? objmap(extractComboNdMps(newNdMps), (v) => 0) : {};    
 	};
 
 	const reload = () => {
@@ -62,7 +67,8 @@
 				$rule as string,
 				newFigure!,
 				$mans[id].dbManoeuvre,
-				$mans[id].olan
+				$mans[id].olan,
+        comboDefaults
 			)
 				.then((res) => {
 					$mans[id] = res;
@@ -171,7 +177,7 @@
 				</button>
 			</div>
 			{#if showNdMps}
-				<EditManParms bind:newParms={newNdMps} oldParms={$mans[id].aresti!.ndmps} bind:canEdit />
+				<EditManParms bind:newParms={newNdMps} oldParms={$mans[id].aresti!.ndmps} bind:canEdit bind:comboDefaults />
 			{/if}
 		{/if}
 		{#if newElements && $mans[id].aresti && newNdMps}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as inputs from '$lib/components/special_inputs/inputs';
-	import { extractComboNdMps, type CombinationValue, type ComparisonValue } from '$lib/schedules/aresti';
+	import { extractComboNdMps} from '$lib/schedules/aresti';
 	import type { ManParm } from '$lib/schedules/mandef';
 	import ArrayInput from './ArrayInput.svelte';
 	import MpInput from './MPInput.svelte';
@@ -21,7 +21,7 @@
 		rollInput: inputs.RollInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
-		ndmps: Record<string, CombinationValue | ComparisonValue>;
+		ndmps: Record<string, number | number[][]>;
 		onchange?: (newVal: number | string | (number | string)[]) => void;
 	} = $props();
 

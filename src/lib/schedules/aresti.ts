@@ -41,15 +41,13 @@ export const peCompare = (one: PE | undefined, other: PE | undefined) => {
 	}
 };
 
-export type CombinationValue = number[][];
-export type ComparisonValue = number | number[] | string | boolean;
 
 export class Figure {
 	relax_back: boolean;
 	constructor(
 		readonly info: ManInfo,
 		readonly elements: (PE | number)[] = [],
-		readonly ndmps: Record<string, CombinationValue | ComparisonValue> = {},
+		readonly ndmps: Record<string, number | number[][]> = {},
 		relax_back: boolean = false
 	) {
 		this.relax_back = relax_back;
@@ -78,20 +76,20 @@ export class Figure {
 }
 
 export function extractComboNdMps(
-	ndmps: Record<string, CombinationValue | ComparisonValue>
-): Record<string, CombinationValue> {
+	ndmps: Record<string, number | number[][]>
+): Record<string, number[][]> {
 	return Object.fromEntries(Object.entries(ndmps).filter(([_, v]) => Array.isArray(v))) as Record<
 		string,
-		CombinationValue
+		number[][]
 	>;
 }
 
 export function extractComparisonNdMps(
-  ndmps: Record<string, CombinationValue | ComparisonValue>
-): Record<string, ComparisonValue> {
+  ndmps: Record<string, number | number[][]>
+): Record<string, number> {
   return Object.fromEntries(Object.entries(ndmps).filter(([_, v]) => !Array.isArray(v))) as Record<
     string,
-    ComparisonValue
+    number
   >;
 }
 

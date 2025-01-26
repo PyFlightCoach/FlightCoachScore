@@ -5,14 +5,15 @@ import { ManInfo } from './maninfo';
 
 
 export class ManParm {
+  defaul: number | string;
 	constructor(
 		readonly name: string,
 		readonly criteria: Record<string, never>,
-		readonly defaul: number | string,
+		defaul: number | string,
 		readonly unit: string,
 		readonly collectors: Record<string, never>,
 		readonly visibility: string | undefined = undefined
-	) {}
+	) {this.defaul = defaul;}
 
 	static parse(data: Record<string, never>) {
 		return new ManParm(

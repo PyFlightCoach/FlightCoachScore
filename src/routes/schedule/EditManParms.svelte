@@ -6,16 +6,19 @@
 	import * as inputs from '$lib/components/special_inputs/inputs';
 	import ArrayInput from '$lib/components/special_inputs/ArrayInput.svelte';
 	import { objmap } from '$lib/utils/arrays';
+  import {extractComboNdMps} from '$lib/schedules/aresti';
 
 	let {
 		newParms = $bindable(),
 		oldParms,
 		canEdit = $bindable(),
+    comboDefaults = $bindable(),
 		onchange = () => {}
 	}: {
 		newParms: Record<string, number | number[][]>;
 		oldParms: Record<string, number | number[][]>;
 		canEdit?: boolean;
+    comboDefaults: Record<string, number>;
 		onchange?: (newParms: Record<string, number | number[][]>) => void;
 	} = $props();
 
@@ -25,14 +28,9 @@
 		)
 	);
 
-	const combinations: Record<string, number[][]> = $derived(
-		Object.fromEntries(Object.entries(newParms).filter(([k, v]) => Array.isArray(v))) as Record<
-			string,
-			number[][]
-		>
-	);
+	const combinations: Record<string, number[][]> = $derived(extractComboNdMps(newParms));
 
-	let comboDefaults: Record<string, number> = $state(objmap(combinations, (v) => 0));
+//	let comboDefaults: Record<string, number> = $state(objmap(combinations, (v) => 0));
 	let newComboName = $state('NewName');
 </script>
 

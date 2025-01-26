@@ -86,11 +86,16 @@ export class ManoeuvreHandler {
 		rules: string,
 		figure: Figure | FigOption,
 		dbManoeuvre: DBManoeuvre | undefined = undefined,
-		olan: Record<string, unknown> | undefined = undefined
+		olan: Record<string, unknown> | undefined = undefined,
+    comboDefaults: Record<string, number> = {}
 	) {
 		const definition = await analysisServer
 			.post('create_mdef', { rules, figure })
 			.then((res) => ManDef.parse(res.data));
+
+    Object.entries(comboDefaults).forEach(([k, v]) => {
+      definition.mps[k].defaul = v;
+    });
 
 		return ManoeuvreHandler.build(figure, definition, dbManoeuvre, olan);
 	}

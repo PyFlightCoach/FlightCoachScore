@@ -4,11 +4,7 @@
 	import EquationInput from './EquationInput.svelte';
 	import MpInput from './MPInput.svelte';
 	import NumberInput from './NumberInput.svelte';
-	import {
-		type CombinationValue,
-		type ComparisonValue,
-		extractComboNdMps
-	} from '$lib/schedules/aresti';
+	import {extractComboNdMps} from '$lib/schedules/aresti';
 
 	let {
 		value = $bindable(),
@@ -24,7 +20,7 @@
 		numInput: inputs.NumberInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
-		ndmps: Record<string, CombinationValue | ComparisonValue>;
+		ndmps: Record<string, number | number[][]>;
 		onchange?: (newVal: number | string | undefined) => void;
 	} = $props();
 
