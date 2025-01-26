@@ -1,14 +1,11 @@
 <script lang="ts">
-	import {
-		type RollInput as RInp,
-		unitOptions,
-		unitMultipliers,
-		re_point_roll,
-		equals,
-	} from '$lib/components/special_inputs/inputs';
+	import * as inputs from '$lib/components/special_inputs/inputs';
+	import { extractComboNdMps, type CombinationValue, type ComparisonValue } from '$lib/schedules/aresti';
 	import type { ManParm } from '$lib/schedules/mandef';
 	import ArrayInput from './ArrayInput.svelte';
+	import MpInput from './MPInput.svelte';
 	import MpNumberInput from './MPNumberInput.svelte';
+	import NumberInput from './NumberInput.svelte';
 
 	let {
 		value = $bindable(),
@@ -16,34 +13,31 @@
 		rollInput,
 		canEdit = false,
 		mps,
+		ndmps,
 		onchange = () => {}
 	}: {
 		value: number | string | (number | string)[];
 		refvalue: number | string | (number | string)[] | undefined;
-		rollInput: RInp;
+		rollInput: inputs.RollInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
+		ndmps: Record<string, CombinationValue | ComparisonValue>;
 		onchange?: (newVal: number | string | (number | string)[]) => void;
 	} = $props();
 
-	const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
+	const hasChanged = $derived(inputs.equals(value, refvalue) ? '' : 'table-warning');
 
 	let inputMode = $state(rollInput.checkOption(value) || 'value');
 
-	const alternateUnits = unitOptions.rad;
-	let selectedUnit = $state(alternateUnits[0]);
-	const multiplier = $derived(unitMultipliers[selectedUnit as keyof typeof unitMultipliers]);
-
-	// svelte-ignore state_referenced_locally
-	let rawValue = $state(typeof value == 'number' ? value / multiplier : value);
-
 	let isValidPointRoll = $derived(
-		inputMode == 'point' ? re_point_roll.test(value as string) : true
+		inputMode == 'point' ? inputs.re_point_roll.test(value as string) : true
 	);
 
 	const allowedMPS = Object.values(mps)
 		.filter((mp) => mp.criteria.kind == 'combination')
 		.map((mp) => mp.name);
+
+  const comboNdMps = $state(extractComboNdMps(ndmps));
 
 </script>
 
@@ -53,9 +47,9 @@
 		value={inputMode}
 		disabled={!canEdit}
 		onchange={(e) => {
-			const old_mode = rollInput.checkOption(value);
-      const newInputMode = (e.target as HTMLSelectElement).value;
-      console.log(`switch from ${inputMode} to ${newInputMode}`);
+			const oldInputMode = rollInput.checkOption(value);
+			const newInputMode = (e.target as HTMLSelectElement).value;
+			console.log(`switch from ${inputMode} to ${newInputMode}`);
 			switch (newInputMode) {
 				case 'MP':
 					if (Array.isArray(value) && typeof value[0] === 'string') {
@@ -75,72 +69,47 @@
 					value = '2x2';
 					break;
 				case 'array':
-					if (['value', 'MP'].includes(old_mode as string)) {
-						value = [value as string | number];
+					if (['value', 'MP'].includes(oldInputMode as string)) {
+						value = [(value as string | number) || 0];
 					} else {
-            const newValue = [];
-            const angle = (2 * Math.PI / parseInt((value as string).slice(-1)))
-            for (let i = 0; i < parseInt((value as string).slice(0)); i++) {
-              newValue.push(angle);
-            }
+						const newValue = [];
+						const angle = (2 * Math.PI) / parseInt((value as string).slice(-1));
+						for (let i = 0; i < parseInt((value as string).slice(0)); i++) {
+							newValue.push(angle);
+						}
 						value = newValue;
 					}
 					break;
 			}
-      inputMode = newInputMode;
+			inputMode = newInputMode;
 		}}
 	>
-  {#if allowedMPS.length}
-    <option value="MP">MP</option>	
-  {/if}
-    <option value="value">value</option>
+		{#if allowedMPS.length || Object.keys(comboNdMps).length}
+			<option value="MP">MP</option>
+		{/if}
+		<option value="value">value</option>
 		<option value="point">point</option>
 		<option value="array">array</option>
 	</select></td
 >
 {#if inputMode == 'MP'}
-	<td class="p-0 {hasChanged}"
-		><select
-			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
-			bind:value
-			onchange={() => onchange(value)}
-			disabled={!canEdit}
-      title={rollInput.description}
-		>
-			{#each allowedMPS as mp}
-				<option value={mp}>{mp}</option>
-			{/each}
-		</select></td
-	>
+	<MpInput
+		bind:value={value as string | undefined}
+		refvalue={refvalue as string | undefined}
+		numInput={new inputs.NumberInput('rad', Math.PI / 4)}
+		{canEdit}
+		{mps}
+		ndmps={comboNdMps}
+		onchange={(newVal) => onchange(newVal as string)}
+	/>
 {:else if inputMode == 'value'}
-	<td class="p-0 {hasChanged}"
-		><input
-			class="w-100 form-control form-control-sm"
-			type="number"
-			step={Math.PI / (4 * multiplier)}
-			bind:value={rawValue}
-			onchange={() => {
-				value = (rawValue as number) * multiplier;
-				onchange(value);
-			}}
-			disabled={!canEdit}
-      title={rollInput.description}
-		/></td
-	>
-	<td class="p-0 {hasChanged}"
-		><select
-			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
-			bind:value={selectedUnit}
-			onchange={() => {
-				rawValue = (value as number) / multiplier;
-			}}
-			disabled={!canEdit}
-		>
-			{#each alternateUnits as ug}
-				<option value={ug}>{ug}</option>
-			{/each}
-		</select></td
-	>
+	<NumberInput
+		value={value as number}
+		refvalue={refvalue as number | undefined}
+		numInput={new inputs.NumberInput('rad', Math.PI / 4, 'Enter a value in radians')}
+		{canEdit}
+		{onchange}
+	/>
 {:else if inputMode == 'point'}
 	<td class="p-0 {hasChanged}" colspan="2"
 		><input
@@ -150,7 +119,7 @@
 			bind:value
 			disabled={!canEdit}
 			onchange={() => onchange(value)}
-      title={rollInput.description}
+			title={rollInput.description}
 		/>
 	</td>
 {:else if inputMode == 'array'}

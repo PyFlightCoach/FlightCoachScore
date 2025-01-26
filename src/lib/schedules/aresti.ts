@@ -3,18 +3,12 @@ import { type Arg, equals } from '$lib/components/special_inputs/inputs';
 import type { ElementBuilder } from './schedule_builder';
 import * as inputs from '$lib/components/special_inputs/inputs';
 
-
 export class PE {
 	kind: string;
 	args: Arg[];
 	kwargs: Record<string, Arg>;
 	centred: boolean;
-	constructor(
-		kind: string,
-		args: Arg[],
-		kwargs: Record<string, Arg>,
-		centred: boolean = false
-	) {
+	constructor(kind: string, args: Arg[], kwargs: Record<string, Arg>, centred: boolean = false) {
 		this.kind = kind;
 		this.args = args;
 		this.kwargs = kwargs;
@@ -22,41 +16,40 @@ export class PE {
 	}
 }
 
-
 export const peSummary = (pe: PE, builder: ElementBuilder) => {
 	return `${pe.kind} ${builder.args
 		.map((a, i) => `(${inputs.inputMap[a as keyof typeof inputs.inputMap].formatArg(pe.args[i])})`)
 		.join(',')}`;
 };
 
+export const peCompare = (one: PE | undefined, other: PE | undefined) => {
+	if (!one || !other) {
+		return false;
+	} else if (one.kind !== other.kind) {
+		return false;
+	} else if (one.args.some((a, i) => !equals(other.args[i], a))) {
+		console.log('arg missmatch', one.args, other.args);
+		return false;
+	} else if (Object.keys(one.kwargs).some((k) => !equals(one.kwargs[k], other.kwargs[k]))) {
+		console.log('kwarg missmatch', one.kwargs, other.kwargs);
+		return false;
+	} else if (Object.keys(other.kwargs).filter((k) => !Object.keys(one.kwargs).includes(k)).length) {
+		console.log('missing kwarg', one.kwargs, other.kwargs);
+		return false;
+	} else {
+		return true;
+	}
+};
 
-export const peCompare = (one: PE|undefined, other: PE|undefined) => {
-  if (!one || !other) {
-    return false;
-  } else if (one.kind !== other.kind) {
-    return false;
-  } else if (one.args.some((a, i) => !equals(other.args[i], a))) {
-    console.log('arg missmatch', one.args, other.args);
-    return false;
-  } else if (Object.keys(one.kwargs).some((k) => !equals(one.kwargs[k], other.kwargs[k]))) {
-    console.log('kwarg missmatch', one.kwargs, other.kwargs);
-    return false;
-  } else if (Object.keys(other.kwargs).filter((k) => !Object.keys(one.kwargs).includes(k)).length) {
-    console.log('missing kwarg', one.kwargs, other.kwargs);
-    return false;
-  } else {
-    return true;
-  }
-}
-
-
+export type CombinationValue = number[][];
+export type ComparisonValue = number | number[] | string | boolean;
 
 export class Figure {
 	relax_back: boolean;
 	constructor(
 		readonly info: ManInfo,
 		readonly elements: (PE | number)[] = [],
-		readonly ndmps: Record<string, number | string | (number | string)[]> = {},
+		readonly ndmps: Record<string, CombinationValue | ComparisonValue> = {},
 		relax_back: boolean = false
 	) {
 		this.relax_back = relax_back;
@@ -84,6 +77,24 @@ export class Figure {
 	}
 }
 
+export function extractComboNdMps(
+	ndmps: Record<string, CombinationValue | ComparisonValue>
+): Record<string, CombinationValue> {
+	return Object.fromEntries(Object.entries(ndmps).filter(([_, v]) => Array.isArray(v))) as Record<
+		string,
+		CombinationValue
+	>;
+}
+
+export function extractComparisonNdMps(
+  ndmps: Record<string, CombinationValue | ComparisonValue>
+): Record<string, ComparisonValue> {
+  return Object.fromEntries(Object.entries(ndmps).filter(([_, v]) => !Array.isArray(v))) as Record<
+    string,
+    ComparisonValue
+  >;
+}
+
 export class FigOption {
 	active: number = 0;
 	constructor(
@@ -105,6 +116,4 @@ export class FigOption {
 	get relax_back() {
 		return this.options[this.active].relax_back;
 	}
-
-
 }

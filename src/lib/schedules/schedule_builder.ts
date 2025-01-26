@@ -75,6 +75,15 @@ export class ManBuilder {
 		readonly element_builders: Record<string, ElementBuilder>
 	) {}
 
+  get comparisons() {
+    const names = Object.keys(this.parameters).filter(k=>this.parameters[k].criteria.kind=='Comparison');
+    return Object.fromEntries(names.map((n)=>[n, this.parameters[n]]));
+  }
+
+  get comparisonValues() {
+    return Object.fromEntries(Object.entries(this.comparisons).map(([k, v])=>[k, v.defaul]));
+  }
+
 	static async load(rule_name: string) {
 		return analysisServer
 			.get(`builder/${rule_name}`)

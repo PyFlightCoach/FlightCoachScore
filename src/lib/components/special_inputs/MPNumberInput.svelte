@@ -1,114 +1,103 @@
 <script lang="ts">
-	import {
-		type NumberInput,
-		unitOptions,
-		unitMultipliers,
-    equals
-	} from '$lib/components/special_inputs/inputs';
+	import * as inputs from '$lib/components/special_inputs/inputs';
 	import type { ManParm } from '$lib/schedules/mandef';
+	import EquationInput from './EquationInput.svelte';
+	import MpInput from './MPInput.svelte';
+	import NumberInput from './NumberInput.svelte';
+	import {
+		type CombinationValue,
+		type ComparisonValue,
+		extractComboNdMps
+	} from '$lib/schedules/aresti';
 
 	let {
 		value = $bindable(),
-    refvalue,
+		refvalue,
 		numInput,
 		canEdit = false,
 		mps,
-    onchange = () => {}
+		ndmps,
+		onchange = () => {}
 	}: {
-		value: number | string;
-    refvalue: number | string | undefined;
-		numInput: NumberInput;
+		value: number | string | undefined;
+		refvalue: number | string | undefined;
+		numInput: inputs.NumberInput;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
-    onchange?: (newVal: number | string) => void;
+		ndmps: Record<string, CombinationValue | ComparisonValue>;
+		onchange?: (newVal: number | string | undefined) => void;
 	} = $props();
-
 
 	const allowedMPS = Object.values(mps)
 		.filter((mp) => mp.unit == numInput.unit)
 		.map((mp) => mp.name);
 
-  let inputMode = $state(numInput.checkOption(value));
-	const alternateUnits = $derived(unitOptions[numInput.unit]);
+	const comboNdMps = $state(extractComboNdMps(ndmps));
 
-	// svelte-ignore state_referenced_locally
-	let selectedUnit = $state(alternateUnits[0]);
-
-	const multiplier = $derived(unitMultipliers[selectedUnit as keyof typeof unitMultipliers]);
-
-	// svelte-ignore state_referenced_locally
-	let rawValue = $state(typeof value == 'number' ? value / multiplier : value);
-
-  const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
+	let inputMode: string | undefined = $state(numInput.checkOption(value));
 </script>
 
-<td class="p-0 {hasChanged}"
+<td class="p-0"
 	><select
 		class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
-		bind:value={inputMode}
+		value={inputMode}
 		disabled={!canEdit}
-		onchange={() => {
-			if (typeof value === 'string' && Object.keys(mps).includes(value)) {
-				value = mps[value].defaul;
-        onchange(value);
+		onchange={(e) => {
+			const oldInputMode = inputMode;
+			inputMode = undefined;
+			const newInputMode = (e.target as HTMLSelectElement).value;
+			switch (newInputMode) {
+				case 'MP':
+					value = undefined;
+					break;
+				case 'value':
+					if (oldInputMode == 'MP') {
+						value = mps[value as string].defaul;
+					} else {
+						value = 0;
+					}
+
+					break;
+				case 'eqn':
+					value = `(${value}*1)`;
+					break;
 			}
-			rawValue = typeof value == 'number' ? value / multiplier : value;
+			onchange(value);
+			inputMode = newInputMode;
 		}}
 	>
-    {#if allowedMPS.length > 0}
-      <option value="MP">MP</option>
-    {/if}
+		{#if allowedMPS.length + Object.keys(comboNdMps).length}
+			<option value="MP">MP</option>
+		{/if}
 		<option value="value">value</option>
 		<option value="eqn">eqn</option>
 	</select></td
 >
 {#if inputMode == 'MP'}
-	<td class="p-0 {hasChanged}"
-		><select
-			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
-			bind:value
-			disabled={!canEdit}
-      onchange={()=>onchange(value)}
-      title={numInput.description}
-		>
-			{#each allowedMPS as mp}
-				<option value={mp}>{mp}</option>
-			{/each}
-		</select></td
-	>
+	<MpInput
+		bind:value={value as string | undefined}
+		{refvalue}
+		{numInput}
+		{canEdit}
+		{mps}
+		{ndmps}
+		{onchange}
+	/>
 {:else if inputMode == 'value'}
-	<td class="p-0 {hasChanged}"
-		><input
-			class="w-100 form-control form-control-sm text-center"
-			type="number"
-			step={numInput.step / multiplier}
-			bind:value={rawValue}
-			onchange={() => {value = (rawValue as number) * multiplier; onchange(value);}}
-			disabled={!canEdit}
-      title={numInput.description}
-		/></td
-	>
-	<td class="p-0 {hasChanged}"
-		><select
-			class="w-100 btn btn-sm form-control-sm btn-outline-secondary"
-			bind:value={selectedUnit}
-			onchange={() => {
-				rawValue = (value as number) / multiplier;
-			}}
-		>
-			{#each alternateUnits as ug}
-				<option value={ug}>{ug}</option>
-			{/each}
-		</select></td
-	>
+	<NumberInput
+		bind:value={value as number}
+		refvalue={refvalue as number | undefined}
+		{numInput}
+		{canEdit}
+		{onchange}
+	/>
 {:else if inputMode == 'eqn'}
-	<td class="p-0 {hasChanged}" colspan="2"
-		><input
-			class="w-100 form-control form-control-sm"
-			type="text"
-			bind:value
-			disabled={!canEdit}
-      onchange={()=>onchange(value)}
-		/></td
-	>
+	<EquationInput
+		bind:value={value as string}
+		refvalue={refvalue as string | undefined}
+		{numInput}
+		{canEdit}
+		{onchange}
+		{mps}
+	/>
 {/if}

@@ -79,7 +79,7 @@
 										canEdit={$canIEdit}
 										ondelete={() => {
 											activeManId = undefined;
-											$mans = $mans.splice(i, 1);
+											$mans.splice(i, 1);
 										}}
 									/>
 								</td>

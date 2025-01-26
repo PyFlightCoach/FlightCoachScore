@@ -9,12 +9,14 @@
 		refpe,
 		builder,
 		canEdit = false,
+    ndmps,
 		onchange = () => {}
 	}: {
 		pe: PE;
 		refpe: PE | undefined;
 		builder: ManBuilder;
 		canEdit?: boolean;
+    ndmps: Record<string, number[][]>;
 		onchange?: (newpe: PE) => void;
 	} = $props();
 
@@ -36,6 +38,7 @@
 					refvalue={refpe?.args[i]}
 					{canEdit}
 					mps={builder.parameters}
+          {ndmps}
 				/>
 			</tr>
 		{/each}
@@ -48,6 +51,7 @@
 					refvalue={refpe?.kwargs[k] == undefined ? elbuilder.kwargs[k] : refpe.kwargs[k] }
 					{canEdit}
 					mps={builder.parameters}
+          {ndmps}
           onchange={(newval) => {
             if (newval != elbuilder.kwargs[k]) {
               pe.kwargs[k] = newval;

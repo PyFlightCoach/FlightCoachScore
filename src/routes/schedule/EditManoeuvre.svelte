@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { ManoeuvreHandler } from '$lib/schedules/manoeuvre_handler';
 	import * as mi from '$lib/schedules/maninfo';
-	import EnumSelect from '$lib/components/EnumSelect.svelte';
 	import { dbServer } from '$lib/api';
 	import { loadSchedulesforUser } from '$lib/schedules/library';
 	import { user } from '$lib/stores/user';
@@ -10,6 +9,8 @@
 	import { rule, mans } from '$lib/schedules/schedule_builder';
 	import { loading } from '$lib/stores/shared';
 	import { faVersion } from '$lib/api';
+	import EditManinfo from './EditManinfo.svelte';
+	import EditManParms from './EditManParms.svelte';
 
 	let {
 		id,
@@ -107,6 +108,8 @@
 		}
 		ondelete();
 	};
+	let showInfo = $state(true);
+	let showNdMps = $state(false);
 </script>
 
 <div class="container-fluid">
@@ -120,7 +123,11 @@
 			>
 				Reload
 			</button>
-			<button class="col btn btn-outline-secondary" title="Undo active changes to match the stored manoeuvre" onclick={reset}>
+			<button
+				class="col btn btn-outline-secondary"
+				title="Undo active changes to match the stored manoeuvre"
+				onclick={reset}
+			>
 				Reset
 			</button>
 			<button
@@ -146,89 +153,35 @@
 	{/if}
 	{#if newInfo && $mans[id].info}
 		<div class="row pt-2">
-			<table class="table table-sm table-borderless">
-				<thead>
-					<tr>
-						<th></th>
-						<th>Entry</th>
-						<th>Exit</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>Height</td>
-						<td class="p-0">
-							<EnumSelect
-								options={[...mi.Heights]}
-								bind:value={newInfo.start.height}
-								bind:canEdit
-								undefValue="Infer"
-								refValue={$mans[id].info.start.height}
-							/>
-						</td>
-						<td class="p-0">
-							<EnumSelect
-								options={[...mi.Heights]}
-								bind:value={newInfo.end.height}
-								bind:canEdit
-								undefValue="Infer"
-								refValue={$mans[id].info.end.height}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td>Direction</td>
-						<td class="p-0">
-							<EnumSelect
-								options={[...mi.Directions]}
-								bind:value={newInfo.start.direction}
-								bind:canEdit
-								undefValue="Infer"
-								refValue={$mans[id].info.start.direction}
-							/>
-						</td>
-						<td class="p-0">
-							<EnumSelect
-								options={[...mi.Directions]}
-								bind:value={newInfo.end.direction}
-								bind:canEdit
-								undefValue="Infer"
-								refValue={$mans[id].info.end.direction}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td>Orientation</td>
-						<td class="p-0">
-							<EnumSelect
-								options={[...mi.Orientations]}
-								bind:value={newInfo.start.orientation}
-								bind:canEdit
-								undefValue="Infer"
-								refValue={$mans[id].info.start.orientation}
-							/>
-						</td>
-						<td class="p-0">
-							<EnumSelect
-								options={[...mi.Orientations]}
-								bind:value={newInfo.end.orientation}
-								bind:canEdit
-								undefValue="Infer"
-								refValue={$mans[id].info.end.orientation}
-							/>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<button class="btn btn-outline-secondary w=100" onclick={() => (showInfo = !showInfo)}>
+				Manoeuvre Info {#if showInfo}<i class="bi bi-chevron-up"></i>{:else}<i
+						class="bi bi-chevron-down"
+					></i>{/if}
+			</button>
 		</div>
-
-		{#if newElements && $mans[id].aresti}
+		{#if showInfo}
+			<EditManinfo bind:newInfo oldInfo={$mans[id].info} bind:canEdit />
+		{/if}
+		{#if newNdMps && $mans[id].aresti}
+			<div class="row pt-2">
+				<button class="btn btn-outline-secondary w-100" onclick={() => (showNdMps = !showNdMps)}>
+					Manoeuvre Parameters {#if showNdMps}<i class="bi bi-chevron-up"></i>{:else}<i
+							class="bi bi-chevron-down"
+						></i>{/if}
+				</button>
+			</div>
+			{#if showNdMps}
+				<EditManParms bind:newParms={newNdMps} oldParms={$mans[id].aresti!.ndmps} bind:canEdit />
+			{/if}
+		{/if}
+		{#if newElements && $mans[id].aresti && newNdMps}
 			<div class="row pt-2">
 				<EditElements
 					bind:pes={newElements}
-					{canEdit}
+					bind:canEdit
 					refpes={$mans[id].aresti.elements}
 					bind:activeElID
+          ndmps={newNdMps}
 				/>
 			</div>
 		{/if}

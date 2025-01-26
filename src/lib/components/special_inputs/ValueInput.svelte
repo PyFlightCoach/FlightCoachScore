@@ -10,6 +10,7 @@
 		refvalue,
 		canEdit = false,
 		mps,
+    ndmps,
 		onchange = () => {}
 	}: {
 		name: keyof typeof inputs.inputMap;
@@ -17,6 +18,7 @@
 		refvalue: inputs.Arg | undefined;
 		canEdit?: boolean;
 		mps: Record<string, ManParm>;
+    ndmps: Record<string, number[][]>;
 		onchange?: (newvalue: inputs.Arg) => void;
 	} = $props();
 
@@ -33,6 +35,7 @@
 		numInput={input}
 		{canEdit}
 		{mps}
+    {ndmps}
 		{onchange}
 	/>
 {:else if input instanceof inputs.SelectInput}
@@ -73,6 +76,7 @@
 		rollInput={input}
 		{canEdit}
 		{mps}
+    {ndmps}
 		{onchange}
 	/>
 {:else if input instanceof inputs.RollTypeInput}

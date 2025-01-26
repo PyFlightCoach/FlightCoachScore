@@ -1,6 +1,6 @@
 export type Arg = number | string | (number | string)[] | boolean;
 
-export const equals = (a: Arg, b: Arg | undefined): boolean => {
+export const equals = (a: Arg | undefined, b: Arg | undefined): boolean => {
 	if (Array.isArray(a) && Array.isArray(b)) {
 		if (a.length !== b.length) {
 			return false;
@@ -39,7 +39,7 @@ export class NumberInput {
     readonly description: string = ''
 	) {}
 
-	checkOption(value: number | string) {
+	checkOption(value: number | string | undefined) {
 		if (typeof value === 'number') {
 			return 'value';
 		} else if (typeof value == 'string' && value.startsWith('(') && value.endsWith(')')) {

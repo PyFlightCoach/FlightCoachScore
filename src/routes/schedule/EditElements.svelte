@@ -1,20 +1,23 @@
 <script lang="ts">
 	import { PE, peCompare, peSummary } from '$lib/schedules/aresti';
 	import { builder } from '$lib/schedules/schedule_builder';
+	import { map } from 'lodash';
 	import EditElement from './EditElement.svelte';
 
 	let {
 		pes = $bindable(),
-		canEdit = false,
+		canEdit = $bindable(),
 		onchange = () => {},
 		refpes = $bindable(),
-		activeElID = $bindable(undefined)
+		activeElID = $bindable(undefined),
+    ndmps
 	}: {
 		pes: (PE | number)[];
 		canEdit?: boolean;
 		onchange?: (new_pes: (PE | number)[]) => void;
 		refpes: (PE | number)[];
 		activeElID?: number | undefined;
+    ndmps: Record<string, number[][]>;
 	} = $props();
 
 	let isPeUpdated = $derived(
@@ -65,7 +68,7 @@
 	{/if}
 
 	{#if activeElID == i && typeof pe != 'number'}
-		<EditElement bind:pe={pes[i] as PE} refpe={refpes[i] as PE} builder={$builder!} {canEdit} />
+		<EditElement bind:pe={pes[i] as PE} refpe={refpes[i] as PE} builder={$builder!} {canEdit} {ndmps} />
 	{/if}
 {/each}
 
@@ -82,7 +85,7 @@
 						$state.snapshot(
 							new PE(
 								elkind,
-								Array.from({ length: $builder!.element_builders[elkind].args.length }),
+								Array.from({ length: $builder!.element_builders[elkind].args.length }).map(() => 0),
 								{}
 							)
 						)
