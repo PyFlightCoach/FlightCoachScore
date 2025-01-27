@@ -36,6 +36,8 @@ export interface DBFlightRanked extends DBFlight {
 	table_rank: number;
 	score: number;
 	version: string[];
+  ooo: boolean;
+  inc: boolean;
 }
 
 

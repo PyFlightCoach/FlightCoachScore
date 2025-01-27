@@ -8,7 +8,7 @@
 	export let lastResponse: 'leaderboard' | 'flightlist' | undefined = undefined;
 	export let table_rows: DBFlightRanked[];
 
-	let col_map = {
+	let col_map: Record<string, keyof DBFlightRanked> = {
 		id: 'flight_id',
 		lat: 'origin_lat',
 		lng: 'origin_lng',
@@ -59,7 +59,7 @@
 			</thead>
 			<tbody>
 				{#each table_rows as row, i}
-          {#if i > 0 &&  row.table_rank - table_rows[i-1].table_rank > 1 }
+          {#if row.ooo }
           <tr><td colspan="{col_heads.length+1}" class="p-0 bg-secondary">...</td></tr>
           {/if}
 					<tr
