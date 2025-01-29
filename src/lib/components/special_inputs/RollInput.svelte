@@ -129,6 +129,7 @@
 		input={rollInput}
 		{canEdit}
 		{mps}
+    ndmps={comboNdMps}
 		{onchange}
 	/>
 {/if}

@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { library } from '$lib/schedules/library';
 	import SelectSchedule from '$lib/components/manselect/SelectSchedule.svelte';
+  import * as sh from '$lib/schedules/schedule_handler';
 	import {
 		rule,
-		parseDB,
-		parseOlan,
 		lastSelectedScheduleID,
 		rules,
     addEmptyManoeuvre
-	} from '$lib/schedules/schedule_builder';
-	import type { DBSchedule } from '$lib/database/interfaces';
-	import { BoxLocation } from '$lib/schedules/maninfo';
+	} from '$lib/schedules/builder';
+  import * as types from '$lib/interfaces/';
+
+  let {schedule=$bindable()}: {schedule: sh.ScheduleHandler | undefined} = $props();
 
 	let inputmode: string = $state('DB');
 	let olan: string = $state('88c24');
-	let selectedSchedule: DBSchedule | undefined = $state($library.subset({ schedule_id: $lastSelectedScheduleID }).first || $library.first);
+	let selectedSchedule: types.DBSched | undefined = $state($library.subset({ schedule_id: $lastSelectedScheduleID }).first || $library.first);
 
 </script>
 
@@ -74,13 +74,13 @@
     onclick={() => {
       switch (inputmode) {
         case 'OLAN':
-          if ($rule) parseOlan(olan, $rule);
+          if ($rule) sh.parseOlan(olan, $rule).then(res=>schedule=res);
           break;
         case 'DB':
-          if (selectedSchedule) parseDB(selectedSchedule);
+          if (selectedSchedule) sh.parseDB(selectedSchedule).then(res=>schedule=res);
           break;
         case 'manual':
-          addEmptyManoeuvre('new', new BoxLocation('BTM', 'UPWIND', 'UPRIGHT'));
+          schedule = {manoeuvres: []};
           break;
       }
     }}

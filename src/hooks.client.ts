@@ -1,5 +1,5 @@
-import {loadSchedulesforUser} from '$lib/schedules/library';
-import {loadRules} from '$lib/schedules/schedule_builder';
+import {reloadSchedules} from '$lib/schedules/library';
+import {loadRules} from '$lib/schedules/builder';
 import {loadGuiLists} from '$lib/stores/shared';
 import { dev as envDev } from '$app/environment';
 import { dev } from '$lib/stores/shared';
@@ -10,5 +10,4 @@ dev.set(envDev);
 
 loadGuiLists();
 loadRules();
-
-loadSchedulesforUser("admin@fcscore.org")
+reloadSchedules();

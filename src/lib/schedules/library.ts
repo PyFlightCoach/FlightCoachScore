@@ -1,11 +1,11 @@
-import { dbServer, dbServerAddress } from '$lib/api';
+import { dbServer } from '$lib/api';
 import { ManDef, ManOpt } from '$lib/schedules/mandef';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
-import { type DBSchedule } from '$lib/database/interfaces';
-import type { schedule_id } from '$lib/stores/leaderboards';
+import type { DBSchedule, DBManoeuvre, DBSch, DBMan, DBSched } from '$lib/interfaces';
+import { user } from '$lib/stores/user';
 
-export function scheduleRepr(s: DBSchedule | undefined): string {
+export function scheduleRepr(s: DBSched | undefined): string {
 	if (!s) {
 		return 'Select Schedule';
 	} else {
@@ -20,21 +20,25 @@ export interface ScheduleRequest {
 	owner?: string;
 }
 
-export async function loadSchedules(request: ScheduleRequest): Promise<DBSchedule[]> {
-	const schedules = await dbServer.get(`schedule/schedules`, request as Record<string, never>);
-	return schedules.data.results;
+export async function requestSchedules(request: ScheduleRequest): Promise<DBSched[]> {
+	return dbServer.get(`schedule/schedules`, request as Record<string, never>).then((res) =>
+		res.data.results.map((s: DBSchedule) => ({
+			...s,
+			manoeuvres: s.manoeuvres.map((m: DBManoeuvre) => ({ ...m, schedule: s } as DBMan))
+		}))
+	);
 }
 
 export class ScheduleLibrary {
-	constructor(readonly schedules: DBSchedule[] = []) {}
+	constructor(readonly schedules: DBSched[] = []) {}
 
 	get length(): number {
 		return this.schedules.length;
 	}
-	get first(): DBSchedule {
+	get first(): DBSched {
 		return this.schedules[0];
 	}
-	get only(): DBSchedule {
+	get only(): DBSched {
 		if (this.schedules.length !== 1) {
 			throw new Error(
 				'ScheduleLibrary.only: ScheduleLibrary does not contain exactly one schedule'
@@ -51,14 +55,14 @@ export class ScheduleLibrary {
 		return new ScheduleLibrary(this.schedules.filter((s) => ids.includes(s.schedule_id)));
 	}
 
-	unique(key: string): string[] {
-		return Array.from(new Set(this.schedules.map((s) => s[key as keyof DBSchedule] as string)));
+	unique(key: keyof DBSch): string[] {
+		return Array.from(new Set(this.schedules.map((s) => s[key] as string)));
 	}
 
 	subset(conditions: Record<string, string | undefined>): ScheduleLibrary {
 		const checkConditions = (s: DBSchedule) => {
 			for (const key in conditions) {
-				if (s[key as keyof DBSchedule] !== conditions[key]) {
+				if (s[key as keyof DBSch] !== conditions[key]) {
 					return false;
 				}
 			}
@@ -68,7 +72,7 @@ export class ScheduleLibrary {
 		return new ScheduleLibrary(this.schedules.filter(checkConditions));
 	}
 
-	append(schedules: DBSchedule[]): ScheduleLibrary {
+	append(schedules: DBSched[]): ScheduleLibrary {
 		const lib = new ScheduleLibrary(schedules.concat(this.schedules));
 		const unique_ids = lib.unique('schedule_id');
 		return new ScheduleLibrary(
@@ -77,15 +81,19 @@ export class ScheduleLibrary {
 	}
 
 	async update(request: ScheduleRequest): Promise<ScheduleLibrary> {
-		return this.append(await loadSchedules(request)).sort(['rule_name', 'category_name', 'schedule_name']);
+		return this.append(await requestSchedules(request)).sort([
+			'rule_name',
+			'category_name',
+			'schedule_name'
+		]);
 	}
 
-	sort(keys: string[]) {
-		const sortFunction = (a: DBSchedule, b: DBSchedule) => {
+	sort(keys: (keyof DBSch)[]) {
+		const sortFunction = (a: DBSched, b: DBSched) => {
 			for (const key of keys) {
-				if (a[key as keyof DBSchedule] < b[key as keyof DBSchedule]) {
+				if (a[key] < b[key]) {
 					return -1;
-				} else if (a[key as keyof DBSchedule] > b[key as keyof DBSchedule]) {
+				} else if (a[key] > b[key]) {
 					return 1;
 				}
 			}
@@ -97,20 +105,28 @@ export class ScheduleLibrary {
 
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
 
-export async function loadSchedulesforUser(owner: string) {
-  console.log("loading schedules for ", owner)
-  get(library).update({ owner: owner })
-    .then(newlib => {library.set(newlib)})
-    .catch(() => {
-      alert("Failed to load schedules from DB, check your internet connection");
-      library.set(new ScheduleLibrary());
-    });
+export async function loadSchedules(request: ScheduleRequest) {
+	console.log('loading schedules: ', request);
+	get(library)
+		.update(request)
+		.then((newlib) => {
+			library.set(newlib);
+		})
+		.catch(() => {
+			alert('Failed to load schedules from DB, check your internet connection');
+			library.set(new ScheduleLibrary());
+		});
 }
 
+export async function reloadSchedules() {
+	library.set(new ScheduleLibrary());
+	await loadSchedules({ owner: 'admin@fcscore.org' });
+	const _user = get(user);
+	if (_user) await loadSchedules({ owner: _user.email });
+}
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
 	return dbServer
 		.get(`schedule/manoeuvre/definition/${manoeuvre_id}`)
 		.then((r) => ManDef.parse(r.data));
 }
-

@@ -1,6 +1,6 @@
 import { parse_dict } from '$lib/utils/arrays';
 import { Result } from './scores';
-import { ManInfo } from './maninfo';
+import * as types from '$lib/interfaces';
 
 
 
@@ -42,7 +42,7 @@ export class ManParm {
 
 export class Criteria {
 	constructor(
-		readonly lookup: Record<string, any>,
+		readonly lookup: Record<string, object>,
 		readonly kind: string,
 		readonly min_bound: number | undefined = undefined,
 		readonly max_bound: number | undefined = undefined,
@@ -74,8 +74,8 @@ export class DownGrade {
 	) {}
 
 	criteria_description(result: Result) {
-		let fac = result.scale(); // result.measurement.unit == 'rad' ? 180 / Math.PI : 1;
-		let unit = result.measurement.unit.replace('rad', '°');
+		const fac = result.scale(); // result.measurement.unit == 'rad' ? 180 / Math.PI : 1;
+		const unit = result.measurement.unit.replace('rad', '°');
 
 		switch (this.criteria.kind) {
 			case 'Trough':
@@ -185,7 +185,7 @@ export class ElDef {
 
 export class ManDef {
 	constructor(
-		readonly info: ManInfo,
+		readonly info: types.ManInfo,
 		readonly mps: Record<string, ManParm>,
 		readonly eds: Record<string, ElDef>,
 		readonly box: Record<string, never>
@@ -195,7 +195,7 @@ export class ManDef {
 			return ManOpt.parse(data);
 		} else {
 			return new ManDef(
-				ManInfo.parse(data.info),
+				data.info as types.ManInfo,
 				parse_dict(data.mps, ManParm.parse),
 				Object.fromEntries(
 					Object.entries(data.eds).map(([k, v]) => {
@@ -233,7 +233,7 @@ export class ManOpt {
 
   get box() {return this.options[0].box;}
 
-  static parse(data: Record<string, unknown>[]) {
+  static parse(data: Record<string, never>[]) {
     return new ManOpt(data.map(v=>ManDef.parse(v) as ManDef));
   }
 

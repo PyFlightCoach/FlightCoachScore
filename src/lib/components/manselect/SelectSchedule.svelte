@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type ScheduleLibrary } from '$lib/schedules/library';
-	import { type DBSchedule } from '$lib/database/interfaces';
+	import { type DBSchedule } from '$lib/database/flightStack';
 
 	const {
     library,

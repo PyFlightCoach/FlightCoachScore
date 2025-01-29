@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DBSchedule } from '$lib/database/interfaces';
+	import type { DBSchedule } from '$lib/database/flightStack';
 	import { library } from '$lib/schedules/library';
 		import { onMount } from 'svelte';
 

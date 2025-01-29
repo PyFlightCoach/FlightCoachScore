@@ -46,7 +46,7 @@
 			<option value={mp}>{mp}</option>
 		{/each}
 		{#each Object.entries(comboNdMps) as [k, mp]}
-			{#each mp as v, i}
+			{#each mp[0] as v, i}
 				<option value="{k}[{i}]">{k}[{i}]</option>
 			{/each}
 		{/each}

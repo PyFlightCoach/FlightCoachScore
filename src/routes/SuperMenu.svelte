@@ -6,9 +6,9 @@
 	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api';
 	import { dbSOption, customDbServer } from '$lib/api';
 	import { user } from '$lib/stores/user';
-  import {library, loadSchedulesforUser, ScheduleLibrary} from '$lib/schedules/library';
+  import {reloadSchedules} from '$lib/schedules/library';
   import {loadGuiLists} from '$lib/stores/shared';
-	import { loadRules } from '$lib/schedules/schedule_builder';
+	import { loadRules } from '$lib/schedules/builder';
 </script>
 
 <NavMenu tooltip="Super User Menu">
@@ -33,10 +33,9 @@
 			bind:selected={$dbSOption}
       onselected={() => {
         console.log("DB Server address changed, reloading info...");
-        $library = new ScheduleLibrary();
-        loadSchedulesforUser("admin@fcscore.org");
         $user = undefined;
         loadGuiLists();
+        reloadSchedules();
       }}
 		/>
 	{/if}

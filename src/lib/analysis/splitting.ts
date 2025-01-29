@@ -2,7 +2,7 @@ import { type FCJson, type FCJMan } from '$lib/analysis/fcjson';
 import { States } from '$lib/analysis/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
 import { loadManDef, library } from '$lib/schedules/library';
-import { type DBManoeuvre } from '$lib/database/interfaces';
+import { type DBMan } from '$lib/interfaces';
 import { get } from 'svelte/store';
 import {schedule_id} from '$lib/stores/leaderboards';
 import type { ManDef, ManOpt } from '../schedules/mandef';
@@ -11,7 +11,7 @@ import type { ManDef, ManOpt } from '../schedules/mandef';
 export interface Split {
   category_name?: string | undefined;
   schedule_name?: string | undefined;
-  manoeuvre?: DBManoeuvre | undefined;
+  manoeuvre?: DBMan | undefined;
   stop?: number | undefined;
   fixed?: boolean;
   alternate_name?: 'TakeOff' | 'Landing' | 'Break' | undefined;
@@ -21,7 +21,7 @@ export interface Split {
 export function build(
   category_name: string | undefined = undefined,
   schedule_name: string | undefined = undefined,
-  manoeuvre: DBManoeuvre | undefined = undefined,
+  manoeuvre: DBMan | undefined = undefined,
   stop: number | undefined = undefined,
   fixed: boolean = false,
   alternate_name: 'TakeOff' | 'Landing' | 'Break' | undefined = undefined

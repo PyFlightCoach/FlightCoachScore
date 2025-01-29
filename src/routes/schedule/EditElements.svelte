@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PE, peCompare, peSummary } from '$lib/schedules/aresti';
-	import { builder } from '$lib/schedules/schedule_builder';
+	import { builder } from '$lib/schedules/builder';
 	import { map } from 'lodash';
 	import EditElement from './EditElement.svelte';
 

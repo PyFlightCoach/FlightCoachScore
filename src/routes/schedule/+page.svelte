@@ -2,13 +2,18 @@
 	import LoadSequence from './LoadSequence.svelte';
 	import EditManoeuvres from './EditManoeuvres.svelte';
 	import EditSequence from './EditSequence.svelte';
-	import { mans } from '$lib/schedules/schedule_builder';
 	import PlotAll from './PlotAll.svelte';
 	import EditManoeuvre from './ManoeuvrePage.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
+  import * as sh from '$lib/schedules/schedule_handler';
+
 
 	let form_state: string | undefined = $state();
 	let activeManId: number | undefined = $state();
+
+  let schedule: sh.ScheduleHandler | undefined = $state();
+
+
 
 	$navBarContents = undefined;
 </script>
@@ -24,10 +29,13 @@
 					<p><mark>{form_state}</mark></p>
 				</div>
 			{/if}
-			{#if $mans.length == 0}
-				<LoadSequence />
+			{#if !schedule}
+				<LoadSequence bind:schedule />
 			{:else}
-				<EditSequence bind:activeManId />
+				<EditSequence bind:schedule />
+        <button class="col col-form-input btn btn-outline-secondary mx-2" onclick={schedule=undefined}>
+          Clear
+        </button>
         <EditManoeuvres bind:activeManId />
 			{/if}
 
@@ -36,9 +44,9 @@
 	</div>
 </div>
 <div class="col-md-8 pt-3">
-	{#if $mans.length > 0}
+	{#if schedule}
 		{#if activeManId != undefined}
-			<EditManoeuvre man={$mans[activeManId]} />
+			<EditManoeuvre man={schedule.manoeuvres[activeManId]} />
 		{:else}
 			<PlotAll />
 		{/if}

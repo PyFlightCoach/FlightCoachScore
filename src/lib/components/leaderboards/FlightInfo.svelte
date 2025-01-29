@@ -2,7 +2,7 @@
 	import Plot from 'svelte-plotly.js';
 	import { user } from '$lib/stores/user.js';
 	import { difficulty, truncate } from '$lib/stores/leaderboards';
-	import { type DBFlightScore, privacyOptions } from '$lib/database/interfaces';
+	import * as types from '$lib/interfaces';
 	import { Flight } from '$lib/database/flight';
 	import { dbServer } from '$lib/api';
 	import { base } from '$app/paths';
@@ -16,7 +16,7 @@
 	export let rank: number | undefined;
 
 	let selectedVersion = Object.keys(f.meta.scores)[0];
-	let score: DBFlightScore;
+	let score: types.DBFlightScore;
 	$: score = f.getScore($difficulty, $truncate, selectedVersion);
 
 	let targetPrivacy = f.meta.privacy;
@@ -25,8 +25,8 @@
 	$: isAnalysisLoaded = f.meta.flight_id == $activeFlight?.meta.flight_id;
 
 	$: canEdit = $user?.id.replaceAll('-', '') == f.meta.pilot_id || $user?.is_superuser;
-	$: canView = canEdit || privacyOptions.indexOf(f.meta.privacy) > 0;
-	$: canAnalyse = canEdit || privacyOptions.indexOf(f.meta.privacy) > 1;
+	$: canView = canEdit || types.privacyOptions.indexOf(f.meta.privacy) > 0;
+	$: canAnalyse = canEdit || types.privacyOptions.indexOf(f.meta.privacy) > 1;
 
 	const patchMeta = () => {
 		const fd = new FormData();
@@ -76,7 +76,7 @@
 			<li class="input-group">
 				<label class="input-group-text" for="set-privacy">Privacy</label>
 				<select disabled={!canEdit} class="form-select" id="set-privacy" bind:value={targetPrivacy}>
-					{#each privacyOptions as v}
+					{#each types.privacyOptions as v}
 						<option value={v}>{v.replace('_', ' ')}</option>
 					{/each}
 				</select>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Plot from 'svelte-plotly.js';
 	import { table_rows } from '$lib/stores/leaderboards';
-  import {  DBFlightStack, stackFlights } from '$lib/database/interfaces';
+  import {  DBFlightStack, stackFlights } from '$lib/database/flightStack';
 
   let stacks: DBFlightStack[] = [];
   $: if ($table_rows) stacks=stackFlights($table_rows, 300);

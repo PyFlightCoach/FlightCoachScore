@@ -1,8 +1,10 @@
-import type { DBFlightMeta, DBSchedule, DBFlightScore } from './interfaces';
+import type { DBFlightMeta, DBSchedule, DBFlightScore } from '$lib/interfaces';
 import { dbServer } from '$lib/api';
 import { library } from '$lib/schedules/library';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
+
+
 
 export class Flight {
 	constructor(

@@ -1,5 +1,4 @@
 import { States } from '$lib/analysis/state';
-import { Manoeuvre } from '$lib/schedules/manoeuvre';
 import { ManDef, ManOpt } from '$lib/schedules/mandef';
 import { ManoeuvreResult } from '$lib/schedules/scores';
 import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/analysis/fcjson';
@@ -7,6 +6,7 @@ import { analysisServer } from '$lib/api';
 import { selectedResult, runInfo, binData, origin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
 import { isAnalysisModified } from '$lib/stores/shared';
+import * as types from '$lib/interfaces';
 
 export class MA {
 	constructor(
@@ -20,9 +20,9 @@ export class MA {
 		readonly k: number | undefined = undefined,
 		readonly flown: States | undefined = undefined,
 		readonly mdef: ManDef | ManOpt | undefined = undefined,
-		readonly manoeuvre: Manoeuvre | undefined = undefined,
+		readonly manoeuvre: types.Manoeuvre | undefined = undefined,
 		readonly template: States | undefined = undefined,
-		readonly corrected: Manoeuvre | undefined = undefined,
+		readonly corrected: types.Manoeuvre | undefined = undefined,
 		readonly corrected_template: States | undefined = undefined,
 		readonly scores: ManoeuvreResult | undefined = undefined
 	) {}
@@ -84,9 +84,9 @@ export class MA {
 				res.mdef.info.k,
 				States.parse(res.flown),
 				ManDef.parse(res.mdef),
-				Manoeuvre.parse(res.manoeuvre),
+				res.manoeuvre,
 				States.parse(res.template),
-				res.corrected ? Manoeuvre.parse(res.corrected) : undefined,
+				res.corrected,
 				res.corrected_template ? States.parse(res.corrected_template) : undefined,
 				res.full_scores ? ManoeuvreResult.parse(res.full_scores) : undefined
 			);
@@ -136,9 +136,9 @@ export class MA {
 			data.mdef?.info.k,
 			data.flown ? States.parse(data.flown) : undefined,
 			data.mdef ? ManDef.parse(data.mdef) : undefined,
-			data.manoeuvre ? Manoeuvre.parse(data.manoeuvre) : undefined,
+			data.manoeuvre,
 			data.template ? States.parse(data.template) : undefined,
-			data.corrected ? Manoeuvre.parse(data.corrected) : undefined,
+			data.corrected,
 			data.corrected_template ? States.parse(data.corrected_template) : undefined,
 			data.scores ? ManoeuvreResult.parse(data.scores) : undefined
 		);

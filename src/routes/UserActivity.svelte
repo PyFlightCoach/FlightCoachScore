@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { library } from '$lib/schedules/library';
-  import {scheduleRepr, type DBSchedule} from '$lib/database/interfaces';
+  import {scheduleRepr, type DBSchedule} from '$lib/database/flightStack';
 	import {userActivity} from '$lib/stores/userActivity';
   import {nth} from '$lib/utils/numbers';
 

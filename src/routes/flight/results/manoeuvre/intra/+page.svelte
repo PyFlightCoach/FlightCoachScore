@@ -8,7 +8,7 @@
 	import { objmap } from '$lib/utils/arrays';
 	import { windowWidth } from '$lib/stores/shared';
 	import VisPlot from './VisPlot.svelte';
-
+	import * as types from '$lib/interfaces';
 	const md = $derived($windowWidth >= 768);
 
 	const man = analyses[$selManID!];
@@ -34,6 +34,7 @@
 			? objmap(summaries, (v: Record<string, number>) => v[selectedDg || 'Total'])
 			: undefined
 	);
+
 </script>
 
 {#snippet plotsec()}
@@ -92,34 +93,34 @@
 		{/if}
 	</div>
 	<div class="row pt-2">
-    <div class="table-responsive">
-		<table class=" table {!md ? 'small table-sm' : ''} border" id="criteriaTable">
-			<thead
-				><tr>
-					<th></th>
-					<th>Name</th>
-					<th>Value</th>
-				</tr></thead
-			>
-			<tbody>
-				{#each dgs ? Object.entries(dgs) : [] as [name, value]}
-					<tr>
-						<td>
-							<input
-								class="form-check-input"
-								type="radio"
-								name="manSelect"
-								bind:group={selectedDg}
-								value={name}
-							/>
-						</td>
-						<td>{name}</td>
-						<td>{value?.toFixed(2)}</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-  </div>
+		<div class="table-responsive">
+			<table class=" table {!md ? 'small table-sm' : ''} border" id="criteriaTable">
+				<thead
+					><tr>
+						<th></th>
+						<th>Name</th>
+						<th>Value</th>
+					</tr></thead
+				>
+				<tbody>
+					{#each dgs ? Object.entries(dgs) : [] as [name, value]}
+						<tr>
+							<td>
+								<input
+									class="form-check-input"
+									type="radio"
+									name="manSelect"
+									bind:group={selectedDg}
+									value={name}
+								/>
+							</td>
+							<td>{name}</td>
+							<td>{value?.toFixed(2)}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 	{#if resdg && eldg}
 		<div class="row">
@@ -129,7 +130,9 @@
 						<tr><td>Measurement:</td> <td> {eldg?.measure}</td></tr>
 						<tr
 							><td>Element:</td>
-							<td> {$man?.manoeuvre?.getEl(selectedElement)?.describe()}</td></tr
+							<td>
+								{describeElement($man?.manoeuvre?.elements.find((v) => v.uid == selectedElement))}
+							</td></tr
 						>
 						<tr><td>Sample:</td> <td> {eldg?.describe_selectors()}</td></tr>
 						<tr>
@@ -167,16 +170,15 @@
 				{@render plotsec()}
 			</div>
 			{#if md}
-        <div class="col-md-4 d-flex flex-column">
-          <div class="col">
-            {@render critplot()}
-          </div>
-          <div class="col">
-            {@render visplot()}
-          </div>
-        </div>
-      
-      {:else}
+				<div class="col-md-4 d-flex flex-column">
+					<div class="col">
+						{@render critplot()}
+					</div>
+					<div class="col">
+						{@render visplot()}
+					</div>
+				</div>
+			{:else}
 				<div class="col-md-4 d-flex flex-col">
 					<div class="row flex-grow-1" style="min-height: 200px;">
 						{@render critplot()}

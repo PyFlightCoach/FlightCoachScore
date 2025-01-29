@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ManParm } from '$lib/schedules/mandef';
-	import type { ManBuilder } from '$lib/schedules/schedule_builder';
-	import { builder } from '$lib/schedules/schedule_builder';
+	import type { ManBuilder } from '$lib/schedules/builder';
+	import { builder } from '$lib/schedules/builder';
 	import NumberInput from '$lib/components/special_inputs/NumberInput.svelte';
 	import * as inputs from '$lib/components/special_inputs/inputs';
 	import ArrayInput from '$lib/components/special_inputs/ArrayInput.svelte';
@@ -38,7 +38,7 @@
 	<tbody>
 		<tr><td colspan="4"><small>Comparison Parameters</small></td></tr>
 		{#each Object.keys(comparisons) as k}
-			<tr>
+			<tr class={comparisons[k] != $builder?.comparisonValues[k] ? 'table-active' : ''}>
 				<td colspan="2" class="text-start overflow-hidden" style="max-width:150px">{k}</td>
 				<NumberInput
 					value={comparisons[k]}

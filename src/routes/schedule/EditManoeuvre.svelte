@@ -1,18 +1,16 @@
 <script lang="ts">
-	import { ManoeuvreHandler } from '$lib/schedules/manoeuvre_handler';
-	import * as mi from '$lib/schedules/maninfo';
+	import { ManoeuvreHandler } from '$lib/schedules/manoeuvre_handler.svelte';
+	import * as types from '$lib/interfaces';
 	import { dbServer } from '$lib/api';
-	import { loadSchedulesforUser } from '$lib/schedules/library';
-	import { user } from '$lib/stores/user';
+	import { reloadSchedules } from '$lib/schedules/library';
 	import EditElements from './EditElements.svelte';
 	import { Figure } from '$lib/schedules/aresti';
-	import { rule, mans } from '$lib/schedules/schedule_builder';
+	import { rule, mans } from '$lib/schedules/builder';
 	import { loading } from '$lib/stores/shared';
-	import { faVersion } from '$lib/api';
 	import EditManinfo from './EditManinfo.svelte';
 	import EditManParms from './EditManParms.svelte';
-  import { objmap } from '$lib/utils/arrays';
-  import {extractComboNdMps} from '$lib/schedules/aresti';
+	import { objmap } from '$lib/utils/arrays';
+	import { extractComboNdMps } from '$lib/schedules/aresti';
 
 	let {
 		id,
@@ -21,7 +19,7 @@
 		ondelete = () => {}
 	}: {
 		id: number;
-		entry?: mi.BoxLocation | undefined;
+		entry?: types.BoxLocation | undefined;
 		canEdit?: boolean;
 		ondelete?: () => void;
 	} = $props();
@@ -31,7 +29,9 @@
 	let newElements = $state($state.snapshot($mans[id].aresti?.elements));
 	let newNdMps = $state($state.snapshot($mans[id].aresti?.ndmps));
 
-  let comboDefaults: Record<string, number> = $state(newNdMps ? objmap(extractComboNdMps(newNdMps), (v) => 0) : {});
+	let comboDefaults: Record<string, number> = $state(
+		newNdMps ? objmap(extractComboNdMps(newNdMps), (v) => 0) : {}
+	);
 
 	//let newFigure: Figure | undefined = $derived(Figure.parse(newFig!));
 
@@ -40,8 +40,16 @@
 		newInfo = $state.snapshot($mans[id].info);
 		newElements = $state.snapshot($mans[id].aresti?.elements);
 		newNdMps = $state.snapshot($mans[id].aresti?.ndmps);
-    //comboDefaults = newNdMps ? objmap(extractComboNdMps(newNdMps), (v) => 0) : {};    
+		//comboDefaults = newNdMps ? objmap(extractComboNdMps(newNdMps), (v) => 0) : {};
 	};
+
+  const dbAction = (fun: (m: ManoeuvreHandler) => Promise<ManoeuvreHandler>) => {
+    $loading = true;
+    fun($mans[id])
+      .then(res=>{$mans[id] = res})
+      .catch(e=>{console.error(e)})
+      .finally(() => ($loading = false));
+  }
 
 	const reload = () => {
 		if ($mans[id].dbManoeuvre) {
@@ -60,15 +68,14 @@
 
 	const update = async () => {
 		if ($mans[id].aresti) {
-			const newFigure = new Figure(newInfo, newElements, newNdMps, $mans[id].aresti.relax_back);
 			$loading = true;
 			activeElID = undefined;
 			await ManoeuvreHandler.parseAresti(
 				$rule as string,
-				newFigure!,
+				new Figure(newInfo, newElements, newNdMps, $mans[id].aresti.relax_back),
 				$mans[id].dbManoeuvre,
 				$mans[id].olan,
-        comboDefaults
+				comboDefaults
 			)
 				.then((res) => {
 					$mans[id] = res;
@@ -80,20 +87,10 @@
 	};
 	const patch = async () => {
 		if (confirm('Are you sure you want to update this manoeuvre?')) {
-			if ($mans[id].aresti && $mans[id].definition && $mans[id].dbManoeuvre && faVersion && $user) {
+			if ($mans[id]!.canPatch) {
 				$loading = true;
-				dbServer
-					.patch(`schedule/manoeuvre/${$mans[id].dbManoeuvre.id}`, {
-						version: faVersion,
-						aresti: $mans[id].aresti,
-						definition: $mans[id].definition
-					})
-					.then(async (res) => {
-						await loadSchedulesforUser('admin@fcscore.org');
-						await loadSchedulesforUser($user.email);
-					})
+				patchManoeuvre($mans[id])
 					.then(reload)
-					.catch((e) => console.error(e))
 					.finally(() => ($loading = false));
 			}
 		}
@@ -107,8 +104,7 @@
 		) {
 			if ($mans[id].dbManoeuvre) {
 				dbServer.delete(`schedule/$mans[id]/${$mans[id].dbManoeuvre.id}`).then(() => {
-					loadSchedulesforUser('admin@fcscore.org');
-					if ($user) loadSchedulesforUser($user.email);
+					reloadSchedules();
 				});
 			}
 		}
@@ -124,7 +120,9 @@
 			<button
 				class="col btn btn-outline-secondary"
 				title="Reload from the database"
-				onclick={reload}
+				onclick={()=>{
+          dbAction(reloadManoeuvre)
+        }}
 				disabled={$mans[id].dbManoeuvre === undefined}
 			>
 				Reload
@@ -177,7 +175,12 @@
 				</button>
 			</div>
 			{#if showNdMps}
-				<EditManParms bind:newParms={newNdMps} oldParms={$mans[id].aresti!.ndmps} bind:canEdit bind:comboDefaults />
+				<EditManParms
+					bind:newParms={newNdMps}
+					oldParms={$mans[id].aresti!.ndmps}
+					bind:canEdit
+					bind:comboDefaults
+				/>
 			{/if}
 		{/if}
 		{#if newElements && $mans[id].aresti && newNdMps}
@@ -187,7 +190,7 @@
 					bind:canEdit
 					refpes={$mans[id].aresti.elements}
 					bind:activeElID
-          ndmps={newNdMps}
+					ndmps={newNdMps}
 				/>
 			</div>
 		{/if}

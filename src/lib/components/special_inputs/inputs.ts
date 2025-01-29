@@ -1,3 +1,5 @@
+import * as types from '$lib/interfaces';
+
 export type Arg = number | string | (number | string)[] | boolean;
 
 export const equals = (a: Arg | undefined, b: Arg | undefined): boolean => {
@@ -11,30 +13,13 @@ export const equals = (a: Arg | undefined, b: Arg | undefined): boolean => {
 	}
 };
 
-export const unitMultipliers = {
-	m: 1,
-	'm/s': 1,
-	rad: 1,
-	'rad/s': 1,
-	'°': Math.PI / 180,
-	'°/s': Math.PI / 180,
-	turn: 2 * Math.PI,
-	'turn/s': 2 * Math.PI
-};
-
-export const unitOptions: Record<string, (keyof typeof unitMultipliers)[]> = {
-	m: ['m'],
-	rad: ['°', 'rad', 'turn'],
-	'm/s': ['m/s'],
-	'rad/s': ['°/s', 'rad/s', 'turn/s']
-};
 
 export const re_eqn = /^\(.\)$/;
 
 export class NumberInput {
   defaultValue=0;
 	constructor(
-		readonly unit: keyof typeof unitOptions,
+		readonly unit: types.BaseUnits,
 		readonly step: number,
     readonly description: string = ''
 	) {}
@@ -51,8 +36,8 @@ export class NumberInput {
 
 	formatArg(value: number | string) {
 		if (typeof value === 'number') {
-			const newUnit = unitOptions[this.unit][0];
-			return `${(value / unitMultipliers[newUnit]).toFixed(0)}${newUnit}`;
+			const newUnit = types.unitOptions[this.unit][0];
+			return `${(value / types.unitMultipliers[newUnit]).toFixed(0)}${newUnit}`;
 		} else {
 			return value;
 		}
@@ -78,8 +63,8 @@ export class RollInput {
 		if (Array.isArray(value)) {
 			return value.map((v) => this.formatArg(v)).join(',');
 		} else if (typeof value === 'number') {
-			const newUnit = unitOptions.rad[0];
-			return `${(value / unitMultipliers[unitOptions.rad[0]]).toFixed(0)}${newUnit}`;
+			const newUnit = types.unitOptions.rad[0];
+			return `${(value / types.unitMultipliers[types.unitOptions.rad[0]]).toFixed(0)}${newUnit}`;
 		} else if (typeof value === 'string') {
 			return value;
 		}
@@ -131,6 +116,7 @@ export const inputMap = {
 	point_length: new NumberInput('m', 2, "The length of the pause between linked rolls"),
 	partial_roll_rate: new NumberInput('rad/s', RATESTEP, "The roll rate for partial rolls (less than 1)"),
 	full_roll_rate: new NumberInput('rad/s', RATESTEP, "The roll rate for full rolls (1 or more)"),
+  roll_rate: new NumberInput('rad/s', RATESTEP, "The roll rate for full rolls (1 or more)"),
 	snap_rate: new NumberInput('rad/s', RATESTEP, "The rate of snap, only effects the template"),
 	stallturn_rate: new NumberInput('rad/s', RATESTEP, "The stallturn yaw rate, only effects the template"),
 	spin_rate: new NumberInput('rad/s', RATESTEP, "The rate of spin, only effects the template"),
@@ -156,4 +142,5 @@ export const inputMap = {
 	reversible: new BooleanInput("Can the rolls be pefromed in either direction?"),
   ke: new BooleanInput("should the loop initiate about the yaw axis?"),
   yaw_rate: new NumberInput('rad/s', RATESTEP, "The stallturn yaw rate, only effects the template"),
+  rollposition: new NumberInput('1', 0.05, "The position of the roll in the loop, 0.5 is half way round"),
 };

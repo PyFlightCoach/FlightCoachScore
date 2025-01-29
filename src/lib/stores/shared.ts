@@ -5,7 +5,7 @@ import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
 import { user } from '$lib/stores/user';
 import { dbServer} from '$lib/api';
-import { loadSchedulesforUser } from '$lib/schedules/library';
+import { loadSchedules } from '$lib/schedules/library';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -77,6 +77,6 @@ user.subscribe((u) => {
 		.catch(() => {
 			news.set([]);
 		});
-  if (u) loadSchedulesforUser(u.email);
+  if (u) loadSchedules({owner: u.email});
   
 });

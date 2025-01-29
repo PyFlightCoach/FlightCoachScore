@@ -6,27 +6,26 @@
 		canIEdit,
 		rule,
 		deleteSchedule
-	} from '$lib/schedules/schedule_builder';
+	} from '$lib/schedules/builder';
 	import { user } from '$lib/stores/user';
+  import * as sh from '$lib/schedules/schedule_handler';
 
-  let {activeManId = $bindable()}: {activeManId?: number} = $props();
 
-	const clear = () => {
-    activeManId = undefined;
-		$mans = [];
-		$dbSchedule = undefined;
-	};
+  let {schedule = $bindable()}: {schedule: sh.ScheduleHandler} = $props();
+
 	let categories: string[] = $derived([
 		...$library.subset({ rule_name: $rule }).unique('category_name'),
 		'New'
 	]);
 
-	let selected_category: string | undefined = $state($dbSchedule?.category_name || 'New');
+	let selected_category: string | undefined = $state(schedule.dbSchedule?.category_name || 'New');
   let category_name: string | undefined = $state(selected_category || $rule);
 	let schedule_name: string | undefined = $state($dbSchedule?.schedule_name || 'new');
 	let owner_name: string = $derived(
 		$dbSchedule?.owner_name || ($user ? `${$user?.first_name} ${$user?.last_name}` : 'NA')
 	);
+
+
 </script>
 
 <div class="row pt-2">
@@ -94,12 +93,14 @@
 		>
 			Delete
 		</button>
-	{:else}
+	{:else if $dbSchedule}
 		<div class="col col-form-label">
 			{#if $dbSchedule}Flight Count = {$dbSchedule?.num_flights}{/if}
 		</div>
+  {:else if $canIEdit}
+    <button class="col col-form-input btn btn-outline-secondary mx-2" onclick={()=>{if (schedule.dbSchedule) {sh.patch(schedule)} else {sh.post(schedule)}}}>
+      {#if $dbSchedule}Patch{:else}Post{/if}
+    </button>
 	{/if}
-	<button class="col col-form-input btn btn-outline-secondary mx-2" onclick={clear}>
-		Clear Sequence
-	</button>
+
 </div>

@@ -4,7 +4,7 @@ import { faVersion } from '$lib/api';
 import { get } from 'svelte/store';
 import { dbServer } from '$lib/api';
 import { checkUser } from '$lib/stores/user';
-import type { DBFlightRanked, DBFlightScore } from '$lib/database/interfaces';
+import * as types from '$lib/interfaces';
 import { activeFlight } from '$lib/stores/shared';
 import { library } from '$lib/schedules/library';
 
@@ -29,7 +29,7 @@ export const includeMyBest = newCookieStoreInt('includeMyBest', 0);
 export const includeMyLatest = newCookieStoreInt('includeMyLatest', 0);
 export const includeActive = newCookieStoreInt('includeActive', 0);
 
-export const table_rows: Writable<DBFlightRanked[]> = writable([]);
+export const table_rows: Writable<types.DBFlightRanked[]> = writable([]);
 export const lastResponse: Writable<'leaderboard' | 'flightlist' | undefined> = writable();
 
 export function getDays(ndval: number) {
@@ -77,7 +77,7 @@ export const updateTable = async () => {
   if (await checkUser()) {
     
     dbServer.get('analysis/' + _method + '?' + new URLSearchParams(q).toString()).then((res) => {
-      table_rows.set(res.data.results.map((row: DBFlightRanked | DBFlightScore) => {
+      table_rows.set(res.data.results.map((row: types.DBFlightRanked | types.DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));
     }).catch((e) => {console.error(e);});

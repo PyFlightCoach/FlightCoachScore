@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PE } from '$lib/schedules/aresti';
-	import type { ManBuilder } from '$lib/schedules/schedule_builder';
+	import type { ManBuilder } from '$lib/schedules/builder';
 	import ValueInput from '$lib/components/special_inputs/ValueInput.svelte';
   import * as inputs from '$lib/components/special_inputs/inputs';
 
@@ -22,8 +22,7 @@
 
 	const elbuilder = $derived(builder.element_builders[pe.kind]);
   let allkwargs = $derived({...elbuilder.kwargs, ...pe.kwargs});
-  $inspect('pe', pe);
-  $inspect('refpe', refpe);
+
 </script>
 
 <hr />

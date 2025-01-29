@@ -20,7 +20,7 @@
 	} from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
-	import { privacyOptions } from '$lib/database/interfaces';
+	import { privacyOptions } from '$lib/interfaces';
 	import { createAnalysisExport } from '$lib/analysis/analysis';
 	import { user, checkUser } from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
