@@ -1,4 +1,4 @@
-import * as types from '$lib/interfaces';
+import * as units from '$lib/units';
 
 export type Arg = number | string | (number | string)[] | boolean;
 
@@ -19,7 +19,7 @@ export const re_eqn = /^\(.\)$/;
 export class NumberInput {
   defaultValue=0;
 	constructor(
-		readonly unit: types.BaseUnits,
+		readonly unit: units.BaseUnit,
 		readonly step: number,
     readonly description: string = ''
 	) {}
@@ -36,8 +36,8 @@ export class NumberInput {
 
 	formatArg(value: number | string) {
 		if (typeof value === 'number') {
-			const newUnit = types.unitOptions[this.unit][0];
-			return `${(value / types.unitMultipliers[newUnit]).toFixed(0)}${newUnit}`;
+			const newUnit = units.unitOptions[this.unit][0];
+			return `${(value / units.unitMultipliers[newUnit]).toFixed(0)}${newUnit}`;
 		} else {
 			return value;
 		}
@@ -63,8 +63,8 @@ export class RollInput {
 		if (Array.isArray(value)) {
 			return value.map((v) => this.formatArg(v)).join(',');
 		} else if (typeof value === 'number') {
-			const newUnit = types.unitOptions.rad[0];
-			return `${(value / types.unitMultipliers[types.unitOptions.rad[0]]).toFixed(0)}${newUnit}`;
+			const newUnit = units.unitOptions.rad[0];
+			return `${(value / units.unitMultipliers[units.unitOptions.rad[0]]).toFixed(0)}${newUnit}`;
 		} else if (typeof value === 'string') {
 			return value;
 		}

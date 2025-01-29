@@ -13,59 +13,52 @@ export interface IPE {
   centred: boolean;
 }
 
-export interface IFig {
-  elements: (IPE | number)[];
-	ndmps: Record<string, number | number[][]>;
-	relax_back: boolean;
-};
-export interface IFigure extends IFig {
-	info: IManInfo;
-};
-
-export interface FigOption {
-  info: IManInfo;
-  figures: IFig[];
-}
-
-export interface FigureOption {
-  figures: IFigure[]
-}
 
 export class PE implements IPE {
+  args: Arg[] = $state([])
+  kwargs: Record<string, Arg> = $state({})
+  centred: boolean = $state(false)
   constructor(
     readonly kind: string,
-    readonly args: Arg[],
-    readonly kwargs: Record<string, Arg>,
-    readonly centred: boolean
-  ) {}
+    args: Arg[] = [],
+    kwargs: Record<string, Arg> = {},
+    centred: boolean = false
+  ) {
+    this.args = args;
+    this.kwargs = kwargs;
+    this.centred = centred;
+  }
 
-  summary  (pe: IPE, builder: ElementBuilder)  {
-    return `${pe.kind} ${builder.args
-      .map((a, i) => `(${inputs.inputMap[a as keyof typeof inputs.inputMap].formatArg(pe.args[i])})`)
+  static parse (data: IPE) {
+    return new PE(data.kind, data.args, data.kwargs, data.centred);
+  };
+
+  summary  (builder: ElementBuilder)  {
+    return `${this.kind} ${builder.args
+      .map((a, i) => `(${inputs.inputMap[a as keyof typeof inputs.inputMap].formatArg(this.args[i] as never)})`)
       .join(',')}`;
   };
 
+  static compare (one: PE | undefined, other: PE | undefined) {
+    if (!one || !other) {
+      return false;
+    } else if (one.kind !== other.kind) {
+      return false;
+    } else if (one.args.some((a, i) => !equals(other.args[i], a))) {
+      console.log('arg missmatch', one.args, other.args);
+      return false;
+    } else if (Object.keys(one.kwargs).some((k) => !equals(one.kwargs[k], other.kwargs[k]))) {
+      console.log('kwarg missmatch', one.kwargs, other.kwargs);
+      return false;
+    } else if (Object.keys(other.kwargs).filter((k) => !Object.keys(one.kwargs).includes(k)).length) {
+      console.log('missing kwarg', one.kwargs, other.kwargs);
+      return false;
+    } else {
+      return true;
+    }
+  };
+
 }
-
-
-export function compare (one: PE | undefined, other: PE | undefined) {
-  if (!one || !other) {
-    return false;
-  } else if (one.kind !== other.kind) {
-    return false;
-  } else if (one.args.some((a, i) => !equals(other.args[i], a))) {
-    console.log('arg missmatch', one.args, other.args);
-    return false;
-  } else if (Object.keys(one.kwargs).some((k) => !equals(one.kwargs[k], other.kwargs[k]))) {
-    console.log('kwarg missmatch', one.kwargs, other.kwargs);
-    return false;
-  } else if (Object.keys(other.kwargs).filter((k) => !Object.keys(one.kwargs).includes(k)).length) {
-    console.log('missing kwarg', one.kwargs, other.kwargs);
-    return false;
-  } else {
-    return true;
-  }
-};
 
 
 
@@ -88,28 +81,52 @@ export function extractComparisonNdMps(
 }
 
 
-//export class Figure {
-//	static parse(data: Record<string, any>): types.Figure | types.FigureOption {
-//		if (data.figures) {
-//			return new FigOption(data.figures.map((d: Record<string, any>) => Figure.parse(d)));
-//		} else if (data.options) {
-//			return new FigOption(data.options.map((d: Record<string, any>) => Figure.parse(d)));
-//		} else {
-//			return {
-//				data.info,
-//				data.elements.map((el: Record<string, any>) => {
-//					if (typeof el === 'number') {
-//						return el;
-//					} else {
-//						return new PE(el.kind, el.args, el.kwargs, el.centred);
-//					}
-//				}),
-//				data.ndmps,
-//				data.relax_back
-//			};
-//		}
-//	}
-//}
+export interface IFig {
+  elements: (IPE | number)[];
+	ndmps: Record<string, number | number[][]>;
+	relax_back: boolean;
+};
+export interface IFigure extends IFig {
+	info: IManInfo;
+};
+
+export interface IFigOption {
+  info: IManInfo;
+  figures: IFig[];
+}
+
+export interface IFigureOption {
+  figures: IFigure[]
+}
+
+export class Fig implements IFig {
+  elements: (number | IPE)[] = $state([]);
+  ndmps: Record<string, number | number[][]> = $state({});
+  relax_back: boolean = $state(false);
+  constructor(
+    elements: (number | IPE)[],
+    ndmps: Record<string, number | number[][]>,
+    relax_back: boolean
+  ) {
+    this.elements = elements;
+    this.ndmps = ndmps;
+    this.relax_back = relax_back;
+  }
+
+	static parse(data: IFig): Fig {
+    return new Fig(
+      data.elements.map((el) => {
+        if (typeof el === 'number') {
+          return el;
+        } else {
+          return PE.parse(el);
+        }
+      }),
+      data.ndmps,
+      data.relax_back
+    );
+	}  
+}
 
 //export class FigOption {
 //	active: number = 0;
