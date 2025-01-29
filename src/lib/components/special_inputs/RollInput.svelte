@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as inputs from '$lib/components/special_inputs/inputs';
-	import { extractComboNdMps} from '$lib/schedules/aresti';
+	import { extractComboNdMps} from '$lib/schedules/aresti.svelte';
 	import type { ManParm } from '$lib/schedules/mandef';
 	import ArrayInput from './ArrayInput.svelte';
 	import MpInput from './MPInput.svelte';

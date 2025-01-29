@@ -4,32 +4,6 @@
 
 
 
-export type Arg = number | string | (number | string)[] | boolean;
-
-export interface PE {
-  kind: string;
-  args: Arg[];
-  kwargs: Record<string, Arg>;
-  centred: boolean;
-}
-
-export interface Fig {
-  elements: (PE | number)[];
-	ndmps: Record<string, number | number[][]>;
-	relax_back: boolean;
-};
-export interface Figure extends Fig {
-	info: ManInfo;
-};
-
-export interface FigOption {
-  info: ManInfo;
-  figures: Fig[];
-}
-
-export interface FigureOption {
-  figures: Figure[]
-}
 
 export interface ParseOlanResponse {
 	olan: Olan;

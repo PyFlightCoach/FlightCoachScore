@@ -4,13 +4,13 @@
 	import { dbServer } from '$lib/api';
 	import { reloadSchedules } from '$lib/schedules/library';
 	import EditElements from './EditElements.svelte';
-	import { Figure } from '$lib/schedules/aresti';
-	import { rule, mans } from '$lib/schedules/builder';
+	import { Figure } from '$lib/schedules/aresti.svelte';
+	import { rule, mans } from '$lib/schedules/builder.svelte';
 	import { loading } from '$lib/stores/shared';
 	import EditManinfo from './EditManinfo.svelte';
 	import EditManParms from './EditManParms.svelte';
 	import { objmap } from '$lib/utils/arrays';
-	import { extractComboNdMps } from '$lib/schedules/aresti';
+	import { extractComboNdMps } from '$lib/schedules/aresti.svelte';
 
 	let {
 		id,

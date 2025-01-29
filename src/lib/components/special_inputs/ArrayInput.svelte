@@ -3,7 +3,7 @@
 	import type { ManParm } from '$lib/schedules/mandef';
 	import MpNumberInput from './MPNumberInput.svelte';
 	import NumberInput from './NumberInput.svelte';
-	import { type CombinationValue, type ComparisonValue } from '$lib/schedules/aresti';
+	import { type CombinationValue, type ComparisonValue } from '$lib/schedules/aresti.svelte';
 	let {
 		value = $bindable(),
 		refvalue = $bindable(),

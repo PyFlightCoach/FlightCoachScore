@@ -6,7 +6,7 @@
 		canIEdit,
 		rule,
 		deleteSchedule
-	} from '$lib/schedules/builder';
+	} from '$lib/schedules/builder.svelte';
 	import { user } from '$lib/stores/user';
   import * as sh from '$lib/schedules/schedule_handler';
 

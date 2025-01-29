@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type NumberInput, equals } from '$lib/components/special_inputs/inputs';
-	import {type CombinationValue, type ComparisonValue, extractComboNdMps } from '$lib/schedules/aresti';
+	import {type CombinationValue, type ComparisonValue, extractComboNdMps } from '$lib/schedules/aresti.svelte';
 	import type { ManParm } from '$lib/schedules/mandef';
 
 	let {

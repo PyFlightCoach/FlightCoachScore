@@ -7,7 +7,7 @@
 		lastSelectedScheduleID,
 		rules,
     addEmptyManoeuvre
-	} from '$lib/schedules/builder';
+	} from '$lib/schedules/builder.svelte';
   import * as types from '$lib/interfaces/';
 
   let {schedule=$bindable()}: {schedule: sh.ScheduleHandler | undefined} = $props();

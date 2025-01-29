@@ -4,7 +4,7 @@
 	import EquationInput from './EquationInput.svelte';
 	import MpInput from './MPInput.svelte';
 	import NumberInput from './NumberInput.svelte';
-	import {extractComboNdMps} from '$lib/schedules/aresti';
+	import {extractComboNdMps} from '$lib/schedules/aresti.svelte';
 
 	let {
 		value = $bindable(),
