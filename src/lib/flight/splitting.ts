@@ -115,6 +115,35 @@ export function next(last: Split, stop: number | undefined = undefined) {
 	}
 }
 
+export function isComp(splits: Split[]) {
+	if (splits.length < 3) {
+		return false;
+	}
+	if (
+		(splits[0].alternate_name != 'TakeOff' || splits[splits.length - 1].alternate_name != 'Landing')
+	) {
+		return false;
+	}
+
+	if (!splits[1].manoeuvre) {
+		return false
+	}
+
+	const schedule = get(library).subset({
+		category_name: splits[1].category_name,
+		schedule_name: splits[1].schedule_name
+	}).first;
+
+	if (splits.length - 2 != schedule.manoeuvres.length) {
+		return false;
+	}
+
+	if (schedule.manoeuvres.some((m, i) => m.short_name != splits[i+1].manoeuvre?.short_name)) {
+    return false;
+  };
+  return true;
+}
+
 export class Splitting {
 	constructor(readonly mans: Split[]) {}
 
@@ -170,4 +199,17 @@ export async function parseFCJMans(fcj: FCJson, states: States) {
 				);
 		}
 	});
+}
+
+export async function loadManDefs(splits: Split[]): Promise<Split[]> {
+	const oMans: Promise<Split>[] = [];
+
+	for (const man of splits) {
+		if (man.manoeuvre) {
+			oMans.push(loadManDef(man.manoeuvre.id).then((md) => ({ ...man, mdef: md })));
+		} else {
+			oMans.push((async () => man)());
+		}
+	}
+	return Promise.all(oMans);
 }

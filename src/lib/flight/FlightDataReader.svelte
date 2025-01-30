@@ -12,6 +12,8 @@
 	export let inputMode = 'bin';
 	export let isDuplicate: boolean = false;
   export let onBeforeLoad: () => void;
+
+  
 	let md5: string | undefined = undefined;
 	let files: FileList | undefined;
 

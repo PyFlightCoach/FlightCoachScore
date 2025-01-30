@@ -4,8 +4,8 @@ import { States } from '$lib/utils/state';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get } from 'svelte/store';
 import { BinData } from '$lib/flight/bin/bindata';
-import { type Split, takeOff, parseFCJMans } from '$lib/flight/splitting';
-import { loadManDef } from '$lib/schedule/library';
+import { isComp, type Split, takeOff} from '$lib/flight/splitting';
+
 
 
 export const isCompFlight: Writable<boolean> = writable(true);
@@ -25,25 +25,7 @@ states.subscribe((sts: States | undefined) => {
 
 export const manSplits: Writable<Split[]> = writable([takeOff()]);
 
-export async function updateSplits(_fcj: FCJson, force: boolean = false): Promise<Split[]> {
-	if (force || get(manSplits).length <= 1) {
-		await parseFCJMans(_fcj, get(states)!).then(async (mans) => {
-			const oMans: Split[] = [];
-			for (const man of mans) {
-				if (man.manoeuvre) {
-					await loadManDef(man.manoeuvre!.id).then((md) => {
-						man.mdef = md;
-					});
-				}
-				oMans.push(man);
-			}
-			manSplits.set(oMans);
-		});
-	}
-  return get(manSplits);
-  
-
-}
+manSplits.subscribe(msplits=>{isCompFlight.set(isComp(msplits))});
 
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);

@@ -11,7 +11,7 @@ import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
 import { analysisServer, faVersion } from '$lib/api/api';
 import { States } from '$lib/utils/state';
-import { Splitting, schedule as getScheduleFromSplit } from '$lib/flight/splitting';
+import { Splitting, schedule as getScheduleFromSplit, isComp } from '$lib/flight/splitting';
 import { ManDef } from '$lib/manoeuvre/definition.svelte';
 import { ScheduleInfo } from './fcjson';
 import { loadManDef, library } from '$lib/schedule/library';
@@ -93,10 +93,6 @@ export function clearDataLoading() {
 	clearAnalysis();
 }
 
-sts.manSplits.subscribe(() => {
-	clearAnalysis();
-});
-
 export async function newAnalysis(states: States, split: Splitting) {
 	setupAnalysisArrays(split.manNames);
 
@@ -108,7 +104,7 @@ export async function newAnalysis(states: States, split: Splitting) {
 		});
 	}
 
-	let direction: string = 'Infer';
+	let direction: string;
 	if (get(sts.isCompFlight)) {
 		const ddef = split.directionDefinition();
 

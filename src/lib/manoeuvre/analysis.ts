@@ -3,7 +3,7 @@ import { ManDef, ManOpt } from '$lib/manoeuvre/definition.svelte';
 import { ManoeuvreResult } from '$lib/manoeuvre/scores';
 import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/flight/fcjson';
 import { analysisServer } from '$lib/api/api';
-import { selectedResult, runInfo, binData, origin } from '$lib/stores/analysis';
+import { selectedResult, binData, origin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
 import { isAnalysisModified } from '$lib/stores/shared';
 import { Manoeuvre } from './raw.svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/flight/analysis.js';
-	import { states, fcj, bin, manSplits, updateSplits } from '$lib/stores/analysis';
+	import { states, fcj, bin, manSplits, isCompFlight } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/flight/fcjson';
@@ -65,8 +65,7 @@
 
 	const reset = () => {
 		activeManId = 0;
-		mans.length = 1;
-		mans[0] = ms.takeOff();
+    mans = [ms.takeOff()];
 		resetRange();
 	};
 
@@ -90,9 +89,13 @@
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			$fcj = FCJson.parse(JSON.parse(e.target?.result as string));
-			updateSplits($fcj).then((res) => {
-				mans = res;
-			});
+			ms.parseFCJMans($fcj, $states!)
+				.then(res => {
+          return ms.loadManDefs(res);
+        })
+				.then((res) => {
+					mans = res;
+				});
 		};
 		reader.readAsText(file);
 	};
@@ -115,13 +118,13 @@
 />
 
 <div
-	class="col-md-4 pt-3 bg-light border mh-100 d-flex flex-column overflow-scroll"
+	class="col-md-4 pt-3 bg-light border mh-100 d-flex flex-column overflow-auto"
 	style="max-height: 100%;"
 >
 	<div class="row">
 		{#if $bin || $fcj}
 			<span class="col-auto">Source File:</span>
-			<span class="col text-nowrap overflow-scroll">{$bin?.name || $fcj?.name || 'unknown'}</span>
+			<span class="col text-nowrap overflow-auto">{$bin?.name || $fcj?.name || 'unknown'}</span>
 		{/if}
 	</div>
 	<div class="row pt-2">

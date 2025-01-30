@@ -43,7 +43,7 @@
 		</div>
 
 		<div class="col navbar-nav collapse navbar-collapse" id="pageMenu">
-			{$navBarContents}
+			<svelte:component this={$navBarContents}/>
 		</div>
 
 		<ul class="col-auto justify-content-end navbar-nav">

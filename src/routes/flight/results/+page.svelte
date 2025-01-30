@@ -8,7 +8,8 @@
 		bootTime,
 		isComplete,
 		difficulty,
-		truncate
+		truncate,
+    isCompFlight
 	} from '$lib/stores/analysis';
 	import {
 		dataSource,
@@ -30,6 +31,8 @@
 	import { postUploadSearch } from '$lib/leaderboards/stores';
 
 	$navBarContents = AnalysisMenu;
+
+  $: console.log("Is Comp Flight?", $isCompFlight);
 
 	$: userId = $user?.id.replaceAll('-', '');
 
@@ -199,12 +202,14 @@
 	</div>
 
 	<div class="row mb-2">
-		{#if canI && $isComplete && (isNew || isUpdated)}
+		{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight}
 			<div class="row justify-content-end p-2">
 				<button class="btn btn-primary" type="submit" on:click={upload}
 					>{isNew ? 'Upload' : 'Update'}</button
 				>
 			</div>
+    {:else if !$isCompFlight}
+      <span>Only complete flights can be uploaded</span>
 		{:else if !canI}
 			{#if !$user}
 				<span>Log in to upload</span>
