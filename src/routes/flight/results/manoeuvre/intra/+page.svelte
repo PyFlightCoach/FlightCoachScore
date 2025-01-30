@@ -8,7 +8,7 @@
 	import { objmap } from '$lib/utils/arrays';
 	import { windowWidth } from '$lib/stores/shared';
 	import VisPlot from './VisPlot.svelte';
-	import * as types from '$lib/interfaces';
+	import * as types from '$lib/flight/db';
 	const md = $derived($windowWidth >= 768);
 
 	const man = analyses[$selManID!];

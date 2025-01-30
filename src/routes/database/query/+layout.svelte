@@ -1,11 +1,11 @@
 <script lang="ts">
-	import LeaderQuery from '$lib/components/leaderboards/LeaderQuery.svelte';
+	import LeaderQuery from '$lib/leaderboards/LeaderQuery.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
 	import DBMenu from './DBMenu.svelte';
 	import { base } from '$app/paths';
-	import { updateTable } from '$lib/stores/leaderboards';
+	import { updateTable } from '$lib/leaderboards/stores';
 	import { windowWidth, activeScheduleIDs, allFAVersions } from '$lib/stores/shared';
-	import { table_rows } from '$lib/stores/leaderboards';
+	import { table_rows } from '$lib/leaderboards/stores';
 	import { onMount } from 'svelte';
 
 	$: md = $windowWidth >= 768;

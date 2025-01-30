@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import { dev, dataSource } from '$lib/stores/shared';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { importAnalysis } from '$lib/analysis/analysis';
+import { importAnalysis } from '$lib/flight/analysis';
 
 export async function load() {
 	if (!get(manNames)) {

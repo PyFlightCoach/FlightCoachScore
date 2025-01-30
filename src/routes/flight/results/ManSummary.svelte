@@ -9,7 +9,7 @@
 		analyses
 	} from '$lib/stores/analysis';
 	import { colscale, redsColors, tealsColrs, yellColors } from '$lib/components/plots/styling';
-	import { analyseManoeuvre } from '$lib/analysis/analysis';
+	import { analyseManoeuvre } from '$lib/flight/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import {} from '$lib/stores/analysis';

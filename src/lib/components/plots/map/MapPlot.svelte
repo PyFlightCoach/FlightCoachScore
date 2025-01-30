@@ -1,9 +1,9 @@
 <script lang="ts">
   import Plot from 'svelte-plotly.js';
   import {binDataMapTrace, originMapTraces} from './mapTraces';
-	import { GPS } from '$lib/analysis/geometry';
+	import { GPS } from '$lib/utils/geometry';
 	import type { BinData } from '$lib/components/bin';
-	import type { Origin } from '$lib/analysis/fcjson';
+	import type { Origin } from '$lib/flight/fcjson';
 
   export let origin: Origin |undefined;
   export let binData: BinData | undefined;

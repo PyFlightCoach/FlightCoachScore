@@ -1,9 +1,24 @@
 import { writable, type Writable } from 'svelte/store';
-import type { DBUser } from '$lib/interfaces';
 import { get } from 'svelte/store';
-import { dbServer } from '$lib/api';
+import { dbServer } from '$lib/api/api';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
+
+export interface DBUser {
+  id: string;
+  email: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  is_verified: boolean;
+  first_name: string;
+  last_name: string;
+  country: string;
+  country_emoji: string;
+  joined_when: string;
+  is_cd: boolean;
+  is_fake: boolean;
+}
+
 
 export const user: Writable<DBUser | undefined> = writable();
 

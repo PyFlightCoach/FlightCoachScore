@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { States } from '$lib/analysis/state';
+	import { States } from '$lib/utils/state';
 	import Plot from 'svelte-plotly.js';
 	import { ribbon, boxtrace } from '$lib/components/plots/traces';
-	import DoubleSlider from '$lib/components/DoubleSlider.svelte';
+	import DoubleSlider from '$lib/components/plots/DoubleSlider.svelte';
 	import colddraft from '$lib/components/plots/colddraft';
 	import { isFullSize } from '$lib/stores/analysis';
 

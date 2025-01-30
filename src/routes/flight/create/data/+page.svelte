@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { binData, origin, fcj, bin, bootTime, states } from '$lib/stores/analysis';
-  import {clearDataLoading} from '$lib/analysis/analysis';
+  import {clearDataLoading} from '$lib/flight/analysis';
   import {dataSource} from '$lib/stores/shared';
-	import FlightDataReader from '$lib/components/FlightDataReader.svelte';
-	import { BoxReader } from '$lib/components/box';
+	import FlightDataReader from '$lib/flight/FlightDataReader.svelte';
+	import { BoxReader } from '$lib/flight/box';
 	import { MapPlot } from '$lib/components/plots/map';
 	import PlanViewPlot from '$lib/components/plots/PlanViewPlot.svelte';
 	import { base } from '$app/paths';
-	import { GPS } from '$lib/analysis/geometry';
+	import { GPS } from '$lib/utils/geometry';
 	
   
 	let inputMode: 'bin' | 'fcj' | 'state' = 'bin';

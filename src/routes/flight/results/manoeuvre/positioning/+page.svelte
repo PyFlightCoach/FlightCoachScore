@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { selManID, analyses } from '$lib/stores/analysis';
-	import type { States } from '$lib/analysis/state';
+	import type { States } from '$lib/utils/state';
 	import Plot from 'svelte-plotly.js';
 	import { coloured_ribbons, points, ribbon } from '$lib/components/plots/traces';
 	import { layout3d } from '$lib/components/plots/layouts';
-	import { iacBoxTrace, f3aBoxTrace } from '$lib/components/box/box_geometry';
+	import { iacBoxTrace, f3aBoxTrace } from '$lib/flight/box/box_geometry';
 	import { d3Color, d3Colors } from '$lib/components/plots/styling';
   import {mean} from 'lodash';
 

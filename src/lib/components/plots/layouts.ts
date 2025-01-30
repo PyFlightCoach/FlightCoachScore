@@ -1,4 +1,4 @@
-import type { States } from '$lib/analysis/state';
+import type { States } from '$lib/utils/state';
 import {max, min} from '$lib/utils/arrays';
 
 

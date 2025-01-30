@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { manNames } from '$lib/stores/analysis';
 	import ManSummary from './ManSummary.svelte';
-	import { analyseAll } from '$lib/analysis/analysis';
+	import { analyseAll } from '$lib/flight/analysis';
 </script>
 
 <div class="table-responsive">

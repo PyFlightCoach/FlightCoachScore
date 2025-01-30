@@ -1,6 +1,6 @@
-import { GPS } from '$lib/analysis/geometry';
-import type { DBSchedule, DBFlightRanked } from '$lib/interfaces';
-
+import { GPS } from '$lib/utils/geometry';
+import type { DBFlightRanked } from '$lib/flight/db';
+import type {DBSchedule} from '$lib/schedule/db';
 
 export class DBFlightStack {
 	flights: DBFlightRanked[] = [];

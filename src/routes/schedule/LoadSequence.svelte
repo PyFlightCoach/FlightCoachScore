@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { library } from '$lib/schedules/library';
-	import SelectSchedule from '$lib/components/manselect/SelectSchedule.svelte';
-  import * as sh from '$lib/schedules/schedule_handler';
+	import { library } from '$lib/schedule/library';
+	import SelectSchedule from '$lib/schedule/SelectSchedule.svelte';
+  import * as sh from '$lib/schedule/schedule_handler';
 	import {
 		rule,
 		lastSelectedScheduleID,
 		rules,
     addEmptyManoeuvre
-	} from '$lib/schedules/builder.svelte';
-  import * as types from '$lib/interfaces/';
+	} from '$lib/schedule/builder.svelte';
+  import * as types from '$lib/flight/db';
 
   let {schedule=$bindable()}: {schedule: sh.ScheduleHandler | undefined} = $props();
 

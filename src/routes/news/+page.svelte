@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { dbServer } from '$lib/api';
+	import { dbServer } from '$lib/api/api.js';
 
 	export let data;
 	let form_state: string | undefined;

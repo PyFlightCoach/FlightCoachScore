@@ -3,7 +3,7 @@
 	import { modeltrace, ribbon } from '$lib/components/plots/traces';
 	import { layout3d } from '$lib/components/plots/layouts';
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
-	import type { States } from '$lib/analysis/state';
+	import type { States } from '$lib/utils/state';
 	import colddraft from '$lib/components/plots/colddraft.js';
 
 	$: man = analyses[$selManID!];

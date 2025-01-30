@@ -1,14 +1,14 @@
 <script lang="ts">
 	import NavMenu from '$lib/components/NavMenu.svelte';
-	import ServerSelection from '$lib/components/ServerSelection.svelte';
+	import ServerSelection from '$lib/api/ServerSelection.svelte';
 	import { base } from '$app/paths';
 	import { dev } from '$lib/stores/shared';
-	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api';
-	import { dbSOption, customDbServer } from '$lib/api';
+	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api/api';
+	import { dbSOption, customDbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
-  import {reloadSchedules} from '$lib/schedules/library';
+  import {reloadSchedules} from '$lib/schedule/library';
   import {loadGuiLists} from '$lib/stores/shared';
-	import { loadRules } from '$lib/schedules/builder.svelte';
+	import { loadRules } from '$lib/schedule/builder.svelte';
 </script>
 
 <NavMenu tooltip="Super User Menu">

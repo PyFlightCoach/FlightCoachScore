@@ -6,8 +6,11 @@
 	import SuperMenu from './SuperMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import { dev, help } from '$lib/stores/shared';
-	import AnalysisProgress from '$lib/components/progress/AnalysisProgress.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
+	import { nMans, nRunning } from '$lib/stores/analysis';
+
+  const n = $derived($nMans - $nRunning);
+
 </script>
 
 <nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
@@ -40,12 +43,25 @@
 		</div>
 
 		<div class="col navbar-nav collapse navbar-collapse" id="pageMenu">
-			<svelte:component this={$navBarContents} />
+			{$navBarContents}
 		</div>
 
 		<ul class="col-auto justify-content-end navbar-nav">
 			<div class="row">
-				<AnalysisProgress />
+				{#if $nRunning}
+					<div class="col-auto progress align-self-center d-none d-sm-block" style="width:200px">
+						<div
+							class="progress-bar"
+							style="width: {Math.round((100 * n) / $nMans)}%"
+							role="progressbar"
+							aria-valuenow={n}
+							aria-valuemin="0"
+							aria-valuemax={$nMans}
+						>
+							{n} / {$nMans}
+						</div>
+					</div>
+				{/if}
 				<span
 					class="col-auto navbar-text mr-auto text-nowrap {$user?.is_verified
 						? ''

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dbServer, formDataFromDict } from '$lib/api';
+	import { dbServer, formDataFromDict } from '$lib/api/api';
 	import { base } from '$app/paths';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { user } from '$lib/stores/user';

@@ -1,15 +1,15 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
-	import { newAnalysis } from '$lib/analysis/analysis';
+	import { newAnalysis } from '$lib/flight/analysis.js';
 	import { states, fcj, bin, manSplits, updateSplits } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import { FCJson } from '$lib/analysis/fcjson';
-	import { loadManDef, library } from '$lib/schedules/library.js';
-	import ManSelect from '$lib/components/manselect/ManSelect.svelte';
-	import * as ms from '$lib/analysis/splitting';
+	import { FCJson } from '$lib/flight/fcjson';
+	import { loadManDef, library } from '$lib/schedule/library.js';
+	import ManSelect from '$lib/flight/ManoeuvreSelecter.svelte';
+	import * as ms from '$lib/flight/splitting.js';
 
-  const { data } = $props();
+	const { data } = $props();
 
 	let mans = $state(data.baseSplits);
 
@@ -25,7 +25,6 @@
 	]);
 
 	let activeIndex: number = $state(range[1]);
-	$inspect('range:', range);
 
 	let canAdd: boolean = $derived(
 		Boolean(
@@ -86,19 +85,17 @@
 		}
 	};
 
-
 	const parseFCJ = (file: File) => {
 		$fcj = undefined;
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			$fcj = FCJson.parse(JSON.parse(e.target?.result as string));
-      updateSplits($fcj)
-        .then((res)=>{mans=res});
+			updateSplits($fcj).then((res) => {
+				mans = res;
+			});
 		};
 		reader.readAsText(file);
 	};
-
-
 </script>
 
 <svelte:window
@@ -117,14 +114,17 @@
 	}}
 />
 
-<div class="col-md-4 pt-3 bg-light border mh-100 d-flex flex-column overflow-scroll"  style="max-height: 100%;">
+<div
+	class="col-md-4 pt-3 bg-light border mh-100 d-flex flex-column overflow-scroll"
+	style="max-height: 100%;"
+>
 	<div class="row">
-  {#if $bin || $fcj}
-      <span class="col-auto">Source File:</span>
+		{#if $bin || $fcj}
+			<span class="col-auto">Source File:</span>
 			<span class="col text-nowrap overflow-scroll">{$bin?.name || $fcj?.name || 'unknown'}</span>
 		{/if}
-  </div>
-  <div class="row pt-2">
+	</div>
+	<div class="row pt-2">
 		{#if mans.length == 1}
 			<div class="row mb-2">
 				<label for="load-fcj" class="col-8 col-form-label">Load FC Json File:</label>
@@ -186,7 +186,7 @@
 							/></td
 						>
 
-						{#if man.alternate_name || activeManId != i}
+						{#if i == 0 || activeManId != i}
 							<td class="text-start">
 								{#if man.manoeuvre}{man.manoeuvre?.index}:
 								{/if}{man.manoeuvre?.short_name || man.alternate_name}
@@ -197,14 +197,13 @@
 									library={$library}
 									old_man={man}
 									onselected={(nms: ms.Split) => {
-										console.debug('selected:', nms);
 										mans[i] = Object.assign(mans[i], nms);
 									}}
 									ondeselect={() => {
-										console.debug('deselected');
 										mans[i].manoeuvre = undefined;
 										mans[i].mdef = undefined;
 									}}
+									specialManoeuvres={i == mans.length - 1 ? ['Break', 'Landing'] : ['Break']}
 								/>
 							</td>
 						{/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Plot from 'svelte-plotly.js';
-	import { table_rows } from '$lib/stores/leaderboards';
+	import { table_rows } from '$lib/leaderboards/stores';
   import {  DBFlightStack, stackFlights } from '$lib/database/flightStack';
 
   let stacks: DBFlightStack[] = [];

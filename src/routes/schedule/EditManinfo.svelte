@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as mi from '$lib/schedules/maninfo';
+  import * as mi from '$lib/manoeuvre/info.svelte';
   import EnumSelect from '$lib/components/EnumSelect.svelte';
 
 	let {

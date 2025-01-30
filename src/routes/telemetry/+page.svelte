@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Plot from 'svelte-plotly.js';
-	import { analysisServer } from '$lib/api';
+	import { analysisServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
 
 	let telemetry: Record<string, string[]> | undefined = $state();

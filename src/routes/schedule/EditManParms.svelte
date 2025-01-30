@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { ManParm } from '$lib/schedules/mandef';
-	import type { ManBuilder } from '$lib/schedules/builder.svelte';
-	import { builder } from '$lib/schedules/builder.svelte';
+	import { ManParm } from '$lib/manoeuvre/definition.svelte';
+	import type { ManBuilder } from '$lib/schedule/builder.svelte';
+	import { builder } from '$lib/schedule/builder.svelte';
 	import NumberInput from '$lib/components/special_inputs/NumberInput.svelte';
 	import * as inputs from '$lib/components/special_inputs/inputs';
 	import ArrayInput from '$lib/components/special_inputs/ArrayInput.svelte';
 	import { objmap } from '$lib/utils/arrays';
-  import {extractComboNdMps} from '$lib/schedules/aresti.svelte';
+  import {extractComboNdMps} from '$lib/schedule/aresti.svelte';
 
 	let {
 		newParms = $bindable(),

@@ -5,7 +5,7 @@ import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
 import { user } from '$lib/stores/user';
 import { dbServer} from '$lib/api';
-import { loadSchedules } from '$lib/schedules/library';
+import { loadSchedules } from '$lib/schedule/library';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -61,8 +61,9 @@ export async function loadGuiLists() {
 			allFAVersions.set(res.data.fa_versions);
 			activeScheduleIDs.set(res.data.active_schedule_ids);
 		})
-		.catch(() => {
-      alert("Failed to load gui_lists from db, check you internet connection");
+		.catch((e) => {
+      console.log("Failed to load gui_lists", e);
+      //alert("Failed to load gui_lists from db, check you internet connection");
 			allFAVersions.set([]);
 			activeScheduleIDs.set([]);
 		});

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dbServer } from '$lib/api.js';
+	import { dbServer } from '$lib/api/api.js';
 	import { goto } from '$app/navigation';
   import { base } from '$app/paths';
 

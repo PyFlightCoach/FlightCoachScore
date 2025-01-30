@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {  split_arg_string, ManDef, ManOpt } from '$lib/schedules/mandef';
-import { Server } from '$lib/api';
+import {  split_arg_string, ManDef, ManOpt } from '$lib/manoeuvre/definition.svelte';
+import { Server } from '$lib/api/api';
 
 const server = new Server('http://localhost:5000');
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { dbServer } from '$lib/api';
-	import { countries, split_country } from '$lib/countries.js';
+	import { dbServer } from '$lib/api/api';
+	import { countries, split_country } from '$lib/utils/countries.js';
 	import { invalidateAll } from '$app/navigation';
 	import { user } from '$lib/stores/user';
   import {base} from '$app/paths';

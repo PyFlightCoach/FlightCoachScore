@@ -7,7 +7,7 @@
 	import MarkdownIt from 'markdown-it';
 	import MainNavBar from './MainNavBar.svelte';
 	import { onMount } from 'svelte';
-	import { dbServer } from '$lib/api';
+	import { dbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';

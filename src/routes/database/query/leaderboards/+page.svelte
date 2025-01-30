@@ -1,6 +1,6 @@
 <script lang="ts">
-	import DbTable from "$lib/components/leaderboards/DBTable.svelte";
-  import { table_rows, lastResponse } from '$lib/stores/leaderboards';
+	import DbTable from "$lib/leaderboards/DBTable.svelte";
+  import { table_rows, lastResponse } from '$lib/leaderboards/stores';
   
 </script>
 

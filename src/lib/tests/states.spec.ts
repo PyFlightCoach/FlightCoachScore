@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {States} from '$lib/analysis/state';
+import {States} from '$lib/utils/state';
 import * as fs from 'fs';
 
 

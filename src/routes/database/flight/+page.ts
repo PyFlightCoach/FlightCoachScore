@@ -1,6 +1,6 @@
-import { dbServer } from '$lib/api.js';
+import { dbServer } from '$lib/api/api.js';
 import { Flight } from '$lib/database/flight';
-import { States } from '$lib/analysis/state';
+import { States } from '$lib/utils/state';
 import { blockProgress, unblockProgress, loading } from '$lib/stores/shared.js';
 
 

@@ -20,14 +20,14 @@
 	} from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
-	import { privacyOptions } from '$lib/interfaces';
-	import { createAnalysisExport } from '$lib/analysis/analysis';
+	import { privacyOptions } from '$lib/flight/db';
+	import { createAnalysisExport } from '$lib/flight/analysis';
 	import { user, checkUser } from '$lib/stores/user';
-	import { dbServer } from '$lib/api';
+	import { dbServer } from '$lib/api/api';
 	import { Flight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-	import { postUploadSearch } from '$lib/stores/leaderboards';
+	import { postUploadSearch } from '$lib/leaderboards/stores';
 
 	$navBarContents = AnalysisMenu;
 

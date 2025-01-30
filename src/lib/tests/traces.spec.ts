@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {OBJ} from '$lib/components/plots/traces';
-import {Point} from '$lib/analysis/geometry';
+import {Point} from '$lib/utils/geometry';
 
 
 describe("OBJ", () => {

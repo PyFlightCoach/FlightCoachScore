@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PlotDtw from '$lib/components/plots/PlotDTW.svelte';
-	import { mans, rule } from '$lib/schedules/builder.svelte';
+	import { mans, rule } from '$lib/schedule/builder.svelte';
 
   
 </script>

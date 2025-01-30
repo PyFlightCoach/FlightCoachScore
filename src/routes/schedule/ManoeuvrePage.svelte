@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
-	import * as mh from '$lib/schedules/manoeuvre_handler.svelte';
+	import * as mh from '$lib/manoeuvre/manoeuvre_handler.svelte';
 
 	let { man }: { man: mh.ManoeuvreHandler} = $props();
 </script>

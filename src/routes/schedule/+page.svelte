@@ -5,7 +5,7 @@
 	import PlotAll from './PlotAll.svelte';
 	import EditManoeuvre from './ManoeuvrePage.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
-  import * as sh from '$lib/schedules/schedule_handler';
+  import * as sh from '$lib/schedule/schedule_handler';
 
 
 	let form_state: string | undefined = $state();

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { PE } from '$lib/schedules/aresti.svelte';
-	import type { ManBuilder } from '$lib/schedules/builder.svelte';
+	import { PE } from '$lib/schedule/aresti.svelte';
+	import type { ManBuilder } from '$lib/schedule/builder.svelte';
 	import ValueInput from '$lib/components/special_inputs/ValueInput.svelte';
   import * as inputs from '$lib/components/special_inputs/inputs';
 

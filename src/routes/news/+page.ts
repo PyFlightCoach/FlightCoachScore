@@ -1,4 +1,4 @@
-import { dbServer } from "$lib/api.js";
+import { dbServer } from "$lib/api/api.js";
 
 export async function load({url}) {
   

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { States } from '$lib/analysis/state';
+	import { States } from '$lib/utils/state';
 	import Plot from 'svelte-plotly.js';
 	import { ribbon } from '$lib/components/plots/traces';
 	import { create3DLayout } from '$lib/components/plots/layouts';

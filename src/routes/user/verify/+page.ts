@@ -1,4 +1,4 @@
-import { dbServer } from '$lib/api';
+import { dbServer } from '$lib/api/api';
 
 export async function load({ url }) {
   const myToken = url.searchParams.get("token");

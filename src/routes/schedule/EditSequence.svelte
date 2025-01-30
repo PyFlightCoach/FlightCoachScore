@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { library } from '$lib/schedules/library';
+	import { library } from '$lib/schedule/library';
 	import {
 		mans,
 		dbSchedule,
 		canIEdit,
 		rule,
 		deleteSchedule
-	} from '$lib/schedules/builder.svelte';
+	} from '$lib/schedule/builder.svelte';
 	import { user } from '$lib/stores/user';
-  import * as sh from '$lib/schedules/schedule_handler';
+  import * as sh from '$lib/schedule/schedule_handler';
 
 
   let {schedule = $bindable()}: {schedule: sh.ScheduleHandler} = $props();

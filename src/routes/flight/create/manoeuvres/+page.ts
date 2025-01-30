@@ -2,7 +2,7 @@ import { binData, origin, states, fcj, updateSplits, manSplits } from '$lib/stor
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-import { States } from '$lib/analysis/state';
+import { States } from '$lib/utils/state';
 import { dev } from '$lib/stores/shared';
 
 

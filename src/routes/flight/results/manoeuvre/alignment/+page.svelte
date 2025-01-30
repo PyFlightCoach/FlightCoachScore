@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
-	import { analyseManoeuvre } from '$lib/analysis/analysis';
+	import { analyseManoeuvre } from '$lib/flight/analysis';
 	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
-	import { MA } from '$lib/analysis/ma';
+	import { MA } from '$lib/manoeuvre/analysis';
 
 	$: man = analyses[$selManID!];
 

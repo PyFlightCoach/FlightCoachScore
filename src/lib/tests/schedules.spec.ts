@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {requestSchedules, ScheduleLibrary} from '$lib/schedules/library';
-import { dbServerAddress, dbServer } from '$lib/api';
+import {requestSchedules, ScheduleLibrary} from '$lib/schedule/library';
+import { dbServerAddress, dbServer } from '$lib/api/api';
 
 
 

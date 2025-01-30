@@ -1,5 +1,5 @@
-import { Point, Quaternion} from '$lib/analysis/geometry';
-import { States } from '$lib/analysis/state';
+import { Point, Quaternion} from '$lib/utils/geometry';
+import { States } from '$lib/utils/state';
 import ObjFile from 'obj-file-parser';
 import { d3Color } from '$lib/components/plots/styling';
 

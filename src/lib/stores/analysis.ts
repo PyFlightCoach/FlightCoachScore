@@ -1,11 +1,11 @@
 import { writable, type Writable, type Readable, derived } from 'svelte/store';
-import { FCJson, Origin } from '$lib/analysis/fcjson';
-import { States } from '$lib/analysis/state';
-import { MA } from '$lib/analysis/ma';
+import { FCJson, Origin } from '$lib/flight/fcjson';
+import { States } from '$lib/utils/state';
+import { MA } from '$lib/manoeuvre/analysis';
 import { get } from 'svelte/store';
-import { BinData } from '$lib/components/bin/bindata';
-import { type Split, takeOff, parseFCJMans } from '$lib/analysis/splitting';
-import { loadManDef } from '$lib/schedules/library';
+import { BinData } from '$lib/flight/bin/bindata';
+import { type Split, takeOff, parseFCJMans } from '$lib/flight/splitting';
+import { loadManDef } from '$lib/schedule/library';
 
 
 export const isCompFlight: Writable<boolean> = writable(true);

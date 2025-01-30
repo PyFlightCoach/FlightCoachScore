@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {dbServer} from '$lib/api'
+    import {dbServer} from '$lib/api/api'
 
     let form_state: string | undefined;
 

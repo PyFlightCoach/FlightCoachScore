@@ -1,6 +1,6 @@
-import type { Origin } from '$lib/analysis/fcjson';
-import type { BinData } from '$lib/components/bin';
-import { drawBoxInWorld, getPointOnCentre } from '$lib/components/box';
+import type { Origin } from '$lib/flight/fcjson';
+import type { BinData } from '$lib/flight/bin';
+import { drawBoxInWorld, getPointOnCentre } from '$lib/flight/box';
 
 
 export const originMapTraces = (origin: Origin, kind: string) => {

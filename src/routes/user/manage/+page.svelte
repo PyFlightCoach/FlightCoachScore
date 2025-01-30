@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { dbServer } from '$lib/api';
+    import { dbServer } from '$lib/api/api.js';
 	import { invalidateAll } from '$app/navigation';
 	
 	let showID: string | undefined = undefined;

@@ -1,4 +1,4 @@
-import { dbServer } from '$lib/api';
+import { dbServer } from '$lib/api/api';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 

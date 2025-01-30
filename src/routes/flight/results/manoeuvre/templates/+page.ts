@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { analyseManoeuvre } from '$lib/analysis/analysis';
+import { analyseManoeuvre } from '$lib/flight/analysis';
 import { selManID, analyses } from '$lib/stores/analysis';
 import { base } from '$app/paths';
 import { goto } from '$app/navigation';

@@ -1,16 +1,15 @@
 <script lang="ts">
-	import { ManoeuvreHandler } from '$lib/schedules/manoeuvre_handler.svelte';
-	import * as types from '$lib/interfaces';
-	import { dbServer } from '$lib/api';
-	import { reloadSchedules } from '$lib/schedules/library';
+	import { type ManoeuvreHandler } from '$lib/manoeuvre/manoeuvre_handler.svelte';
+	import { dbServer } from '$lib/api/api';
+	import { reloadSchedules } from '$lib/schedule/library';
 	import EditElements from './EditElements.svelte';
-	import { Figure } from '$lib/schedules/aresti.svelte';
-	import { rule, mans } from '$lib/schedules/builder.svelte';
+	import { Figure } from '$lib/schedule/aresti.svelte';
+	import { rule, mans } from '$lib/schedule/builder.svelte';
 	import { loading } from '$lib/stores/shared';
 	import EditManinfo from './EditManinfo.svelte';
 	import EditManParms from './EditManParms.svelte';
 	import { objmap } from '$lib/utils/arrays';
-	import { extractComboNdMps } from '$lib/schedules/aresti.svelte';
+	import { extractComboNdMps } from '$lib/schedule/aresti.svelte';
 
 	let {
 		id,

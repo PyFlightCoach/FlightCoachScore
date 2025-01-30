@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { mans } from '$lib/schedules/builder.svelte';
-	import { canIEdit, addEmptyManoeuvre } from '$lib/schedules/builder.svelte';
+	import { mans } from '$lib/schedule/builder.svelte';
+	import { canIEdit, addEmptyManoeuvre } from '$lib/schedule/builder.svelte';
 	import EditManoeuvre from './EditManoeuvre.svelte';
 
 	let { activeManId = $bindable() } = $props();

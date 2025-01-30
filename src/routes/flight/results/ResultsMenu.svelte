@@ -2,7 +2,7 @@
 	import { base } from '$app/paths';
 	import { manNames, isComplete, bin } from '$lib/stores/analysis';
 	import { activeFlight } from '$lib/stores/shared';
-	import { analyseAll, clearAnalysis, clearDataLoading } from '$lib/analysis/analysis';
+	import { analyseAll, clearAnalysis, clearDataLoading } from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { user } from '$lib/stores/user';

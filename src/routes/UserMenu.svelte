@@ -2,7 +2,7 @@
 	import NavMenu from '$lib/components/NavMenu.svelte';
 	import { base } from '$app/paths';
 	import { user } from '$lib/stores/user';
-	import { dbServer } from '$lib/api';
+	import { dbServer } from '$lib/api/api';
 	import { goto } from '$app/navigation';
 
 </script>
