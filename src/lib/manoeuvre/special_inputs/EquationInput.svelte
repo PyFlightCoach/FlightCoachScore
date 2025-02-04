@@ -2,22 +2,22 @@
 	import {
 		type NumberInput,
 		equals
-	} from '$lib/components/special_inputs/inputs';
-	import type { ManParm } from '$lib/manoeuvre/definition.svelte';
+	} from './inputs';
+	import type { MPValue } from '$lib/manoeuvre/definition.svelte';
 
 	let {
 		value = $bindable(),
 		refvalue,
 		numInput,
 		canEdit = false,
-		mps,
+		mpValues,
 		onchange = () => {}
 	}: {
 		value: number | string;
 		refvalue: number | string | undefined;
 		numInput: NumberInput;
 		canEdit?: boolean;
-		mps: Record<string, ManParm>;
+		mpValues: Record<string, MPValue>;
 		onchange?: (newVal: number | string) => void;
 	} = $props();
 

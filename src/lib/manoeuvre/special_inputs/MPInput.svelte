@@ -1,31 +1,26 @@
 <script lang="ts">
-	import { type NumberInput, equals } from '$lib/components/special_inputs/inputs';
-	import {type CombinationValue, type ComparisonValue, extractComboNdMps } from '$lib/schedule/aresti.svelte';
-	import type { ManParm } from '$lib/manoeuvre/definition.svelte';
+	import { type NumberInput, equals } from './inputs';
+	import type { MPValue } from '$lib/manoeuvre/definition.svelte';
+	import { objfilter } from '$lib/utils/arrays';
 
 	let {
 		value = $bindable(),
 		refvalue,
 		numInput,
 		canEdit = false,
-		mps,
-		ndmps,
+		mpValues,
 		onchange = () => {}
 	}: {
 		value: string | undefined;
 		refvalue: number | string | undefined;
 		numInput: NumberInput;
 		canEdit?: boolean;
-		mps: Record<string, ManParm>;
-		ndmps: Record<string, CombinationValue | ComparisonValue>;
+		mpValues: Record<string, MPValue>;
 		onchange?: (newVal: string | undefined) => void;
 	} = $props();
 
-	const allowedMPS = Object.values(mps)
-		.filter((mp) => mp.unit == numInput.unit)
-		.map((mp) => mp.name);
-  
-  const comboNdMps = $state(extractComboNdMps(ndmps));
+  const allowedMPS = $derived(objfilter(mpValues, (v)=>v.unit==numInput.unit));
+
 	const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
 </script>
 
@@ -42,13 +37,8 @@
 		title={numInput.description}
 	>
 		<option value="Select MP" disabled>Select MP</option>
-		{#each allowedMPS as mp}
+		{#each Object.keys(allowedMPS) as mp}
 			<option value={mp}>{mp}</option>
-		{/each}
-		{#each Object.entries(comboNdMps) as [k, mp]}
-			{#each mp[0] as v, i}
-				<option value="{k}[{i}]">{k}[{i}]</option>
-			{/each}
 		{/each}
 	</select></td
 >

@@ -1,7 +1,7 @@
-import { parse_dict } from '$lib/utils/arrays';
+import { objmap } from '$lib/utils/arrays';
 import * as units from '$lib/utils/units';
 import { ManInfo } from './info.svelte';
-import {Result} from './scores';
+import { Result } from './scores';
 
 export function split_arg_string(arg_string: string) {
 	const args = arg_string.split(',');
@@ -16,9 +16,10 @@ export function split_arg_string(arg_string: string) {
 export interface ICriteria {
 	lookup: Record<string, object>;
 	kind: string;
-	min_bound: number | undefined;
-	max_bound: number | undefined;
-	limit: number | undefined;
+	min_bound?: number | undefined;
+	max_bound?: number | undefined;
+	limit?: number | undefined;
+	desired?: number[][];
 }
 
 export class Criteria {
@@ -27,10 +28,18 @@ export class Criteria {
 		readonly kind: string,
 		readonly min_bound: number | undefined = undefined,
 		readonly max_bound: number | undefined = undefined,
-		readonly limit: number | undefined = undefined
+		readonly limit: number | undefined = undefined,
+		readonly desired: number[][] | undefined = undefined
 	) {}
 	static parse(data: ICriteria) {
-		return new Criteria(data.lookup, data.kind, data.min_bound, data.max_bound, data.limit);
+		return new Criteria(
+			data.lookup,
+			data.kind,
+			data.min_bound,
+			data.max_bound,
+			data.limit,
+			data.desired
+		);
 	}
 }
 
@@ -53,6 +62,28 @@ export class DownGrade {
 		readonly display_name: string
 	) {}
 
+	static parse(data: IDownGrade) {
+		return new DownGrade(
+			data.name,
+			data.measure,
+			data.smoothers,
+			data.selectors,
+			Criteria.parse(data.criteria),
+			data.display_name
+		);
+	}
+
+	dump() {
+		return {
+			name: this.name,
+			measure: this.measure,
+			smoothers: this.smoothers,
+			selectors: this.selectors,
+			criteria: this.criteria,
+			display_name: this.display_name
+		} as IDownGrade;
+	}
+
 	criteria_description(result: Result) {
 		const fac = result.scale(); // result.measurement.unit == 'rad' ? 180 / Math.PI : 1;
 		const unit = result.measurement.unit.replace('rad', '°');
@@ -61,7 +92,7 @@ export class DownGrade {
 			case 'Trough':
 				return `The largest absolute value is downgraded based on its distance below ${(fac * this.criteria.limit!).toFixed(2)} ${unit}.`;
 			case 'Peak':
-				return `The largest absolute value is downgraded based on its distance above ${(this.criteria.limit * fac).toFixed(2)} ${unit}.`;
+				return `The largest absolute value is downgraded based on its distance above ${(this.criteria.limit! * fac).toFixed(2)} ${unit}.`;
 			case 'Single':
 				return `All values in the sample are downgraded.`;
 			case 'Limit':
@@ -87,11 +118,7 @@ export class DownGrade {
 				case 'after_slowdown':
 				case 'after_speedup':
 				case 'before_speedup':
-					const before = method![0].includes('before') ? 'before' : 'after';
-					const increased = method![0].includes('speedup') ? 'increased above' : 'reduced below';
-
-					return `${before} the speed has ${increased} ${args.sp} m/s`;
-
+					return `${method![0].includes('before') ? 'before' : 'after'} the speed has ${method![0].includes('speedup') ? 'increased above' : 'reduced below'} ${args.sp} m/s`;
 				case 'autorot_break':
 					return `before the autorotation has rotated by ${((args.rot * 180) / Math.PI).toFixed(0)}°.`;
 				case 'autorot_recovery':
@@ -120,36 +147,34 @@ export class DownGrade {
 
 		return `${all ? 'All values' : 'The'} ${sels.join(' ')}`;
 	}
-
-	static parse(data: IDownGrade) {
-		return new DownGrade(
-			data.name,
-			data.measure,
-			data.smoothers,
-			data.selectors,
-			Criteria.parse(data.criteria),
-			data.display_name
-		);
-	}
 }
 
 export interface IManParm {
 	defaul: string | number;
 	name: string;
-	criteria: Record<string, ICriteria>;
+	criteria: ICriteria;
 	unit: units.BaseUnit;
 	collectors: Record<string, never>;
 	visibility: string | undefined;
 }
 
+export class MPValue {
+  value: number | undefined = $state();
+	constructor(
+		value: number,
+		readonly unit: units.BaseUnit
+	) {this.value=value;}
+}
+
 export class ManParm {
+	defaul: string | number | undefined = $state();
 	constructor(
 		readonly name: string,
-		readonly criteria: Record<string, ICriteria>,
+		readonly criteria: ICriteria,
 		readonly unit: units.BaseUnit,
 		readonly collectors: Record<string, never>,
 		readonly visibility: string | undefined = undefined,
-		readonly defaul: string | number
+		defaul: string | number
 	) {
 		this.defaul = defaul;
 	}
@@ -165,7 +190,33 @@ export class ManParm {
 		);
 	}
 
-  getCollectorEls(els: string[]) {
+	dump() {
+		return {
+			name: this.name,
+			criteria: this.criteria,
+			unit: this.unit,
+			collectors: this.collectors,
+			visibility: this.visibility,
+			defaul: this.defaul
+		} as IManParm;
+	}
+
+	get mpValues() {
+		if (this.criteria.kind == 'Comparison') {
+      const res: Record<string, MPValue> = {};
+      res[this.name] = new MPValue(this.defaul as number, this.unit);
+			return res;
+		} else {
+			return Object.fromEntries(
+				this.criteria.desired![this.defaul as number].map((v: number, i: number) => [
+					`${this.name}[${i}]`,
+					new MPValue(v, this.unit)
+				])
+			);
+		}
+	}
+
+	getCollectorEls(els: string[]) {
 		return Object.values(this.collectors).map((c: string) => {
 			const elList: string[] = [];
 			const words = c.split(/[^A-Za-z_0-9]/);
@@ -198,13 +249,16 @@ export class ElDef {
 		return `${this.name} (${this.Kind}) `;
 	}
 	static parse(data: IElDef) {
-		const dgs = Object.fromEntries(
-			Object.entries(data.dgs).map(([k, v]) => {
-				return [k, DownGrade.parse(v)];
-			})
-		);
+		return new ElDef(data.name, data.Kind, data.props, objmap(data.dgs, DownGrade.parse));
+	}
 
-		return new ElDef(data.name, data.Kind, data.props, dgs);
+	dump() {
+		return {
+			name: this.name,
+			Kind: this.Kind,
+			props: this.props,
+			dgs: objmap(this.dgs, (d) => d.dump())
+		} as IElDef;
 	}
 
 	getDG(critn: string | undefined) {
@@ -231,31 +285,33 @@ export class ManDef {
 		readonly box: object
 	) {}
 
-	static parse(data: IManDef | IManDef[]): ManDef | ManOpt {
+	get options() {
+		return [this];
+	}
+
+	static parse(data: IManDef | IManDef[] | IManOpt): ManDef | ManOpt {
 		if (Array.isArray(data)) {
 			return ManOpt.parse(data);
+		} else if (Object.keys(data).includes('options')) {
+			return ManOpt.parse((data as IManOpt).options);
 		} else {
 			return new ManDef(
-				ManInfo.parse(data.info),
-				parse_dict(data.mps, ManParm.parse),
-				Object.fromEntries(
-					Object.entries(data.eds).map(([k, v]) => {
-						return [k, ElDef.parse(v)];
-					})
-				),
-				data.box
+				ManInfo.parse((data as IManDef).info),
+				objmap((data as IManDef).mps, ManParm.parse),
+				objmap((data as IManDef).eds, ElDef.parse),
+				(data as IManDef).box
 			);
 		}
 	}
 
-  dump() {
-    return {
-      info: this.info.dump(),
-      mps: this.mps as Record<string, IManParm>,
-      eds: this.eds as Record<string, IElDef>,
-      box: this.box
-    } as IManDef;
-  }
+	dump(info: ManInfo | undefined = undefined, new_name: string | undefined = undefined) {
+		return {
+			info: info?.dump(new_name) || this.info.dump(),
+			mps: objmap(this.mps, (v) => v.dump()),
+			eds: objmap(this.eds, (e) => e.dump()),
+			box: this.box
+		} as IManDef;
+	}
 
 	getEd(dgn: string | undefined) {
 		if (dgn && this.eds[dgn]) {
@@ -268,6 +324,9 @@ export class ManDef {
 			}
 		}
 	}
+	setmp(name: string, value: string | number) {
+		this.mps[name].defaul = value;
+	}
 }
 
 export interface IManOpt {
@@ -275,29 +334,36 @@ export interface IManOpt {
 }
 
 export class ManOpt {
-	constructor(readonly options: ManDef[]) {}
+	active = $state(0);
+	constructor(
+		readonly options: ManDef[],
+		active: number = 0
+	) {
+		this.active = active;
+	}
 
 	get info() {
-		return this.options[0].info;
+		return this.options[this.active].info;
 	}
-
 	get eds() {
-		return this.options[0].eds;
+		return this.options[this.active].eds;
 	}
-
 	get mps() {
-		return this.options[0].mps;
+		return this.options[this.active].mps;
 	}
-
 	get box() {
-		return this.options[0].box;
+		return this.options[this.active].box;
 	}
 
 	static parse(data: IManDef[]) {
 		return new ManOpt(data.map((v) => ManDef.parse(v) as ManDef));
 	}
 
-  dump () {
-    return this.options.map((v) => v.dump());
-  }
+	dump() {
+		return this.options.map((v) => v.dump());
+	}
+
+	setmp(name: string, value: string | number) {
+		this.options.forEach((o) => o.setmp(name, value));
+	}
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as inputs from '$lib/components/special_inputs/inputs';
-	import type { ManParm } from '$lib/manoeuvre/definition.svelte';
+	import * as inputs from './inputs';
+	import type { ManParm, MPValue } from '$lib/manoeuvre/definition.svelte';
 	import MPNumberInput from './MPNumberInput.svelte';
 	import RollInput from './RollInput.svelte';
 
@@ -9,17 +9,15 @@
 		value = $bindable(),
 		refvalue,
 		canEdit = false,
-		mps,
-    ndmps,
+		mpValues,
 		onchange = () => {}
 	}: {
 		name: keyof typeof inputs.inputMap;
 		value: inputs.Arg;
 		refvalue: inputs.Arg | undefined;
 		canEdit?: boolean;
-		mps: Record<string, ManParm>;
-    ndmps: Record<string, number[][]>;
-		onchange?: (newvalue: inputs.Arg) => void;
+		mpValues: Record<string, MPValue>;
+		onchange?: (newvalue: inputs.Arg | undefined) => void;
 	} = $props();
 
 	const input = $derived(inputs.inputMap[name]);
@@ -34,8 +32,7 @@
 		refvalue={refvalue as string | number | undefined}
 		numInput={input}
 		{canEdit}
-		{mps}
-    {ndmps}
+		{mpValues}
 		{onchange}
 	/>
 {:else if input instanceof inputs.SelectInput}
@@ -75,8 +72,7 @@
 		refvalue={refvalue as number | string | (number | string)[] | undefined}
 		rollInput={input}
 		{canEdit}
-		{mps}
-    {ndmps}
+		{mpValues}
 		{onchange}
 	/>
 {:else if input instanceof inputs.RollTypeInput}

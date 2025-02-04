@@ -251,7 +251,8 @@ export async function analyseAll(
 export async function analyseManoeuvre(
 	id: number,
 	force: boolean = false,
-	optimise: boolean | undefined = undefined
+	optimise: boolean | undefined = undefined,
+  reset: boolean = false
 ) {
 	const ma = get(sts.analyses[id]);
 
@@ -261,7 +262,7 @@ export async function analyseManoeuvre(
 		optimise = !isReRun;
 	} //optimise if for new analysis version
 
-	if ((!ma!.scores || optimise || force) && !get(sts.running)[id]) {
+	if ((!ma!.scores || optimise || force || reset) && !get(sts.running)[id]) {
 		//if scores exist, only run if server version not in history
 
 		sts.runInfo[id].set(`Running analysis at ${new Date().toLocaleTimeString()}`);
@@ -272,7 +273,7 @@ export async function analyseManoeuvre(
 		});
 
 		await ma!
-			.run(optimise)
+			.run(optimise, reset)
 			.then((res) => {
 				sts.analyses[id].set(res);
         sts.runInfo[id - 1].set(res.runinfo);

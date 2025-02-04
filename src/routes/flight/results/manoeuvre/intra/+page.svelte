@@ -8,8 +8,9 @@
 	import { objmap } from '$lib/utils/arrays';
 	import { windowWidth } from '$lib/stores/shared';
 	import VisPlot from './VisPlot.svelte';
-	import * as types from '$lib/flight/db';
-	const md = $derived($windowWidth >= 768);
+	import { find } from 'lodash';
+
+  const md = $derived($windowWidth >= 768);
 
 	const man = analyses[$selManID!];
 
@@ -35,6 +36,7 @@
 			: undefined
 	);
 
+  $inspect($man);
 </script>
 
 {#snippet plotsec()}
@@ -131,7 +133,7 @@
 						<tr
 							><td>Element:</td>
 							<td>
-								{describeElement($man?.manoeuvre?.elements.find((v) => v.uid == selectedElement))}
+								{$man!.manoeuvre!.getEl(selectedElement)?.describe()}
 							</td></tr
 						>
 						<tr><td>Sample:</td> <td> {eldg?.describe_selectors()}</td></tr>

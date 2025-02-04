@@ -3,7 +3,9 @@ import { FCJson, Origin } from '$lib/flight/fcjson';
 import { BinField } from '$lib/flight/bin/bindata';
 
 
-export interface St {
+export interface IState {
+  t: number,
+  dt: number,
   x: number,
   y: number,
   z: number,
@@ -20,15 +22,125 @@ export interface St {
   du: number | undefined,
   dv: number | undefined,
   dw: number | undefined,
-  manoeuvre: string | undefined,
-  element: string | undefined,
+  manoeuvre?: string | undefined,
+  element?: string | undefined,
 }
 
 
 export class State{
-	constructor(data: St) {
-		return Object.setPrototypeOf(data, State.prototype);
+  t: number=0;
+  dt: number=0;
+  x: number=0;
+  y: number=0;
+  z: number=0;
+  rw: number=0;
+  rx: number=0;
+  ry: number=0;
+  rz: number=0;
+  u: number | undefined;
+  v: number | undefined;
+  w: number | undefined;
+  p: number | undefined;
+  q: number | undefined;
+  r: number | undefined;
+  du: number | undefined;
+  dv: number | undefined;
+  dw: number | undefined;
+  manoeuvre?: string | undefined;
+  element?: string | undefined;
+	constructor(
+    t: number=0,
+    dt: number=0.04,
+    x: number=0,
+    y: number=0,
+    z: number=0,
+    rw: number=0,
+    rx: number=0,
+    ry: number=0,
+    rz: number=0,
+    u: number | undefined,
+    v: number | undefined,
+    w: number | undefined,
+    p: number | undefined,
+    q: number | undefined,
+    r: number | undefined,
+    du: number | undefined,
+    dv: number | undefined,
+    dw: number | undefined,
+    manoeuvre?: string | undefined,
+    element?: string | undefined,
+  ) {
+    this.t = t;
+    this.dt = dt;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.rw = rw;
+    this.rx = rx;
+    this.ry = ry;
+    this.rz = rz;
+    this.u = u;
+    this.v = v;
+    this.w = w;
+    this.p = p;
+    this.q = q;
+    this.r = r;
+    this.du = du;
+    this.dv = dv;
+    this.dw = dw;
+    this.manoeuvre = manoeuvre;
+    this.element = element;
 	}
+
+  static parse(data: IState) {
+    return new State(
+      data.t,
+      data.dt,
+      data.x,
+      data.y,
+      data.z,
+      data.rw,
+      data.rx,
+      data.ry,
+      data.rz,
+      data.u,
+      data.v,
+      data.w,
+      data.p,
+      data.q,
+      data.r,
+      data.du,
+      data.dv,
+      data.dw,
+      data.manoeuvre,
+      data.element
+    );
+  }
+
+  dump() {
+    return {
+      t: this.t,
+      dt: this.dt,
+      x: this.x,
+      y: this.y,
+      z: this.z,
+      rw: this.rw,
+      rx: this.rx,
+      ry: this.ry,
+      rz: this.rz,
+      u: this.u,
+      v: this.v,
+      w: this.w,
+      p: this.p,
+      q: this.q,
+      r: this.r,
+      du: this.du,
+      dv: this.dv,
+      dw: this.dw,
+      manoeuvre: this.manoeuvre,
+      element: this.element
+    } as IState;
+  }
 
 	get pos() {
 		return new Point(this.x, this.y, this.z);
@@ -37,13 +149,13 @@ export class State{
 		return new Quaternion(this.rw, this.rx, this.ry, this.rz);
 	}
 	get vel() {
-		return new Point(this.u, this.v, this.w);
+		return new Point(this.u!, this.v!, this.w!);
 	}
 	get rvel() {
-		return new Point(this.p, this.q, this.r);
+		return new Point(this.p!, this.q!, this.r!);
 	}
 	get acc() {
-		return new Point(this.du, this.dv, this.dw);
+		return new Point(this.du!, this.dv!, this.dw!);
 	}
 
 	body_to_world(p: Point): Point {
@@ -65,8 +177,8 @@ export class States {
 		this.data = data;
 	}
 
-	static parse(data: Record<string, number | string>[] | Record<string, Record<string, number | string[]>>): States {
-		return new States((data.hasOwnProperty('data') ? data.data : data).map((st) => new State(st)));
+	static parse(data: IState[] | {data: IState[]}): States {
+		return new States((Array.isArray(data) ? data : data.data).map((st) => State.parse(st)));
 	}
 
   static read_csv(data: string) {
@@ -78,10 +190,10 @@ export class States {
         cols = line.split(',');
       } else {
         sts.push(
-          new State(
+          State.parse(
             Object.fromEntries(
               line.split(',').map((val, i) => [cols[i], Number(val)])
-            ) as unknown as St
+            ) as unknown as IState
           )
         );
       }
@@ -111,6 +223,9 @@ export class States {
     return this.data.map((state) => state.t);
   }
 
+  get dt() {
+    return this.data.map((state) => state.dt );
+  }
 	get pos() {
 		return this.data.map((state) => state.pos);
 	}
@@ -133,11 +248,18 @@ export class States {
 		return this.data.map((state) => state.element);
 	}
 
+  get first() {
+    return this.data[0];
+  }
+
+  get last() {
+    return this.data[this.data.length - 1];
+  }
 	move(start: Point) {
 		const offset = Point.distance(this.pos[0], start);
 		return new States(
 			this.data.map((st, i) => {
-				return new State({
+				return State.parse({
 					...st,
 					x: st.x + offset.x,
 					y: st.y + offset.y,
@@ -170,8 +292,8 @@ export class States {
 			const attbox = Quaternion.mul(box_rot, att);
 
 			sts.push(
-				new State({
-					t: xkf1.time_boot_s[i],
+				State.parse({
+					t: xkf1.time_boot_s[i] as number,
 					x: posbox.x + shift.x,
 					y: posbox.y + shift.y,
 					z: posbox.z + shift.z,
@@ -179,7 +301,7 @@ export class States {
 					rx: attbox.x,
 					ry: attbox.y,
 					rz: attbox.z
-				})
+				} as IState)
 			);
 		}
 		return new States(sts);
@@ -204,7 +326,7 @@ export class States {
 				const velbody = attbox
 					.inverse()
 					.transform_point(box_rot.transform_point(new Point(row.VN, row.VE, row.VD)));
-				const st = new State({
+				const st = State.parse({
 					t: row.time / 1e6,
 					dt: row.time / 1e6 - lastT,
 					x: posbox.x + shift.x,
@@ -217,7 +339,7 @@ export class States {
 					u: velbody.x,
 					v: velbody.y,
 					w: velbody.z
-				});
+				} as IState);
 				lastT = row.time / 1e6;
 				return st;
 			})
@@ -327,8 +449,8 @@ export function state_centre(state: State[], col: string) {
 	return (srange[0] + srange[1]) / 2;
 }
 
-export function state_multi(state: State[], cols: string[], func: any) {
-	let ranges: Record<string, number> = {};
+export function state_multi(state: State[], cols: string[], func: (state: State[], col: string) => number) {
+	const ranges: Record<string, number> = {};
 	cols.forEach((col) => {
 		ranges[col] = func(state, col);
 	});
@@ -336,7 +458,7 @@ export function state_multi(state: State[], cols: string[], func: any) {
 }
 
 export function split_states(state: State[], col: string) {
-	let states: Record<string, State[]> = {};
+	const states: Record<string, State[]> = {};
 	state.forEach((st) => {
 		if (st[col] in states) {
 			states[st[col]].push(st);

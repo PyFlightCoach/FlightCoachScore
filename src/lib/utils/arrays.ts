@@ -1,7 +1,4 @@
 
-export function objmap(obj: Record<string, any>, fun: (a: any)=>any) {
-  return Object.fromEntries(Object.entries(obj).map(([k, v])=>[k, fun(v)]));
-}
 
 
 export function linspace(start: number, stop: number, num: number) {
@@ -63,10 +60,10 @@ export const mean = (arr: number[]) => {
 	return sum(arr) / arr.length;
 };
 
-export function parse_dict(data: Record<string, any>, parser) {
-	let outdata: Record<string, any> = {};
-	Object.entries(data).forEach((entry) => {
-		outdata[entry[0]] = parser(entry[1]);
-	});
-	return outdata;
+export function objmap(obj: Record<string, any>, fun: (a: any)=>any) {
+  return Object.fromEntries(Object.entries(obj).map(([k, v])=>[k, fun(v)]));
+}
+
+export function objfilter(obj: Record<string, any>, fun: (a: any)=>boolean) {
+  return Object.fromEntries(Object.entries(obj).filter(([k, v])=>fun(v)));
 }

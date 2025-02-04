@@ -77,7 +77,7 @@ const describe: Record<ElementKind, (arg0: IElement) => string> = {
 		spin = spin as ISpin;
 		return `${((spin.turns * 180) / Math.PI).toFixed(0)}° spin at ${spin.speed.toFixed(0)} m/s, height ${spin.height.toFixed(0)} m`;
 	},
-	Stallturn: (stallturn: IElement) => {
+	StallTurn: (stallturn: IElement) => {
 		stallturn = stallturn as IStallturn;
 		return `Stall turn with yaw rate ${((stallturn.yaw_rate * 180) / Math.PI).toFixed(0)}°/s`;
 	}
@@ -92,23 +92,34 @@ export class Element {
 }
 
 export interface IManoeuvre {
-	elements: Record<string, IElement>;
+	elements: IElement[];
 	exit_line: ILine;
 	uid: string;
 }
 
 export class Manoeuvre {
 	constructor(
-		readonly elements: Record<string, Element>,
+		readonly elements: Element[],
 		readonly exit_line: ILine,
 		readonly uid: string
 	) {}
 
 	static parse(data: IManoeuvre) {
 		return new Manoeuvre(
-			objmap(data.elements, (el: IElement) => new Element(el)),
+			data.elements.map(el=>new Element(el)),
 			data.exit_line,
 			data.uid
 		);
 	}
+	dump() {
+		return {
+			elements: this.elements.map(el => el.data),
+			exit_line: this.exit_line,
+			uid: this.uid
+		} as IManoeuvre;
+	}
+
+  getEl(name: string) {
+    return this.elements.find(el => el.data.uid == name);
+  }
 }

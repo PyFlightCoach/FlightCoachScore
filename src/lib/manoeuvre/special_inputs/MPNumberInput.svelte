@@ -1,35 +1,29 @@
 <script lang="ts">
-	import * as inputs from '$lib/components/special_inputs/inputs';
-	import type { ManParm } from '$lib/manoeuvre/definition.svelte';
+	import * as inputs from './inputs';
+	import type {  MPValue } from '$lib/manoeuvre/definition.svelte';
 	import EquationInput from './EquationInput.svelte';
 	import MpInput from './MPInput.svelte';
 	import NumberInput from './NumberInput.svelte';
-	import {extractComboNdMps} from '$lib/schedule/aresti.svelte';
+	import { objfilter } from '$lib/utils/arrays';
 
 	let {
 		value = $bindable(),
 		refvalue,
 		numInput,
 		canEdit = false,
-		mps,
-		ndmps,
+		mpValues,
 		onchange = () => {}
 	}: {
 		value: number | string | undefined;
 		refvalue: number | string | undefined;
 		numInput: inputs.NumberInput;
 		canEdit?: boolean;
-		mps: Record<string, ManParm>;
-		ndmps: Record<string, number | number[][]>;
+		mpValues: Record<string, MPValue>;
 		onchange?: (newVal: number | string | undefined) => void;
 	} = $props();
 
-	const allowedMPS = Object.values(mps)
-		.filter((mp) => mp.unit == numInput.unit)
-		.map((mp) => mp.name);
-
-	const comboNdMps = $state(extractComboNdMps(ndmps));
-
+	const allowedMPS = $derived(objfilter(mpValues, (v)=>v.unit==numInput.unit));
+  
 	let inputMode: string | undefined = $state(numInput.checkOption(value));
 </script>
 
@@ -48,7 +42,7 @@
 					break;
 				case 'value':
 					if (oldInputMode == 'MP') {
-						value = mps[value as string].defaul;
+						value = mpValues[value as string].value;
 					} else {
 						value = 0;
 					}
@@ -62,7 +56,7 @@
 			inputMode = newInputMode;
 		}}
 	>
-		{#if allowedMPS.length + Object.keys(comboNdMps).length}
+		{#if Object.keys(allowedMPS).length }
 			<option value="MP">MP</option>
 		{/if}
 		<option value="value">value</option>
@@ -75,8 +69,7 @@
 		{refvalue}
 		{numInput}
 		{canEdit}
-		{mps}
-		{ndmps}
+		mpValues={allowedMPS}
 		{onchange}
 	/>
 {:else if inputMode == 'value'}
@@ -94,6 +87,6 @@
 		{numInput}
 		{canEdit}
 		{onchange}
-		{mps}
+		mpValues={allowedMPS}
 	/>
 {/if}

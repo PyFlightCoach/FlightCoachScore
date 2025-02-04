@@ -2,7 +2,7 @@
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
 	import { analyseManoeuvre } from '$lib/flight/analysis';
 	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
-	import { MA } from '$lib/manoeuvre/analysis';
+  import { loadManDef, library } from '$lib/schedule/library';
 
 	$: man = analyses[$selManID!];
 
@@ -33,26 +33,15 @@
 				i++;
 			}
 		}
-		let history = $man!.history;
-		$man = new MA(
-			$man!.name,
-			$man!.id,
-			$man!.tStart,
-			$man!.tStop,
-			$man!.schedule,
-			$man!.scheduleDirection,
-			history,
-			$man!.k,
-			$man!.flown,
-			$man!.mdef
-		);
+
+		$man!.reset();
 	};
 
 	$: states = $man!.flown!.split();
 </script>
 
 <div class="col-12 border">
-	<PlotDTW sts={states} bind:activeEl={element} sp={3} />
+	<PlotDTW sts={states} bind:activeEl={element} sp={3} expand={30}/>
 
 	<nav class="navbar fixed-bottom ">
 		<div class="container-fluid ">
@@ -107,6 +96,24 @@
 						if ($selManID) analyseManoeuvre($selManID, true, false);
 					}}>Score</button
 				>
+        <button
+          class="btn btn-outline-secondary"
+          title="Rerun the analysis from scratch, inluding the initial DTW alignment"
+          on:click={() => {
+            if ($selManID) loadManDef(
+              $library.subset({
+                category_name: $man!.schedule.category,
+                schedule_name: $man!.schedule.name
+              }).first!.manoeuvres[$man!.id - 1].id
+            )
+            .then((md)=>{
+              $man = $man!.reset(md);
+              analyseManoeuvre($selManID, true, true, true);
+            });
+            
+             
+          }}>Reset</button>
+
       </div>
 			</div>
 		</div>

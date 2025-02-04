@@ -1,4 +1,4 @@
-import { analysisServer, dbServer } from "./api";
+import { analysisServer, dbServer, faVersion } from "./api";
 
 
-export { analysisServer, dbServer };
+export { analysisServer, dbServer, faVersion };

@@ -1,5 +1,5 @@
 import { Point } from '$lib/utils/geometry';
-import { parse_dict, sum } from '$lib/utils/arrays';
+import { objmap, sum } from '$lib/utils/arrays';
 import { Criteria } from './definition.svelte';
 
 
@@ -91,7 +91,7 @@ export class Results {
   ) {}
 
   static parse(data: Record<string, any>) {
-    return new Results(data.name, parse_dict(data.data, Result.parse), data.summary, data.total);
+    return new Results(data.name, objmap(data.data, Result.parse), data.summary, data.total);
   }
 
   factoredDG(difficulty: (v: number) => number, trunc = false) {
@@ -119,7 +119,7 @@ export class ElementsResults {
   ) {}
 
   static parse(data: Record<string, any>) {
-    return new ElementsResults(parse_dict(data.data, Results.parse), data.summary, data.total);
+    return new ElementsResults(objmap(data.data, Results.parse), data.summary, data.total);
   }
 
   all_fields() {

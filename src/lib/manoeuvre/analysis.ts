@@ -48,15 +48,34 @@ export class MA {
 		}
 	}
 
-	async run(optimise: boolean) {
+  reset(newmd?: ManDef | ManOpt | undefined) {
+    return new MA(
+      this.name,
+      this.id,
+      this.tStart,
+      this.tStop,
+      this.schedule,
+      this.scheduleDirection,
+      this.history,
+      this.k,
+      this.flown,
+      newmd || this.mdef,
+    );
+  }
+
+	async run(optimise: boolean, reset: boolean) {
+
+
+
 		const res = (
 			await analysisServer.post('analyse', {
 				id: this.id,
-				mdef: this.mdef?.dump(),
+				mdef: this.mdef!.dump(),
 				optimise_alignment: optimise,
 				flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
 				origin: get(origin),
-				schedule_direction: this.scheduleDirection
+				schedule_direction: this.scheduleDirection,
+        reset
 			})
 		).data;
 		selectedResult.set(res.fa_version);
@@ -82,9 +101,9 @@ export class MA {
 			res.mdef.info.k,
 			States.parse(res.flown),
 			ManDef.parse(res.mdef),
-			res.manoeuvre,
-			States.parse(res.template),
-			res.corrected,
+			res.manoeuvre ? Manoeuvre.parse(res.manoeuvre): undefined,
+			res.template ? States.parse(res.template) : undefined,
+			res.corrected ? Manoeuvre.parse(res.corrected) : undefined,
 			res.corrected_template ? States.parse(res.corrected_template) : undefined,
 			res.full_scores ? ManoeuvreResult.parse(res.full_scores) : undefined,
       res.info  
@@ -105,10 +124,10 @@ export class MA {
 	longExport() {
 		return {
 			...this.shortExport(),
-			mdef: this.mdef,
-			manoeuvre: this.manoeuvre,
+			mdef: this.mdef?.dump(),
+			manoeuvre: this.manoeuvre?.dump(),
 			template: this.template!.data,
-			corrected: this.corrected,
+			corrected: this.corrected?.dump(),
 			corrected_template: this.corrected_template!.data,
 			scores: this.scores
 		};

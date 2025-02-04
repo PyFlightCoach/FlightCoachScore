@@ -1,10 +1,29 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import * as mh from '$lib/manoeuvre/manoeuvre_handler.svelte';
+  import {points} from '$lib/components/plots/traces';
 
-	let { man }: { man: mh.ManoeuvreHandler} = $props();
+	let { man, }: { man: mh.ManoeuvreHandler} = $props();
+
+  let states = man.template?.split();
+
+	let centre_points = $derived(
+		man.definition!.info.centre_points.map((i) => Object.values(states!)[i - 1].data.at(-1)!.pos)
+	);
+	let el_points = $derived(
+		man.definition!.info.centred_els.map((i) => {
+			let el = Object.values(states!)[i[0]].data;
+			return el[Math.round(i[1] * el.length)].pos;
+		})
+	);
+  const cpNames = $derived(man.definition!.info.centre_points.map((i) => 'Point '.concat(i.toString())));
+  const ceNames = $derived(man.definition!.info.centred_els.map((i) => 'Element '.concat(i[0].toString())));
+
+
 </script>
 
 {#if man.template}
-	<PlotSec flst={man.template[0]} expand={50} exclude_controls={['slider', 'showBox']} fixRange hideAxes/>
+	<PlotSec flst={man.template} expand={50} exclude_controls={['slider', 'showBox']} fixRange hideAxes
+    extraTraces={[...points(centre_points,cpNames), ...points(el_points,ceNames)]}
+  />
 {/if}

@@ -4,7 +4,7 @@ export const heights = ['BTM', 'MID', 'TOP'];
 export type Height = (typeof heights)[number];
 export const directions = ['UPWIND', 'DOWNWIND', 'CROSS'];
 export type Direction = (typeof directions)[number];
-export const positions = ['CENTER', 'END'];
+export const positions = ['CENTRE', 'END'];
 export type Position = (typeof positions)[number];
 export const orientations = ['UPRIGHT', 'INVERTED'];
 export type Orientation = (typeof orientations)[number];
@@ -34,6 +34,9 @@ export class BoxLocation implements IBoxLocation {
     return new BoxLocation(data.height, data.direction, data.orientation);
   }
 
+  copy() {
+    return new BoxLocation(this.height, this.direction, this.orientation);
+  }
   dump() {
     return {
       height: this.height,

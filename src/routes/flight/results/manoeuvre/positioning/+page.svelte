@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { selManID, analyses } from '$lib/stores/analysis';
-	import type { States } from '$lib/utils/state';
 	import Plot from 'svelte-plotly.js';
-	import { coloured_ribbons, points, ribbon } from '$lib/components/plots/traces';
+	import { points, ribbon } from '$lib/components/plots/traces';
 	import { layout3d } from '$lib/components/plots/layouts';
 	import { iacBoxTrace, f3aBoxTrace } from '$lib/flight/box/box_geometry';
-	import { d3Color, d3Colors } from '$lib/components/plots/styling';
+	import { d3Color } from '$lib/components/plots/styling';
   import {mean} from 'lodash';
 
 	let man = analyses[$selManID!];
@@ -61,7 +60,7 @@
 		});
 	});
 
-  $inspect(centredg);  
+  
   const cpNames = $derived($man!.mdef!.info.centre_points.map((i) => 'Point '.concat(i.toString())));
   const ceNames = $derived($man!.mdef!.info.centred_els.map((i) => 'Element '.concat(i[0].toString())));
 </script>

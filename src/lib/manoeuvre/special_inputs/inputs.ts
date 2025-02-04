@@ -2,7 +2,7 @@ import * as units from '$lib/utils/units';
 
 export type Arg = number | string | (number | string)[] | boolean;
 
-export const equals = (a: Arg | undefined, b: Arg | undefined): boolean => {
+export const equals = (a: Arg[][] | Arg[] | Arg | undefined, b: Arg[][] | Arg[] | Arg | undefined): boolean => {
 	if (Array.isArray(a) && Array.isArray(b)) {
 		if (a.length !== b.length) {
 			return false;
@@ -25,7 +25,7 @@ export class NumberInput {
 	) {}
 
 	checkOption(value: number | string | undefined) {
-		if (typeof value === 'number') {
+		if (typeof value === 'number' || !value) {
 			return 'value';
 		} else if (typeof value == 'string' && value.startsWith('(') && value.endsWith(')')) {
 			return 'eqn';

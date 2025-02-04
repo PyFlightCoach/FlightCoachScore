@@ -4,7 +4,7 @@ import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
 import { user } from '$lib/stores/user';
-import { dbServer} from '$lib/api';
+import { dbServer, analysisServer} from '$lib/api';
 import { loadSchedules } from '$lib/schedule/library';
 
 export const mouse = writable({ x: 0, y: 0 });
@@ -81,3 +81,15 @@ user.subscribe((u) => {
   if (u) loadSchedules({owner: u.email});
   
 });
+
+
+export const rules: Writable<string[]> = writable();
+
+export function loadRules() {
+  analysisServer
+    .get('rules')
+    .then((res) => rules.set(res.data))
+    .catch((e) => {
+      alert(`Error loading rules from analysis server ${e}`);
+    });
+}

@@ -1,27 +1,24 @@
 <script lang="ts">
-	import * as inputs from '$lib/components/special_inputs/inputs';
-	import { extractComboNdMps} from '$lib/schedule/aresti.svelte';
-	import type { ManParm } from '$lib/manoeuvre/definition.svelte';
+	import * as inputs from './inputs';
+	import type { ManParm, MPValue } from '$lib/manoeuvre/definition.svelte';
 	import ArrayInput from './ArrayInput.svelte';
 	import MpInput from './MPInput.svelte';
-	import MpNumberInput from './MPNumberInput.svelte';
 	import NumberInput from './NumberInput.svelte';
+	import { objfilter } from '$lib/utils/arrays';
 
 	let {
 		value = $bindable(),
 		refvalue,
 		rollInput,
 		canEdit = false,
-		mps,
-		ndmps,
+		mpValues,
 		onchange = () => {}
 	}: {
 		value: number | string | (number | string)[];
 		refvalue: number | string | (number | string)[] | undefined;
 		rollInput: inputs.RollInput;
 		canEdit?: boolean;
-		mps: Record<string, ManParm>;
-		ndmps: Record<string, number | number[][]>;
+		mpValues: Record<string, MPValue>;
 		onchange?: (newVal: number | string | (number | string)[]) => void;
 	} = $props();
 
@@ -32,12 +29,8 @@
 	let isValidPointRoll = $derived(
 		inputMode == 'point' ? inputs.re_point_roll.test(value as string) : true
 	);
-
-	const allowedMPS = Object.values(mps)
-		.filter((mp) => mp.criteria.kind == 'combination')
-		.map((mp) => mp.name);
-
-  const comboNdMps = $state(extractComboNdMps(ndmps));
+  
+  const allowedMPS = $derived(objfilter(mpValues, (v)=>v.unit=='rad'));
 
 </script>
 
@@ -84,7 +77,7 @@
 			inputMode = newInputMode;
 		}}
 	>
-		{#if allowedMPS.length || Object.keys(comboNdMps).length}
+		{#if allowedMPS.length}
 			<option value="MP">MP</option>
 		{/if}
 		<option value="value">value</option>
@@ -98,8 +91,7 @@
 		refvalue={refvalue as string | undefined}
 		numInput={new inputs.NumberInput('rad', Math.PI / 4)}
 		{canEdit}
-		{mps}
-		ndmps={comboNdMps}
+		{mpValues}
 		onchange={(newVal) => onchange(newVal as string)}
 	/>
 {:else if inputMode == 'value'}
@@ -128,8 +120,6 @@
 		refvalue={refvalue as (number | string)[] | undefined}
 		input={rollInput}
 		{canEdit}
-		{mps}
-    ndmps={comboNdMps}
 		{onchange}
 	/>
 {/if}

@@ -6,8 +6,6 @@ import { get } from 'svelte/store';
 import { BinData } from '$lib/flight/bin/bindata';
 import { isComp, type Split, takeOff} from '$lib/flight/splitting';
 
-
-
 export const isCompFlight: Writable<boolean> = writable(true);
 
 export const bin: Writable<File | undefined> = writable();

@@ -1,24 +1,17 @@
 <script lang="ts">
-	import * as inputs from '$lib/components/special_inputs/inputs';
-	import type { ManParm } from '$lib/manoeuvre/definition.svelte';
-	import MpNumberInput from './MPNumberInput.svelte';
+	import * as inputs from './inputs';
 	import NumberInput from './NumberInput.svelte';
-	import { type CombinationValue, type ComparisonValue } from '$lib/schedule/aresti.svelte';
 	let {
 		value = $bindable(),
 		refvalue = $bindable(),
 		input,
 		canEdit = false,
-		mps,
-    ndmps,
 		onchange = () => {}
 	}: {
 		value: (number | string)[];
 		refvalue: (number | string)[] | undefined;
 		input: inputs.RollInput;
 		canEdit?: boolean;
-		mps: Record<string, ManParm> | undefined;
-    ndmps: Record<string, CombinationValue | ComparisonValue>;
 		onchange?: (newVal: number | string | (number | string)[]) => void;
 	} = $props();
   
@@ -42,23 +35,12 @@
 				<tbody>
 					{#each value as v, i}
 						<tr>
-              {#if mps}
-              <MpNumberInput
-								bind:value={value[i]}
-                refvalue={refvalue ? refvalue[i] : undefined}
-								numInput={new inputs.NumberInput('rad', Math.PI / 4)}
-								{canEdit}
-								{mps}
-                {ndmps}
-							/>
-              {:else}
               <NumberInput 
                 bind:value={value[i] as number}
                 refvalue={refvalue ? refvalue[i] as number : undefined}
                 numInput={new inputs.NumberInput('rad', Math.PI / 4)}
                 {canEdit}
                 />
-              {/if}
             </tr>
 					{/each}
           <tr>

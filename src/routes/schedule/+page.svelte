@@ -1,19 +1,16 @@
 <script lang="ts">
-	import LoadSequence from './LoadSequence.svelte';
-	import EditManoeuvres from './EditManoeuvres.svelte';
-	import EditSequence from './EditSequence.svelte';
+	import LoadScheduleHandler from './LoadScheduleHandler.svelte';
+	import EditSchedule from './EditSchedule.svelte';
 	import PlotAll from './PlotAll.svelte';
 	import EditManoeuvre from './ManoeuvrePage.svelte';
 	import navBarContents from '$lib/stores/navBarContents';
-  import * as sh from '$lib/schedule/schedule_handler';
-
+	import { ScheduleHandler } from '$lib/schedule/schedule_handler.svelte';
 
 	let form_state: string | undefined = $state();
 	let activeManId: number | undefined = $state();
+  
 
-  let schedule: sh.ScheduleHandler | undefined = $state();
-
-
+	let schedule: ScheduleHandler | undefined = $state();
 
 	$navBarContents = undefined;
 </script>
@@ -29,26 +26,20 @@
 					<p><mark>{form_state}</mark></p>
 				</div>
 			{/if}
-			{#if !schedule}
-				<LoadSequence bind:schedule />
+			{#if schedule}
+				<EditSchedule {schedule} bind:activeManId onclear={()=>{schedule=undefined}}/>
 			{:else}
-				<EditSequence bind:schedule />
-        <button class="col col-form-input btn btn-outline-secondary mx-2" onclick={schedule=undefined}>
-          Clear
-        </button>
-        <EditManoeuvres bind:activeManId />
+				<LoadScheduleHandler bind:schedule />
 			{/if}
-
-			
 		</div>
 	</div>
 </div>
 <div class="col-md-8 pt-3">
-	{#if schedule}
+	{#if schedule && schedule.manoeuvres.length}
 		{#if activeManId != undefined}
-			<EditManoeuvre man={schedule.manoeuvres[activeManId]} />
+			<EditManoeuvre man={schedule.manoeuvres[activeManId]}/>
 		{:else}
-			<PlotAll />
+			<PlotAll {schedule} />
 		{/if}
 	{/if}
 </div>

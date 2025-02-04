@@ -54,10 +54,23 @@ export class ManInfo implements ManInfo {
 		);
 	}
 
-  dump() {
+  copy() {
+    return new ManInfo(
+      this.name,
+      this.short_name,
+      this.k,
+      this.position,
+      this.start.copy(),
+      this.end.copy(),
+      this.centre_points,
+      this.centred_els
+    );
+  }
+
+  dump(new_name: string | undefined = undefined) {
     return {
       name: this.name,
-      short_name: this.short_name,
+      short_name: new_name || this.short_name,
       k: this.k,
       position: this.position,
       start: this.start.dump(),

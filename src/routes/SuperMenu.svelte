@@ -8,7 +8,7 @@
 	import { user } from '$lib/stores/user';
   import {reloadSchedules} from '$lib/schedule/library';
   import {loadGuiLists} from '$lib/stores/shared';
-	import { loadRules } from '$lib/schedule/builder.svelte';
+	import { loadRules } from '$lib/stores/shared';
 </script>
 
 <NavMenu tooltip="Super User Menu">

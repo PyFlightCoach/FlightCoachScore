@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {
 		type NumberInput,
-		unitOptions,
-		unitMultipliers,
 		equals
-	} from '$lib/components/special_inputs/inputs';
-
+	} from './inputs';
+  import {unitOptions,
+		unitMultipliers} from '$lib/utils/units';
+    
 	let {
 		value = $bindable(),
 		refvalue,

@@ -32,7 +32,7 @@
 	export let includeZero: boolean = false;
 	export let expand: number = 0;
   export let hideAxes: boolean = false;
-
+  export let extraTraces: any[] = [];
 
   let showcontrols = controls.filter(c=>!exclude_controls.includes(c))
 
@@ -146,7 +146,7 @@
 				}
 			: { type: 'mesh3d', visible: false, name: 'grey2' };
 
-	$: traces = [box, fl_ribbon, tp_ribbon, fl_model, tp_model, grey_ribbon1, grey_ribbon2];
+	$: traces = [box, fl_ribbon, tp_ribbon, fl_model, tp_model, grey_ribbon1, grey_ribbon2, ...extraTraces];
 
 	let player: number | undefined;
 

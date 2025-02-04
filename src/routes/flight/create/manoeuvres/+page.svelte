@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlotSec from '$lib/components/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/flight/analysis.js';
-	import { states, fcj, bin, manSplits, isCompFlight } from '$lib/stores/analysis';
+	import { states, fcj, bin, manSplits } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/flight/fcjson';
