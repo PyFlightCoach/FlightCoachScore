@@ -59,7 +59,7 @@ export class ScheduleHandler {
 			)
 			.then(() =>
 				dbServer.post(
-					`schedule/`,
+					`schedule`,
 					{ name, category }
 				)
 			)
