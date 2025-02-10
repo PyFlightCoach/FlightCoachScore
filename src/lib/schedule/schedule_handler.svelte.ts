@@ -57,20 +57,17 @@ export class ScheduleHandler {
 				{ name: category, rule: this.builder.rule },
 				{ validateStatus: (status) => [200, 409].includes(status) }
 			)
-			.then(() =>
-				dbServer.post(
-					`schedule`,
-					{ name, category }
-				)
-			)
-			.then((res) => {
-				this.manoeuvres.forEach((man, i) => {
-					man.post(res.data.schedule_id, i + 1);
-				});
-			});
+			.then(() => dbServer.post(`schedule`, { name, category }))
+			.then(
+				async (res) =>
+					await Promise.all(this.manoeuvres.map((man, i) => man.post(res.data.schedule_id, i + 1)))
+			);
 	}
 
-	async patch() {}
+	async patch() {
+		const res = this.manoeuvres.map((man) => man.patch());
+		return await Promise.all(res);
+	}
 
 	get canIEdit() {
 		if (get(user)?.is_superuser) return true;
@@ -82,20 +79,20 @@ export class ScheduleHandler {
 		return false;
 	}
 
-  arestiJson(name: string | undefined) {
-    return {
-      name: name || this.dbSchedule?.schedule_name,
-      rules: this.builder.rule,
-      figures: this.manoeuvres.map(m=>m.dumpAresti())
-    }
-  }
+	arestiJson(name: string | undefined) {
+		return {
+			name: name || this.dbSchedule?.schedule_name,
+			rules: this.builder.rule,
+			figures: this.manoeuvres.map((m) => m.dumpAresti())
+		};
+	}
 
-  definitionJson(name: string | undefined, category: string | undefined) {
-    return {
-      name: name || this.dbSchedule!.schedule_name,
-      category: category || this.dbSchedule!.category_name,
-      fa_version: get(faVersion),
-      mdefs: this.manoeuvres.map(m=>m.dumpDefinition())
-    }
-  }
+	definitionJson(name: string | undefined, category: string | undefined) {
+		return {
+			name: name || this.dbSchedule!.schedule_name,
+			category: category || this.dbSchedule!.category_name,
+			fa_version: get(faVersion),
+			mdefs: this.manoeuvres.map((m) => m.dumpDefinition())
+		};
+	}
 }
