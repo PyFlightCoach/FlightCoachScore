@@ -51,7 +51,7 @@ export class ScheduleHandler {
 	}
 
 	async post(name: string, category: string) {
-		dbServer
+		return await dbServer
 			.post(
 				'schedule/category',
 				{ name: category, rule: this.builder.rule },
