@@ -12,7 +12,6 @@
 	import { analyseManoeuvre } from '$lib/flight/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import {} from '$lib/stores/analysis';
 
 	interface Props {
 		id: number;
