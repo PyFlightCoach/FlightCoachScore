@@ -118,18 +118,15 @@
 		<span class="small text-nowrap text-muted w-100 overflow-scroll">
 			{$info}
 			{#if $info && !isRunning && !$info.includes('Imported') && score == 0}
-				<a
+				<button
 					tabindex="0"
-					onkeydown={() => activate_man(id, 'alignment')}
-					href="#"
-					type="link"
-					role="button"
-					class="text-sm"
+					class=" btn btn-sm btn-link p-0"
+          data-sveltekit-preload-data="tap"
 					onclick={() => activate_man(id, 'alignment')}
 					title="Failed analyses or unexpectedly low scores may be a result of a failed element alignment. Go to the the alignment page to check and fix it for this manoeuvre."
 				>
 					Check Alignment
-				</a>
+				</button>
 			{/if}
 		</span>
   </div>
