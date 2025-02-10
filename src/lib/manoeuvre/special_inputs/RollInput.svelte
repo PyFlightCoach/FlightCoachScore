@@ -96,7 +96,7 @@
 	/>
 {:else if inputMode == 'value'}
 	<NumberInput
-		value={value as number}
+		bind:value={value as number}
 		refvalue={refvalue as number | undefined}
 		numInput={new inputs.NumberInput('rad', Math.PI / 4, 'Enter a value in radians')}
 		{canEdit}
