@@ -109,7 +109,8 @@
 		<div class="col col-form-label">
 			{#if schedule.dbSchedule}Flight Count = {schedule.dbSchedule?.num_flights}{/if}
 		</div>
-	{:else if schedule.canIEdit && ($user?.is_superuser || $user?.is_cd)}
+  {/if}
+	{#if schedule.canIEdit && ($user?.is_superuser || $user?.is_cd)}
 		<button
 			class="col col-form-input btn btn-outline-secondary mx-1"
 			onclick={() => {
