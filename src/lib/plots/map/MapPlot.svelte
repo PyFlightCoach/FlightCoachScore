@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Plot from 'svelte-plotly.js';
+  import Plot from '$lib/plots/Plotly.svelte';
   import {binDataMapTrace, originMapTraces} from './mapTraces';
 	import { GPS } from '$lib/utils/geometry';
-	import type { BinData } from '$lib/components/bin';
+	import type { BinData } from '$lib/flight/bin';
 	import type { Origin } from '$lib/flight/fcjson';
 
   export let origin: Origin |undefined;
@@ -42,5 +42,4 @@
 			},
 			margin: { l: 0, r: 0, t: 0, b: 0 }
 		}}
-		fillParent={true}
 	/>

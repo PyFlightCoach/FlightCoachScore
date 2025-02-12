@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PlotSec from '$lib/components/plots/PlotSec.svelte';
+	import PlotSec from '$lib/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/flight/analysis.js';
 	import { states, fcj, bin, manSplits } from '$lib/stores/analysis';
 	import { base } from '$app/paths';
@@ -8,6 +8,7 @@
 	import { loadManDef, library } from '$lib/schedule/library.js';
 	import ManSelect from '$lib/flight/ManoeuvreSelecter.svelte';
 	import * as ms from '$lib/flight/splitting.js';
+  import {isFullSize} from '$lib/stores/shared';
 
 	const { data } = $props();
 
@@ -290,7 +291,8 @@
 			bind:range
 			flst={$states}
 			greyUnselected={true}
-			controls={['slider', 'modelClick']}
+			controls={['slider', 'modelClick', 'scale']}
+      scale={$isFullSize ? 3.5 : 1.5}
 		/>
 	{/if}
 </div>

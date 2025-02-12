@@ -1,6 +1,6 @@
 <script lang="ts">
 	
-	import Plot from 'svelte-plotly.js';
+	import Plot from './Plotly.svelte';
   import {states} from '$lib/stores/analysis';
 
   
@@ -21,6 +21,4 @@
   layout={{
 		yaxis:{scaleanchor:"x", scaleratio:1}
 	}}
-  fillParent={true}
-
 />

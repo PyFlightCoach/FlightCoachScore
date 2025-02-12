@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { selManID, analyses, isFullSize } from '$lib/stores/analysis';
-	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
-	import PlotSec from '$lib/components/plots/PlotSec.svelte';
+	import { selManID, analyses } from '$lib/stores/analysis';
+	import PlotDTW from '$lib/plots/PlotDTW.svelte';
+	import PlotSec from '$lib/plots/PlotSec.svelte';
 	import DGPlot from './DGPlot.svelte';
 	import CriteriaPlot from './CriteriaPlot.svelte';
-	import { d3Color } from '$lib/components/plots/styling';
+	import { d3Color } from '$lib/plots/styling';
 	import { objmap } from '$lib/utils/arrays';
-	import { windowWidth } from '$lib/stores/shared';
+	import { windowWidth, isFullSize } from '$lib/stores/shared';
 	import VisPlot from './VisPlot.svelte';
-	import { find } from 'lodash';
-
+	
+  
   const md = $derived($windowWidth >= 768);
 
 	const man = analyses[$selManID!];
@@ -46,7 +46,7 @@
 		bind:i={activeIndex}
 		controls={['play', 'scale', 'speed', 'projection', 'modelClick']}
 		fixRange
-		scale={0.4}
+		scale={$isFullSize ? 1 : 0.6}
 		expand={40}
 	/>
 {/snippet}
@@ -155,7 +155,7 @@
 			{#if selectedElement == 'All'}
 				<PlotDTW
 					sts={states}
-					sp={$isFullSize ? 10 : 4}
+					scale={$isFullSize ? 3 : 1}
 					bind:activeEl={selectedElement}
 					defaultValue="All"
 					labels={eltotals ? objmap(eltotals, (v) => v?.toFixed(2)) : {}}

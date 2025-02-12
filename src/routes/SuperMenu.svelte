@@ -1,5 +1,5 @@
 <script lang="ts">
-	import NavMenu from '$lib/components/NavMenu.svelte';
+	import NavMenu from './NavMenu.svelte';
 	import ServerSelection from '$lib/api/ServerSelection.svelte';
 	import { base } from '$app/paths';
 	import { dev } from '$lib/stores/shared';

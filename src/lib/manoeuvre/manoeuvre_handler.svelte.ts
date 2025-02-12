@@ -213,31 +213,3 @@ export class ManoeuvreHandler {
 		});
 	}
 }
-
-/*
-
-
-export async function reload(
-	dbMan: types.DBMan | undefined,
-	olan: types.Olan | undefined,
-	rules: string | undefined
-) {
-	if (dbMan) {
-		return await parseDB(dbMan);
-	} else if (olan) {
-		return await parseOlan(olan.rawfig, rules || dbMan!.schedule.rule_name);
-	} else {
-		throw new Error('');
-	}
-}
-
-
-export async function deleteMH(man: ManoeuvreHandler) {
-	if (man.dbManoeuvre) {
-		await dbServer.delete(`schedule/$mans[id]/${man.dbManoeuvre.id}`).then(() => {
-			//TODO reload this scheudle
-		});
-	}
-	return man;
-}
-*/

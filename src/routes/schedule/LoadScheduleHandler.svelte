@@ -11,7 +11,7 @@
 	let rule: string = $state('f3a');
 	let olan: string = $state('88c24');
 	let selectedSchedule: DBSchedule | undefined = $state(schedule?.dbSchedule ? schedule.dbSchedule :$library.first);
-  
+
   async function createSchedule() {
     switch (inputmode) {
       case 'OLAN':

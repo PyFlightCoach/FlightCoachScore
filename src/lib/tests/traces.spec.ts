@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {OBJ} from '$lib/components/plots/traces';
+import {OBJ} from '$lib/plots/traces';
 import {Point} from '$lib/utils/geometry';
 
 

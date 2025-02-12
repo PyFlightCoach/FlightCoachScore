@@ -1,6 +1,6 @@
 <script lang="ts">
   import {base} from "$app/paths";
-  import NavMenu from "$lib/components/NavMenu.svelte";
+  import NavMenu from "./NavMenu.svelte";
 	import { user } from '$lib/stores/user';
 
 

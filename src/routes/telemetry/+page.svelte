@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Plot from 'svelte-plotly.js';
+	import Plot from '$lib/plots/Plotly.svelte';
 	import { analysisServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
 	import { saveAs } from 'file-saver';

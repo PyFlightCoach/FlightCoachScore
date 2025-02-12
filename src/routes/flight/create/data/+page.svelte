@@ -4,8 +4,8 @@
 	import { dataSource } from '$lib/stores/shared';
 	import FlightDataReader from '$lib/flight/FlightDataReader.svelte';
 	import { BoxReader } from '$lib/flight/box';
-	import { MapPlot } from '$lib/components/plots/map';
-	import PlanViewPlot from '$lib/components/plots/PlanViewPlot.svelte';
+	import { MapPlot } from '$lib/plots/map';
+	import PlanViewPlot from '$lib/plots/PlanViewPlot.svelte';
 	import { base } from '$app/paths';
 	import { GPS } from '$lib/utils/geometry';
 	import { States } from '$lib/utils/state';

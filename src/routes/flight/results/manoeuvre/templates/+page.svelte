@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Plot from 'svelte-plotly.js';
-	import { modeltrace, ribbon } from '$lib/components/plots/traces';
-	import { layout3d } from '$lib/components/plots/layouts';
+	import Plot from '$lib/plots/Plotly.svelte';
+	import { modeltrace, ribbon } from '$lib/plots/traces';
+	import { layout3d } from '$lib/plots/layouts';
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
 	import type { States } from '$lib/utils/state';
-	import colddraft from '$lib/components/plots/colddraft.js';
+	import colddraft from '$lib/plots/colddraft.js';
 
 	$: man = analyses[$selManID!];
 

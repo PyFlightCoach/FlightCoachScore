@@ -37,7 +37,7 @@
 <div class="col-md-8 pt-3">
 	{#if schedule && schedule.manoeuvres.length}
 		{#if activeManId != undefined}
-			<EditManoeuvre man={schedule.manoeuvres[activeManId]}/>
+			<EditManoeuvre man={schedule.manoeuvres[activeManId]} rule={schedule.builder.rule}/>
 		{:else}
 			<PlotAll {schedule} />
 		{/if}

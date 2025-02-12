@@ -1,6 +1,7 @@
 <script lang="ts">
-	import PlotDtw from '$lib/components/plots/PlotDTW.svelte';
+	import PlotDtw from '$lib/plots/PlotDTW.svelte';
 	import type { ScheduleHandler } from '$lib/schedule/schedule_handler.svelte';
+  import {getScale} from '$lib/schedule/schedule_handler.svelte';
 
   const {schedule = $bindable()}: {schedule: ScheduleHandler | undefined} = $props();
   
@@ -24,7 +25,7 @@
 						{#if ol.template}
 							<PlotDtw
 								sts={ol.template.split()}
-								sp={['f3a', 'IMAC'].includes(schedule?.builder.rule || '') ? 8 : 15}
+								scale={getScale(schedule?.builder.rule || 'unknown')}
 								expand={20}
                 hideAxes
                 canSelect={false}

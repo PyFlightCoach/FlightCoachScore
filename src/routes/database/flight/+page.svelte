@@ -1,11 +1,13 @@
 <script lang="ts">
-	import PlotSec from '$lib/components/plots/PlotSec.svelte';
-	export let data;
+	import PlotSec from '$lib/plots/PlotSec.svelte';
+  import {getScale} from '$lib/schedule/schedule_handler.svelte'
+	const { data } = $props();
 
-  let version = Object.keys(data.flight!.meta.scores)[0];
-	let scores = data.flight!.getScore(3, false, version);	
-	let activeManId = 0;
-	let showBox = true;
+  let version = $state(Object.keys(data.flight!.meta.scores)[0]);
+	let scores = $derived(data.flight!.getScore(3, false, version));	
+	let activeManId = $state(0);
+	let showBox = $state(true);
+  let i: number=$state(0);
 </script>
 
 <div class="col-2">
@@ -40,6 +42,7 @@
 									name="manSelect"
 									value={i}
 									bind:group={activeManId}
+                  
 								/></td
 							>
 							<td>{man.short_name}</td>
@@ -58,5 +61,6 @@
 		controls={['play', 'scale', 'speed', 'projection', 'modelClick', 'showBox']}
     fixRange
     includeZero={true} expand={50}
+    scale={data.flight? getScale(data.flight?.schedule.rule_name): 1}
 	/>
 </div>

@@ -8,7 +8,7 @@
 	const plink = (name: string) => base + '/flight/results/manoeuvre/' + name;
 
 
-  const isLoaded = (name: string) => $page.url.pathname.endsWith(name) ? 'active' : '';
+  const isLoaded = (name: string) => $page.url.pathname.endsWith(name + '/') ? 'active' : '';
   
 
 </script>

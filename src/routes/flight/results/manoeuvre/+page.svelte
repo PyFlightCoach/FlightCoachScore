@@ -1,14 +1,14 @@
 <script lang='ts'>
   import { selManID, analyses } from '$lib/stores/analysis';
-  import PlotSec from '$lib/components/plots/PlotSec.svelte';
-  let man = $derived(analyses[$selManID!]);
-//  $: result = $man?.history[$selectedResult!]?.get_score($difficulty, $truncate)?.score;
+  import PlotSec from '$lib/plots/PlotSec.svelte';
+  import {isFullSize} from '$lib/stores/shared';
 
+  let man = $derived(analyses[$selManID!]);
   
 </script>  
 <div class="col">
   {#if $man && $man.flown} 
-    <PlotSec flst={$man.flown} i={1} expand={50} includeZero 
+    <PlotSec flst={$man.flown} i={1} expand={50} includeZero scale={$isFullSize ? 3 : 1.5}
     controls={[
       'slider',
       'play',

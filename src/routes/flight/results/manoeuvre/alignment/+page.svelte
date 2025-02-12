@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
 	import { analyseManoeuvre } from '$lib/flight/analysis';
-	import PlotDTW from '$lib/components/plots/PlotDTW.svelte';
+  import {isFullSize} from '$lib/stores/shared';
+	import PlotDTW from '$lib/plots/PlotDTW.svelte';
   import { loadManDef, library } from '$lib/schedule/library';
 
 	$: man = analyses[$selManID!];
@@ -41,7 +42,7 @@
 </script>
 
 <div class="col-12 border">
-	<PlotDTW sts={states} bind:activeEl={element} sp={3} expand={30}/>
+	<PlotDTW sts={states} bind:activeEl={element} scale={$isFullSize ? 3 : 1.5} expand={30}/>
 
 	<nav class="navbar fixed-bottom ">
 		<div class="container-fluid ">

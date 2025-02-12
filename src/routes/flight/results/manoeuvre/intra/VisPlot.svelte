@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Result } from '$lib/manoeuvre/scores';
-	import Plot from 'svelte-plotly.js';
+	import Plot from '$lib/plots/Plotly.svelte';
 	import { linspace } from '$lib/utils/arrays';
 	import type { DownGrade } from '$lib/manoeuvre/definition.svelte';
 

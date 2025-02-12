@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ManInfo } from '$lib/manoeuvre/info.svelte';
 	import * as pos from '$lib/manoeuvre/positioning.svelte';
-	import EnumSelect from '$lib/components/EnumSelect.svelte';
+	import EnumSelect from '$lib/schedule/EnumSelect.svelte';
 
 	let {
 		newInfo = $bindable(),

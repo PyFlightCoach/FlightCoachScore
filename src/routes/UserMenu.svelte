@@ -1,5 +1,5 @@
 <script lang="ts">
-	import NavMenu from '$lib/components/NavMenu.svelte';
+	import NavMenu from './NavMenu.svelte';
 	import { base } from '$app/paths';
 	import { user } from '$lib/stores/user';
 	import { dbServer } from '$lib/api/api';

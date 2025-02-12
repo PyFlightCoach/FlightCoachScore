@@ -1,7 +1,7 @@
 import { Point, Quaternion} from '$lib/utils/geometry';
 import { States } from '$lib/utils/state';
 import ObjFile from 'obj-file-parser';
-import { d3Color } from '$lib/components/plots/styling';
+import { d3Color } from '$lib/plots/styling';
 
 export const ribbon = (
 	st: States,
@@ -58,6 +58,23 @@ export const coloured_ribbons = (states: Record<string, States>, span: number) =
 };
 
 
+export const plotCorners = (st: States, expand: number = 0, includeZero:boolean=false) => { 
+  const r = {
+    x: st.plotRange('x', includeZero, expand),
+    y: st.plotRange('y', includeZero, expand),
+    z: st.plotRange('z', includeZero, expand)
+  };
+
+  return {
+    type: 'scatter3d',
+    mode: 'markers',
+    x: [r.x[0], r.x[0], r.x[0], r.x[0], r.x[1], r.x[1], r.x[1], r.x[1]],
+    y: [r.y[0], r.y[0], r.y[1], r.y[1], r.y[0], r.y[0], r.y[1], r.y[1]],
+    z: [r.z[0], r.z[1], r.z[0], r.z[1], r.z[0], r.z[1], r.z[0], r.z[1]],
+    marker: { size: 0, color: 'white' },
+    hoverinfo: 'none'
+  };
+};
 
 export const vectors = (
 	pos: Point[],
@@ -124,7 +141,8 @@ export const boxtrace = () => {
 		k: [2, 3, 4, 6, 6],
 		opacity: 0.4,
 		color: 'grey',
-		type: 'mesh3d'
+		type: 'mesh3d',
+    hoverinfo: 'none',
 	};
 };
 

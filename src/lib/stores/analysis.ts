@@ -5,6 +5,7 @@ import { MA } from '$lib/manoeuvre/analysis';
 import { get } from 'svelte/store';
 import { BinData } from '$lib/flight/bin/bindata';
 import { isComp, type Split, takeOff} from '$lib/flight/splitting';
+import { isFullSize } from './shared';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 
@@ -15,7 +16,6 @@ export const origin: Writable<Origin | undefined> = writable(Origin.load());
 export const fcj: Writable<FCJson | undefined> = writable();
 export const states: Writable<States | undefined> = writable();
 
-export const isFullSize: Writable<boolean> = writable(false);
 
 states.subscribe((sts: States | undefined) => {
 	isFullSize.set(sts ? Math.max(sts.range('z'), sts.range('x'), sts.range('y')) > 1000 : false);

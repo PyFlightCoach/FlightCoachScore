@@ -8,7 +8,7 @@
 		runInfo,
 		analyses
 	} from '$lib/stores/analysis';
-	import { colscale, redsColors, tealsColrs, yellColors } from '$lib/components/plots/styling';
+	import { colscale, redsColors, tealsColrs, yellColors } from '$lib/plots/styling';
 	import { analyseManoeuvre } from '$lib/flight/analysis';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';

@@ -96,3 +96,19 @@ export class ScheduleHandler {
 		};
 	}
 }
+
+
+export const getScale = (rule: string) => {
+  switch (rule) {
+    case "f3a":
+      return 1.2
+    case "IMAC":
+      return 1.6
+    case "IAC":
+      return 3.0
+    case "IACGLIDER":
+      return 2.0
+    default:
+      return 1.0
+  }
+}

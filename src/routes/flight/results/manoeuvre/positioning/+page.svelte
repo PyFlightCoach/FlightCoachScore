@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { selManID, analyses } from '$lib/stores/analysis';
-	import Plot from 'svelte-plotly.js';
-	import { points, ribbon } from '$lib/components/plots/traces';
-	import { layout3d } from '$lib/components/plots/layouts';
+	import Plot from '$lib/plots/Plotly.svelte';
+	import { points, ribbon } from '$lib/plots/traces';
+	import { layout3d } from '$lib/plots/layouts';
 	import { iacBoxTrace, f3aBoxTrace } from '$lib/flight/box/box_geometry';
-	import { d3Color } from '$lib/components/plots/styling';
+	import { d3Color } from '$lib/plots/styling';
   import {mean} from 'lodash';
-
+  import {isFullSize} from '$lib/stores/shared';
+  
 	let man = analyses[$selManID!];
 
 	let states = $derived($man!.flown!.split());
@@ -177,15 +178,15 @@
 			data={[
 				ribbon(
 					$man!.flown!,
-					5,
+					$isFullSize ? 17 : 7,
 					{},
-					activeDg ? { opacity: 0.2, showlegend: false, color: 'grey', name: 'base' } : {}
+					activeDg ? { opacity: 0.2, color: 'grey', name: 'base' } : {color: 'grey'}
 				),
 				...(outRegions?.length
 					? outRegions.map((r, i) =>
 							ribbon(
 								r.sts,
-								5,
+								$isFullSize ? 17 : 7,
 								{},
 								{ opacity: 1, showlegend: false, color: d3Color(i), name: `out ${i}` }
 							)
@@ -196,7 +197,6 @@
 				boxfunc()
 			]}
 			layout={layout3d}
-			fillParent={true}
 		/>
 	</div>
 </div>

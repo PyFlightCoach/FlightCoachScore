@@ -13,6 +13,8 @@ export const lastErrorCode: Writable<number | undefined> = writable();
 export const lastErrorText: Writable<string | undefined> = writable();
 export const lastErrorDetail: Writable<string | undefined> = writable();
 
+export const isFullSize: Writable<boolean> = writable(false);
+
 export const loading: Writable<boolean | undefined> = writable();
 
 export const activeFlight: Writable<Flight | undefined> = writable();

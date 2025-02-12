@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { analyses, selManID, fcj } from '$lib/stores/analysis';
-	import PlotInter from '$lib/components/plots/PlotInter.svelte';
-  import { d3Color } from '$lib/components/plots/styling';
+	import PlotInter from '$lib/plots/PlotInter.svelte';
+  import { d3Color } from '$lib/plots/styling';
+  import {isFullSize} from '$lib/stores/shared';
 	
 	const man = analyses[$selManID!];
 
@@ -90,7 +91,7 @@
 	<PlotInter
 		sts={states}
 		activeEls={mp ? mp.getCollectorEls(Object.keys($man!.mdef!.eds)) : undefined}
-		sp={1.5}
+		sp={$isFullSize ? 2.5 : 1}
 	/>
 </div>
 </div>

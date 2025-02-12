@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Plot from 'svelte-plotly.js';
+	import Plot from '$lib/plots/Plotly.svelte';
 	import { user } from '$lib/stores/user.js';
 	import { difficulty, truncate } from '$lib/leaderboards/stores';
 	import * as types from '$lib/flight/db';
@@ -65,9 +65,6 @@
 					},
 					margin: { l: 0, r: 0, t: 0, b: 0 }
 				}}
-				fillParent={true}
-				fillParentWidth={true}
-				fillParentHeight={true}
 			/>
 		</div>
 	{/if}
