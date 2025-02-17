@@ -2,17 +2,12 @@
 	import type { Result } from '$lib/manoeuvre/scores';
 	import Plot from '$lib/plots/Plotly.svelte';
 	import { linspace } from '$lib/utils/arrays';
-	export let result: Result;
 
-	export let activeIndex: null | number = null;
-
-	$: plotIndex = activeIndex == null ? 0 : activeIndex;
-
-	$: scale = result.scale();
-
-	$: unit = result.measurement.unit.replace('rad', 'deg');
-
-	$: x = linspace(0, result.measurement.value.length - 1, result.measurement.value.length);
+  let {result, activeIndex=$bindable(0)} : {result: Result; activeIndex?: number} = $props();
+	
+  const scale = $derived(result.scale());
+  const unit = $derived(result.measurement.unit.replace('rad', 'deg'));
+  const x = $derived(linspace(0, result.measurement.value.length - 1, result.measurement.value.length));
 </script>
 
 <Plot
@@ -96,9 +91,9 @@
 		shapes: [
 			{
 				type: 'line',
-				x0: plotIndex,
+				x0: activeIndex,
 				y0: 0,
-				x1: plotIndex,
+				x1: activeIndex,
 				y1: 1,
 				yref: 'paper',
 				line: { color: 'black', width: 1 }
@@ -106,8 +101,8 @@
 		],
 		modebar: { orientation: 'v' }
 	}}
-	fillParent={true}
-	on:click={(e) => {
-		activeIndex = e.detail.points[0].x;
+	onclick={(e) => {
+    console.log(e);
+		activeIndex = e.points[0].x as number;
 	}}
 />

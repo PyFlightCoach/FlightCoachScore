@@ -36,7 +36,7 @@
 			: undefined
 	);
 
-  $inspect($man);
+  $inspect(activeIndex);
 </script>
 
 {#snippet plotsec()}
