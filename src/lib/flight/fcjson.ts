@@ -3,7 +3,6 @@ import { GPS, Quaternion, Point } from '$lib/utils/geometry';
 import { analysisServer } from '$lib/api/api';
 import _ from 'lodash';
 
-
 export class Origin {
 	lat: number;
 	lng: number;
@@ -36,7 +35,8 @@ export class Origin {
 
 	static load() {
 		if (
-			browser && ['orginLat', 'orginLon', 'orginAlt', 'orginHead']
+			browser &&
+			['orginLat', 'orginLon', 'orginAlt', 'orginHead']
 				.map((key) => localStorage.getItem(key))
 				.every((v) => v)
 		) {
@@ -324,7 +324,9 @@ export class FCJson {
 		this.origin = new Origin(
 			parseFloat(this.parameters.pilotLat),
 			parseFloat(this.parameters.pilotLng),
-			parseFloat(this.parameters.pilotAlt),
+			typeof this.parameters.originAlt == 'number'
+				? this.parameters.originAlt
+				: parseFloat(this.parameters.originAlt),
 			(this.parameters.rotation * 180) / Math.PI,
 			this.parameters.moveEast,
 			this.parameters.moveNorth
@@ -393,7 +395,4 @@ export class FCJson {
 			data: this.data
 		};
 	}
-
-
-  
 }

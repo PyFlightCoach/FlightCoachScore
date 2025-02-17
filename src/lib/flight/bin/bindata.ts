@@ -1,4 +1,6 @@
 import { lookupMonotonic } from '$lib/utils/arrays';
+import {GPS} from '$lib/utils/geometry';
+
 
 export class BinField {
 	constructor(data: Record<string, number[]>) {
@@ -35,9 +37,9 @@ export class BinData {
 		return Object.keys(this).filter((key) => key.startsWith(name));
 	}
 
-	col(name: string, core: number | undefined = undefined) {
+	col(name: string, core: number | undefined = undefined): BinField {
 		const cols = this.getCols(name).sort();
-		return core && cols.includes(`${name}[${core}]`) ? this[`${name}[${core}]`] : this[cols[0]];
+		return core && cols.includes(`${name}[${core}]`) ? this[`${name}[${core}]` as keyof BinData] : this[cols[0]];
 	}
 
 	get xkf1() {
@@ -68,6 +70,10 @@ export class BinData {
 		return this.col('GPS');
 	}
 
+  get gpa() {
+    return this.col('GPA');
+  }
+
   get rcin() {
     return this.col('RCIN');
   }
@@ -91,4 +97,23 @@ export class BinData {
 			Object.fromEntries(Object.entries(data).map(([k, v]) => [k, new BinField(v)]))
 		);
 	}
+
+  findOrigin() {
+    // find the point where GPA accuracy is below something, ref Artur
+    
+    let i = 1;
+    let ind = -1;
+    const HACC = 3;
+    while (ind === -1 && i < 8) {
+        ind = this.gpa.HAcc.findIndex( (e) => e.HAcc < (HACC * i) && e.HAcc > 0.1  );
+        i++;
+    }
+    if (ind === -1) throw new Error(`No suitable origin found in GPS`);
+
+    const gpsindex = lookupMonotonic(this.gpa.t[ind], this.gps.t);
+
+    return new GPS(this.gps.Lat[gpsindex], this.gps.Lng[gpsindex], this.gps.Alt[gpsindex]);
+  }
+
+
 }

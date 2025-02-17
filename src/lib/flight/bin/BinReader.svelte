@@ -10,7 +10,7 @@
 	let md5Sum: string | undefined = $state();
 	let {
     bin = undefined,
-		messages = $bindable(['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'ORGN']),
+		messages = $bindable(['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'GPA', 'ORGN']),
 		busy = $bindable(false),
 		download = false,
 		clear = false,
