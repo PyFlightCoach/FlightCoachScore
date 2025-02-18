@@ -1122,6 +1122,20 @@
                                     "lng": "-68.916845",
                                     "alt": "1020.00"
                                 }
+                            },
+                            {
+                                "value": "Aeroranch PM",
+                                "label": "Aeroranch PM",
+                                "pilotGPS": {
+                                    "lat": "-32.975930",
+                                    "lng": "-68.916715",
+                                    "alt": "1020.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "-32.975987",
+                                    "lng": "-68.914507",
+                                    "alt": "1020.00"
+                                }
                             }
                         ]
                     },
@@ -1455,6 +1469,26 @@
                                     "lat": "-20.730830",
                                     "lng": "-49.466404",
                                     "alt": "541.00"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "value": "Presidente Prudente",
+                        "label": "Presidente Prudente",
+                        "children": [
+                            {
+                                "value": "SDEM",
+                                "label": "SDEM",
+                                "pilotGPS": {
+                                    "lat": "-22.1034031",
+                                    "lng": "-51.4555019",
+                                    "alt": "426"
+                                },
+                                "centerGPS": {
+                                    "lat": "-22.1033572",
+                                    "lng": "-51.4553585",
+                                    "alt": "426"
                                 }
                             }
                         ]
@@ -2347,6 +2381,32 @@
                                     "lat": "49.317661053973",
                                     "lng": "17.5822977709581",
                                     "alt": "226.00"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Prague-East",
+                "label": "Prague-East",
+                "children": [
+                    {
+                        "value": "Běchovice",
+                        "label": "Běchovice",
+                        "children": [
+                            {
+                                "value": "RC Letiště Běchovice",
+                                "label": "RC Letiště Běchovice",
+                                "pilotGPS": {
+                                    "lat": "50.067001",
+                                    "lng": "14.617568",
+                                    "alt": "262.00"
+                                },
+                                "centerGPS": {                                    
+                                    "lat": "50.066754",
+                                    "lng": "14.613676",
+                                    "alt": "262.00"
                                 }
                             }
                         ]
@@ -3432,7 +3492,53 @@
                 ]
             }
         ]
-    },    
+    },
+    {
+        "value": "Hong Kong",
+        "label": "Hong Kong",
+        "children": [
+            {
+                "value": "Yuen Long",
+                "label": "Yuen Long",
+                "children": [
+                    {
+                        "value": "Tai Shue Ha Road W",
+                        "label": "Tai Shue Ha Road W",
+                        "children": [
+                            {
+                                "value": "HKMEC",
+                                "label": "HKMEC",
+                                "pilotGPS": {
+                                    "lat": "22.416158",
+                                    "lng": "114.042949",
+                                    "alt": "98.70"
+                                },
+                                "centerGPS": {
+                                    "lat": "22.415706",
+                                    "lng": "114.044352",
+                                    "alt": "98.70"
+                                }
+                            },
+                            {
+                                "value": "HKMEC South",
+                                "label": "HKMEC South",
+                                "pilotGPS": {
+                                    "lat": "22.416158",
+                                    "lng": "114.042949",
+                                    "alt": "98.70"
+                                },
+                                "centerGPS": {
+                                    "lat": "22.41484",
+                                    "lng": "114.04322",
+                                    "alt": "98.70"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
     {
         "value": "Israel",
         "label": "Israel",
@@ -3515,6 +3621,32 @@
                                     "lat": "44.050539",
                                     "lng": "12.491583",
                                     "alt": "26.00"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Palermo",
+                "label": "Palermo",
+                "children": [
+                    {
+                        "value": "San Cipirello",
+                        "label": "San Cipirello",
+                        "children": [
+                            {
+                                "value": "Asd GAMP",
+                                "label": "Asd GAMP",
+                                "pilotGPS": {
+                                    "lat": "37.929919",
+                                    "lng": "13.239707",
+                                    "alt": "391.40"
+                                },
+                                "centerGPS": {
+                                    "lat": "37.933007",
+                                    "lng": "13.235604",
+                                    "alt": "391.40"
                                 }
                             }
                         ]
@@ -3625,13 +3757,13 @@
                                 "value": "KAT",
                                 "label": "KAT",
                                 "pilotGPS": {
-                                    "lat": "35.029540",
-                                    "lng": "137.162499",
+                                    "lat": "35.029651",
+                                    "lng": "137.162571",
                                     "alt": "25.00"
                                 },
                                 "centerGPS": {
-                                    "lat": "35.029387",
-                                    "lng": "137.162764",
+                                    "lat": "35.029362",
+                                    "lng": "137.163037",
                                     "alt": "25.00"
                                 }
                             }
@@ -3660,7 +3792,21 @@
                                     "lng": "139.983386",
                                     "alt": "10.00"
                                 }
-                            }
+                            },
+                            {
+                                "value": "OGU RC",
+                                "label": "OGU RC",
+                                "pilotGPS": {
+                                    "lat": "35.9057698",
+                                    "lng": "140.0149782",
+                                    "alt": "10.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "35.9060259",
+                                    "lng": "140.0151404",
+                                    "alt": "10.00"
+                                }
+                            }                            
                         ]
                     },
                     {
@@ -4264,6 +4410,26 @@
                 "label": "Miyagi",
                 "children": [
                     {
+                        "value": "Igu",
+                        "label": "Igu",
+                        "children": [
+                            {
+                                "value": "MMRC",
+                                "label": "MMRC",
+                                "pilotGPS": {
+                                    "lat": "37.914423",
+                                    "lng": "140.785391",
+                                    "alt": "23.80"
+                                },
+                                "centerGPS": {
+                                    "lat": "37.922581",
+                                    "lng": "140.785552",
+                                    "alt": "23.80"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "value": "Sendai",
                         "label": "Sendai",
                         "children": [
@@ -4603,6 +4769,32 @@
                                     "lat": "37.9741199",
                                     "lng": "140.1470790",
                                     "alt": "219.00"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Tokushima",
+                "label": "Tokushima",
+                "children": [
+                    {
+                        "value": "徳島",
+                        "label": "徳島",
+                        "children": [
+                            {
+                                "value": "T.F.C",
+                                "label": "T.F.C",
+                                "pilotGPS": {
+                                    "lat": "34.091291",
+                                    "lng": "134.410327",
+                                    "alt": "11.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "34.091572",
+                                    "lng": "134.410217",
+                                    "alt": "11.00"
                                 }
                             }
                         ]
@@ -4995,13 +5187,13 @@
                                 "value": "Hamilton MAC",
                                 "label": "Hamilton MAC",
                                 "pilotGPS": {
-                                    "lat": "-37.8359967",
-                                    "lng": "175.26017",
+                                    "lat": "-37.83590098380841",
+                                    "lng": "175.26021455430916",
                                     "alt": "53.00"
                                 },
                                 "centerGPS": {
-                                    "lat": "-37.837296215718915",
-                                    "lng": "175.26062831024774",
+                                    "lat": "-37.83719545923009",
+                                    "lng": "175.26069518888679",
                                     "alt": "53.00"
                                 }
                             }
@@ -5547,6 +5739,32 @@
         "value": "Saudi Arabia",
         "label": "Saudi Arabia",
         "children": [
+            {
+                "value": "Makkah",
+                "label": "Makkah",
+                "children": [
+                    {
+                        "value": "Sakhiya",
+                        "label": "Sakhiya",
+                        "children": [
+                            {
+                                "value": "Fadil Kaki",
+                                "label": "Fadil Kaki",
+                                "pilotGPS": {
+                                    "lat": "21.187940",
+                                    "lng": "39.626160",
+                                    "alt": "111.8"
+                                },
+                                "centerGPS": {
+                                    "lat": "21.187944",
+                                    "lng": "39.626012",
+                                    "alt": "111.8"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
             {
                 "value": "Riyadh",
                 "label": "Riyadh",
@@ -6696,6 +6914,26 @@
                         ]
                     },
                     {
+                        "value": "Deeside",
+                        "label": "Deeside",
+                        "children": [
+                            {
+                                "value": "Deeside Model Flying",
+                                "label": "Deeside Model Flying",
+                                "pilotGPS": {
+                                    "lat": "53.241718",
+                                    "lng": "-3.061371",
+                                    "alt": "4"
+                                },
+                                "centerGPS": {
+                                    "lat": "53.243190",
+                                    "lng": "-3.059843",
+                                    "alt": "4"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "value": "Fareham",
                         "label": "Fareham",
                         "children": [
@@ -7385,6 +7623,26 @@
                                     "lat": "33.7723222",
                                     "lng": "-117.69506111",
                                     "alt": "438.00"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "value": "Skaggs Island",
+                        "label": "Skaggs Island",
+                        "children": [
+                            {
+                                "value": "North Bay RC",
+                                "label": "North Bay RC",
+                                "pilotGPS": {
+                                    "lat": "38.207274",
+                                    "lng": "-122.375074",
+                                    "alt": "0.6"
+                                },
+                                "centerGPS": {
+                                    "lat": "38.208314",
+                                    "lng": "-122.373933",
+                                    "alt": "0.6"
                                 }
                             }
                         ]
@@ -8187,6 +8445,32 @@
                             }
                         ]
                     }                 
+                ]
+            },
+            {
+                "value": "Nebraska",
+                "label": "Nebraska",
+                "children": [
+                    {
+                        "value": "Grand Island",
+                        "label": "Grand Island",
+                        "children": [
+                            {
+                                "value": "GI Modelers",
+                                "label": "GI Modelers",
+                                "pilotGPS": {
+                                    "lat": "40.88996",
+                                    "lng": "-98.47340",
+                                    "alt": "582.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "40.88996",
+                                    "lng": "-98.47212",
+                                    "alt": "582.00"
+                                }
+                            }
+                        ]
+                    }
                 ]
             },
             {

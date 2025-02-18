@@ -11,47 +11,130 @@
 	import { States } from '$lib/utils/state';
 	import { goto } from '$app/navigation';
 	import { parseFCJMans, loadManDefs } from '$lib/flight/splitting';
+	import { Origin } from '$lib/flight/fcjson';
+	import BinReader from '$lib/flight/bin/BinReader.svelte';
+	import { dbServer } from '$lib/api';
 
-	let inputMode: 'bin' | 'fcj' | 'state' = 'bin';
-	let form_state: string | undefined;
-	let target: GPS | undefined;
-	let isDuplicate: boolean = false;
-	$: if (inputMode) {
-		if (inputMode != 'bin') {
-			form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
+	let inputMode: 'bin' | 'fcj' | 'state' = $state('bin');
+  let siteInputMode: 'fcsites' | 'fcj' | 'pc' | 'ph' = $state('ph');
+	let form_state: string | undefined = $state();
+	let box_state: string | undefined = $state();
+
+	const reset = () => {
+		clearDataLoading();
+		form_state = undefined;
+		box_state = undefined;
+	};
+
+	const checkOrigin = (newOrigin: Origin | undefined = undefined, fix: boolean) => {
+		//return a new Origin and warn in box_state
+		//if fix is true an attemt will be made to fix the origin.
+		const target = $binData?.findOrigin();
+
+		if (newOrigin) {
+			const dist = GPS.sub(target!, newOrigin.pilot);
+			const distxy = Math.sqrt(dist.x ** 2 + dist.y ** 2);
+
+			if (distxy > 200) {
+				box_state = `Pilot position is ${(distxy / 1000).toFixed(2)}km from bin origin.`;
+        
+				if (fix) {
+					box_state = box_state + ' Setting pilot position to bin origin.';
+          siteInputMode = "fcsites";
+					return new Origin(target!.lat, target!.lon, target!.alt, newOrigin.heading);
+				} else {
+					return newOrigin;
+				}
+			}
+
+			if (Math.abs(dist.z) > 20) {
+				box_state = `Box elevation = ${newOrigin.alt}, bin origin altitude = ${target!.alt}, shifting box to origin altitude.`;
+
+				if (fix) {
+          siteInputMode = "fcsites";
+					box_state = box_state + ' Setting pilot altitude to bin origin.';
+					return new Origin(newOrigin.lat, newOrigin.lng, target!.alt, newOrigin.heading);
+				} else {
+					return newOrigin;
+				}
+			}
+      if (fix) {siteInputMode = "ph";}
+      
+			box_state = undefined;
+			return newOrigin;
 		} else {
-			form_state = undefined;
+			box_state = 'Box initialised on bin origin.';
+			return new Origin(target!.lat, target!.lon, target!.alt, 0);
 		}
-	}
+	};
 
-	$: if ($binData) {
-		target = new GPS($binData.pos.Lat[0], $binData.pos.Lng[0], $binData.pos.Alt[0]);
-	}
+	const inputModes: Record<string, string> = {
+		bin: 'Ardupilot Bin file',
+		fcj: 'FC json file',
+		state: 'State csv file'
+	};
 
-	$: if (isDuplicate != undefined) {
-		if (isDuplicate) {
-			$bin = undefined;
-			form_state =
-				'This bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
-		} else {
-			form_state = undefined;
-		}
-	}
 </script>
 
 <div class="col-md-4 pt-3 bg-light border">
 	<small>Load Flight Data</small>
 
-	<FlightDataReader
-		bind:bin={$bin}
-		bind:binData={$binData}
-		bind:bootTime={$bootTime}
-		bind:fcj={$fcj}
-		bind:states={$states}
-		bind:inputMode
-		bind:isDuplicate
-		onBeforeLoad={clearDataLoading}
-	/>
+	<div class="row p-2">
+		<label class="col col-form-label" for="data-input-mode">Data Source:</label>
+		<select
+			class="col col-form-input form-select"
+			id="data-input-mode"
+			bind:value={inputMode}
+			onchange={reset}
+		>
+			{#each Object.entries(inputModes) as [k, v]}
+				<option value={k}>{v}</option>
+			{/each}
+		</select>
+	</div>
+
+	<div class="row p-2">
+		<label class="col col-form-label" for="data-input-mode">{inputModes[inputMode]}:</label>
+		<div class="col col-form-input" style:overflow="hidden" id="data-file-input">
+			{#if inputMode == 'bin'}
+				<BinReader
+					bin={$bin}
+					onloaded={(...data) => {
+						reset();
+						let md5: string;
+						[$bin, $binData, $bootTime, md5] = data;
+						dbServer
+							.get(`flight/check_duplicate/${md5}`)
+							.then((r) => {
+								return r.statusText != 'OK';
+							})
+							.catch((e) => {
+								return true;
+							})
+							.then((isDuplicate) => {
+								if (isDuplicate) {
+									form_state =
+										'This bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
+									$bin = undefined;
+								}
+							});
+						$origin = checkOrigin($origin, true);
+					}}
+				/>
+			{:else}
+				<FlightDataReader
+					bind:inputMode
+					onloaded={(_fcj, _states) => {
+						reset();
+						$fcj = _fcj;
+						$states = _states;
+						$origin = $fcj?.origin || $origin;
+						form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
+					}}
+				/>
+			{/if}
+		</div>
+	</div>
 
 	{#if form_state}
 		<div class="row mt-4">
@@ -60,20 +143,30 @@
 	{/if}
 	<hr />
 
-	{#if inputMode == 'bin'}
+	{#if $binData && $origin}
 		<small>Define The Box</small>
-		<BoxReader bind:origin={$origin} bind:fcjson={$fcj} bind:target />
-
+		<BoxReader
+			target={$binData.findOrigin()}
+      origin={$origin}
+			onorigin={(newOrigin: Origin) => ($origin = checkOrigin(newOrigin, false))}
+			onfcj={(newFCJ) => ($fcj = newFCJ)}
+      bind:siteInputMode={siteInputMode}
+		/>
+		{#if box_state}
+			<div class="row mt-4">
+				<p><mark>{box_state}</mark></p>
+			</div>
+		{/if}
 		<hr />
 	{/if}
 
 	{#if ($binData && $origin) || $states}
 		<div class="row">
-			<label class="col col-form-label" for="select-manoeuvres">Select Manoeuvres:</label>
+			<button class="btn btn-outline-primary col mx-2" onclick={clearDataLoading}>Clear</button>
 			<button
 				id="select-manoeuvres"
-				class="btn btn-outline-primary col"
-				on:click={async () => {
+				class="btn btn-outline-primary col mx-2"
+				onclick={async () => {
 					$dataSource = inputMode;
 					if ($origin) {
 						$origin.save();
@@ -83,7 +176,7 @@
 					}
 					if ($fcj) $manSplits = await parseFCJMans($fcj, $states!).then(loadManDefs);
 
-          goto(base + '/flight/create/manoeuvres');
+					goto(base + '/flight/create/manoeuvres');
 				}}
 			>
 				Next

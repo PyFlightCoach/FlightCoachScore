@@ -92,6 +92,8 @@
 		bin = undefined;
 	}
 
+  $effect(() => {if(bin) {files=undefined}})
+
 	let ddopen = false;
 </script>
 

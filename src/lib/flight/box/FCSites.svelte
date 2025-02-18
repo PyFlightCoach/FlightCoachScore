@@ -1,41 +1,46 @@
 <script lang="ts">
 	import { Origin } from '$lib/flight/fcjson';
 	import { GPS } from '$lib/utils/geometry';
-	import { FCSite, getSites } from '$lib/flight/box/box';
+	import { getShortlist, FCSite } from '$lib/flight/box/fcsites';
 
-	export let origin: Origin | undefined = undefined;
-	export let target: GPS | undefined = undefined;
-	let selectedSiteId: number | undefined;
-	let sites: FCSite[] | undefined;
+	let {
+		target,
+		onchange = () => {}
+	}: {
+		target: GPS;
+		onchange: (origin: Origin) => void;
+	} = $props();
 
-	$: if (target) {
-		selectedSiteId = undefined;
-		getSites().then((res) => {
-			sites = res
-				.sort((a, b) => {
-					if (GPS.sub(a.pilot, target).length() > GPS.sub(b.pilot, target).length()) {
-						return 1;
-					} else {
-						return -1;
-					}
-				})
-				.slice(undefined, 4);
-		});
-	}
+	let selectedSiteId: number | undefined = $state();
+	let shortlist: FCSite[] = $derived(getShortlist(target));
 
-	$: if (selectedSiteId && sites) {
-    origin = Origin.from_centre(
-			sites[selectedSiteId - 1].pilot,
-			sites[selectedSiteId - 1].center
-		);
-	}
+	const selectSite = () => {
+		if (shortlist && typeof selectedSiteId != 'undefined' && selectedSiteId < shortlist.length) {
+			onchange(
+				Origin.from_centre(
+					new GPS(
+						shortlist[selectedSiteId].pilot.lat,
+						shortlist[selectedSiteId].pilot.lon,
+						target?.alt || shortlist[selectedSiteId].pilot.alt
+					),
+					new GPS(
+						shortlist[selectedSiteId].center.lat,
+						shortlist[selectedSiteId].center.lon,
+						target?.alt || shortlist[selectedSiteId].center.alt
+					)
+				)
+			);
+		}
+	};
+
+
+
 </script>
 
-<select class="form-select" size="3" bind:value={selectedSiteId}>
-  {#if sites}
-  {#each sites as site, i}
-    <option value={i + 1}>{site.description()}</option>
-  {/each}
-  {/if}
+<select class="form-select" size="3" bind:value={selectedSiteId} onchange={selectSite}>
+	{#if shortlist}
+		{#each shortlist as site, i}
+			<option value={i}>{site.description}</option>
+		{/each}
+	{/if}
 </select>
-

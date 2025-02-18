@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {getSites, FCSite} from '$lib/flight/box/box';
+import {sites, FCSite} from '$lib/flight/box/fcsites';
 
 
 describe("Box", async () => {

@@ -2,23 +2,27 @@
 	import { FCJson, Origin } from '$lib/flight/fcjson';
 
 	let {
-		origin = $bindable(),
-		fcjson = $bindable()
-	}: { origin?: Origin | undefined; fcjson?: FCJson | undefined } = $props();
+		onorigin = () => {},
+    onfcj = () => {}
+	}: {
+		onorigin?: (origin: Origin) => void;
+    onfcj?: (fcjson: FCJson) => void;
+	} = $props();
 
-	let files: FileList;
+	let files: FileList | undefined = $state();
 
 	const loadBoxFile = (file: File) => {
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const _norg = Origin.parseF3aZone(reader.result as string);
 			if (_norg) {
-				origin = Object.assign(origin || new Origin(0, 0, 0, 0), _norg);
+        onorigin(_norg);
 			} else {
-				fcjson = FCJson.parse(JSON.parse(reader.result as string));
+				const newfcj = FCJson.parse(JSON.parse(reader.result as string));
 
-				if (fcjson) {
-					origin = Object.assign(origin || new Origin(0, 0, 0, 0), fcjson.origin);
+				if (newfcj) {
+          onorigin(newfcj.origin);
+          onfcj(newfcj);
 				}
 			}
 		};

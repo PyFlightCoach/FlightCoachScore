@@ -59,6 +59,10 @@ export class Origin {
 		return new GPS(this.lat, this.lng, this.alt);
 	}
 
+  get centre() {
+    return this.pilot.offset(this.rotation.transform_point(new Point(0, 100, 0)));
+  }
+
 	get rotation() {
 		return Quaternion.parse_euler(new Point(Math.PI, 0, this.radHeading + Math.PI / 2));
 	}

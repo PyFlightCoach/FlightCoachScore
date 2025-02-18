@@ -61,7 +61,6 @@
 			reloadPlot: number;
 		}
 	) {
-		$inspect(Plotly);
     let plotDiv: PlotlyHTMLElement | undefined;
 		Plotly.newPlot(node, data, layout, config).then((plot: PlotlyHTMLElement) => {
 			plot.on('plotly_hover', onhover);

@@ -105,7 +105,7 @@ export class BinData {
     let ind = -1;
     const HACC = 3;
     while (ind === -1 && i < 8) {
-        ind = this.gpa.HAcc.findIndex( (e) => e.HAcc < (HACC * i) && e.HAcc > 0.1  );
+        ind = this.gpa.HAcc.findIndex( (e) => e < (HACC * i) && e > 0.1  );
         i++;
     }
     if (ind === -1) throw new Error(`No suitable origin found in GPS`);
