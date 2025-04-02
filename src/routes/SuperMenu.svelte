@@ -79,4 +79,6 @@
 			Uverify me
 		</button>
 	{/if}
+  <small class="dropdown-header">Analysis Options</small>
+  
 </NavMenu>

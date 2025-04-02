@@ -15,9 +15,10 @@ export interface ScheduleRequest {
 }
 
 export async function requestSchedules(request: ScheduleRequest): Promise<DBSchedule[]> {
-	return dbServer
+	const dbscheds = dbServer
 		.get(`schedule/schedules`, request as Record<string, never>)
 		.then((res) => res.data.results.map(DBSchedule.parse));
+  return dbscheds;
 }
 
 export class ScheduleLibrary {
@@ -66,17 +67,19 @@ export class ScheduleLibrary {
 	append(schedules: DBSchedule[]): ScheduleLibrary {
 		const lib = new ScheduleLibrary(schedules.concat(this.schedules));
 		const unique_ids = lib.unique('schedule_id');
-		return new ScheduleLibrary(
+		const newlib = new ScheduleLibrary(
 			unique_ids.map((id: string) => lib.subset({ schedule_id: id }).first)
 		);
+    return newlib;
 	}
 
 	async update(request: ScheduleRequest): Promise<ScheduleLibrary> {
-		return this.append(await requestSchedules(request)).sort([
+		const lib = this.append(await requestSchedules(request)).sort([
 			'rule_name',
 			'category_name',
 			'schedule_name'
 		]);
+    return lib;
 	}
 
 	sort(keys: (keyof IDBSchedule)[]) {

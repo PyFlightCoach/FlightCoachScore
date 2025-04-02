@@ -80,9 +80,10 @@ export class MA {
 		).data;
 		selectedResult.set(res.fa_version);
 
-		const results = FCJManResult.parse(res);
+
+		const results = res.els && res.results ? FCJManResult.parse(res) : undefined;
 		const isNewFAVersion = !this.history[res.fa_version];
-		const isNewSplit = !isNewFAVersion
+		const isNewSplit = results && !isNewFAVersion
 			? !this.history[res.fa_version].compareSplit(results)
 			: false;
 
@@ -116,7 +117,7 @@ export class MA {
 			id: this.id,
 			schedule: this.schedule,
 			schedule_direction: this.scheduleDirection,
-			flown: this.flown!.data,
+			flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
 			history: this.history
 		};
 	}
@@ -128,7 +129,7 @@ export class MA {
 			manoeuvre: this.manoeuvre?.dump(),
 			template: this.template!.data,
 			corrected: this.corrected?.dump(),
-			corrected_template: this.corrected_template!.data,
+			corrected_template: this.corrected_template?.data,
 			scores: this.scores
 		};
 	}

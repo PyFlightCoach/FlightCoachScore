@@ -87,21 +87,21 @@
 					class="btn btn-outline-secondary"
 					title="Run aligment optimisation"
 					on:click={() => {
-						if ($selManID) analyseManoeuvre($selManID, true, true);
+						analyseManoeuvre($selManID!, true, true);
 					}}>Optimise</button
 				>
 				<button
 					class="btn btn-outline-secondary"
 					title="Recalculate score without optimisation"
 					on:click={() => {
-						if ($selManID) analyseManoeuvre($selManID, true, false);
+						analyseManoeuvre($selManID!, true, false);
 					}}>Score</button
 				>
         <button
           class="btn btn-outline-secondary"
           title="Rerun the analysis from scratch, inluding the initial DTW alignment"
           on:click={() => {
-            if ($selManID) loadManDef(
+            loadManDef(
               $library.subset({
                 category_name: $man!.schedule.category,
                 schedule_name: $man!.schedule.name
@@ -109,7 +109,7 @@
             )
             .then((md)=>{
               $man = $man!.reset(md);
-              analyseManoeuvre($selManID, true, true, true);
+              analyseManoeuvre($selManID!, true, true, true);
             });
             
              

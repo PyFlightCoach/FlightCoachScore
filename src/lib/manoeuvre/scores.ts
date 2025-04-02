@@ -66,13 +66,13 @@ export class Result {
   info() {
     const scale = this.scale();
     return this.keys.map((_k, i) => {
-      const k = this.sample_keys[_k as number];
+      const k = Math.round(this.sample_keys[_k as number]);
       return 'measurement = ' +
-          (this.measurement.value[k] * scale).toFixed(2) +
+          (this.measurement.value[k] || 0 * scale).toFixed(2) +
           '<br>error = ' +
           (this.errors[i] * scale).toFixed(1).toString() +
           '<br>visibility = ' +
-          this.measurement.visibility[k].toFixed(2).toString() +
+          this.measurement.visibility[k]?.toFixed(2).toString() +
           '<br>downgrade = ' +
           this.dgs[i].toFixed(2).toString();
     });

@@ -15,7 +15,7 @@
 	import BinReader from '$lib/flight/bin/BinReader.svelte';
 	import { dbServer } from '$lib/api';
 
-	let inputMode: 'bin' | 'fcj' | 'state' = $state('bin');
+	let inputMode: 'bin' | 'fcj' | 'state' | 'acrowrx' = $state('bin');
   let siteInputMode: 'fcsites' | 'fcj' | 'pc' | 'ph' = $state('ph');
 	let form_state: string | undefined = $state();
 	let box_state: string | undefined = $state();
@@ -71,7 +71,8 @@
 	const inputModes: Record<string, string> = {
 		bin: 'Ardupilot Bin file',
 		fcj: 'FC json file',
-		state: 'State csv file'
+		state: 'State csv file',
+    acrowrx: 'Acrowrx file'
 	};
 
 </script>

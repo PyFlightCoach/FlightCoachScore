@@ -154,6 +154,15 @@ export class ManoeuvreHandler {
 		);
 	}
 
+  static async parseJSON(rules: string, data: Record<string, any>) {    
+    const fig = Figure.parse(data);
+    return await ManoeuvreHandler.parseAresti(
+      rules,
+      fig.info,
+      fig.figure,
+    );
+  }
+
 	static parseOlanResponse(olanRes: ParseOlanResponse) {
 		const { info, figure } = Figure.parse(olanRes.aresti);
 		return new ManoeuvreHandler(info, undefined, olanRes.olan, [
@@ -183,14 +192,14 @@ export class ManoeuvreHandler {
 
 	dumpAresti() {
 		const aresti = this.options.map((o, i) =>
-			o.aresti!.dump(this.info, i ? `${this.info.name}_option_${i}` : this.info.name)
+			o.aresti!.dump(this.info, i ? `${this.info.short_name}_option_${i}` : this.info.short_name)
 		);
     return aresti.length == 1 ? aresti[0] : aresti;
 	}
 
 	dumpDefinition() {
 		const definition = this.options.map((o, i) =>
-			o.definition!.dump(this.info, i ? `${this.info.name}_option_${i}` : this.info.name)
+			o.definition!.dump(this.info, i ? `${this.info.short_name}_option_${i}` : this.info.short_name)
 		);
     return definition.length == 1 ? definition[0] : definition;
 	}

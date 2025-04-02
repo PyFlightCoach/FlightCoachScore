@@ -199,9 +199,9 @@ export async function importAnalysis(data: Record<string, any>) {
 	});
 }
 
-export async function loadExample() {
+export async function loadExample(newformat: boolean = false) {
 	await analysisServer
-		.get('example', blockProgress('Downloading Example'))
+		.get(newformat ? 'new_example' : 'example', blockProgress('Downloading Example'))
 		.then((res) => {
 			importAnalysis(res.data);
 			dataSource.set('example');
@@ -276,11 +276,11 @@ export async function analyseManoeuvre(
 			.run(optimise, reset)
 			.then((res) => {
 				sts.analyses[id].set(res);
-        sts.runInfo[id - 1].set(res.runinfo);
+        sts.runInfo[id].set(res.runinfo);
 			})
 			.catch((e) => {
 				console.error(e);
-				sts.runInfo[id - 1].set(`Analysis Failed: ${e.message}`);
+				sts.runInfo[id].set(`Analysis Failed: ${e.message}`);
 			})
 			.finally(() => {
 				sts.running.update((v) => {

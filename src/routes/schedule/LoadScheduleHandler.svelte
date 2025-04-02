@@ -12,6 +12,8 @@
 	let olan: string = $state('88c24');
 	let selectedSchedule: DBSchedule | undefined = $state(schedule?.dbSchedule ? schedule.dbSchedule :$library.first);
 
+  let files: FileList | undefined = $state();
+
   async function createSchedule() {
     switch (inputmode) {
       case 'OLAN':
@@ -20,6 +22,8 @@
         return ScheduleHandler.parseDB(selectedSchedule!);
       case 'manual':
         return ScheduleHandler.empty(rule).then(res=>schedule=res);
+      case 'json':
+        return ScheduleHandler.parseJSON(files![0]);
     }
   }
 
@@ -31,6 +35,7 @@
 		<option value="OLAN">Open Aero</option>
 		<option value="DB">Database</option>
 		<option value="manual">Manual</option>
+    <option value="json">JSON</option>
 	</select>
 </div>
 
@@ -61,7 +66,6 @@
 		</div>
 	</div>
 {/if}
-
 {#if inputmode == 'DB'}
 	<SelectSchedule
 		library={$library}
@@ -73,6 +77,27 @@
 			selectedSchedule = sched;
 		}}
 	/>
+{/if}
+{#if inputmode == 'json'}
+  <div class="row pt-2 px-2">
+    <label class="btn btn-outline-secondary form-control text-nowrap" for="jsonfile">
+      {#if !files || files.length == 0}
+        Select JSON File
+      {:else}
+        {files[0].name}
+      {/if}
+    </label>
+    <input
+      class="form-control d-none"
+      type="file"
+      id="jsonfile"
+      accept=".json"
+      onchange={(e) => {
+    		files = (e.target as HTMLInputElement).files ?? undefined;
+        console.log(files);
+      }}
+    />
+  </div>
 {/if}
 
 <div class="row pt-2">

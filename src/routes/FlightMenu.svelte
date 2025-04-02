@@ -99,5 +99,17 @@
 		>
 			Example
 		</button>
+    <button
+			class="dropdown-item"
+      data-sveltekit-preload-data="tap"
+			on:click={() => {
+				$loading = true;
+				loadExample(true).then(() => {
+					goto(base + '/flight/results');
+				}).finally(()=>$loading = false);
+			}}
+		>
+			New Example
+		</button>
 	{/if}
 </NavMenu>

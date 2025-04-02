@@ -258,7 +258,7 @@ export class States {
 	move(start: Point) {
 		const offset = Point.distance(this.pos[0], start);
 		return new States(
-			this.data.map((st, i) => {
+			this.data.map((st) => {
 				return State.parse({
 					...st,
 					x: st.x + offset.x,

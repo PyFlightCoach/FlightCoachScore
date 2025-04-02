@@ -33,6 +33,18 @@ export class ScheduleHandler {
 		);
 	}
 
+	static async parseJSON(file: File) {
+		const data = await file.text().then((text) => JSON.parse(text));
+		const figs = data.figures.map((fig: Record<string, any>) => {
+      return ManoeuvreHandler.parseJSON(data.rules, fig);
+    })
+
+    return new ScheduleHandler(
+			await ManBuilder.load(data.rules),
+			await Promise.all(figs)
+		);
+	}
+
 	static async parseDB(dbSchedule: DBSchedule) {
 		const new_mans = new Array(dbSchedule.manoeuvres.length);
 		for (const manoeuvre of dbSchedule.manoeuvres) {
@@ -97,18 +109,17 @@ export class ScheduleHandler {
 	}
 }
 
-
 export const getScale = (rule: string) => {
-  switch (rule) {
-    case "f3a":
-      return 1.2
-    case "IMAC":
-      return 1.6
-    case "IAC":
-      return 3.0
-    case "IACGLIDER":
-      return 2.0
-    default:
-      return 1.0
-  }
-}
+	switch (rule) {
+		case 'f3a':
+			return 1.2;
+		case 'IMAC':
+			return 1.6;
+		case 'IAC':
+			return 3.0;
+		case 'IACGLIDER':
+			return 2.0;
+		default:
+			return 1.0;
+	}
+};

@@ -137,9 +137,9 @@ export class DownGrade {
 				case 'absmax':
 					all = false;
 					return `maximum absolute value`;
-				case 'borders':
+				case 'middle':
 					all = false;
-					return `middle of the sample, with a margin of ${args.tb} seconds`;
+					return `middle of the sample, with a margin of ${args.chopt} seconds`;
 				default:
 					return '';
 			}

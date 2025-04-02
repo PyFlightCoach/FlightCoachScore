@@ -1,20 +1,18 @@
 <script lang="ts">
 	import type { Result } from '$lib/manoeuvre/scores';
 	import Plot from '$lib/plots/Plotly.svelte';
-	import { linspace } from '$lib/utils/arrays';
 
-  let {result, activeIndex=$bindable(0)} : {result: Result; activeIndex?: number} = $props();
-	
-  const scale = $derived(result.scale());
+  let {result, activeIndex=$bindable(0), x} : {result: Result; activeIndex?: number, x:Number[]} = $props();
+	const scale = $derived(result.scale());
   const unit = $derived(result.measurement.unit.replace('rad', 'deg'));
-  const x = $derived(linspace(0, result.measurement.value.length - 1, result.measurement.value.length));
+
 </script>
 
 <Plot
 	data={[
 		{
 			type: 'scatter',
-			x,
+			x: result.sample_keys,
 			y: result.measurement.value.map((p) => {
 				if (p != null) {
 					return p * scale;
@@ -28,7 +26,7 @@
 		},
 		{
 			type: 'scatter',
-			x,
+			x: result.sample_keys,
 			y: result.measurement.visibility,
 			name: 'visibility',
 			line: { color: 'blue', width: 1, dash: 'dot' },
@@ -36,7 +34,7 @@
 		},
 		{
 			type: 'scatter',
-			x,
+			x: result.sample_keys,
 			y: result.raw_sample.map(v=>v*scale),
 			name: 'raw sample',
 			line: { width: 1, color: 'grey' }
@@ -56,7 +54,7 @@
 		},
 		{
 			type: 'scatter',
-			x: result.keys.map((k) => result.sample_keys[k]),
+			x: result.keys.map((k)=>result.sample_keys[k]),
 			y: result.keys.map((k) => result.sample[k] * scale),
 			text: result.dgs.map((dg) => dg.toFixed(3)),
 			hovertext: result.info(),
@@ -82,7 +80,7 @@
 		},
 		xaxis: {
 			visible: false,
-			range: [0, result.measurement.value.length]
+			range: [0, x.length - 1]
 		},
 		hovermode: 'x unified',
 		legend: { orientation: 'h', x: 0.2, y: 0 },

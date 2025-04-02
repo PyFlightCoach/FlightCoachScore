@@ -192,7 +192,7 @@
 			{/if}
 		</div>
 		<div class="row" style="min-height:250px;">
-			<DGPlot result={resdg} bind:activeIndex />
+			<DGPlot result={resdg} bind:activeIndex x={states[selectedElement].t}/>
 		</div>
 	{/if}
 </div>
