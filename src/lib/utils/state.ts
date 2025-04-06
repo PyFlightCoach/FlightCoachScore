@@ -255,9 +255,9 @@ export class States {
   get last() {
     return this.data[this.data.length - 1];
   }
-	move(start: Point) {
-		const offset = Point.distance(this.pos[0], start);
-		return new States(
+
+  shift(offset: Point) {
+    return new States(
 			this.data.map((st) => {
 				return State.parse({
 					...st,
@@ -267,6 +267,11 @@ export class States {
 				});
 			})
 		);
+  }
+
+	move(start: Point) {
+		const offset = Point.distance(this.pos[0], start);
+		return this.shift(offset);
 	}
 
 	body_to_world(p: Point) {
