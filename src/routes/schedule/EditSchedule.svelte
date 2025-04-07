@@ -98,8 +98,7 @@
 			class="col col-form-control btn btn-outline-secondary mx-1"
 			onclick={() => {
 				if (confirm('Are you sure you want to delete this schedule?')) {
-					schedule.delete();
-					reloadSchedules();
+					schedule.delete().then(reloadSchedules);
 				}
 			}}
 		>

@@ -30,6 +30,7 @@
 				return;
 			}
 			$user = (await dbServer.get('users/me')).data;
+      
 			goto(previousPage);
 		} catch (error) {
 			form_state = 'Oops...something has gone wrong. Please try again later.';

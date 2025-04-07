@@ -2,7 +2,7 @@
 	import * as sp from '$lib/flight/splitting';
 	import type { ScheduleLibrary } from '$lib/schedule/library';
 	import { schedule_id } from '$lib/leaderboards/stores';
-
+	
 	let {
 		library,
 		old_man,
@@ -80,7 +80,7 @@
 	};
 
 	const getKey = (level: number) => {
-		return Object.keys(man)[level] as keyof typeof man;
+		return  Object.keys(man)[level] as keyof typeof man ;
 	};
 
 	const getEmpty = (level: number) => {
@@ -96,6 +96,9 @@
 	let level: number = $derived(getLevel(man));
 
 	let sLevel: number = $derived(Math.min(level, stopLevel));
+
+
+
 </script>
 
 <div class="btn-group">
@@ -119,7 +122,11 @@
 		aria-label="Toggle Dropdown"
 		title="Select {man[getKey(sLevel - 1)]} {getKey(sLevel).split('_')[0]}"
 	>
-		{man[getKey(sLevel)]}
+    {#if ["Takeoff", "Landing", "Break"].includes(man.manoeuvre_name)}
+        {man.manoeuvre_name}
+      {:else}
+        {man[getKey(sLevel)]}
+      {/if}
 	</button>
 	<ul class="dropdown-menu">
 		{#each getlists[sLevel]() as cat}

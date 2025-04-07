@@ -17,7 +17,10 @@
 		isAnalysisModified,
 		loading,
 		blockProgress,
-		unblockProgress
+		unblockProgress,
+
+		loadGuiLists
+
 	} from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
@@ -92,15 +95,17 @@
 						blockProgress('Uploading Analysis to Database', 'upload')
 					);
 				}
-			})().then((r) => Flight.load(r.data.id))
+			})()
+        .then((r) => Flight.load(r.data.id))
+        .then(loadGuiLists)
 				.then((f) => {
 					activeFlight.set(f);
 					postUploadSearch();
 					form_state = 'Upload Successful';
 					$bin = undefined;
-					goto(base + '/database/query/leaderboards');
+          goto(base + '/database/query/leaderboards');
 				})
-				.catch((e) => {
+        .catch((e) => {
 					form_state = 'Upload Failed: ' + e.response?.data?.detail?.detail || '';
 					console.error(e);
 				})

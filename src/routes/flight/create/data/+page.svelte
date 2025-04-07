@@ -170,7 +170,7 @@
 		<hr />
 	{/if}
 
-	{#if $states}
+	{#if inputMode=="acrowrx" && $states}
     <p>Shift Box:</p>
     <table class="table table-sm text-center">
 			<tbody>

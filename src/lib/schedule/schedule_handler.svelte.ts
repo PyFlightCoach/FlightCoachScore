@@ -6,6 +6,7 @@ import { ManBuilder } from '$lib/manoeuvre/builder.svelte';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 
+
 export class ScheduleHandler {
 	manoeuvres: ManoeuvreHandler[] = $state([]);
 	dbSchedule?: DBSchedule | undefined = $state();
@@ -59,7 +60,7 @@ export class ScheduleHandler {
 	}
 
 	async delete() {
-		return dbServer.delete(`schedule/${this.dbSchedule!.schedule_id}`);
+		await dbServer.delete(`schedule/${this.dbSchedule!.schedule_id}`);
 	}
 
 	async post(name: string, category: string) {

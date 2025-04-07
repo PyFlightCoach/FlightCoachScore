@@ -173,6 +173,8 @@
 			fun();
 		}
 	};
+
+  $inspect(range);
 </script>
 
 <div
