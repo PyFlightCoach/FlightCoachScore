@@ -139,7 +139,7 @@
 						<tr><td>Sample:</td> <td> {eldg?.describe_selectors()}</td></tr>
 						<tr>
 							<td>Smoothing: </td>
-							<td> {eldg.smoothers.length > 0 ? eldg.smoothers : 'None'}</td>
+							<td> {eldg.smoothers.length > 1 ? eldg.summarise_smoothers() : 'None'}</td>
 						</tr>
 						<tr><td>Criteria: </td> <td> {eldg?.criteria_description(resdg)}</td></tr>
 					</tbody>

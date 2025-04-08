@@ -16,9 +16,9 @@
 	</p>
 	<p>
 		FCScore is still under active development, but it is already producing compelling results for
-		F3A aerobatic flights. Initial trials have been performed for full-scale power and glider
-		aerobatics and preliminary support for IMAC will be added soon. Future work will also include
-		closer integration with the Flight Coach plotter.
+		F3A aerobatic flights and preliminary support is available for the IMAC and IAC known schedules. 
+    Future work will include closer integration with the Flight Coach plotter and other aerobatic
+    flight plotting tools such as Acrowrx.
 	</p>
   <p class="d-none">
     Click <a class="link" href="https://pyflightcoach.github.io/ScoringInfo/elements">here</a> for 

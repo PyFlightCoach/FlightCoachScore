@@ -199,9 +199,9 @@ export async function importAnalysis(data: Record<string, any>) {
 	});
 }
 
-export async function loadExample(newformat: boolean = false) {
+export async function loadExample() {
 	await analysisServer
-		.get(newformat ? 'new_example' : 'example', blockProgress('Downloading Example'))
+		.get('example', blockProgress('Downloading Example'))
 		.then((res) => {
 			importAnalysis(res.data);
 			dataSource.set('example');

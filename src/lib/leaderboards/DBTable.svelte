@@ -59,7 +59,7 @@
 			</thead>
 			<tbody>
 				{#each table_rows as row, i}
-          {#if row.ooo }
+          {#if row.ooo && i>0 && table_rows[i-1].rank < row.rank - 1}
           <tr><td colspan="{col_heads.length+1}" class="p-0 bg-secondary">...</td></tr>
           {/if}
 					<tr

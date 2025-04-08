@@ -62,6 +62,10 @@ export class DownGrade {
 		readonly display_name: string
 	) {}
 
+  summarise_smoothers() {
+    return this.smoothers.filter(sm => !sm.startsWith("final"))
+  }
+
 	static parse(data: IDownGrade) {
 		return new DownGrade(
 			data.name,
