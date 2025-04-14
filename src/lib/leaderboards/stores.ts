@@ -44,7 +44,7 @@ export const postUploadSearch = () => {
   const fl = get(activeFlight)!;
   select_by_date.set(false);
   n_days_val.set(380);
-  schedule_id.set(fl.meta.schedule_id || '');
+  schedule_id.set(fl?.meta?.schedule_id || '');
   sort_by_score_flag.set(true);
   version.set(get(faVersion)!);
   includeActive.set(3);

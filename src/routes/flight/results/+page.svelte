@@ -97,16 +97,16 @@
 				}
 			})()
         .then((r) => Flight.load(r.data.id))
-        .then(loadGuiLists)
-				.then((f) => {
+        .then((f) => {
 					activeFlight.set(f);
 					postUploadSearch();
 					form_state = 'Upload Successful';
 					$bin = undefined;
           goto(base + '/database/query/leaderboards');
 				})
+        .then(loadGuiLists)
         .catch((e) => {
-					form_state = 'Upload Failed: ' + e.response?.data?.detail?.detail || '';
+					form_state = 'Upload Failed: ' + e.response?.data?.detail?.detail || e.message;
 					console.error(e);
 				})
 				.finally(() => {
