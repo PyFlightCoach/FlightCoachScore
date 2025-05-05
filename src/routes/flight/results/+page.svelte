@@ -25,13 +25,14 @@
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
 	import { privacyOptions } from '$lib/flight/db';
-	import { createAnalysisExport } from '$lib/flight/analysis';
+	import { createAnalysisExport, createScoreCSV } from '$lib/flight/analysis';
 	import { user, checkUser } from '$lib/stores/user';
 	import { dbServer } from '$lib/api/api';
 	import { Flight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
+	import { saveAs } from 'file-saver';
 
 	$navBarContents = AnalysisMenu;
 
@@ -207,12 +208,22 @@
 	</div>
 
 	<div class="row mb-2">
+    {#if $isComplete && $isCompFlight && $user?.is_verified}
+      
+        <button class="col btn btn-outline-secondary px-2" type="submit" on:click={()=>{
+          saveAs(createScoreCSV(), 'score.csv');
+        }}
+          >Download Score CSV</button
+        >
+      
+    
+    {/if}
 		{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight}
-			<div class="row justify-content-end p-2">
-				<button class="btn btn-primary" type="submit" on:click={upload}
+			
+				<button class="col btn btn-primary px-2" type="submit" on:click={upload}
 					>{isNew ? 'Upload' : 'Update'}</button
 				>
-			</div>
+			
     {:else if !$isCompFlight}
       <span>Only complete flights can be uploaded</span>
 		{:else if !canI}

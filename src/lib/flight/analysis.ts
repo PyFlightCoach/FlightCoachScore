@@ -152,6 +152,33 @@ export async function createAnalysisExport(small: boolean = false) {
 	};
 }
 
+export function createScoreCSV() {
+  const fl = get(activeFlight);
+  const sinfo = get(sts.analyses[1])?.schedule;
+  const lines = [
+    `#Category: ${sinfo!.category}`,
+    `#Schedule: ${sinfo!.name}`,
+    `#FAVersion: ${get(faVersion)}`,
+    `#Boot Time: ${get(sts.bootTime)?.toISOString() || 'Unknown'}`,
+    `#Pilot: ${fl?.meta.pilot_id || 'Unknown'}`,
+    `#FCSCore ID: ${fl?.meta.flight_id || 'Unknown'}`,
+    `#Dificulty: ${get(sts.difficulty)}`,
+    `#Truncate: ${get(sts.truncate)}`,
+    `#Total Score: ${get(sts.totalScore)}`,
+    'ID,Manoeuvre,K,Score'
+  ];
+
+  sts.analyses.forEach((ma) => {
+    const man = get(ma);
+    const score = man?.get_score(get(sts.selectedResult)!, get(sts.difficulty), get(sts.truncate));
+    lines.push(`${man?.id},${man?.name},${man?.k},${score?.total}`);
+  });
+  
+  return new Blob([lines.join('\n')], {
+    type: 'text/csv'
+  });
+}
+
 export async function exportAnalysis(small: boolean = false) {
 	return new Blob([JSON.stringify(await createAnalysisExport(small), null, 2)], {
 		type: 'application/json'
