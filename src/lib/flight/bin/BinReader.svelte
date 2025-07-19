@@ -3,33 +3,37 @@
 	import { saveAs } from 'file-saver';
 	import { BinData, BinField } from './bindata';
 	import { md5 } from 'js-md5';
-	const worker = new BINWorker();
+
+  const worker = new BINWorker();
 
 	let binData: BinData | undefined = $state();
 	let bootTime: Date | undefined = $state();
 	let md5Sum: string | undefined = $state();
 	let {
-    bin = undefined,
+    bin = $bindable(undefined),
 		messages = $bindable(['POS', 'ATT', 'XKF1', 'XKF2', 'IMU', 'GPS', 'GPA', 'ORGN']),
 		busy = $bindable(false),
 		download = false,
 		clear = false,
     loadOnChange = true,
+    showInput = true,
+    percent = $bindable(undefined),
 		onloaded = () => {}
 	}: {
-    bin?: File;
+    bin?: File | undefined;
 		messages?: string[];
 		busy?: boolean;
 		download?: boolean;
 		clear?: boolean;
     loadOnChange?: boolean;
+    showInput?: boolean;
+    percent?: number | undefined;
 		onloaded: (bin: File, binData: BinData, bootTime: Date, md5Sum: string) => void;
 	} = $props();
 
 	let files: FileList | undefined = $state();
 	let availableMessages: Record<string, any> | undefined = $state();
 	let loadedMessages: Record<string, boolean> = $state({});
-	let percent: number | undefined = $state();
 
 	worker.onmessage = (event) => {
 		if (event.data.hasOwnProperty('availableMessages')) {
@@ -92,12 +96,20 @@
 		bin = undefined;
 	}
 
-  $effect(() => {if(bin) {files=undefined}})
+  $effect(() => {
+    if(bin) {
+      files=undefined
+      if (!showInput) {
+        parseBin(bin);
+      }
+    }}
+    
+  )
 
 	let ddopen = false;
 </script>
 
-{#if !busy}
+{#if !busy && showInput}
 	<label
 		for="bininput"
 		class="btn btn-outline-secondary form-control text-nowrap"
@@ -133,6 +145,6 @@
 			<button class="form-control btn btn-outline-secondary" onclick={saveData}>Download</button>
 		{/if}
 	{/if}
-{:else}
+{:else if showInput}
 	<span class="form-control">{percent?.toFixed(0) || 0}</span>
 {/if}

@@ -236,17 +236,26 @@ export async function loadExample() {
 		.finally(unblockProgress);
 }
 
-export async function loadAnalysisFromDB(flight_id: string) {
-	const zip = new JSZip();
+export async function loadAJson(flight_id: string) {
+  const zip = new JSZip();
 	loading.set(true);
-	await dbServer
+	return await dbServer
 		.get(`flight/ajson/${flight_id}`, {
-			responseType: 'arraybuffer',
+			responseType: 'blob',
 			...blockProgress('Loading Analysis from Database')
 		})
 		.then((response) => zip.loadAsync(response.data))
 		.then((res) => Object.values(res.files)[0].async('string'))
 		.then((ajson) => JSON.parse(ajson))
+    .finally(() => {
+			unblockProgress();
+			loading.set(false);
+		});
+}
+
+export async function loadAnalysisFromDB(flight_id: string) {
+	loading.set(true);
+	await loadAJson(flight_id)
 		.then(importAnalysis)
 		.then(() => Flight.load(flight_id))
 		.then((flight) => {
@@ -258,6 +267,16 @@ export async function loadAnalysisFromDB(flight_id: string) {
 			unblockProgress();
 			loading.set(false);
 		});
+}
+
+export async function loadAnalysisFromHolding(holdingId: string) {
+  loading.set(true);
+  await dbServer
+    .get(`flight/holding/${holdingId}`)
+    .then((response)=>{
+      
+    })
+
 }
 
 export async function analyseMans(ids: number[]) {
@@ -317,4 +336,12 @@ export async function analyseManoeuvre(
 			});
 
 	}
+}
+
+
+export async function loadHoldingData(holdingId: string) {
+ const fcj = dbServer.get(`flight/holding?holdingId=${holdingId}`)
+
+
+
 }

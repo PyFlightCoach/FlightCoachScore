@@ -2,13 +2,15 @@
 	import NavMenu from './NavMenu.svelte';
 	import ServerSelection from '$lib/api/ServerSelection.svelte';
 	import { base } from '$app/paths';
-	import { dev } from '$lib/stores/shared';
+	import { activeFlight, dev } from '$lib/stores/shared';
 	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api/api';
 	import { dbSOption, customDbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
   import {reloadSchedules} from '$lib/schedule/library';
   import {loadGuiLists} from '$lib/stores/shared';
 	import { loadRules } from '$lib/stores/shared';
+	import { postUploadSearch } from '$lib/leaderboards/stores';
+	import { goto } from '$app/navigation';
 </script>
 
 <NavMenu tooltip="Super User Menu">
@@ -78,6 +80,17 @@
 		>
 			Uverify me
 		</button>
+    {#if $activeFlight}
+      <button
+        class="dropdown-item"
+        onclick={() => {
+          postUploadSearch();
+          goto(base + '/database/query/leaderboards');
+        }}
+      >
+        Post Upload Test
+      </button>
+    {/if}
 	{/if}
   <small class="dropdown-header">Analysis Options</small>
   

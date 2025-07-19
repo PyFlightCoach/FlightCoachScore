@@ -10,7 +10,9 @@
 	import { manNames } from '$lib/stores/analysis';
 	import { loading, activeFlight } from '$lib/stores/shared';
 	import { goto } from '$app/navigation';
-	import { windowWidth } from '$lib/stores/shared';
+	import { windowWidth, blockProgress } from '$lib/stores/shared';
+	import { saveAs } from 'file-saver';
+	import JSZip from 'jszip';
 
 	export let f: Flight;
 	export let rank: number | undefined;
@@ -96,13 +98,31 @@
 				</li>
 			{/if}
 			<li class="input-group">
-				<a
+				<button
 					class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
-					href="{base}/database/flight/?flight_id={f.meta.flight_id}"
 					data-sveltekit-preload-data="tap"
+					on:click={() => {
+						dbServer
+							.post('flight/holding/copy/' + f.meta.flight_id)
+							.then((res) => {
+								window.open(
+									'https://www.flightcoach.org/ribbon3/plotter.html?token=' + res.data.token,
+									'_blank'
+								);
+							})
+							.catch((err) => {
+								console.error(err);
+								if (confirm('cant quite do this yet, open the plotter anyway?')) {
+									window.open(
+										'https://www.flightcoach.org/ribbon3/plotter.html?token=12345',
+										'_blank'
+									);
+								}
+							});
+					}}
 				>
 					View Flight
-				</a>
+				</button>
 				<button
 					class="form-control btn btn-outline-secondary {canAnalyse ? '' : 'disabled'}"
 					data-sveltekit-preload-data="tap"
@@ -117,6 +137,43 @@
 					View Analysis
 				</button>
 				{#if $user?.is_superuser}
+					<button
+						class="form-control btn btn-outline-secondary"
+						on:click={() => {
+							dbServer.get(`flight/fcj/${f.meta.flight_id}`).then((res) => {
+								const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+								saveAs(blob, `${f.meta.flight_id}.json`);
+							});
+						}}
+					>
+						Download FCJ
+					</button>
+					<button
+						class="form-control btn btn-outline-secondary"
+						on:click={() => {
+							const zip = new JSZip();
+							dbServer
+								.get(`flight/bin/${f.meta.flight_id}`, {
+									responseType: 'blob',
+									...blockProgress('Loading BIN from Database')
+								})
+								.then((response) => zip.loadAsync(response.data))
+								.then((res) => res.files['flightlog.bin'].async('arraybuffer'))
+								.then((res) => {
+									const blob = new Blob([res], { type: 'application/octet-stream' });
+									saveAs(blob, `${f.meta.flight_id}.BIN`);
+								});
+						}}
+					>
+						Download BIN
+					</button>
+					<a
+						class="form-control btn btn-outline-secondary"
+						href={`${base}/flight/create/holding/?id=${f.meta.flight_id}`}
+            data-sveltekit-preload-data={false}
+          >
+            Simulate Holding
+          </a>
 					<button
 						class="form-control btn btn-outline-secondary"
 						on:click={() => {

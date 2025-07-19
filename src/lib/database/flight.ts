@@ -34,4 +34,9 @@ export class Flight {
 			return score;
 		}
 	}
+
+  get date() {
+    return new Date(this.meta.date);
+  }
+
 }

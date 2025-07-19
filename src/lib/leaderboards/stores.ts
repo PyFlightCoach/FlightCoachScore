@@ -42,12 +42,20 @@ export function getNFlights(nfval: number) {
 
 export const postUploadSearch = () => {
   const fl = get(activeFlight)!;
-  select_by_date.set(false);
-  n_days_val.set(380);
+
+  select_by_date.set(true);
+  const dbefore = fl!.date;
+  dbefore.setDate(dbefore.getDate() + 1);
+  date_before.set(dbefore.toISOString().split('T')[0]);
+  const dafter = fl!.date;
+  dafter.setDate(dafter.getDate() - 30);
+  date_after.set(dafter.toISOString().split('T')[0]);
+  //n_days_val.set(30);
   schedule_id.set(fl?.meta?.schedule_id || '');
-  sort_by_score_flag.set(true);
+  sort_by_score_flag.set(false);
   version.set(get(faVersion)!);
-  includeActive.set(3);
+  n_results.set(1000);
+  //includeActive.set(3);
   updateTable();
 }
 

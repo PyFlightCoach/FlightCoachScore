@@ -4,6 +4,7 @@
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import SuperMenu from './SuperMenu.svelte';
+  import CdMenu from './CDMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import { dev, help } from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
@@ -21,6 +22,9 @@
 				<UserMenu />
 				<FlightMenu />
 				<DataBaseMenu />
+        {#if $user?.is_cd || $user?.is_superuser || $dev}
+          <CdMenu />
+        {/if}
 				{#if $user?.is_superuser || $dev}
 					<SuperMenu />
 				{/if}

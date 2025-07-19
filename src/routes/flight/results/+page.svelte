@@ -33,6 +33,7 @@
 	import { base } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
 	import { saveAs } from 'file-saver';
+  import JSZip from 'jszip';
 
 	$navBarContents = AnalysisMenu;
 
@@ -58,23 +59,23 @@
 	$: canI = $user?.is_verified && (isMine || isNew || $user?.is_superuser);
 
 	const upload = async () => {
-		const form_data = new FormData();
-
-    const ajson = new File(
-				[
-					new Blob([JSON.stringify(await createAnalysisExport(true), null, 2)], {
-						type: 'application/octet-stream'
-					})
-				],
-				'analysis.ajson',
-				{ type: 'application/octet-stream' }
-			)
-
-		
-		if (comment) form_data.append('comment', comment);
-		if (privacy) form_data.append('privacy', privacy);
-		
 		if (await checkUser()) {
+      const form_data = new FormData();
+
+      const ajson = new File(
+          [
+            new Blob([JSON.stringify(await createAnalysisExport(true), null, 2)], {
+              type: 'application/octet-stream'
+            })
+          ],
+          'analysis.ajson',
+          { type: 'application/octet-stream' }
+        )
+          
+      if (comment) form_data.append('comment', comment);
+      if (privacy) form_data.append('privacy', privacy);
+		
+		
 			form_state = 'Uploading Analysis, this can take some time...';
 			$loading = true;
 

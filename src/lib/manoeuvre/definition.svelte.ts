@@ -107,6 +107,8 @@ export class DownGrade {
 				return `All peaks and troughs are downgraded based on the distance from the last peak or trough.`;
 			case 'Bounded':
 				return `Regions of the sample below ${(this.criteria.min_bound! * fac).toFixed(2)} ${unit} or above ${(this.criteria.max_bound! * fac).toFixed(2)} ${unit} are downgraded.`;
+      case 'Deviation':
+        return `The entire sample is downgraded based on its standard deviation.`;
 		}
 	}
 

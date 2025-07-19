@@ -12,4 +12,5 @@
     <a class="dropdown-item" href="{base}/database/query/leaderboards">Leaderboard</a>
   {/if}
   <a class="dropdown-item" href="{base}/schedule">Schedules</a>
+  <a class="dropdown-item" href="{base}/competition" hidden>Competitions</a>
 </NavMenu>
