@@ -68,7 +68,7 @@ const getSites = () => {
 	}
 };
 
-const sites: FCSite[] = getSites();
+export const sites: FCSite[] = getSites();
 
 export function getShortlist(target: GPS) {
 	return sites

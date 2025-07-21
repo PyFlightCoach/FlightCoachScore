@@ -4,9 +4,10 @@
   import BinReader from '$lib/flight/bin/BinReader.svelte';
   import {dbServer} from '$lib/api';
   import {States} from '$lib/utils/state';
-	import * as MSplit from '$lib/flight/splitting';
   import {goto} from '$app/navigation';
   import { base } from '$app/paths';
+  import * as split from '$lib/flight/splitting';
+  import {library} from '$lib/schedule/library';
 
 	const { data } = $props();
 
@@ -14,7 +15,7 @@
   let binfile = $state(data.bin);
   $inspect($states);
   $origin = data.origin;
-
+  const schedule = $library.subset({category_name:data.sinfo.category, schedule_name:data.sinfo.name}).only;
 </script>
 
 
@@ -30,9 +31,13 @@
       .catch((e) => {return true;})
       .then((isDuplicate) => {if (isDuplicate) {$bin = undefined}});
     $states = States.from_xkf1($origin!, $binData!.orgn, $binData!.xkf1);
-    
-    $manSplits = data.mans.map((m, i)=>MSplit.build(data.sinfo.category, data.sinfo.name, i+1, m.stop))
-    //goto(base + '/flight/create/manoeuvres');
+    $manSplits = [split.takeOff(data.mans[0][1])];
+    data.mans.forEach((m, i)=>$manSplits.push(split.build(
+      schedule.category_name, schedule.schedule_name, schedule.manoeuvres[i], m[1],
+    )))
+    $manSplits.push(split.landing($states.data.length));
+
+    goto(base + '/flight/create/manoeuvres');
   }}
   showInput={false}
 />
@@ -41,5 +46,5 @@
 <p>{data.origin.lat},{data.origin.lng},{data.origin.alt}, {data.origin.heading}</p>
 <p>{data.sinfo.category}, {data.sinfo.name}</p>
 {#each data.mans as man}
-  <p>{man.start}, {man.stop}  </p>
+  <p>{man[0]}, {man[1]}  </p>
 {/each}

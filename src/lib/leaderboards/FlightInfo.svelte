@@ -157,11 +157,8 @@
 									responseType: 'blob',
 									...blockProgress('Loading BIN from Database')
 								})
-								.then((response) => zip.loadAsync(response.data))
-								.then((res) => res.files['flightlog.bin'].async('arraybuffer'))
 								.then((res) => {
-									const blob = new Blob([res], { type: 'application/octet-stream' });
-									saveAs(blob, `${f.meta.flight_id}.BIN`);
+									saveAs(res.data, `${f.meta.flight_id}.zip`);
 								});
 						}}
 					>

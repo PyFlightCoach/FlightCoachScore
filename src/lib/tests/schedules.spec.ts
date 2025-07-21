@@ -25,7 +25,7 @@ describe ('Schedule Library', async () => {
     expect(library).toBeDefined();
     expect(library.schedules.length).toBeGreaterThan(0);
     expect(library.subset({schedule_name: 'p25'}).only.schedule_name).toBe('p25');
-    expect(library.subset({category_name: 'f3a'}).length).toBe(4);
+    expect(library.subset({category_name: 'f3a'}).length).toBe(6);
   });
 
   it('should return unique values', async ()=>{

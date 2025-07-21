@@ -44,6 +44,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@blu3r4y/lzma": "^2.3.3",
 		"@types/beyonk__gdpr-cookie-consent-banner": "^9.0.4",
 		"@types/promise-fs": "^2.1.5",
 		"axios": "^1.7.9",
@@ -54,6 +55,8 @@
 		"file-saver": "^2.0.5",
 		"js-md5": "^0.8.3",
 		"jszip": "^3.10.1",
+		"lzma": "^2.3.2",
+		"lzma1": "^0.1.1",
 		"markdown-it": "^14.1.0",
 		"obj-file-parser": "^0.6.2",
 		"plotly.js-dist": "^3.0.0"

@@ -2,7 +2,7 @@ import { type FCJson, type FCJMan } from '$lib/flight/fcjson';
 import { States } from '$lib/utils/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
 import { loadManDef, library } from '$lib/schedule/library';
-import { type DBMan } from '$lib/schedule/db';
+import { type DBManoeuvre } from '$lib/schedule/db';
 import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
@@ -10,7 +10,7 @@ import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
 export interface Split {
 	category_name?: string | undefined;
 	schedule_name?: string | undefined;
-	manoeuvre?: DBMan | undefined;
+	manoeuvre?: DBManoeuvre | undefined;
 	stop?: number | undefined;
 	fixed?: boolean;
 	alternate_name?: 'TakeOff' | 'Landing' | 'Break' | undefined;
@@ -20,7 +20,7 @@ export interface Split {
 export function build(
 	category_name: string | undefined = undefined,
 	schedule_name: string | undefined = undefined,
-	manoeuvre: DBMan | undefined = undefined,
+	manoeuvre: DBManoeuvre | undefined = undefined,
 	stop: number | undefined = undefined,
 	fixed: boolean = false,
 	alternate_name: 'TakeOff' | 'Landing' | 'Break' | undefined = undefined
