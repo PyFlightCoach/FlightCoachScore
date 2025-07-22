@@ -6,7 +6,7 @@
 	import { Flight } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
 	import { base } from '$app/paths';
-	import { loadAnalysisFromDB } from '$lib/flight/analysis';
+	import { loadAnalysisFromDB, loadAJson } from '$lib/flight/analysis';
 	import { manNames } from '$lib/stores/analysis';
 	import { loading, activeFlight } from '$lib/stores/shared';
 	import { goto } from '$app/navigation';
@@ -105,8 +105,9 @@
 						dbServer
 							.post('flight/holding/copy/' + f.meta.flight_id)
 							.then((res) => {
+                console.log("Flight copied to holding, expiry:", res.data.detail)
 								window.open(
-									'https://www.flightcoach.org/ribbon3/plotter.html?token=' + res.data.token,
+									'https://www.flightcoach.org/ribbon3/plotter.html?token=' + res.data.id,
 									'_blank'
 								);
 							})
@@ -140,13 +141,15 @@
 					<button
 						class="form-control btn btn-outline-secondary"
 						on:click={() => {
-							dbServer.get(`flight/fcj/${f.meta.flight_id}`).then((res) => {
-								const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
-								saveAs(blob, `${f.meta.flight_id}.json`);
-							});
+              loadAJson(f.meta.flight_id)
+                .then(res=>{
+                  const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+                  saveAs(blob, `${f.meta.flight_id}.analysis.json`);
+                })
+
 						}}
 					>
-						Download FCJ
+						Download AJson
 					</button>
 					<button
 						class="form-control btn btn-outline-secondary"
@@ -164,13 +167,6 @@
 					>
 						Download BIN
 					</button>
-					<a
-						class="form-control btn btn-outline-secondary"
-						href={`${base}/flight/create/holding/?id=${f.meta.flight_id}`}
-            data-sveltekit-preload-data={false}
-          >
-            Simulate Holding
-          </a>
 					<button
 						class="form-control btn btn-outline-secondary"
 						on:click={() => {
