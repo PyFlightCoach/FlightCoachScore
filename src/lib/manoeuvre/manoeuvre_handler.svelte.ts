@@ -1,4 +1,4 @@
-import { dbServer, analysisServer, faVersion } from '$lib/api';
+import { dbServer, analysisServer } from '$lib/api';
 import { States, type IState } from '$lib/utils/state';
 import { ManInfo } from './info.svelte';
 import { Figure, FigOption } from './aresti.svelte';
@@ -9,6 +9,7 @@ import { DBManoeuvre } from '$lib/schedule/db';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 import { BoxLocation } from '$lib/manoeuvre/positioning.svelte';
+import {faVersion} from '$lib/stores/shared';
 
 export class ManHandler {
 	aresti: Figure | undefined = $state();

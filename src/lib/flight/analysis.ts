@@ -5,13 +5,14 @@ import {
 	dataSource,
 	blockProgress,
 	unblockProgress,
-	loading
+	loading,
+  faVersion
 } from '$lib/stores/shared';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
-import { analysisServer, faVersion } from '$lib/api/api';
+import { analysisServer } from '$lib/api/api';
 import { States } from '$lib/utils/state';
-import { Splitting, schedule as getScheduleFromSplit, isComp } from '$lib/flight/splitting';
+import { Splitting, schedule as getScheduleFromSplit } from '$lib/flight/splitting';
 import { ManDef } from '$lib/manoeuvre/definition.svelte';
 import { ScheduleInfo } from './fcjson';
 import { loadManDef, library } from '$lib/schedule/library';

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { dbServer, formDataFromDict } from '$lib/api/api';
 	import { base } from '$app/paths';
 	import { goto, afterNavigate } from '$app/navigation';
-	import { user } from '$lib/stores/user';
-	
+	import { user, loginUser } from '$lib/stores/user';
+	import { loading } from '$lib/stores/shared';
+
 	let previousPage: string = base || '/';
 
 	let form_state: string | undefined;
@@ -16,25 +16,22 @@
 	});
 
 	async function _handleSubmit(event: Event) {
-		try {
-			const fdata = new FormData(event.currentTarget as HTMLFormElement);
+    loading.set(true);
+    const fdata = new FormData(event.currentTarget as HTMLFormElement);
 
-			const fd = formDataFromDict({
-				username: fdata.get('email'),
-				password: fdata.get('current-password')
-			});
-			try {
-				await dbServer.post('auth/jwt/login', fd);
-			} catch {
-				form_state = 'Sign in has failed; please check your credentials.';
-				return;
-			}
-			$user = (await dbServer.get('users/me')).data;
-      
-			goto(previousPage);
-		} catch (error) {
-			form_state = 'Oops...something has gone wrong. Please try again later.';
-		}
+    loginUser(fdata.get('email') as string, fdata.get('current-password') as string)
+      .then(() => {
+        form_state = undefined;
+        goto(previousPage || base);
+      })
+      .catch((error) => {
+        console.error('Login error:', error);
+        form_state = 'Sign in has failed; please check your credentials.';
+      })
+      .finally(() => {
+        loading.set(false);
+      });
+
 	}
 </script>
 

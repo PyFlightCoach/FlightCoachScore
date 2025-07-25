@@ -52,27 +52,8 @@ export const unblockProgress = () => {
 
 export const news: Writable<[]> = writable([]);
 
-export const allFAVersions: Writable<string[]> = writable([]);
-export const activeScheduleIDs: Writable<string[]> = writable([]);
-
-export async function loadGuiLists() {
-  console.info("Loading gui_lists");
-	dbServer
-		.get('analysis/guilists')
-		.then((res) => {
-			allFAVersions.set(res.data.fa_versions);
-			activeScheduleIDs.set(res.data.active_schedule_ids);
-		})
-		.catch((e) => {
-      console.log("Failed to load gui_lists", e);
-      //alert("Failed to load gui_lists from db, check you internet connection");
-			allFAVersions.set([]);
-			activeScheduleIDs.set([]);
-		});
-}
-
-user.subscribe((u) => {
-	dbServer
+export async function loadNews() {
+  dbServer
 		.get('news', { validateStatus: (status) => status == 200 })
     .then((res) => {
 			news.set(res.data.results);
@@ -80,18 +61,54 @@ user.subscribe((u) => {
 		.catch(() => {
 			news.set([]);
 		});
-  if (u) loadSchedules({owner: u.email});
-  
-});
+}
+
+export function clearNews() {news.set([])};
 
 
-export const rules: Writable<string[]> = writable();
+export const faVersion: Writable<string | undefined> = writable(undefined);
 
-export function loadRules() {
-  analysisServer
+export async function loadFAVersion() {
+  await analysisServer
+		.get('fa_version')
+		.then((res) => {
+      faVersion.set(res.data);
+      console.info("Current analysis version:", res.data);
+    })
+		.catch((e) => {
+      faVersion.set(undefined);
+      console.error("Failed to load FA version from analysis server:", e);
+    });
+}
+export const allFAVersions: Writable<string[]> = writable([]);
+export const activeScheduleIDs: Writable<string[]> = writable([]);
+
+export async function loadGuiLists() {
+	await dbServer
+		.get('analysis/guilists')
+		.then((res) => {
+			allFAVersions.set(res.data.fa_versions);
+			activeScheduleIDs.set(res.data.active_schedule_ids);
+      console.info("Loaded gui_lists");
+		})
+		.catch((e) => {
+			allFAVersions.set([]);
+			activeScheduleIDs.set([]);
+      throw new Error("Failed to load gui_lists", e);
+		});
+}
+
+
+
+
+export const rules: Writable<string[] | undefined> = writable();
+
+export async function loadRules() {
+  await analysisServer
     .get('rules')
     .then((res) => rules.set(res.data))
     .catch((e) => {
-      alert(`Error loading rules from analysis server ${e}`);
+      rules.set(undefined);
+      throw new Error("Failed to load rules", e);
     });
 }

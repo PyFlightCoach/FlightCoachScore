@@ -4,8 +4,6 @@ import { blockProgress, unblockProgress } from '$lib/stores/shared';
 import JSZip from 'jszip';
 import {library} from '$lib/schedule/library';
 import { get } from 'svelte/store';
-import {dev, loadGuiLists, loadRules} from '$lib/stores/shared';
-import {reloadSchedules} from '$lib/schedule/library';
 
 //LZMA.compress(string || byte_array, mode, on_finish(result, error) {}, on_progress(percent) {});
 //LZMA.decompress(byte_array, on_finish(result, error) {}, on_progress(percent) {});
@@ -15,18 +13,6 @@ export async function load({ url }) {
 	//TODO currently this reads from a db entry and simulates the metadata by reading the ajson.
 	// need to change to the holding roots when they are available.
 	
-  const devServer = url.searchParams.get('dev')==="";
-  console.log("devServer: ", devServer);
-  if (devServer) {
-    console.log("Setting to dev server.");
-    dev.set(true);
-    await Promise.all([
-      loadGuiLists(),
-      loadRules(),
-      reloadSchedules()
-    ]);
-  }
-
   const id = url.searchParams.get('id');
 
 	const binPromise = dbServer

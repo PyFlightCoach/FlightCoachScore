@@ -1,4 +1,5 @@
-import { analysisServer, dbServer, faVersion } from '$lib/api';
+import { analysisServer, dbServer } from '$lib/api'
+import { faVersion } from '$lib/stores/shared';
 import { ManoeuvreHandler } from '../manoeuvre/manoeuvre_handler.svelte';
 import { DBSchedule } from './db';
 import { type ParseOlanResponse } from '../manoeuvre/olan';

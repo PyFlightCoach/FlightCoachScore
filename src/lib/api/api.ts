@@ -1,9 +1,6 @@
 import { newCookieStore } from '$lib/utils/cookieStore';
-import { type Writable, writable, get } from 'svelte/store';
-import { dev } from '$app/environment';
+import { type Writable, writable} from 'svelte/store';
 import axios, {type AxiosInstance }  from 'axios';
-import { user } from '$lib/stores/user';
-
 
 // The rest is all logic to handle the selection of analysis and db server addesses
 export function jsonEscapeUTF(s: string) {
@@ -21,85 +18,34 @@ export function formDataFromDict(data: unknown) {
 	return fd;
 }
 
-
-
 export let analysisServer: AxiosInstance;
-export const anServerAddress: Writable<string> = writable();
-
-export const customAnalysisServer = newCookieStore('customAnalysisServer', 'http://localhost:5000');
-
-export const an_servers = {
-	uk: 'https://flightcoachscore.org:5010',
-	pre: 'https://flightcoachscore.org:5020'
-};
-
-export const anSOption = newCookieStore('anSOption', 'uk', (value) => {
-  if (dev || get(user)?.is_superuser) {
-    if (Object.keys(an_servers).includes(value)) {
-      anServerAddress.set(an_servers[value as keyof typeof an_servers]);
-    } else {
-      anServerAddress.set(get(customAnalysisServer));
-    }
-  } else { 
-    anServerAddress.set(an_servers.uk);
-  }
-	
-});
-
-customAnalysisServer.subscribe((value) => {
-	if (get(anSOption)=='custom') {
-		anServerAddress.set(value);
-	}
-});
-
-export const faVersion: Writable<string | undefined> = writable(undefined);
-
-anServerAddress.subscribe((value: string) => {
-	analysisServer = axios.create({
-    baseURL: value
-  });
-  analysisServer
-		.get('fa_version')
-		.then((res) => faVersion.set(res.data))
-		.catch(() => faVersion.set(undefined));
-});
-
 export let dbServer: AxiosInstance;
-export const dbServerAddress: Writable<string> = writable();
 
-export const customDbServer = newCookieStore('customDbServer', 'http://localhost:8000');
 
-export const db_servers = {
+
+export const dbServers = {
 	uk: 'https://flightcoachscore.org:5012',
-	pre: 'https://flightcoachscore.org:5022'
+	dev: 'https://flightcoachscore.org:5022',
+  local: 'http://localhost:8000'
 };
 
-export const dbSOption = newCookieStore('dbSOption', 'uk', (value) => {
-	if (dev || get(user)?.is_superuser) {
-    if (Object.keys(db_servers).includes(value)) {
-      dbServerAddress.set(db_servers[value as keyof typeof db_servers]);
-    } else {
-      dbServerAddress.set(get(customDbServer));
-    } 
-	} else { 
-    dbServerAddress.set(db_servers.uk);
-  }
-});
+export const anServers = {
+	uk: 'https://flightcoachscore.org:5010',
+	dev: 'https://flightcoachscore.org:5020',
+  local: 'http://localhost:5000'
+};
 
-customDbServer.subscribe((value) => {
-	if (get(dbSOption) == 'custom') {
-		dbServerAddress.set(value);
-	}
-});
-
-dbServerAddress.subscribe((value: string) => {
-	dbServer = axios.create({
-    baseURL: value,
+export const servers = newCookieStore('server', 'uk', (value) => {
+  console.info("Switching DB server to:", dbServers[value as keyof typeof dbServers]);
+  console.info("Switching Analysis server to:", anServers[value as keyof typeof anServers]);
+  dbServer = axios.create({
+    baseURL: dbServers[value as keyof typeof dbServers],
     withCredentials: true
   });
+  analysisServer = axios.create({
+    baseURL: anServers[value as keyof typeof anServers],
+  });
+  
+  
 });
 
-if (!dev) {
-	anSOption.set('uk');
-	dbSOption.set('uk');
-}

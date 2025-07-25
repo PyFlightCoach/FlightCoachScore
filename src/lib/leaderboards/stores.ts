@@ -1,11 +1,10 @@
 import { newCookieStore, newCookieStoreInt, newCookieStoreBool } from '$lib/utils/cookieStore';
 import { writable, type Writable } from 'svelte/store';
-import { faVersion } from '$lib/api/api';
 import { get } from 'svelte/store';
 import { dbServer } from '$lib/api/api';
 import { checkUser } from '$lib/stores/user';
 import * as types from '$lib/flight/db';
-import { activeFlight } from '$lib/stores/shared';
+import { activeFlight, faVersion } from '$lib/stores/shared';
 import { library } from '$lib/schedule/library';
 
 export const n_results = newCookieStoreInt('n_results', 10);

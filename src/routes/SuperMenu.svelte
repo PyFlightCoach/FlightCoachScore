@@ -1,14 +1,9 @@
 <script lang="ts">
 	import NavMenu from './NavMenu.svelte';
-	import ServerSelection from '$lib/api/ServerSelection.svelte';
 	import { base } from '$app/paths';
 	import { activeFlight, dev } from '$lib/stores/shared';
-	import { an_servers, anSOption, customAnalysisServer, dbServer, db_servers } from '$lib/api/api';
-	import { dbSOption, customDbServer } from '$lib/api/api';
+	import { servers, dbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
-  import {reloadSchedules} from '$lib/schedule/library';
-  import {loadGuiLists} from '$lib/stores/shared';
-	import { loadRules } from '$lib/stores/shared';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
 	import { goto } from '$app/navigation';
 </script>
@@ -16,32 +11,6 @@
 <NavMenu tooltip="Super User Menu">
 	<span slot="icon"><i class="bi bi-star"></i> </span>
 
-	{#if $user?.is_superuser || $dev}
-		<ServerSelection
-			title="Analysis Server"
-			options={Object.keys(an_servers)}
-			bind:custom={$customAnalysisServer}
-			bind:selected={$anSOption}
-      onselected={() => {
-        console.log("Analysis Server address changed, reloading info...");
-        loadRules();
-      }}
-		/>
-		<div class="dropdown-divider"></div>
-		<ServerSelection
-			title="Database Server"
-			options={Object.keys(db_servers)}
-			bind:custom={$customDbServer}
-			bind:selected={$dbSOption}
-      onselected={() => {
-        console.log("DB Server address changed, reloading info...");
-        $user = undefined;
-        loadGuiLists();
-        reloadSchedules();
-      }}
-		/>
-	{/if}
-	<hr />
 	<small class="dropdown-header">Management</small>
 	<a class="dropdown-item" href="{base}/news">News</a>
 	<a class="dropdown-item" href="{base}/user/manage">Users</a>

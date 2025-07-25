@@ -1,7 +1,7 @@
 <script lang="ts">
 	import NavMenu from './NavMenu.svelte';
 	import { base } from '$app/paths';
-	import { user } from '$lib/stores/user';
+	import { user, logoutUser } from '$lib/stores/user';
 	import { dbServer } from '$lib/api/api';
 	import { goto } from '$app/navigation';
 
@@ -13,11 +13,8 @@
 		<a class="dropdown-item" href="{base}/user/profile">Profile</a>
 		<button
 			class="btn dropdown-item"
-			onclick={() => {
-        dbServer.post('auth/jwt/logout', {});
-    	$user =undefined;
-		goto(base + '/')
-      }}>Logout
+			onclick={logoutUser}
+    >Logout
     </button>
 	{:else}
 		<a class="dropdown-item" href="{base}/user/login">Login</a>

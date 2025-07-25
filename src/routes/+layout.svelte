@@ -9,11 +9,12 @@
 	import { onMount } from 'svelte';
 	import { dbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
-	import { page } from '$app/stores';
-	import { base } from '$app/paths';
+	import { page } from '$app/state';
 	import { dev, help, windowHeight, windowWidth } from '$lib/stores/shared';
 	import '@beyonk/gdpr-cookie-consent-banner/banner.css';
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner';
+
+	const { data } = $props();
 
 	export const gpdc = {
 		cookieName: 'fcscore_cookie_consent',
@@ -43,18 +44,6 @@
 		typographer: true
 	});
 
-	$: if ($page) {
-		let helpFileName = $page.url.pathname
-			.replaceAll('/', '_')
-			.split(base.replace('/', '_'))
-			.join('')
-			.replace('_', '');
-    helpFileName = helpFileName.endsWith('_') ? helpFileName.slice(0, -1) : helpFileName;
-		fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
-			.then((response) =>  response.ok ? response.text() : undefined)
-			.then((text) => ($help = text?.replace('/fcscorebase', base)));
-	}
-
 	onMount(() => {
 		dbServer
 			.get('/users/me')
@@ -64,7 +53,7 @@
 				}
 			})
 			.catch((e) => {
-				console.debug('no user', e.message);
+				console.error('no user:', e.message);
 			});
 	});
 </script>
@@ -86,7 +75,7 @@
 
 <div class="offcanvas offcanvas-end position-fixed" tabindex="-1" id="help">
 	<div class="offcanvas-header">
-		<h5>Help for {$page.url.pathname}</h5>
+		<h5>Help for {page.url.pathname}</h5>
 		<button
 			type="button"
 			class="btn-close text-reset"

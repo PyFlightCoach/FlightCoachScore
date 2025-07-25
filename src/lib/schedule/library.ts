@@ -1,11 +1,10 @@
-import { dbServer } from '$lib/api/api';
+import { dbServer, servers } from '$lib/api/api';
 import { ManDef, ManOpt } from '$lib/manoeuvre/definition.svelte';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { DBSchedule, type IDBSchedule } from '$lib/schedule/db';
 
 import { user } from '$lib/stores/user';
-
 
 export interface ScheduleRequest {
 	schedule_id?: string;
@@ -18,7 +17,7 @@ export async function requestSchedules(request: ScheduleRequest): Promise<DBSche
 	const dbscheds = dbServer
 		.get(`schedule/schedules`, request as Record<string, never>)
 		.then((res) => res.data.results.map(DBSchedule.parse));
-  return dbscheds;
+	return dbscheds;
 }
 
 export class ScheduleLibrary {
@@ -70,7 +69,7 @@ export class ScheduleLibrary {
 		const newlib = new ScheduleLibrary(
 			unique_ids.map((id: string) => lib.subset({ schedule_id: id }).first)
 		);
-    return newlib;
+		return newlib;
 	}
 
 	async update(request: ScheduleRequest): Promise<ScheduleLibrary> {
@@ -79,7 +78,7 @@ export class ScheduleLibrary {
 			'category_name',
 			'schedule_name'
 		]);
-    return lib;
+		return lib;
 	}
 
 	sort(keys: (keyof IDBSchedule)[]) {
@@ -95,29 +94,43 @@ export class ScheduleLibrary {
 		};
 		return new ScheduleLibrary(this.schedules.sort(sortFunction));
 	}
+
+	summarize(): Record<string, { repr: string; count: number }> {
+		return Object.fromEntries(
+			this.schedules.map((s) => {
+				const repr = `${s.category_name} ${s.schedule_name}`;
+				return [s.schedule_id, { repr, count: s.num_flights }];
+			})
+		);
+	}
 }
 
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
 
 export async function loadSchedules(request: ScheduleRequest) {
-	console.log('loading schedules: ', request);
-	get(library)
+	await get(library)
 		.update(request)
 		.then((newlib) => {
+			console.log(`loaded schedules from ${request.owner ? request.owner : 'unknown'}`, newlib);
 			library.set(newlib);
 		})
 		.catch((e) => {
 			console.error('failed to load schedules', e);
-			//alert('Failed to load schedules from DB, check your internet connection');
-			library.set(new ScheduleLibrary());
+			throw new Error('Failed to load schedules', e);
 		});
 }
 
 export async function reloadSchedules() {
 	library.set(new ScheduleLibrary());
+
 	await loadSchedules({ owner: 'admin@fcscore.org' });
+
 	const _user = get(user);
-	if (_user) await loadSchedules({ owner: _user.email });
+	if (_user) {
+		await loadSchedules({ owner: _user.email }).catch((e) => {
+			console.log(`cant get schedules for ${_user.email}:`, e.message);
+		});
+	}
 }
 
 export async function loadManDef(manoeuvre_id: string): Promise<ManDef | ManOpt> {
