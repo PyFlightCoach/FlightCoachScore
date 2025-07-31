@@ -3,9 +3,11 @@ import { Flight } from '$lib/database/flight';
 import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
-import { user } from '$lib/stores/user';
 import { dbServer, analysisServer} from '$lib/api';
-import { loadSchedules } from '$lib/schedule/library';
+import {get} from 'svelte/store';
+import { library, loadedSchedules } from '$lib/schedule/library';
+import { reloadSchedules } from '$lib/schedule/library';
+import { requestActivity } from '$lib/stores/userActivity';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -67,48 +69,96 @@ export function clearNews() {news.set([])};
 
 
 export const faVersion: Writable<string | undefined> = writable(undefined);
+export const loadedFAVersion: Writable<boolean | string> = writable(false);
 
 export async function loadFAVersion() {
+  loadedFAVersion.set(false);
   await analysisServer
 		.get('fa_version')
 		.then((res) => {
       faVersion.set(res.data);
+      loadedFAVersion.set(true);
       console.info("Current analysis version:", res.data);
     })
 		.catch((e) => {
       faVersion.set(undefined);
-      console.error("Failed to load FA version from analysis server:", e);
+      loadedFAVersion.set(`${e.message}, Failed to read FA version.`);
+      throw new Error("Failed to read FA version from analysis server", e);
     });
 }
+
 export const allFAVersions: Writable<string[]> = writable([]);
 export const activeScheduleIDs: Writable<string[]> = writable([]);
+export const loadedGuiLists: Writable<boolean | string> = writable(false);
 
 export async function loadGuiLists() {
+  loadedGuiLists.set(false);
 	await dbServer
 		.get('analysis/guilists')
 		.then((res) => {
 			allFAVersions.set(res.data.fa_versions);
 			activeScheduleIDs.set(res.data.active_schedule_ids);
-      console.info("Loaded gui_lists");
+      loadedGuiLists.set(true);
 		})
 		.catch((e) => {
 			allFAVersions.set([]);
 			activeScheduleIDs.set([]);
+      loadedGuiLists.set(`${e.message}, Failed to load gui lists.`);
       throw new Error("Failed to load gui_lists", e);
 		});
 }
 
-
-
-
 export const rules: Writable<string[] | undefined> = writable();
+export const loadedRules: Writable<boolean | string> = writable(false);
 
 export async function loadRules() {
+  loadedRules.set(false);
   await analysisServer
     .get('rules')
-    .then((res) => rules.set(res.data))
+    .then((res) => {
+      rules.set(res.data);
+      loadedRules.set(true);
+    })
     .catch((e) => {
       rules.set(undefined);
+      loadedRules.set(`${e.message}, Failed to load rules.`);
       throw new Error("Failed to load rules", e);
+    });
+}
+
+
+export const serverDataLoaded: Writable<boolean| string> = writable(false);
+
+function checkServerDataLoaded(msg: boolean | string) {
+  let val = get(serverDataLoaded);
+  if (typeof msg === 'string') {
+    if (typeof val === 'string') {
+      val += ` ${msg}`;
+    }
+    else {
+      val = msg;
+    }
+  } else {
+    if (get(loadedGuiLists)==true && get(loadedRules)==true && get(loadedSchedules)==true && get(loadedFAVersion)==true) {
+      val = true;
+    } 
+  }
+  serverDataLoaded.set(val);
+}
+loadedGuiLists.subscribe(checkServerDataLoaded);
+loadedRules.subscribe(checkServerDataLoaded);
+loadedSchedules.subscribe(checkServerDataLoaded);
+loadedFAVersion.subscribe(checkServerDataLoaded); 
+
+
+export async  function loadAllServerData() {
+  serverDataLoaded.set(false);
+  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity()])
+    .then(() => {
+      console.log('All data loaded successfully.');
+      serverDataLoaded.set(true);
+    })
+    .catch((e) => {
+      console.error('Error loading required data', e);
     });
 }

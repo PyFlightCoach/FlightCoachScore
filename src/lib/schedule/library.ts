@@ -106,8 +106,10 @@ export class ScheduleLibrary {
 }
 
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
+export const loadedSchedules: Writable<boolean | string> = writable(false);
 
 export async function loadSchedules(request: ScheduleRequest) {
+  loadedSchedules.set(false);
 	await get(library)
 		.update(request)
 		.then((newlib) => {
@@ -116,14 +118,19 @@ export async function loadSchedules(request: ScheduleRequest) {
 		})
 		.catch((e) => {
 			console.error('failed to load schedules', e);
-			throw new Error('Failed to load schedules', e);
+			throw e;
 		});
 }
 
 export async function reloadSchedules() {
 	library.set(new ScheduleLibrary());
-
-	await loadSchedules({ owner: 'admin@fcscore.org' });
+  loadedSchedules.set(false);
+	await loadSchedules({ owner: 'admin@fcscore.org' })
+    .then(() => loadedSchedules.set(true))
+    .catch((e) => {
+      loadedSchedules.set(`${e.message}, Failed to load schedules.`);
+      throw new Error('Failed to reload schedules', e);
+    });
 
 	const _user = get(user);
 	if (_user) {

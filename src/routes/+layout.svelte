@@ -10,7 +10,7 @@
 	import { dbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/state';
-	import { dev, help, windowHeight, windowWidth } from '$lib/stores/shared';
+	import { dev, help, windowHeight, windowWidth, serverDataLoaded } from '$lib/stores/shared';
 	import '@beyonk/gdpr-cookie-consent-banner/banner.css';
 	import GdprBanner from '@beyonk/gdpr-cookie-consent-banner';
 
@@ -65,12 +65,31 @@
 <GdprBanner {...gpdc} />
 
 <div class="container-fluid  min-vh-100 d-flex flex-column overflow-auto  ">
+  {#if !$serverDataLoaded || typeof $serverDataLoaded === 'string'}
+  <div class="row flex-grow-1 justify-content-center align-items-center">
+    <div class="col-lg-4 col-10">
+      <div class="alert alert-info text-center" role="alert">
+        {#if typeof $serverDataLoaded === 'string'}
+          Error loading data from server<br>
+          <span class="text-danger">{$serverDataLoaded}</span>
+        {:else if $serverDataLoaded}
+          Loaded GuiLists
+        {:else}
+          Loading data from the server...
+        {/if}
+        
+      </div>
+    </div>
+  </div>
+  {:else}
+  
   <div class="row justify-self-start">
     <MainNavBar/>
   </div>
 	<div class="row flex-grow-1 justify-content-center ">
 		<slot />
 	</div>
+  {/if}
 </div>
 
 <div class="offcanvas offcanvas-end position-fixed" tabindex="-1" id="help">
@@ -88,6 +107,7 @@
 			{@html md.render($help)}
 		{/if}
 	</div>
+  
 </div>
 
 <svelte:head>

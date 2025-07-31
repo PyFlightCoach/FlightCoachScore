@@ -15,8 +15,12 @@ export interface UserActivityResponse {
 }
 
 export const userActivity: Writable<UserActivityResponse[]> = writable([]);
-
+let loadingActivity = false;
 export async function requestActivity() {
+  if (loadingActivity) {
+    return;
+  }
+  loadingActivity = true;  
   await dbServer
     .get('/analysis/user_activity')
     .then((res) => {
@@ -26,6 +30,9 @@ export async function requestActivity() {
     .catch((err) => {
       userActivity.set([]);
       console.error("Failed to load user activity:", err);
+    })
+    .finally(() => {
+      loadingActivity = false;
     });
 };
 

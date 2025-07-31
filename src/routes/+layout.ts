@@ -1,6 +1,5 @@
 import { servers } from '$lib/api/api';
-import { loadAllServerData, serverDataLoaded } from '$lib/stores';
-import {  help } from '$lib/stores/shared';
+import {  help, serverDataLoaded, loadAllServerData } from '$lib/stores/shared';
 import { base } from '$app/paths';
 import { get } from 'svelte/store';
 
@@ -9,7 +8,7 @@ export const ssr = false;
 export const trailingSlash = 'always';
 
 function setServer(location: string) {
-  if (get(servers) !== location || !serverDataLoaded) {
+  if (get(servers) !== location || !get(serverDataLoaded)) {
     servers.set(location);
     console.log(`Changing to ${location} server`);
     loadAllServerData();
@@ -23,6 +22,7 @@ export async function load({ url }) {
   const localServer = url.searchParams.get('local') === '';
 
   console.log('servers options:', mainServer, devServer, localServer);
+
   setServer(mainServer ? 'uk' : devServer ? 'dev' : localServer ? 'local' : get(servers));
   
 

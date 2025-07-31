@@ -15,6 +15,16 @@ export async function load({ url }) {
 	
   const id = url.searchParams.get('id');
 
+  const dataPromise = dbServer
+    .get(`flight/holding/meta/${id}`, {
+      responseType: 'json',
+      ...blockProgress(`Loading Metadata ${id} from Database`)
+    })
+    .then((response) => {
+      return JSON.parse(response.data.data);
+    })
+
+
 	const binPromise = dbServer
 		.get(`flight/holding/bin/${id}`, {
 			responseType: 'arraybuffer',
@@ -26,14 +36,6 @@ export async function load({ url }) {
 			return new File([res], 'flightlog.bin');
 		})
 	
-  const dataPromise = dbServer
-    .get(`flight/holding/meta/${id}`, {
-      responseType: 'json',
-      ...blockProgress(`Loading Metadata ${id} from Database`)
-    })
-    .then((response) => {
-      return JSON.parse(response.data.data);
-    })
   
   const [bin, metadata] = await Promise.all([binPromise, dataPromise])
     .catch((e) => {console.error(e); throw e;})
