@@ -5,7 +5,7 @@ import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
 import { dbServer, analysisServer} from '$lib/api';
 import {get} from 'svelte/store';
-import { library, loadedSchedules } from '$lib/schedule/library';
+import { loadedSchedules } from '$lib/schedule/library';
 import { reloadSchedules } from '$lib/schedule/library';
 import { requestActivity } from '$lib/stores/userActivity';
 

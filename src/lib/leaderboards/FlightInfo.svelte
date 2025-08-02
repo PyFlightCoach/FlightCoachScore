@@ -107,18 +107,13 @@
 							.then((res) => {
                 console.log("Flight copied to holding, expiry:", res.data.detail)
 								window.open(
-									'https://www.flightcoach.org/ribbon3/plotter.html?token=' + res.data.id,
+									'https://flightcoach.org/ribbon3/plotter.html?token=' + res.data.id,
 									'_blank'
 								);
 							})
 							.catch((err) => {
 								console.error(err);
-								if (confirm('cant quite do this yet, open the plotter anyway?')) {
-									window.open(
-										'https://www.flightcoach.org/ribbon3/plotter.html?token=12345',
-										'_blank'
-									);
-								}
+								alert('Failed to open flight for plotter access: ' + err.message);
 							});
 					}}
 				>

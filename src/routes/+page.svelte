@@ -1,6 +1,5 @@
 <script lang="ts">
 	import navBarContents from '$lib/stores/navBarContents';
-	import { base } from '$app/paths';
 	import { news } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
 	import About from './About.svelte';
