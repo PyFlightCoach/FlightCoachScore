@@ -107,7 +107,7 @@
 							.then((res) => {
                 console.log("Flight copied to holding, expiry:", res.data.detail)
 								window.open(
-									'https://flightcoach.org/ribbon3/plotter.html?token=' + res.data.id,
+									'https://flightcoach.org/viewer/plotter.html?token=' + res.data.id,
 									'_blank'
 								);
 							})
