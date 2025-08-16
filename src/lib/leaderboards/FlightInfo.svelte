@@ -162,6 +162,29 @@
 					>
 						Download BIN
 					</button>
+          <button
+            class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
+            data-sveltekit-preload-data="tap"
+            on:click={() => {
+              dbServer
+                .post('flight/holding/copy/' + f.meta.flight_id)
+                .then((res) => {
+                  console.log("Flight copied to holding, expiry:", res.data.detail);
+                  return dbServer.get('flight/holding/copy/fcj/' + res.data.id);
+                })
+                .then((res) => {
+                  const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+                  saveAs(blob, `${f.meta.flight_id}.fc.json`);
+                })
+                .catch((err) => {
+                  console.error(err);
+                  alert('Failed to download json: ' + err.message);
+                });
+            }}
+          >
+            Download FCJ
+          </button>
+
 					<button
 						class="form-control btn btn-outline-secondary"
 						on:click={() => {
