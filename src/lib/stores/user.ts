@@ -79,7 +79,7 @@ export async function checkUser(require_cd: boolean = false, require_super: bool
 			if (require_super && !me.is_superuser) {
 				alert('You need to be a superuser to perform this action');
 				return false;
-			} else if (require_cd && !me.is_cd) {
+			} else if (require_cd && (!me.is_cd && !me.is_superuser)) {
 				alert('You need to be a CD to perform this action');
 				return false;
 			} else if (!me.is_verified) {

@@ -12,5 +12,9 @@
     <a class="dropdown-item" href="{base}/database/query/leaderboards">Leaderboard</a>
   {/if}
   <a class="dropdown-item" href="{base}/schedule">Schedules</a>
-  <a class="dropdown-item" href="{base}/competition" hidden>Competitions</a>
+  {#if $user?.is_superuser || $user?.is_cd}
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Competitions</div>
+    <a class="dropdown-item" href="{base}/competition/create">Create</a>
+  {/if}
 </NavMenu>

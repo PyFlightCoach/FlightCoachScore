@@ -22,8 +22,9 @@
 		getNFlights
 	} from '$lib/leaderboards/stores';
 	import { activeFlight } from '$lib/stores/shared';
-
-	let { fa_versions, schedule_ids }: { fa_versions: string[]; schedule_ids: string[] } = $props();
+  import CheckInput from '$lib/components/CheckInput.svelte';
+	
+  let { fa_versions, schedule_ids }: { fa_versions: string[]; schedule_ids: string[] } = $props();
 
 	let lib = $derived(schedule_ids ? $library.downselect(schedule_ids) : $library);
 	let categories = $derived(lib.unique('category_name') || []);
@@ -131,53 +132,15 @@
 	</select>
 </div>
 
-<div class="form-check p-2 px-4">
-	<input
-		type="checkbox"
-		class="form-check-input"
-		id="truncate"
-		name="truncate"
-		bind:checked={$truncate}
-	/>
-	<label for="truncate">Truncate</label>
-</div>
-
-<div class="form-check p-2 px-4">
-	<input
-		type="checkbox"
-		class="form-check-input"
-		id="me_only_flag"
-		name="me_only_flag"
-		bind:checked={$me_only_flag}
-	/>
-	<label for="form-check-label">Only my flights</label>
-</div>
+<CheckInput name="truncate" bind:checked={$truncate}/>
+<CheckInput name="Only my flights" bind:checked={$me_only_flag}/>
 
 {#if $sort_by_score_flag}
-	<div class="form-check p-2 px-4">
-		<input
-			type="checkbox"
-			class="form-check-input"
-			id="one_per_pilot_flag"
-			name="one_per_pilot_flag"
-			bind:checked={$one_per_pilot_flag}
-		/>
-		<label for="one_per_pilot_flag">Only best flight from each pilot</label>
-	</div>
+  <CheckInput name="Only best flight from each pilot" bind:checked={$one_per_pilot_flag}/>
 {/if}
 
 {#if $sort_by_score_flag}
-	<div class="form-check p-2 px-4">
-		<input
-			type="checkbox"
-			class="form-check-input"
-			id="wholeflight"
-			name="truncate"
-			bind:checked={$singleman}
-		/>
-		<label for="wholeflight">Single Manoeuvre</label>
-	</div>
-
+  <CheckInput name="Single Manoeuvre" bind:checked={$singleman}/>
 	{#if $singleman}
 		<div class="row p-2 px-4">
 			<label class="col col-form-label text-nowrap" for="manoeuvre_ind">Manoeuvre Number</label>
@@ -192,16 +155,8 @@
 		</div>
 	{/if}
 {/if}
-<div class="form-check p-2 px-4">
-	<input
-		type="checkbox"
-		class="form-check-input"
-		id="select_by_date"
-		name="select_by_date"
-		bind:checked={$select_by_date}
-	/>
-	<label class="form-check-label" for="select_by_date">Select By Dates</label>
-</div>
+<CheckInput name="Select By Dates" bind:checked={$select_by_date}/>
+
 {#if $select_by_date}
 	<div class="row">
 		<div class="col p-2">
