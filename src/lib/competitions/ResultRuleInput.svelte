@@ -2,11 +2,9 @@
   import { type ResultRule } from './compInterfaces';
   let {rule=$bindable<ResultRule>()} : {rule: ResultRule} = $props();
   
-  const normaliseOptions = ["raw", "best", "average"];
-  let normaliseOption = $state(rule.raw_score ? "raw" : rule.normalise_best_to_n ? "best" : "average");
+  let normaliseOption = $state(rule.raw_score ? "raw" : rule.normalise_average_to_n ? "average" : "best");
   let normTo = $state(1000); 
 
-  
 
 </script>
 
@@ -17,7 +15,7 @@
     id="normOption"
     bind:value={normaliseOption}
     onchange={(e)=>{
-      normaliseOption = (e.target as EventTarget).value;
+      normaliseOption = (e.target as HTMLSelectElement).value;
       rule.raw_score = normaliseOption === "raw";
       
     }}
