@@ -1,23 +1,86 @@
 <script lang="ts">
-  import UserSearch from "$lib/components/UserSearch.svelte";
-	import type { DBUser } from "$lib/stores/user";
-  import {dbServer} from "$lib/api";
+	import { user, type DBUser } from '$lib/stores/user';
+	import { dbServer } from '$lib/api';
+	import TextInput from '$lib/components/TextInput.svelte';
 
-  let {users, compID}: {users: DBUser[], compID: string} = $props();
+	let {
+		users,
+		compID,
+		onadded = () => {}
+	}: { users: DBUser[]; compID: string; onadded: () => void } = $props();
 
-  let selectedUser : string | undefined = $state();
-
+	let formState: string | undefined = $state();
+	let email: string | undefined = $state();
+	let pilotMayExist: boolean = $state(true);
+	let pilotName: string | undefined = $state();
 </script>
 
+{#if formState}
+	<div class="row mt-4">
+		<p><mark>{formState}</mark></p>
+	</div>
+{/if}
 <div class="row p-2">
-  <div class="col-10">
-    <UserSearch {users} bind:selectedUser={selectedUser}  />
-  </div>
-  <button 
-    class="col-2 btn btn-outline-primary" 
-    disabled={selectedUser==""}
-    onclick={()=>{
-      dbServer.post(`competition/add_competitor/${compID}/${selectedUser}`)
-    }}
-  >Add Pilot</button>
+	<TextInput name={'email'} bind:value={email} />
+	{#if !pilotMayExist}
+		<TextInput name={'name'} bind:value={pilotName} />
+	{/if}
+</div>
+<div class="row p-2">
+	<button
+		class="col btn btn-outline-primary"
+		onclick={() => {
+			const founduser = users.find((u) => u.email == 'email');
+			if (founduser) {
+				dbServer
+					.post(`competition/add_competitor/`, {
+						comp_id: compID,
+						user_id: founduser.id
+					})
+					.then(() => {
+						dbServer.post(`user/send_email/${founduser.id}`, {
+							subject: 'You have been added to a competition on FCScore.',
+							body: `The contest director ${$user?.first_name} ${$user?.first_name} has added you to a competition on FCScore, 
+              log in or click here to see more information`
+						});
+						onadded();
+					})
+					.catch((e) => {
+						formState = `Failed to add ${founduser.first_name} ${founduser.last_name} ${e}`;
+					});
+			} else {
+				if (pilotMayExist) {
+					formState = 'Pilot not found in DB, enter name to create dummy pilot.';
+					pilotMayExist = false;
+				} else {
+					if (pilotName) {
+						dbServer
+							.post(`competition/add_competitor/`, {
+								comp_id: compID,
+								user_id: email,
+								name_override: pilotName
+							})
+							.then(() => {
+								alert(
+									'add code to email prospective user here, or perhaps just generate a linking code'
+								);
+								onadded();
+							})
+							.catch((e) => {
+								formState = `Failed to add ${pilotName} ${e}`;
+							});
+					}
+				}
+			}
+		}}>Add</button
+	>
+	<button
+		class="col btn btn-outline-primary"
+		onclick={() => {
+			email = '';
+			pilotMayExist = true;
+			pilotName = undefined;
+			formState = undefined;
+		}}>clear</button
+	>
 </div>

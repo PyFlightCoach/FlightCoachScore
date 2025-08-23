@@ -2,7 +2,7 @@
   import {base} from "$app/paths";
   import NavMenu from "./NavMenu.svelte";
 	import { user } from '$lib/stores/user';
-
+  import {cdComps} from '$lib/stores/contests';
 
 </script>
 
@@ -14,7 +14,15 @@
   <a class="dropdown-item" href="{base}/schedule">Schedules</a>
   {#if $user?.is_superuser || $user?.is_cd}
     <div class="dropdown-divider"></div>
-    <div class="dropdown-header">Competitions</div>
-    <a class="dropdown-item" href="{base}/competition/create">Create</a>
+    <div class="dropdown-header">Contest Director</div>
+    {#each Object.entries($cdComps) as [name, id]}
+      <a class="dropdown-item" href="{base}/competition/management/?id={id}">{name}</a>
+    {/each}
+    <a class="dropdown-item" href="{base}/competition/management">Create Competition</a>
+    
   {/if}
+  <div class="dropdown-divider"></div>
+  <div class="dropdown-header">Competitions</div>
+
+
 </NavMenu>

@@ -57,30 +57,30 @@ export interface FlightRule {
 export interface CompThingSummary {
   id: string;
   name: string;
-  comment: string | null;
-  index: number | null;
+  comment: string | undefined;
+  index: number | undefined;
   what_am_i: ["competition", "stage", "round"];
-  date_start: string | null;
-  date_end: string | null;
-  fa_version: string | null;
+  date_start: string | undefined;
+  date_end: string | undefined;
+  fa_version: string | undefined;
   is_open_now: boolean;
-  directors: Director[] | null;
-  result_rules: ResultRule | null;
-  add_rules: AddRule | null;
+  directors: Director[] | undefined;
+  result_rules: ResultRule | undefined;
+  add_rules: AddRule | undefined;
   hide_results: boolean;
-  competitors: Competitor[] | null;
-  children: CompThingSummary[] | null;
+  flight_rules?: FlightRule | undefined;
+  competitors: Competitor[] | undefined;
+  children: CompThingSummary[] | undefined;
 }
 
-
 export interface CompThingCreateUpdate {
-  name: string | null;
-  comment?: string | null;
-  parent_id?: string | null; 
-  fa_version?: string | null;
-  directors?: string[] | null;
-  result_rules?: ResultRule | null;
-  flight_rules?: FlightRule | null;
-  add_rules?: AddRule | null;
-  hide_results?: boolean | null;
+  name: string | undefined;
+  comment?: string | undefined;
+  parent_id?: string | undefined; 
+  fa_version?: string | undefined;
+  directors?: string[] | undefined;
+  result_rules?: ResultRule | undefined;
+  flight_rules?: FlightRule | undefined;
+  add_rules?: AddRule | undefined;
+  hide_results?: boolean | undefined;
 }

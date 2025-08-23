@@ -1,8 +1,8 @@
 <script lang="ts">
   import { type ResultRule } from './compInterfaces';
-  let {rule=$bindable<ResultRule>()} : {rule: ResultRule} = $props();
+  let {rule=$bindable<ResultRule>()} : {rule: ResultRule | undefined} = $props();
   
-  let normaliseOption = $state(rule.raw_score ? "raw" : rule.normalise_average_to_n ? "average" : "best");
+  let normaliseOption = $state(rule?.raw_score ? "raw" : rule?.normalise_average_to_n ? "average" : "best");
   let normTo = $state(1000); 
 
 
