@@ -2,9 +2,9 @@
 	import ResultRuleInput from '$lib/competitions/ResultRuleInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import CheckInput from '$lib/components/CheckInput.svelte';
-	import { activeComp } from '$lib/stores/contests';
+	import { activeComp, updateCDComps } from '$lib/stores/contests';
 	import { user, type DBUser } from '$lib/stores/user';
-	import AddCompetitor from '$lib/competitions/AddCompetitor.svelte';
+	import Stages from '$lib/competitions/Stages.svelte';
 	import type {
 		CompThingSummary,
 		CompThingCreateUpdate,
@@ -33,7 +33,8 @@
 	let normalise_to: number | undefined = $state(1000);
 	let hide_results: boolean = $state(false);
   let competitors: Competitor[] = $state([]);
-	function hasChanged(val1: any, val2: any) {
+
+  function hasChanged(val1: any, val2: any) {
 		return val1 != val2 ? 'bg-warning' : '';
 	}
 
@@ -74,7 +75,7 @@
 </script>
 
 <div class="row">
-	<div class="col-md-6 col-sm-auto pt-3 bg-light border">
+	<div class="col-md-4 col-sm-6 pt-3 bg-light border">
 		<small>Competition Setup</small>
 
 		<TextInput
@@ -129,7 +130,8 @@
 				onclick={() => {
 					if (!$activeComp.id) {
 						dbServer.post('competition', createUpdateRequest()).then((res) => {
-							$activeComp = res.data;
+							updateCDComps();
+              $activeComp = res.data;
 						});
 					} else {
 						dbServer
@@ -146,19 +148,14 @@
 	</div>
 
 	{#if $activeComp.id}
-		<div class="col-md-6 col-sm-auto pt-3 bg-light border">
-			<small>Add Competitor:</small>
-			<AddCompetitor
-				compID={$activeComp.id}
-				users={data.users}
-				onadded={() => {
-					dbServer.get(`competition/${$activeComp.id}`).then((res) => {
-						$activeComp = res.data;
-					});
-				}}
-			/>
-			<CompetitorTable {competitors} />
+		<div class="col-md-4 col-sm-3 pt-3 bg-light border">
+			<CompetitorTable users={data.users} {competitors} />
       
 		</div>
 	{/if}
+  <div class="col-md-4  col-sm-3 pt-3 bg-light border">
+    <Stages parentID={$activeComp.id} bind:stages={$activeComp.children } />
+  </div>
 </div>
+
+

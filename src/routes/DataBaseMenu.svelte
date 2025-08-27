@@ -16,9 +16,9 @@
     <div class="dropdown-divider"></div>
     <div class="dropdown-header">Contest Director</div>
     {#each Object.entries($cdComps) as [name, id]}
-      <a class="dropdown-item" href="{base}/competition/management/?id={id}">{name}</a>
+      <a class="dropdown-item" href="{base}/competition/management/?id={id}" data-sveltekit-preload-data="tap">{name}</a>
     {/each}
-    <a class="dropdown-item" href="{base}/competition/management">Create Competition</a>
+    <a class="dropdown-item" href="{base}/competition/management"  data-sveltekit-preload-data="tap">Create Competition</a>
     
   {/if}
   <div class="dropdown-divider"></div>

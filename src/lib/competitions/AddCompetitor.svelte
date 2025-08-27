@@ -2,6 +2,7 @@
 	import { user, type DBUser } from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
 	import TextInput from '$lib/components/TextInput.svelte';
+	import { activeComp } from '$lib/stores/contests';
 
 	let {
 		users,
@@ -30,19 +31,15 @@
 	<button
 		class="col btn btn-outline-primary"
 		onclick={() => {
-			const founduser = users.find((u) => u.email == 'email');
+			const founduser = users.find((u) => u.email == email);
 			if (founduser) {
 				dbServer
 					.post(`competition/add_competitor/`, {
 						comp_id: compID,
 						user_id: founduser.id
 					})
-					.then(() => {
-						dbServer.post(`user/send_email/${founduser.id}`, {
-							subject: 'You have been added to a competition on FCScore.',
-							body: `The contest director ${$user?.first_name} ${$user?.first_name} has added you to a competition on FCScore, 
-              log in or click here to see more information`
-						});
+					.then((res) => {
+            $activeComp=res.data;
 						onadded();
 					})
 					.catch((e) => {
