@@ -9,10 +9,10 @@
 	}: { name: string; checked: boolean | undefined; classappend?: string } = $props();
 </script>
 
-<div class="form-check p-2 px-4">
+<div class={"form-check p-2 px-4 " + classappend}>
 	<input
 		type="checkbox"
-		class={"form-check-input " + classappend} 
+		class={"form-check-input"} 
 		{name}
 		bind:checked
   />

@@ -5,6 +5,10 @@ import {faVersion} from '$lib/stores/shared';
 import {get} from 'svelte/store';
 
 export const activeComp: Writable<CompThingSummary> = writable({} as CompThingSummary);
+
+
+
+
 export const cdComps: Writable<Record<string, string>> = writable({});
 
 export async function updateCDComps() {

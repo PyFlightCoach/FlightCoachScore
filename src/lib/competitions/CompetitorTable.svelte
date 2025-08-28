@@ -2,10 +2,10 @@
 	import { type Competitor } from '$lib/competitions/compInterfaces';
   import AddCompetitor from './AddCompetitor.svelte';
   import { activeComp } from '$lib/stores/contests';
-	import type { DBUser } from '$lib/stores/user';
+	import {type DBUser, users } from '$lib/stores/user';
   import {dbServer} from '$lib/api';
-
-	let { users, competitors }: { users: DBUser[]; competitors: Competitor[] } = $props();
+  
+	let { competitors }: { competitors: Competitor[] } = $props();
 
 	let showID: number | undefined = $state();
 </script>

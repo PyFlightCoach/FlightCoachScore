@@ -29,11 +29,6 @@ export async function load({ url }) {
 				goto(base + '/competition/management');
 			});
 	}
-
-	if (await checkUser(true)) {
-		const users = await dbServer.get('users/list').then((res) => res.data.results);
-		return { users};
-	} else {
-		goto('/');
-	}
+  await checkUser(true);
+	
 }

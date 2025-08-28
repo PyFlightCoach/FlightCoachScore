@@ -1,5 +1,12 @@
 
 
+export type Competition="competition";
+export type Stage="stage";
+export type Round="round";
+
+export type Thing = Competition | Stage | Round;
+  
+
 export interface Director {
   id: string;
   name: string;
@@ -59,7 +66,7 @@ export interface CompThingSummary {
   name: string;
   comment: string | undefined;
   index: number | undefined;
-  what_am_i: ["competition", "stage", "round"];
+  what_am_i: Thing;
   date_start: string | undefined;
   date_end: string | undefined;
   fa_version: string | undefined;
@@ -83,4 +90,21 @@ export interface CompThingCreateUpdate {
   flight_rules?: FlightRule | undefined;
   add_rules?: AddRule | undefined;
   hide_results?: boolean | undefined;
+}
+
+
+export function competitionPostData(
+  name: string,
+  comment: string | undefined = undefined,
+  fa_version: string | undefined = undefined,
+  add_rules: AddRule | undefined = undefined,
+  result_rules: ResultRule | undefined = undefined,
+) {
+  return {
+    name,
+    comment,
+    fa_version,
+    add_rules,
+    result_rules
+  } as CompThingCreateUpdate;
 }
