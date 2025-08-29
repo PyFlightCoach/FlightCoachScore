@@ -2,6 +2,7 @@
 	import type { CompThingSummary, Stage, Round } from './compInterfaces';
 	import CompThingManager from './CompThingManager.svelte';
 	import { activeComp } from '$lib/stores/contests';
+	import { toLower } from 'lodash';
 
 	let {
 		parentID = undefined,
@@ -48,7 +49,7 @@
 				{#if showID == i}
 					<tr>
 						<td colspan="2">
-							<CompThingManager parentID={thing.id} whatAmI={thing.what_am_i} {thing} />
+							<CompThingManager parentID={parentID} whatAmI={toLower(thing.what_am_i)} {thing} />
 						</td>
 					</tr>
 				{/if}

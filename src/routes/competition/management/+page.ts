@@ -13,7 +13,6 @@ export async function load({ url }) {
 
 	activeComp.set({
 		name: '',
-    comment: '',
 		fa_version: get(faVersion),
 		add_rules: {} as AddRule
 	} as CompThingSummary);

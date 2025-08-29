@@ -98,6 +98,10 @@
 			};
 		}
 
+    if (parentID) {
+      data.parent_id = parentID;
+    }
+    console.log(data);
 		return data;
 	}
 
@@ -108,7 +112,8 @@
 	let editing: boolean = $state(whatAmI == 'competition' ? true : !thing?.id);
 </script>
 
-<div class="col">
+<div class="col-auto">
+  
 	{#if thing?.id}
 		<div class="row px-2">
 			<button
@@ -121,8 +126,10 @@
 			</button>
 		</div>
 	{/if}
-
 	{#if editing}
+    <p><small>id={thing?.id}</small></p>
+    <p><small>parent_id={parentID}</small></p>
+    <p><small>whatAmI={whatAmI}</small></p>
 		<TextInput name="Name" bind:value={name} classappend={hasChanged(name, thing?.name)} />
 		<TextInput
 			name="Comment"
@@ -209,7 +216,7 @@
 			<button
 				class="col btn btn-outline-primary"
 				onclick={() => {
-					if (!thing) {
+					if (!thing?.id) {
 						dbServer.post('competition', createUpdateRequest()).then((res) => {
 							updateCDComps();
 							$activeComp = res.data;
@@ -221,7 +228,7 @@
 					}
 				}}
 			>
-				{thing ? 'Update' : 'Create'}
+				{thing?.id ? 'Update' : 'Create'}
 			</button>
 		</div>
 	{/if}
@@ -229,15 +236,15 @@
 
 {#if thing?.id}
 	{#if whatAmI == 'competition'}
-		<div class="col">
+		<div class="col-auto">
 			<CompetitorTable {competitors} />
 		</div>
 	{/if}
 
-	<div class="col">
+	<div class="col-auto">
 		{#if whatAmI == 'competition' || whatAmI == 'stage'}
 			<CompThings
-				{parentID}
+				parentID={thing?.id}
 				things={thing?.children}
 				whatAreThey={whatAmI == 'competition' ? 'stage' : 'round'}
 			/>

@@ -21,8 +21,9 @@
     <a class="dropdown-item" href="{base}/competition/management"  data-sveltekit-preload-data="tap">Create Competition</a>
     
   {/if}
-  <div class="dropdown-divider"></div>
-  <div class="dropdown-header">Competitions</div>
-
+  {#if $user?.is_verified}
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Competitions</div>
+  {/if}
 
 </NavMenu>

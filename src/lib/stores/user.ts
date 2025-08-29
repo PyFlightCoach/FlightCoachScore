@@ -27,7 +27,7 @@ export const user: Writable<DBUser | undefined> = writable();
 
 export const users: Writable<DBUser[]> = writable([]);
 
-async function getUsers() {
+export async function getUsers() {
 	if (await checkUser(true, false, false)) {
 		await dbServer.get('users/list').then((res) => {
 			users.set(res.data.results as DBUser[]);

@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { user, type DBUser } from '$lib/stores/user';
+	import { users } from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { activeComp } from '$lib/stores/contests';
 
 	let {
-		users,
+		
 		compID,
 		onadded = () => {}
-	}: { users: DBUser[]; compID: string; onadded: () => void } = $props();
+	}: { compID: string; onadded: () => void } = $props();
 
 	let formState: string | undefined = $state();
 	let email: string | undefined = $state();
 	let pilotMayExist: boolean = $state(true);
 	let pilotName: string | undefined = $state();
+
+  $inspect($users);
 </script>
 
 {#if formState}
@@ -31,7 +33,7 @@
 	<button
 		class="col btn btn-outline-primary"
 		onclick={() => {
-			const founduser = users.find((u) => u.email == email);
+			const founduser = $users.find((u) => u.email == email);
 			if (founduser) {
 				dbServer
 					.post(`competition/add_competitor/`, {

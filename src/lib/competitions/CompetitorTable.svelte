@@ -2,8 +2,7 @@
 	import { type Competitor } from '$lib/competitions/compInterfaces';
   import AddCompetitor from './AddCompetitor.svelte';
   import { activeComp } from '$lib/stores/contests';
-	import {type DBUser, users } from '$lib/stores/user';
-  import {dbServer} from '$lib/api';
+	import {dbServer} from '$lib/api';
   
 	let { competitors }: { competitors: Competitor[] } = $props();
 
@@ -52,7 +51,6 @@
         <td colspan="2">
         <AddCompetitor
           compID={$activeComp.id}
-          users={users}
           onadded={() => {
             dbServer.get(`competition/${$activeComp.id}`).then((res) => {
               $activeComp = res.data;

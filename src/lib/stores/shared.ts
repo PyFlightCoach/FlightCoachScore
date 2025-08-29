@@ -10,6 +10,7 @@ import { reloadSchedules } from '$lib/schedule/library';
 import { requestActivity } from '$lib/stores/userActivity';
 import { updateCDComps } from '$lib/stores/contests';
 
+
 export const mouse = writable({ x: 0, y: 0 });
 
 export const lastErrorCode: Writable<number | undefined> = writable();
@@ -154,7 +155,7 @@ loadedFAVersion.subscribe(checkServerDataLoaded);
 
 export async  function loadAllServerData() {
   serverDataLoaded.set(false);
-  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity(), updateCDComps()])
+  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity(), updateCDComps(), getUsers()])
     .then(() => {
       console.log('All data loaded successfully.');
       serverDataLoaded.set(true);
@@ -163,3 +164,4 @@ export async  function loadAllServerData() {
       console.error('Error loading required data', e);
     });
 }
+import {getUsers} from '$lib/stores/user';
