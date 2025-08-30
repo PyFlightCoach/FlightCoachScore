@@ -20,6 +20,7 @@ export interface Competitor {
   competitor_id: string;
   name_override: string;
   missed_cut: boolean;
+  registration: string | undefined;
   raw_score: number;
   raw_override: number;
   flight_order: number;
@@ -28,6 +29,15 @@ export interface Competitor {
   position: number;
   score_dropped: boolean;
 }
+
+export interface CompetitorCreate {
+  comp_id: string;
+  user_id: string;
+  name_override: string | undefined;
+  flight_order: number | undefined;
+  registration: string | undefined;
+}
+
 
 export interface ResultRule {
   raw_score?: boolean;
@@ -73,9 +83,9 @@ export interface CompThingSummary {
   is_open_now: boolean;
   directors: Director[] | undefined;
   result_rules: ResultRule | undefined;
+  flight_rules?: FlightRule | undefined;
   add_rules: AddRule | undefined;
   hide_results: boolean;
-  flight_rules?: FlightRule | undefined;
   competitors: Competitor[] | undefined;
   children: CompThingSummary[] | undefined;
 }

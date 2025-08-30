@@ -15,13 +15,11 @@ async function setServer(location: string) {
   }
 }
 
-export async function load({ url }) {
+export async function load({ url, fetch }) {
 
   const mainServer = url.searchParams.get('main') === '';
   const devServer = url.searchParams.get('dev') === '';
   const localServer = url.searchParams.get('local') === '';
-
-  console.log('servers options:', mainServer, devServer, localServer);
 
   const promise1 = setServer(mainServer ? 'uk' : devServer ? 'dev' : localServer ? 'local' : get(servers));
   

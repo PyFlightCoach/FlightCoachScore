@@ -29,11 +29,11 @@
 				{/each}
         {#if isMyComp}
           <th
-            role="button"
+            role="button" class="w-auto text-center"
             onclick={() => {
               createEmptyThing(`Stage ${($activeComp.children?.length || 0) + 1}`, $activeComp.id)
                 .then(newComp=>{$activeComp=newComp});
-            }} title="Create new stage">+</th
+            }} title="Create new stage" >+</th
           >
         {/if}
 			</tr>
@@ -44,7 +44,7 @@
 						<th><CompThingCell thing={round} {isMyComp}/></th>
 					{/each}
           {#if isMyComp}
-					<th role="button" onclick={() => {
+					<th role="button" class="w-auto text-center" onclick={() => {
 						createEmptyThing(`Round ${(stage.children?.length || 0) + 1}`, stage.id)
               .then(newComp=>{$activeComp=newComp});
 					}} title="Create new {stage.name} round">+</th>

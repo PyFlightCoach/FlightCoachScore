@@ -13,7 +13,7 @@
 	let pilotName: string | undefined = $state();
 
 	let isValid = $state(true);
-	$inspect(isValid);
+	
 </script>
 
 <small>Enter pilots email address</small>
@@ -42,7 +42,7 @@
 			const founduser = $users.find((u) => u.email == email);
 			if (founduser) {
 				dbServer
-					.post(`competition/add_competitor/`, {
+					.post(`competition/competitor/`, {
 						comp_id: compID,
 						user_id: founduser.id
 					})
@@ -60,7 +60,7 @@
 				} else {
 					if (pilotName) {
 						dbServer
-							.post(`competition/add_competitor/`, {
+							.post(`competition/competitor/`, {
 								comp_id: compID,
 								user_id: email,
 								name_override: pilotName
