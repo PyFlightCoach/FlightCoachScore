@@ -1,8 +1,8 @@
 
 
-export type Competition="competition";
-export type Stage="stage";
-export type Round="round";
+export type Competition="Competition";
+export type Stage="Stage";
+export type Round="Round";
 
 export type Thing = Competition | Stage | Round;
   

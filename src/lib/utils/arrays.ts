@@ -53,7 +53,7 @@ export const min = (arr: number[]) => {
 };
 
 export const sum = (arr: number[]) => {
-	return arr.reduce((a, b) => a + b);
+	return arr.reduce((a, b) => a + b, 0);
 };
 
 export const mean = (arr: number[]) => {

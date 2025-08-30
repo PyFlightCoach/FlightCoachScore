@@ -5,8 +5,9 @@
 	let {
 		name = '',
 		checked = $bindable(),
-    classappend = ""
-	}: { name: string; checked: boolean | undefined; classappend?: string } = $props();
+    classappend = "",
+    disabled=false,
+	}: { name: string; checked: boolean | undefined; classappend?: string; disabled?: boolean } = $props();
 </script>
 
 <div class={"form-check p-2 px-4 " + classappend}>
@@ -14,6 +15,7 @@
 		type="checkbox"
 		class={"form-check-input"} 
 		{name}
+    {disabled}
 		bind:checked
   />
 	<label for="truncate">{name}</label>

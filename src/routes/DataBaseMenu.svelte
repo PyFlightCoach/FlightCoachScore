@@ -2,7 +2,11 @@
   import {base} from "$app/paths";
   import NavMenu from "./NavMenu.svelte";
 	import { user } from '$lib/stores/user';
-  import {cdComps} from '$lib/stores/contests';
+  import {activeComp, cdComps, createEmptyComp} from '$lib/stores/contests';
+	import { dbServer } from "$lib/api";
+	import type { CompThingSummary } from "$lib/competitions/compInterfaces";
+	import { goto } from "$app/navigation";
+	import { faVersion } from "$lib/stores/shared";
 
 </script>
 
@@ -18,7 +22,18 @@
     {#each Object.entries($cdComps) as [name, id]}
       <a class="dropdown-item" href="{base}/competition/management/?id={id}" data-sveltekit-preload-data="tap">{name}</a>
     {/each}
-    <a class="dropdown-item" href="{base}/competition/management"  data-sveltekit-preload-data="tap">Create Competition</a>
+    <button class="dropdown-item" onclick={()=>{
+      const name = prompt("Enter new competition name:");
+      if (name) {
+        createEmptyComp(name)
+          .then((newComp) => {
+            goto(`/competition/management/?id=${newComp.id}`);
+          })
+          .catch((error) => {
+            alert("Error creating competition: " + error);
+          });
+      }
+    }}  data-sveltekit-preload-data="tap">Create Competition</button>
     
   {/if}
   {#if $user?.is_verified}

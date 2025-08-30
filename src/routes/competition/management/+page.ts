@@ -1,4 +1,4 @@
-import { checkUser } from '$lib/stores/user';
+import { user } from '$lib/stores/user';
 
 import { dbServer } from '$lib/api';
 import type { AddRule, CompThingSummary } from '$lib/competitions/compInterfaces.js';
@@ -10,7 +10,7 @@ import {activeComp} from '$lib/stores/contests';
 
 export async function load({ url }) {
 	const compID = url.searchParams.get('id');
-
+  
 	activeComp.set({
 		name: '',
 		fa_version: get(faVersion),
@@ -28,6 +28,9 @@ export async function load({ url }) {
 				goto(base + '/competition/management');
 			});
 	}
-  await checkUser(true);
-	
+
+  const userid = get(user)?.id.replaceAll("-", "");
+  
+  const isMyComp = userid && get(activeComp)?.directors?.map(d=>d.id).includes(userid);
+  return {isMyComp};
 }
