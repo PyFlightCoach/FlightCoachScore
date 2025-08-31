@@ -1,17 +1,14 @@
 <script lang="ts">
-	import type { CompThingSummary } from '$lib/competitions/compInterfaces.js';
-	import CompThingEditor from '$lib/competitions/CompThingCreateUpdate.svelte';
-	import { dbServer } from '$lib/api';
-	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
-	import { activeComp } from '$lib/stores/contests';
-  import Popup from '$lib/components/Popup.svelte';
+
+	import CompThingEditor from '$lib/competitions/ContestUpdater.svelte';
+	import {  setComp } from '$lib/stores/contests';
+	import Popup from '$lib/components/Popup.svelte';
+	import type { ContestManager } from './ContestManager';
 
 	let {
 		thing,
-		isMyComp,
 		showProperties = $bindable(false)
-	}: { thing: CompThingSummary; isMyComp: boolean; showProperties?: boolean } = $props();
+	}: { thing: ContestManager; showProperties?: boolean } = $props();
 </script>
 
 <div class="dropdown">
@@ -21,9 +18,9 @@
 		data-bs-toggle="dropdown"
 		aria-haspopup="true"
 		aria-expanded="false"
-		title="{thing.what_am_i} options"
+		title="{thing.summary.what_am_i} options"
 	>
-		{thing.name}
+		{thing.summary.name}
 	</button>
 	<div class="dropdown-menu">
 		<button
@@ -32,24 +29,32 @@
 				showProperties = !showProperties;
 			}}>Properties</button
 		>
-		{#if isMyComp}
+		{#if thing.isMyComp}
+			{#if thing.summary.what_am_i === 'Round'}
+				<button
+					class="dropdown-item"
+					onclick={() => {
+						thing
+							.toggle_open()
+							.then(setComp)
+							.catch((err) => {
+								alert(
+									`Failed to ${thing.summary.is_open_now ? 'close' : 'open'} ${thing.summary.what_am_i}: ${err.response?.data?.detail || err}`
+								);
+							});
+					}}
+				>
+					{thing.summary.is_open_now ? 'Close' : 'Open'}
+				</button>
+			{/if}
 			<button
 				class="dropdown-item"
 				onclick={() => {
-					if (confirm(`Are you sure you want to delete this ${thing.what_am_i}?`)) {
-						dbServer
-							.delete(`competition/${thing}`)
-							.then(() => {
-								if (thing.what_am_i == 'Competition') {
-									goto(base);
-								} else {
-									dbServer.get(`competition/${$activeComp.id}`).then((res) => {
-										$activeComp = res.data;
-									});
-								}
-							})
+					if (confirm(`Are you sure you want to delete this ${thing.summary.what_am_i}?`)) {
+            thing.delete()
+            .then(res=>setComp(res!))
 							.catch((err) => {
-								alert(`Failed to delete ${thing.what_am_i}: ${err}`);
+								alert(`Failed to delete ${thing.summary.what_am_i}: ${err}`);
 							});
 					}
 				}}>Delete</button
@@ -58,5 +63,5 @@
 	</div>
 </div>
 <Popup bind:show={showProperties}>
-  <CompThingEditor whatAmI={thing.what_am_i} {thing} {isMyComp}/>
+	<CompThingEditor {thing}/>
 </Popup>
