@@ -14,6 +14,10 @@
 		<a class="dropdown-item" href="{base}/database/query/leaderboards">Leaderboard</a>
 	{/if}
 	<a class="dropdown-item" href="{base}/schedule">Schedules</a>
+  {#if $user?.is_verified}
+		
+		<a class="dropdown-item" href="{base}/competition/browse">Competitions</a>
+	{/if}
 	{#if $user?.is_superuser || $user?.is_cd}
 		<div class="dropdown-divider"></div>
 		<div class="dropdown-header">Contest Director</div>
@@ -41,9 +45,5 @@
 			}}
 			data-sveltekit-preload-data="tap">Create Competition</button
 		>
-	{/if}
-	{#if $user?.is_verified}
-		<div class="dropdown-divider"></div>
-		<div class="dropdown-header">Competitions</div>
 	{/if}
 </NavMenu>

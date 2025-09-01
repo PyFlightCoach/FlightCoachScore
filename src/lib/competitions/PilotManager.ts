@@ -4,10 +4,10 @@ import { ContestManager } from './ContestManager';
 
 
 export class PilotManager {
-	constructor(private parentID: string, private competitor: Competitor) {}
+	constructor(readonly parentID: string, readonly competitor: Competitor) {}
 
 	async delete() {
-		dbServer
+		return dbServer
 			.delete(`competition/competitor/${this.parentID}/${this.competitor.id}`)
 			.then(() => {
         return ContestManager.load(this.parentID)

@@ -93,7 +93,7 @@
 				>
 				<Popup bind:show={showAddPilot}>
 					<AddCompetitor
-						compID={$activeComp.summary.id}
+						competition={$activeComp}
 						onadded={() => {
 							showAddPilot = false;
 						}}
