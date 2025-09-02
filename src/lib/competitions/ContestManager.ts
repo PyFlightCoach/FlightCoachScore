@@ -97,4 +97,16 @@ export class ContestManager {
 			})
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
+
+  async addFlight(flight_id: string) {
+    return dbServer
+      .post(`competition/round/add_flight`, {
+        round_id: this.summary.id,
+        flight_id
+      })
+      .then((res) => new ContestManager(res.data as CompThingSummary));
+  }
+
 }
+
+

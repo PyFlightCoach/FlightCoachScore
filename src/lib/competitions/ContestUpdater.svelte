@@ -8,7 +8,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { dbServer } from '$lib/api';
 	import {ContestManager} from '$lib/competitions/ContestManager';
-	import { activeComp, setComp, updateCDComps } from '$lib/stores/contests';
+	import { activeComp, setComp } from '$lib/stores/contests';
 	import { set } from 'lodash';
 	
 	let {
@@ -70,9 +70,6 @@
 			};
 		}
 
-		if (thing.parentID) {
-			data.parent_id = thing.parentID;
-		}
 		return data;
 	}
 

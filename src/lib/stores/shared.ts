@@ -8,8 +8,7 @@ import {get} from 'svelte/store';
 import { loadedSchedules } from '$lib/schedule/library';
 import { reloadSchedules } from '$lib/schedule/library';
 import { requestActivity } from '$lib/stores/userActivity';
-import { updateCDComps } from '$lib/stores/contests';
-
+import {getComps, clearComps} from '$lib/stores/contests';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -155,7 +154,7 @@ loadedFAVersion.subscribe(checkServerDataLoaded);
 
 export async  function loadAllServerData() {
   serverDataLoaded.set(false);
-  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity(), updateCDComps(), getUsers()])
+  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity(), getUsers(), getComps()])
     .then(() => {
       console.log('All data loaded successfully.');
       serverDataLoaded.set(true);

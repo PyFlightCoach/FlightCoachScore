@@ -46,22 +46,13 @@ export interface ResultRule {
   progress_top_n?: number;
   use_top_n?: number;
 };
-export function newResultRule(): ResultRule {
-  return {
-    normalise_best_to_n: 1000,
-  };
-}
+
 
 export interface AddRule {
   cd_only?: boolean;
   cd_and_self_add?: boolean;
 }
-export function newAddRule(): AddRule {
-  return {
-    cd_only: true,
-    cd_and_self_add: false
-  };
-}
+
 
 export interface FlightRule {
   flown_whilst_open?: boolean;
@@ -103,18 +94,12 @@ export interface CompThingCreateUpdate {
 }
 
 
-export function competitionPostData(
-  name: string,
-  comment: string | undefined = undefined,
-  fa_version: string | undefined = undefined,
-  add_rules: AddRule | undefined = undefined,
-  result_rules: ResultRule | undefined = undefined,
-) {
-  return {
-    name,
-    comment,
-    fa_version,
-    add_rules,
-    result_rules
-  } as CompThingCreateUpdate;
+export interface CompListRequest {
+  n_days?: number|undefined;
+  date_after? : Date | undefined;
+  date_before? : Date | undefined;
+  include_competitors? : boolean | undefined;
+  i_am_cd? : boolean | undefined;
+  i_am_competitor? : boolean | undefined;
+  i_can_upload_to? : boolean | undefined;
 }

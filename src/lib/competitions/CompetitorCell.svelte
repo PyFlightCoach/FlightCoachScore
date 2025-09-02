@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { Competitor, CompThingSummary } from '$lib/competitions/compInterfaces.js';
-	import { dbServer } from '$lib/api';
 	import { activeComp, setComp } from '$lib/stores/contests';
 	import Popup from '$lib/components/Popup.svelte';
 	import type { PilotManager } from '$lib/competitions/PilotManager';
@@ -47,11 +45,9 @@
 	</div>
 </div>
 <Popup bind:show={showProperties}>
-	<small>
-		<ul class="list-unstyled">
-			<li>{competitor.name || competitor.competitor.name_override}</li>
-			<li>{competitor.country}</li>
-			<li>{competitor.registration}</li>
-		</ul>
-	</small>
+	<ul class="list-unstyled">
+		<li>{competitor.competitor.name || competitor.competitor.name_override}</li>
+		<li>{competitor.competitor.country}</li>
+		<li>{competitor.competitor.registration}</li>
+	</ul>
 </Popup>

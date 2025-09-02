@@ -3,7 +3,7 @@
 	import NavMenu from './NavMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import { ContestManager } from '$lib/competitions/ContestManager';
-	import { setComp, cdComps } from '$lib/stores/contests';
+	import { setComp, cdComps} from '$lib/stores/contests';
 	import { goto } from '$app/navigation';
 
 </script>
@@ -21,11 +21,11 @@
 	{#if $user?.is_superuser || $user?.is_cd}
 		<div class="dropdown-divider"></div>
 		<div class="dropdown-header">Contest Director</div>
-		{#each Object.entries($cdComps) as [name, id]}
+		{#each $cdComps as comp}
 			<a
 				class="dropdown-item"
-				href="{base}/competition/load/?id={id}"
-				data-sveltekit-preload-data="tap">{name}</a
+				href="{base}/competition/load/?id={comp.summary.id}"
+				data-sveltekit-preload-data="tap">{comp.summary.name}</a
 			>
 		{/each}
 		<button

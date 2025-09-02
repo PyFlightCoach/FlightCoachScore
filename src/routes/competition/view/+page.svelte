@@ -5,6 +5,7 @@
 	import CompThingCell from '$lib/competitions/CompThingCell.svelte';
 	import CompetitorCell from '$lib/competitions/CompetitorCell.svelte';
   import AddCompetitor from '$lib/competitions/AddCompetitor.svelte';
+	import ScoreCell from '$lib/competitions/ScoreCell.svelte';
   
 	let nrounds = $derived($activeComp.children.map((stage) => stage.children.length));
 
@@ -12,11 +13,11 @@
 </script>
 
 <div class="table-responsive">
-	<table class="table table-bordered">
-		<thead>
+	<table class="table table-bordered table-striped">
+		<thead class="table-dark">
 			<tr>
 				<th>Competition:</th>
-				<th colspan={sum(nrounds) + 3}><CompThingCell thing={$activeComp} /></th>
+				<th colspan={sum(nrounds) + 4}><CompThingCell thing={$activeComp} /></th>
 			</tr>
 			<tr>
 				<th>Stages:</th>
@@ -59,6 +60,7 @@
 						>
 					{/if}
 				{/each}
+        {#if $activeComp.isMyComp}<td></td>{/if}
 			</tr>
 		</thead>
 		<tbody>
@@ -67,16 +69,13 @@
 					<td><CompetitorCell {competitor} /></td>
 					{#each $activeComp.children as stage}
 						{#each stage.children as round}
-							{#if round.summary.competitors && round.summary.competitors.length > i && round.summary.competitors[i].flight_id}
-								<td class="">
-									{round.summary.competitors[i].raw_score}, {round.summary.competitors[i].normalised_score}
-								</td>
-							{:else}
-								<td class=""></td>
-							{/if}
+              <td class="text-center">
+                <ScoreCell {round} competitorID={competitor.competitor.id} />
+              </td>
 						{/each}
 						<td></td>
 					{/each}
+          {#if $activeComp.isMyComp}<td></td>{/if}
 				</tr>
 			{/each}
 			{#if $activeComp.isMyComp}
@@ -84,22 +83,24 @@
 					><td
 						role="button"
 						title="Add Pilot"
+            class="text-center"
 						onclick={() => {
 							showAddPilot = !showAddPilot;
 						}}
 					>
 						+
-					</td></tr
-				>
-				<Popup bind:show={showAddPilot}>
-					<AddCompetitor
-						competition={$activeComp}
-						onadded={() => {
-							showAddPilot = false;
-						}}
-					/>
-				</Popup>
+					</td>
+          <td colspan={sum(nrounds)+4}></td>
+        </tr>
 			{/if}
 		</tbody>
 	</table>
 </div>
+<Popup bind:show={showAddPilot}>
+  <AddCompetitor
+    competition={$activeComp}
+    onadded={() => {
+      showAddPilot = false;
+    }}
+  />
+</Popup>

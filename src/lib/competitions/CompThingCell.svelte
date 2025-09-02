@@ -63,5 +63,7 @@
 	</div>
 </div>
 <Popup bind:show={showProperties}>
-	<CompThingEditor {thing}/>
+	<div class="text-dark">
+  <CompThingEditor {thing}/>
+  </div>
 </Popup>

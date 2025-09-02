@@ -1,31 +1,37 @@
 import { writable, type Writable } from 'svelte/store';
 import { dbServer } from '$lib/api';
 import { ContestManager } from '$lib/competitions/ContestManager';
+import type { CompListRequest, CompThingSummary } from '$lib/competitions/compInterfaces';
 
 export const activeComp: Writable<ContestManager> = writable();
-
 
 export function setComp(comp: ContestManager) {
 	activeComp.set(comp);
 }
 
-export const cdComps: Writable<Record<string, string>> = writable({});
+export const compList: Writable<ContestManager[]> = writable([]);
 
-export async function updateCDComps() {
-	await dbServer
-		.get('/competition/list/?i_am_cd=true')
-		.then((res) => {
-			cdComps.set(
-				Object.fromEntries(res.data.results.map((c: Record<string, string>) => [c.name, c.id]))
-			);
-		})
-		.catch((err) => {
-			console.error('Error updating CD comps:', err);
-			cdComps.set({});
-		});
+export const cdComps: Writable<ContestManager[]> = writable([]);
+compList.subscribe((comps) => {
+	cdComps.set(comps.filter((c) => c.isMyComp));
+});
+
+export async function listComps(params: CompListRequest) {
+	return dbServer.get('/competition/list/', { params }).then((res) => {
+		return res.data.results.map(
+			(res: CompThingSummary) => new ContestManager(res)
+		);
+	});
 }
 
-export async function clearCDComps() {
-	cdComps.set({});
+export function setComps(competitions: ContestManager[]) {
+	compList.set(competitions);
 }
 
+export async function getComps() {
+  listComps({}).then(setComps).catch(err=>{console.log(err)});
+}
+
+export async function clearComps() {
+  compList.set([]);
+}

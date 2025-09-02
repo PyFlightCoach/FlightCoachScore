@@ -34,5 +34,5 @@ export async function load({ url, fetch }) {
 		.then((response) => (response.ok ? response.text() : undefined))
 		.then((text) => help.set(text?.replace('/fcscorebase', base)));
   
-  await Promise.all([promise1, promise2]);
+  await promise1;
 }

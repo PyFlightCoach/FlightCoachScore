@@ -6,7 +6,7 @@ import { library, loadSchedules } from '$lib/schedule/library';
 import { loadNews, clearNews } from './shared';
 import { requestActivity, clearActivity } from '$lib/stores/userActivity';
 import { get } from 'svelte/store';
-import { updateCDComps, clearCDComps } from '$lib/stores/contests';
+import {getComps, clearComps} from '$lib/stores/contests';
 
 export interface DBUser {
 	id: string;
@@ -40,8 +40,8 @@ export async function postLoginUser() {
 		loadSchedules({ owner: get(user)?.email }),
 		loadNews(),
 		requestActivity(),
-		updateCDComps(),
-    getUsers()
+    getUsers(),
+    getComps()
 	]);
 }
 
@@ -50,7 +50,7 @@ export async function postLogoutUser() {
 	library.set(get(library).subset({ owner: 'admin@fcscore.org' }));
 	clearNews();
 	clearActivity();
-	clearCDComps();
+  clearComps();
 }
 
 export async function loginUser(email: string, password: string) {
