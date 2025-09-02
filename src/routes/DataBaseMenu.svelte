@@ -36,7 +36,7 @@
 					ContestManager.createEmptyCompetition(name)
 						.then((res) => {
 							setComp(res);
-							goto(`/competition/load/view`);
+							goto(`/competition/view`);
 						})
 						.catch((error) => {
 							alert('Error creating competition: ' + error);

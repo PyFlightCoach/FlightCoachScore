@@ -12,7 +12,7 @@ export async function load({ url }) {
     })
     .catch(() => {
       alert(`Competition not found`);
-      goto(base);
+      goto(base + "/");
     });
 	
 }
