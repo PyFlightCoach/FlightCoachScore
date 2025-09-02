@@ -18,32 +18,4 @@
 		
 		<a class="dropdown-item" href="{base}/competition/browse">Competitions</a>
 	{/if}
-	{#if $user?.is_superuser || $user?.is_cd}
-		<div class="dropdown-divider"></div>
-		<div class="dropdown-header">Contest Director</div>
-		{#each $cdComps as comp}
-			<a
-				class="dropdown-item"
-				href="{base}/competition/load/?id={comp.summary.id}"
-				data-sveltekit-preload-data="tap">{comp.summary.name}</a
-			>
-		{/each}
-		<button
-			class="dropdown-item"
-			onclick={() => {
-				const name = prompt('Enter new competition name:');
-				if (name) {
-					ContestManager.createEmptyCompetition(name)
-						.then((res) => {
-							setComp(res);
-							goto(`/competition/view`);
-						})
-						.catch((error) => {
-							alert('Error creating competition: ' + error);
-						});
-				}
-			}}
-			data-sveltekit-preload-data="tap">Create Competition</button
-		>
-	{/if}
 </NavMenu>

@@ -3,13 +3,13 @@ import { dbServer } from '$lib/api';
 import { faVersion } from '$lib/stores/shared';
 import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
-import { goto } from '$app/navigation';
-import {base} from "$app/paths";
 import { PilotManager } from './PilotManager';
 
 export class ContestManager {
 	children: ContestManager[] = [];
 	isMyComp: boolean;
+  iAmCompeting: boolean;
+  iCanEnter: boolean;
   competitors: PilotManager[];
 
 	constructor(
@@ -25,6 +25,8 @@ export class ContestManager {
 			false;
 
     this.competitors = this.summary.competitors?.map(c => new PilotManager(this.summary.id, c)) || [];
+    this.iAmCompeting = this.summary.competitors?.some(c=>c.competitor_id == userID) || false;
+    this.iCanEnter = this.summary.add_rules?.cd_and_self_add || false;
 	}
 
   static async load(id: string) {
@@ -61,9 +63,7 @@ export class ContestManager {
 		return dbServer.delete(`competition/${this.summary.id}`).then(() => {
 			if (this.summary.what_am_i != 'Competition') {
 				return dbServer.get(`competition/${this.parentID}`).then((res) => new ContestManager(res.data as CompThingSummary));
-			} else {
-        goto(base);
-      }
+			}
 		});
 	}
 

@@ -72,7 +72,10 @@
 				competition.addPilot(selected!).then((res) => {
 					setComp(res);
 					onadded();
-				});
+				})
+        .catch((e) => {
+          formState = `Failed to add pilot: ${e.response?.data?.detail || e}`;
+        });
 			}}
 			disabled={!selected}>Add</button
 		>

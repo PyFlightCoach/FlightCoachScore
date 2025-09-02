@@ -12,7 +12,7 @@
 	let showAddPilot = $state(false);
 </script>
 
-<div class="table-responsive">
+<div class="table-responsive p-0">
 	<table class="table table-bordered table-striped">
 		<thead class="table-dark">
 			<tr>

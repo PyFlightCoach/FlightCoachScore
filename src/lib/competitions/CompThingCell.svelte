@@ -1,9 +1,10 @@
 <script lang="ts">
-
 	import CompThingEditor from '$lib/competitions/ContestUpdater.svelte';
-	import {  setComp } from '$lib/stores/contests';
+	import { getComps, setComp } from '$lib/stores/contests';
 	import Popup from '$lib/components/Popup.svelte';
 	import type { ContestManager } from './ContestManager';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let {
 		thing,
@@ -51,8 +52,17 @@
 				class="dropdown-item"
 				onclick={() => {
 					if (confirm(`Are you sure you want to delete this ${thing.summary.what_am_i}?`)) {
-            thing.delete()
-            .then(res=>setComp(res!))
+						thing
+							.delete()
+							.then((res) => {
+								new Promise(async () => {
+									if (thing.summary.what_am_i === 'Competition') {
+                    getComps();
+										await goto(resolve('/'));
+									}
+                  setComp(res);
+								});
+							})
 							.catch((err) => {
 								alert(`Failed to delete ${thing.summary.what_am_i}: ${err}`);
 							});
@@ -64,6 +74,6 @@
 </div>
 <Popup bind:show={showProperties}>
 	<div class="text-dark">
-  <CompThingEditor {thing}/>
-  </div>
+		<CompThingEditor {thing} />
+	</div>
 </Popup>

@@ -9,10 +9,10 @@
 
 	let { round, competitorID }: { round: ContestManager; competitorID: string } = $props();
 
-	const competitor: PilotManager | undefined = $derived(
-		(round.competitors || []).find((competitor) => competitor.competitor.id == competitorID)
+	const competitor: PilotManager = $derived(
+		(round.competitors || []).find((competitor) => competitor.competitor.id == competitorID)!
 	);
-
+  $inspect(round.summary.name, round.summary.competitors);
   let showDBLinkMenu = $state(false);
 </script>
 
