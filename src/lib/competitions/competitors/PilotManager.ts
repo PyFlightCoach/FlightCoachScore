@@ -1,6 +1,6 @@
 import type { Competitor } from '$lib/competitions/compInterfaces';
 import { dbServer } from '$lib/api';
-import { ContestManager } from './ContestManager';
+import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 
 
 export class PilotManager {

@@ -2,10 +2,10 @@
 	import { activeComp, setComp } from '$lib/stores/contests';
 	import { sum } from '$lib/utils/arrays';
 	import Popup from '$lib/components/Popup.svelte';
-	import CompThingCell from '$lib/competitions/CompThingCell.svelte';
-	import CompetitorCell from '$lib/competitions/CompetitorCell.svelte';
-  import AddCompetitor from '$lib/competitions/AddCompetitor.svelte';
-	import ScoreCell from '$lib/competitions/ScoreCell.svelte';
+	import CompThingCell from '$lib/competitions/compthings/CompThingCell.svelte';
+	import CompetitorCell from '$lib/competitions/competitors/CompetitorCell.svelte';
+  import AddCompetitor from '$lib/competitions/competitors/AddCompetitor.svelte';
+	import ScoreCell from '$lib/competitions/competitors/ScoreCell.svelte';
   
 	let nrounds = $derived($activeComp.children.map((stage) => stage.children.length));
 
@@ -13,69 +13,40 @@
 </script>
 
 <div class="table-responsive p-0">
-	<table class="table table-bordered table-striped">
-		<thead class="table-dark">
+	<table class="table table-striped table-sm align-middle table-borderless">
+		<thead class="table-dark align-middle">
 			<tr>
 				<th>Competition:</th>
-				<th colspan={sum(nrounds) + 4}><CompThingCell thing={$activeComp} /></th>
+				<CompThingCell thing={$activeComp} colspan={sum(nrounds) + nrounds.length + 1}/>
 			</tr>
 			<tr>
 				<th>Stages:</th>
 				{#each $activeComp.children as stage, i}
-					<th colspan={nrounds[i] + ($activeComp.isMyComp ? 1 : 0)}
-						><CompThingCell thing={stage} /></th
-					>
+            <CompThingCell thing={stage} colspan={nrounds[i] + 1}/>
 				{/each}
-				{#if $activeComp.isMyComp}
-					<th
-						role="button"
-						class="w-auto text-center"
-						onclick={() => {
-							$activeComp.addChild(`Stage ${$activeComp.children.length + 1}`)
-              .then(setComp)
-              .catch((e) => alert(`Failed to create stage: ${e}`));
-						}}
-						title="Create new stage">+</th
-					>
-				{/if}
+        <th rowspan="2" class="text-center">Total</th>
 			</tr>
 			<tr>
 				<th>Rounds:</th>
 				{#each $activeComp.children as stage, i}
 					{#each stage.children as round}
-						<th class={`${round.summary.is_open_now ? 'bg-primary' : ''}`}
-							><CompThingCell thing={round} /></th
-						>
+						<CompThingCell thing={round} />
 					{/each}
-					{#if $activeComp.isMyComp}
-						<th
-							role="button"
-							class="w-auto text-center"
-							onclick={() => {
-                stage.addChild(`Round ${stage.children.length + 1}`)
-                  .then(setComp)
-                  .catch((e) => alert(`Failed to create round: ${e}`));
-							}}
-							title="Create new {stage.summary.name} round">+</th
-						>
-					{/if}
+          <th class="text-center">Total</th>
 				{/each}
-        {#if $activeComp.isMyComp}<td></td>{/if}
 			</tr>
 		</thead>
 		<tbody>
 			{#each $activeComp.competitors as competitor, i}
 				<tr>
-					<td><CompetitorCell {competitor} /></td>
+					<CompetitorCell {competitor} />
 					{#each $activeComp.children as stage}
 						{#each stage.children as round}
-              <td class="text-center">
-                <ScoreCell {round} competitorID={competitor.competitor.id} />
-              </td>
+              <ScoreCell {round} competitorID={competitor.competitor.id} />
 						{/each}
-						<td></td>
+						<ScoreCell round={stage} competitorID={competitor.competitor.id} />
 					{/each}
-          {#if $activeComp.isMyComp}<td></td>{/if}
+          <ScoreCell round={$activeComp} competitorID={competitor.competitor.id} />
 				</tr>
 			{/each}
 			{#if $activeComp.isMyComp}
@@ -83,7 +54,7 @@
 					><td
 						role="button"
 						title="Add Pilot"
-            class="text-center"
+            class="btn btn-outline-secondary w-100 h-100"
 						onclick={() => {
 							showAddPilot = !showAddPilot;
 						}}
@@ -93,6 +64,7 @@
           <td colspan={sum(nrounds)+4}></td>
         </tr>
 			{/if}
+      
 		</tbody>
 	</table>
 </div>

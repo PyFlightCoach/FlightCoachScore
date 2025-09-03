@@ -2,7 +2,7 @@
 	import { base } from '$app/paths';
 	import NavMenu from './NavMenu.svelte';
 	import { user } from '$lib/stores/user';
-	import { ContestManager } from '$lib/competitions/ContestManager';
+	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { setComp, cdComps} from '$lib/stores/contests';
 	import { goto } from '$app/navigation';
 

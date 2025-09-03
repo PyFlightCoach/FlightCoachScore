@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 import { dbServer } from '$lib/api';
-import { ContestManager } from '$lib/competitions/ContestManager';
+import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 import type { CompListRequest, CompThingSummary } from '$lib/competitions/compInterfaces';
 import {get} from "svelte/store";
 

@@ -3,8 +3,8 @@
 	import type { DBFlightRanked, DBFlightScore } from '$lib/flight/db';
 	import { setComp } from '$lib/stores/contests';
 	import { faVersion } from '$lib/stores/shared';
-	import type { ContestManager } from './ContestManager';
-	import type { PilotManager } from './PilotManager';
+	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
+	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
 
 	let { round, competitor, show=$bindable(false) }: { round: ContestManager; competitor: PilotManager, show: boolean } = $props();
 

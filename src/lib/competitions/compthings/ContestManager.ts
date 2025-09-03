@@ -1,9 +1,9 @@
-import type { CompThingCreateUpdate, CompThingSummary } from './compInterfaces';
+import type { CompThingCreateUpdate, CompThingSummary } from '../compInterfaces';
 import { dbServer } from '$lib/api';
 import { faVersion } from '$lib/stores/shared';
 import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
-import { PilotManager } from './PilotManager';
+import { PilotManager } from '$lib/competitions/competitors/PilotManager';
 
 export class ContestManager {
 	children: ContestManager[] = [];

@@ -17,10 +17,7 @@
 	}
 
   let allowSelfAdd: boolean  = $state(false);
-
 	let specifyRules: boolean = $state(false);
-
-  $inspect(oldRule, specifyRules)
 
   $effect(() => {
     allowSelfAdd = oldRule?.cd_and_self_add || false;

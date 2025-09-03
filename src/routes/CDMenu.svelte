@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import NavMenu from './NavMenu.svelte';
-	import { ContestManager } from '$lib/competitions/ContestManager';
+	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { setComp, cdComps, activeComp, getComps } from '$lib/stores/contests';
 	import { goto } from '$app/navigation';
 </script>

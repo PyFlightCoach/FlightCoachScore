@@ -1,11 +1,6 @@
 <script lang="ts">
-	import { users } from '$lib/stores/user';
 	import { dbServer } from '$lib/api';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import { activeComp, setComp } from '$lib/stores/contests';
-	import { validateEmail } from '$lib/utils/text';
-	import type { ContestManager } from './ContestManager';
-	import { on } from 'svelte/events';
+	import type { ContestManager } from '../compthings/ContestManager';
 
 	let { competition, onadded = () => {} }: { competition: ContestManager; onadded?: () => void } =
 		$props();

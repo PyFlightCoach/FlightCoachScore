@@ -2,11 +2,11 @@
 	import type { CompThingCreateUpdate, ResultRule } from '$lib/competitions/compInterfaces';
 	import CheckInput from '$lib/components/CheckInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import { ContestManager } from '$lib/competitions/ContestManager';
+	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { setComp } from '$lib/stores/contests';
-	import ResultRules from './ResultRules.svelte';
-	import FlightRules from './FlightRules.svelte';
-	import AddRules from './AddRules.svelte';
+	import ResultRules from '$lib/competitions/rules/ResultRules.svelte';
+	import FlightRules from '$lib/competitions/rules/FlightRules.svelte';
+	import AddRules from '$lib/competitions/rules/AddRules.svelte';
 
 	let {
 		thing,

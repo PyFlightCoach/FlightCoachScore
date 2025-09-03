@@ -1,7 +1,7 @@
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
 import { activeComp } from '$lib/stores/contests';
-import { ContestManager } from '$lib/competitions/ContestManager.js';
+import { ContestManager } from '$lib/competitions/compthings/ContestManager.js';
 
 export async function load({ url }) {
 	

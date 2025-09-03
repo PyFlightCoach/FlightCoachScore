@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { activeComp, setComp } from '$lib/stores/contests';
 	import Popup from '$lib/components/Popup.svelte';
-	import type { PilotManager } from '$lib/competitions/PilotManager';
+	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
 
 	let {
 		competitor,
@@ -9,10 +9,11 @@
 	}: { competitor: PilotManager; showProperties?: boolean } = $props();
 </script>
 
-<div class="dropdown">
+<td class="p-0 h-100">
+<div class="dropdown h-100">
 	<button
 		type="button"
-		class="nav-link dropdown-toggle"
+		class="btn btn-outline-secondary w-100 "
 		data-bs-toggle="dropdown"
 		aria-haspopup="true"
 		aria-expanded="false"
@@ -44,6 +45,7 @@
 		{/if}
 	</div>
 </div>
+</td>
 <Popup bind:show={showProperties}>
 	<ul class="list-unstyled">
 		<li>{competitor.competitor.name || competitor.competitor.name_override}</li>
