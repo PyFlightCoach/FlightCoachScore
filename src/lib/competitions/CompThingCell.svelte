@@ -10,6 +10,8 @@
 		thing,
 		showProperties = $bindable(false)
 	}: { thing: ContestManager; showProperties?: boolean } = $props();
+
+  $inspect(thing.summary);
 </script>
 
 <div class="dropdown">
@@ -74,6 +76,6 @@
 </div>
 <Popup bind:show={showProperties}>
 	<div class="text-dark">
-		<CompThingEditor {thing} />
+		<CompThingEditor {thing} oncreated={() => {showProperties = false}} />
 	</div>
 </Popup>

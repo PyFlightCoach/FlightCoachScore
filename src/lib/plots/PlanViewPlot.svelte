@@ -15,7 +15,7 @@
 	);
   
   let plotstates = $derived($states!.shift(new Point(shiftx, shifty, shiftz)));
-  $inspect(shiftx);
+  
 </script>
 
 

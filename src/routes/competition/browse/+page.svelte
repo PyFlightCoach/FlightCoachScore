@@ -20,10 +20,9 @@
 		})
 	);
 
-	$inspect(group);
 </script>
 
-{#snippet filterButton(name, description)}
+{#snippet filterButton(name: string, description: string)}
     <button
         class="col btn btn-outline-secondary {group == name ? 'active' : ''}"
         onclick={() => {group = name;}}
