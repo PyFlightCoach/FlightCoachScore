@@ -1,6 +1,5 @@
 import type { CompThingCreateUpdate, CompThingSummary } from '../compInterfaces';
 import { dbServer } from '$lib/api';
-import { faVersion } from '$lib/stores/shared';
 import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
 import { PilotManager } from '$lib/competitions/competitors/PilotManager';
@@ -8,9 +7,10 @@ import { PilotManager } from '$lib/competitions/competitors/PilotManager';
 export class ContestManager {
 	children: ContestManager[] = [];
 	isMyComp: boolean;
-  iAmCompeting: boolean;
-  iCanEnter: boolean;
-  competitors: PilotManager[];
+	iAmCompeting: boolean;
+	iCanEnter: boolean;
+	competitors: PilotManager[];
+	whatAreMyChildren: 'Stage' | 'Round' | undefined;
 
 	constructor(
 		readonly summary: CompThingSummary,
@@ -24,36 +24,33 @@ export class ContestManager {
 			get(user)?.is_superuser ||
 			false;
 
-    this.competitors = this.summary.competitors?.map(c => new PilotManager(this.summary.id, c)) || [];
-    this.iAmCompeting = this.summary.competitors?.some(c=>c.competitor_id == userID) || false;
-    this.iCanEnter = this.summary.add_rules?.cd_and_self_add || false;
+		this.competitors =
+			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
+		this.iAmCompeting = this.summary.competitors?.some((c) => c.competitor_id == userID) || false;
+		this.iCanEnter = this.summary.add_rules?.cd_and_self_add || false;
+		this.whatAreMyChildren =
+			this.summary.what_am_i === 'Competition'
+				? 'Stage'
+				: this.summary.what_am_i === 'Stage'
+					? 'Round'
+					: undefined;
 	}
 
-  static async load(id: string) {
-		return await dbServer
-			.get(`/competition/${id}`)
-			.then((res) => {
-				return new ContestManager(res.data as CompThingSummary);
-			});
+	static async load(id: string) {
+		return await dbServer.get(`/competition/${id}`).then((res) => {
+			return new ContestManager(res.data as CompThingSummary);
+		});
 	}
 
-	static async createEmptyCompetition(name: string): Promise<ContestManager> {
-		return await dbServer
-			.post('/competition', {
-				name,
-				fa_version: get(faVersion) as string
-			} as CompThingCreateUpdate)
-			.then((res) => {
-				return new ContestManager(res.data as CompThingSummary);
-			});
+	static async newCompetition(data: CompThingCreateUpdate): Promise<ContestManager> {
+		return await dbServer.post('/competition', data).then((res) => {
+			return new ContestManager(res.data as CompThingSummary);
+		});
 	}
 
-	async addChild(name: string) {
+	async addChild(data: CompThingCreateUpdate) {
 		return await dbServer
-			.post('/competition', {
-				name,
-				parent_id: this.summary.id
-			} as CompThingCreateUpdate)
+			.post('/competition', { ...data, parent_id: this.summary.id })
 			.then((res) => {
 				return new ContestManager(res.data as CompThingSummary);
 			});
@@ -62,7 +59,9 @@ export class ContestManager {
 	async delete() {
 		return dbServer.delete(`competition/${this.summary.id}`).then(() => {
 			if (this.summary.what_am_i != 'Competition') {
-				return dbServer.get(`competition/${this.parentID}`).then((res) => new ContestManager(res.data as CompThingSummary));
+				return dbServer
+					.get(`competition/${this.parentID}`)
+					.then((res) => new ContestManager(res.data as CompThingSummary));
 			}
 		});
 	}
@@ -98,15 +97,12 @@ export class ContestManager {
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
 
-  async addFlight(flight_id: string) {
-    return dbServer
-      .post(`competition/round/add_flight`, {
-        round_id: this.summary.id,
-        flight_id
-      })
-      .then((res) => new ContestManager(res.data as CompThingSummary));
-  }
-
+	async addFlight(flight_id: string) {
+		return dbServer
+			.post(`competition/round/add_flight`, {
+				round_id: this.summary.id,
+				flight_id
+			})
+			.then((res) => new ContestManager(res.data as CompThingSummary));
+	}
 }
-
-

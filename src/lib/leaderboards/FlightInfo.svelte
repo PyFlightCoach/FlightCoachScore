@@ -3,7 +3,7 @@
 	import { user } from '$lib/stores/user.js';
 	import { difficulty, truncate } from '$lib/leaderboards/stores';
 	import * as types from '$lib/flight/db';
-	import { Flight } from '$lib/database/flight';
+	import { Flight, loadInPlotter } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
 	import { base } from '$app/paths';
 	import { loadAnalysisFromDB, loadAJson } from '$lib/flight/analysis';
@@ -13,6 +13,7 @@
 	import { windowWidth, blockProgress } from '$lib/stores/shared';
 	import { saveAs } from 'file-saver';
 	import JSZip from 'jszip';
+
 
 	export let f: Flight;
 	export let rank: number | undefined;
@@ -102,19 +103,11 @@
 					class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
 					data-sveltekit-preload-data="tap"
 					on:click={() => {
-						dbServer
-							.post('flight/holding/copy/' + f.meta.flight_id)
-							.then((res) => {
-                console.log("Flight copied to holding, expiry:", res.data.detail)
-								window.open(
-									'https://flightcoach.org/viewer/plotter.html?token=' + res.data.id,
-									'_blank'
-								);
-							})
-							.catch((err) => {
-								console.error(err);
-								alert('Failed to open flight for plotter access: ' + err.message);
-							});
+            $loading = true;
+            loadInPlotter(f.meta.flight_id)
+              .finally(() => {
+                $loading = false;
+              });
 					}}
 				>
 					View Flight
@@ -125,7 +118,7 @@
 					on:click={() => {
 						if (isAnalysisLoaded) {
 							goto(base + '/flight/results');
-						} else if (!$manNames || confirm('This will clear the current analysis. Continue?')) {
+						} else {
 							loadAnalysisFromDB(f.meta.flight_id);
 						}
 					}}

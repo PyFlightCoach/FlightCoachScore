@@ -10,6 +10,8 @@
 	let nrounds = $derived($activeComp.children.map((stage) => stage.children.length));
 
 	let showAddPilot = $state(false);
+
+  $inspect("activeComp", $activeComp);
 </script>
 
 <div class="table-responsive p-0">
@@ -17,12 +19,12 @@
 		<thead class="table-dark align-middle">
 			<tr>
 				<th>Competition:</th>
-				<CompThingCell thing={$activeComp} colspan={sum(nrounds) + nrounds.length + 1}/>
+				<CompThingCell competition={$activeComp} thing={$activeComp} colspan={sum(nrounds) + nrounds.length + 2}/>
 			</tr>
 			<tr>
 				<th>Stages:</th>
 				{#each $activeComp.children as stage, i}
-            <CompThingCell thing={stage} colspan={nrounds[i] + 1}/>
+            <CompThingCell competition={$activeComp} parent={$activeComp} thing={stage} colspan={nrounds[i] + 1}/>
 				{/each}
         <th rowspan="2" class="text-center">Total</th>
 			</tr>
@@ -30,7 +32,7 @@
 				<th>Rounds:</th>
 				{#each $activeComp.children as stage, i}
 					{#each stage.children as round}
-						<CompThingCell thing={round} />
+						<CompThingCell competition={$activeComp} thing={round} />
 					{/each}
           <th class="text-center">Total</th>
 				{/each}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
 	import type { ContestManager } from '../compthings/ContestManager';
-
+  import {setComp} from '$lib/stores/contests';
 	let { competition, onadded = () => {} }: { competition: ContestManager; onadded?: () => void } =
 		$props();
 

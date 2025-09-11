@@ -33,8 +33,7 @@
 	import { base } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
 	import { saveAs } from 'file-saver';
-  import JSZip from 'jszip';
-
+  
 	$navBarContents = AnalysisMenu;
 
   $: console.log("Is Comp Flight?", $isCompFlight);
@@ -45,8 +44,7 @@
 
 	let comment: string | undefined = $activeFlight?.meta.comment || '';
 	let privacy: string | undefined = $activeFlight?.meta.privacy || 'view_analysis';
-	let include_bin = true;
-
+	
 	$: isNew = $bin && !$activeFlight;
 	$: isMine =
 		userId &&
@@ -82,7 +80,7 @@
 			(async () => {
 				if (!$activeFlight) {
           form_data.append('files', ajson);
-          if (include_bin && $bin && isNew) form_data.append('files', $bin);
+          if ($bin && isNew) form_data.append('files', $bin);
 
 					return await dbServer.post(
 						'flight',
@@ -208,7 +206,7 @@
 		></textarea>
 	</div>
 
-	<div class="row mb-2">
+	<div class="row mb-2 px-2">
     {#if $isComplete && $isCompFlight && $user?.is_verified}
       
         <button class="col btn btn-outline-secondary px-2" type="submit" on:click={()=>{
@@ -217,14 +215,17 @@
           >Download Score CSV</button
         >
       
-    
     {/if}
-		{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight}
+		{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && $dataSource=='bin'}
 			
 				<button class="col btn btn-primary px-2" type="submit" on:click={upload}
 					>{isNew ? 'Upload' : 'Update'}</button
 				>
-			
+		{/if}
+	</div>
+  <div class="row mb-2 px-2">
+    {#if $dataSource!='bin'}
+      <span>You can only upload original flights loaded from a .bin file</span>
     {:else if !$isCompFlight}
       <span>Only complete flights can be uploaded</span>
 		{:else if !canI}
@@ -240,10 +241,11 @@
 				<span>No change from stored analysis</span>
 			{/if}
 			<span>Nothing to update</span>
-		{:else if !$isComplete}
-			<span>Run all analyses for the latest analysis version before uploading</span>
+		{:else if !$isComplete} before uploading
+			<span>Run all analyses for the latest analysis version and confirm zeros for failed analyses before uploading</span>
+    
 		{/if}
-	</div>
+  </div>
 </div>
 
 <div class="col-lg-8 align-self pt-3">

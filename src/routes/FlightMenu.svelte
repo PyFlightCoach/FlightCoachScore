@@ -1,6 +1,5 @@
 <script lang="ts">
 	import NavMenu from './NavMenu.svelte';
-	import { base } from '$app/paths';
 	import { manNames, bin } from '$lib/stores/analysis';
 	import {
 		exportAnalysis,
@@ -12,21 +11,12 @@
 	import { saveAs } from 'file-saver';
 	import { loading } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
-	import { dev } from '$lib/stores/shared';
+	import { dev, dataSource } from '$lib/stores/shared';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-
+	
 	let importedname: string | undefined;
 
-	const parseAnalysis = (file: File) => {
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			importedname = file.name;
-			importAnalysis(JSON.parse(reader.result as string));
-			goto(resolve('/flight/results'));
-		};
-		reader.readAsText(file);
-	};
 </script>
 
 <NavMenu tooltip="Flight Analysis Menu">
@@ -79,8 +69,22 @@
 					style="display: none;"
 					accept=".json, .ajson"
 					on:change={(e) => {
-						if (e.target?.files?.length > 0) {
-							parseAnalysis(e.target.files[0]);
+						const target = e.target as HTMLInputElement | null;
+						if (target && target.files && target.files.length > 0) {
+              loading.set(true);
+							const file = target.files[0];
+							const reader = new FileReader();
+							reader.onload = (e) => {
+								importedname = file.name;
+								importAnalysis(JSON.parse(reader.result as string)).then(() => {
+									dataSource.set('ajson');
+									goto(resolve('/flight/results'));
+								})
+                .finally(() => {
+                  loading.set(false);
+                });
+							};
+							reader.readAsText(file);
 						}
 					}}
 				/>

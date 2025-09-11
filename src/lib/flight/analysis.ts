@@ -255,6 +255,9 @@ export async function loadAJson(flight_id: string) {
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
+  if (get(sts.manNames) || confirm('Loading from DB will clear current analysis, continue?') == false) {
+    return;
+  }
 	loading.set(true);
 	await loadAJson(flight_id)
 		.then(importAnalysis)

@@ -4,6 +4,11 @@
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { setComp, cdComps, activeComp, getComps } from '$lib/stores/contests';
 	import { goto } from '$app/navigation';
+  import Popup from '$lib/components/Popup.svelte';
+	import CompetitionEditor from '$lib/competitions/compthings/CompetitionEditor.svelte';
+
+  let showPopup = $state(false);
+
 </script>
 
 <NavMenu tooltip="Contest Director Menu">
@@ -15,18 +20,7 @@
 	<button
 		class="dropdown-item"
 		onclick={() => {
-			const name = prompt('Enter new competition name:');
-			if (name) {
-				ContestManager.createEmptyCompetition(name)
-					.then((res) => {
-						setComp(res);
-						goto(resolve(`/competition/view`));
-					})
-          .then(getComps)
-					.catch((error) => {
-						alert('Error creating competition: ' + error);
-					});
-			}
+      showPopup = true;
 		}}
 		data-sveltekit-preload-data="tap">Create Competition</button
 	>
@@ -42,3 +36,6 @@
 		>
 	{/each}
 </NavMenu>
+<Popup bind:show={showPopup} >
+  <CompetitionEditor oncreated={() => { showPopup = false; getComps(); }} />
+</Popup>

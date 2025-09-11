@@ -6,7 +6,7 @@
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
 
-	let { round, competitor, show=$bindable(false) }: { round: ContestManager; competitor: PilotManager, show: boolean } = $props();
+	let { round, competitor, show=$bindable(false) }: { round: ContestManager; competitor: PilotManager, show?: boolean } = $props();
 
 	let flights: DBFlightRanked[] = $state([]);
 

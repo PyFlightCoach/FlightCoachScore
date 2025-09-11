@@ -3,31 +3,32 @@
 	import CheckInput from '$lib/components/CheckInput.svelte';
 
 	let {
-		oldRule = $bindable(),
+		oldRule = $bindable(null),
 		newRule = $bindable(),
-		disabled = $bindable()
+		disabled = $bindable(false),
+    whatAmI,
+    showChanges = true
 	}: {
-		oldRule: AddRule | null;
+		oldRule?: AddRule | null;
 		newRule: AddRule | null;
-		disabled: boolean;
+		disabled?: boolean;
+    whatAmI: 'Competition' | 'Round';
+    showChanges?: boolean;
 	} = $props();
 
 	function hasChanged(val1: any, val2: any) {
-		return val1 != val2 ? 'bg-warning' : '';
+		return (val1 != val2) && showChanges ? 'bg-warning' : '';
 	}
 
   let allowSelfAdd: boolean  = $state(false);
-	let specifyRules: boolean = $state(false);
+	
 
   $effect(() => {
     allowSelfAdd = oldRule?.cd_and_self_add || false;
-    specifyRules = oldRule !== null;
   });
 
 	$effect(() => {
-		newRule = specifyRules
-			? allowSelfAdd ? {cd_and_self_add: true} as AddRule : {cd_only: true} as AddRule
-			: null;
+		newRule = {cd_and_self_add: allowSelfAdd} as AddRule;
 	});
 
   
@@ -35,18 +36,8 @@
 </script>
 
 <CheckInput
-	name="Specify Add Rules Here"
-	bind:checked={specifyRules}
-	{disabled}
-	onchange={(e: Event) => {}}
-  classappend={hasChanged(specifyRules, oldRule?.cd_only || oldRule?.cd_and_self_add || false)}
+  name={"Allow pilots to register and upload their own flights"}
+  bind:checked={allowSelfAdd}
+  classappend={hasChanged(allowSelfAdd, oldRule?.cd_and_self_add || false)}
+  {disabled}
 />
-
-{#if specifyRules}
-	<CheckInput
-		name="Allow pilots to submit their own flights"
-		bind:checked={allowSelfAdd}
-		classappend={hasChanged(allowSelfAdd, oldRule?.cd_and_self_add || false)}
-		{disabled}
-	/>
-{/if}

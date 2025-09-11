@@ -4,7 +4,7 @@
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import CDMenu from './CDMenu.svelte';
-  import SuperMenu from './SuperMenu.svelte';
+	import SuperMenu from './SuperMenu.svelte';
 	import { user } from '$lib/stores/user';
 	import { dev, help } from '$lib/stores/shared';
 	import navBarContents from '$lib/stores/navBarContents';
@@ -14,7 +14,10 @@
 	const n = $derived($nMans - $nRunning);
 </script>
 
-<nav class="navbar navbar-expand-md {$servers==='uk' ? 'bg-body-tertiary' : 'bg-primary'}" data-bs-theme="dark">
+<nav
+	class="navbar navbar-expand-md {$servers === 'uk' ? 'bg-body-tertiary' : 'bg-primary'}"
+	data-bs-theme="dark"
+>
 	<div class="container-fluid justify-content-between">
 		<div class="col-auto d-flex flex-row">
 			<a class="col-auto navbar-brand" href={base + '/'}>FCScore</a>
@@ -22,9 +25,9 @@
 				<UserMenu />
 				<FlightMenu />
 				<DataBaseMenu />
-        {#if $user?.is_cd || $user?.is_superuser || $dev}
-          <CDMenu />
-        {/if}
+				{#if $user?.is_cd || $user?.is_superuser}
+					<CDMenu />
+				{/if}
 				{#if $user?.is_superuser || $dev}
 					<SuperMenu />
 				{/if}
@@ -35,26 +38,26 @@
 						href={base + '/?main'}
 						aria-label="Server Warning!"
 						data-sveltekit-preload-data="tap"
-            title="You are talking to a {$servers} server, this is not reccommended! Click here to switch to the UK server."
-          >
-            <i class="bi bi-exclamation-triangle strong"></i>
-          </a>
+						title="You are talking to a {$servers} server, this is not reccommended! Click here to switch to the UK server."
+					>
+						<i class="bi bi-exclamation-triangle strong"></i>
+					</a>
 				{/if}
-				{#if $help}
-					<div class="nav-item">
-						<button
-							class="nav-link ms-2"
-							id="navbarDropdown"
-							title="help"
-							aria-label="Help Menu"
-							data-bs-toggle="offcanvas"
-							data-bs-target="#help"
-							aria-controls="Offcanvas"
-						>
-							<span><i class="bi bi-question"></i></span>
-						</button>
-					</div>
-				{/if}
+
+				<div class="nav-item">
+					<button
+						class="nav-link ms-2"
+						id="navbarDropdown"
+						title="help"
+						aria-label="Help Menu"
+						data-bs-toggle="offcanvas"
+						data-bs-target="#help"
+						aria-controls="Offcanvas"
+						disabled={!$help}
+					>
+						<span><i class="bi bi-question"></i></span>
+					</button>
+				</div>
 			</ul>
 		</div>
 

@@ -2,7 +2,7 @@
 	import { activeComp, setComp } from '$lib/stores/contests';
 	import Popup from '$lib/components/Popup.svelte';
 	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
-
+  import DisplayDict from '$lib/components/DisplayDict.svelte';
 	let {
 		competitor,
 		showProperties = $bindable(false)
@@ -36,7 +36,7 @@
 						competitor
 							.delete()
 							.then(setComp)
-							.catch((err) => {
+							.catch((err) => {f
 								alert(`Failed to delete ${competitor.competitor.name}: ${err}`);
 							});
 					}
@@ -47,9 +47,5 @@
 </div>
 </td>
 <Popup bind:show={showProperties}>
-	<ul class="list-unstyled">
-		<li>{competitor.competitor.name || competitor.competitor.name_override}</li>
-		<li>{competitor.competitor.country}</li>
-		<li>{competitor.competitor.registration}</li>
-	</ul>
+  <DisplayDict dict={competitor.competitor}/>
 </Popup>

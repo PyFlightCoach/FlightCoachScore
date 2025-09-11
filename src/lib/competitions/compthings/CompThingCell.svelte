@@ -1,32 +1,34 @@
 <script lang="ts">
-	import CompThingEditor from '$lib/competitions/compthings/ContestUpdater.svelte';
 	import { getComps, setComp } from '$lib/stores/contests';
-	import Popup from '$lib/components/Popup.svelte';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import CompThingEditor from './CompThingEditor.svelte';
+  import Popup from '$lib/components/Popup.svelte';
+  import DisplayDict from '$lib/components/DisplayDict.svelte';
 
 	let {
-		thing,
-		colspan = 1,
-		showProperties = $bindable(false)
-	}: { thing: ContestManager; colspan?: number; showProperties?: boolean } = $props();
+    competition = undefined,
+		parent = undefined,
+		thing = $bindable(),
+		colspan = 1
+	}: {
+    competition?: ContestManager | undefined;
+		parent?: ContestManager | undefined;
+		thing: ContestManager;
+		colspan?: number;
+		showEditor?: boolean;
+	} = $props();
 
-	let whatAreMyChildren: string | undefined = $derived(
-		thing.summary.what_am_i === 'Competition'
-			? 'Stage'
-			: thing.summary.what_am_i === 'Stage'
-				? 'Round'
-				: undefined
-	);
-
-	$inspect(thing.summary);
+	let showEditor = $state(false);
+	let showCreator = $state(false);
+  let showProperties = $state(false);
 </script>
 
 <th {colspan} class={`${thing.summary.is_open_now ? 'bg-secondary' : ''} p-0`}>
 	<div class="dropdown">
 		<button
-			class="btn btn-outline-light w-100 "
+			class="btn btn-outline-light w-100"
 			data-bs-toggle="dropdown"
 			aria-haspopup="true"
 			aria-expanded="false"
@@ -35,11 +37,14 @@
 			{thing.summary.name}
 		</button>
 		<div class="dropdown-menu">
+      <button class="dropdown-item" 
+        onclick={() => { showProperties = true; }}
+      >Properties</button>
 			<button
 				class="dropdown-item"
 				onclick={() => {
-					showProperties = !showProperties;
-				}}>Properties</button
+					showEditor = true;
+				}}>Edit</button
 			>
 			{#if thing.isMyComp}
 				{#if thing.summary.what_am_i === 'Round'}
@@ -62,13 +67,10 @@
 					<button
 						class="dropdown-item"
 						onclick={() => {
-							thing
-								.addChild(`${whatAreMyChildren} ${thing.children.length + 1}`)
-								.then(setComp)
-								.catch((e) => alert(`Failed to create round: ${e}`));
+							showCreator = true;
 						}}
 					>
-						Add new {whatAreMyChildren}
+						Add New {thing.whatAreMyChildren}
 					</button>
 				{/if}
 				<button
@@ -95,14 +97,13 @@
 			{/if}
 		</div>
 	</div>
+{#if showEditor}
+	<CompThingEditor {competition} bind:show={showEditor} {thing} />
+{/if}
+{#if showCreator}
+	<CompThingEditor {competition} bind:show={showCreator} parent={thing} />
+{/if}
+<Popup bind:show={showProperties} >
+  <DisplayDict dict={thing.summary} />
+</Popup>  
 </th>
-<Popup bind:show={showProperties}>
-	<div class="text-dark">
-		<CompThingEditor
-			{thing}
-			oncreated={() => {
-				showProperties = false;
-			}}
-		/>
-	</div>
-</Popup>

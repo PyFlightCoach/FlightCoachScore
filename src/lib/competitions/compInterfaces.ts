@@ -40,7 +40,6 @@ export interface CompetitorCreate {
 
 
 export interface ResultRule {
-  raw_score: boolean | null;
   normalise_best_to_n: number | null;
   normalise_average_to_n: number | null;
   progress_top_n: number | null;
@@ -49,7 +48,6 @@ export interface ResultRule {
 
 
 export interface AddRule {
-  cd_only: boolean | null;
   cd_and_self_add: boolean | null;
 }
 
@@ -68,6 +66,10 @@ export interface CompThingSummary {
   comment: string | null;
   index: number;
   what_am_i: Thing;
+  category_id: string | null;
+  schedule_id: string | null;
+  datetime_start: string | null;
+  datetime_end: string | null;
   date_start: string | null;
   date_end: string | null;
   fa_version: string | null;
@@ -85,6 +87,8 @@ export interface CompThingCreateUpdate {
   name: string | undefined;
   comment?: string | undefined;
   parent_id?: string | undefined; 
+  category_id?: string | undefined;
+  schedule_id?: string | undefined;
   fa_version?: string | undefined;
   directors?: string[] | undefined;
   result_rules?: ResultRule | undefined;
