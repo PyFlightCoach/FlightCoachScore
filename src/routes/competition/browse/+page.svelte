@@ -7,7 +7,8 @@
   let categories = $derived($library.unique("category_name"));
 	let comps = $derived(
 		$compList.filter((c) => {
-			switch (group) {
+			
+      switch (group) {
 				case 'All':
 					return true;
 				case 'Active':
@@ -17,6 +18,8 @@
 				case 'Entered':
 					return c.iAmCompeting;
 			}
+
+
 		})
 	);
 

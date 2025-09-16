@@ -1,5 +1,6 @@
 import { objmap } from '$lib/utils/arrays';
 import * as units from '$lib/utils/units';
+import type { D } from 'vitest/dist/chunks/reporters.d.BFLkQcL6.js';
 import { ManInfo } from './info.svelte';
 import { Result } from './scores';
 
@@ -12,6 +13,7 @@ export function split_arg_string(arg_string: string) {
 		})
 	);
 }
+
 
 export interface ICriteria {
 	lookup: Record<string, object>;
@@ -43,6 +45,22 @@ export class Criteria {
 	}
 }
 
+
+export class DG {
+  static parse(data: IPairedDownGrade | IDownGrade) {
+    if ('first' in data) {
+      return new PairedDownGrade(
+        data.name,
+        DownGrade.parse(data.first),
+        DownGrade.parse(data.second)
+      );
+    } else {
+      return DownGrade.parse(data);
+    }
+  }
+}
+
+
 export interface IDownGrade {
 	name: string;
 	measure: string;
@@ -61,10 +79,6 @@ export class DownGrade {
 		readonly criteria: Criteria,
 		readonly display_name: string
 	) {}
-
-  summarise_smoothers() {
-    return this.smoothers.filter(sm => !sm.startsWith("final"))
-  }
 
 	static parse(data: IDownGrade) {
 		return new DownGrade(
@@ -87,6 +101,11 @@ export class DownGrade {
 			display_name: this.display_name
 		} as IDownGrade;
 	}
+
+  summarise_smoothers() {
+    return this.smoothers.filter(sm => !sm.startsWith("final"))
+  }
+
 
 	criteria_description(result: Result) {
 		const fac = result.scale(); // result.measurement.unit == 'rad' ? 180 / Math.PI : 1;
@@ -153,6 +172,43 @@ export class DownGrade {
 
 		return `${all ? 'All values' : 'The'} ${sels.join(' ')}`;
 	}
+}
+
+
+
+export interface IPairedDownGrade {
+  name: string;
+  first: IDownGrade;
+  second: IDownGrade;
+}
+
+export class PairedDownGrade {
+  constructor(
+    readonly name: string,
+    readonly first: DownGrade,
+    readonly second: DownGrade
+  ) {}
+  static parse(data: IPairedDownGrade) {
+    return new PairedDownGrade(
+      data.name,
+      DownGrade.parse(data.first),
+      DownGrade.parse(data.second)
+    );
+  }
+  dump() {
+    return {
+      name: this.name,
+      first: this.first.dump(),
+      second: this.second.dump()
+    } as IPairedDownGrade;
+  }
+  summarise_smoothers() {return ""}
+  criteria_description(result: Result) {
+    return ""
+  }
+  describe_selectors() {
+    return ""
+  }
 }
 
 export interface IManParm {
@@ -240,7 +296,7 @@ export interface IElDef {
 	name: string;
 	Kind: string;
 	props: object;
-	dgs: Record<string, IDownGrade>;
+	dgs: Record<string, IDownGrade | IPairedDownGrade>;
 }
 
 export class ElDef {
@@ -255,7 +311,7 @@ export class ElDef {
 		return `${this.name} (${this.Kind}) `;
 	}
 	static parse(data: IElDef) {
-		return new ElDef(data.name, data.Kind, data.props, objmap(data.dgs, DownGrade.parse));
+		return new ElDef(data.name, data.Kind, data.props, objmap(data.dgs, DG.parse));
 	}
 
 	dump() {

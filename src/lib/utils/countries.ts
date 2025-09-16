@@ -1462,6 +1462,6 @@ export const countries = [
 export function split_country(s: string) {
 	const split_idx = s.lastIndexOf(' ');
 	const country = s.slice(0, split_idx);
-	const emoji = s.slice(split_idx + 1);
-	return [country, emoji];
+	const country_emoji = s.slice(split_idx + 1);
+	return {country, country_emoji};
 }

@@ -17,8 +17,8 @@ export interface Competitor {
   id: string;
   name: string;
   country: string;
+  is_fake: boolean;
   competitor_id: string;
-  name_override: string;
   missed_cut: boolean;
   registration: string | null;
   raw_score: number | null;
@@ -106,4 +106,12 @@ export interface CompListRequest {
   i_am_cd? : boolean | undefined;
   i_am_competitor? : boolean | undefined;
   i_can_upload_to? : boolean | undefined;
+}
+
+export interface CreateFakeUserRequest {
+  first_name: string;
+  last_name: string;
+  country: string;
+  country_emoji: string;
+  email?: string | undefined;
 }

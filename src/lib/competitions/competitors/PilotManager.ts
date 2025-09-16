@@ -1,7 +1,7 @@
 import type { Competitor } from '$lib/competitions/compInterfaces';
 import { dbServer } from '$lib/api';
 import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-
+import type { DBUser } from '$lib/stores/user';
 
 export class PilotManager {
 	constructor(readonly parentID: string, readonly competitor: Competitor) {}
@@ -14,5 +14,8 @@ export class PilotManager {
 			});
 	}
 
+  async user() {
+    return dbServer.get(`users/${this.competitor.id}`).then(res=>res.data as DBUser);
+  }
 
 }

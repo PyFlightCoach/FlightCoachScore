@@ -1,4 +1,8 @@
-import type { CompThingCreateUpdate, CompThingSummary } from '../compInterfaces';
+import type {
+	CompThingCreateUpdate,
+	CompThingSummary,
+	CreateFakeUserRequest
+} from '../compInterfaces';
 import { dbServer } from '$lib/api';
 import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
@@ -80,9 +84,18 @@ export class ContestManager {
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
 
+	async createPilot(id_or_info: string | CreateFakeUserRequest): Promise<string> {
+		if (typeof id_or_info === 'string') {
+			return id_or_info;
+		} else {
+			return dbServer
+				.post('competition/create_fake_user', id_or_info)
+				.then((res) => res.data.id as string);
+		}
+	}
+
 	async addPilot(
 		id_or_email: string,
-		name_override: string | undefined = undefined,
 		flight_order: number | undefined = undefined,
 		registration: string | undefined = undefined
 	) {
@@ -90,7 +103,6 @@ export class ContestManager {
 			.post(`competition/competitor/`, {
 				comp_id: this.summary.id,
 				user_id: id_or_email,
-				name_override,
 				flight_order,
 				registration
 			})

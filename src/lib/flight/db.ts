@@ -24,6 +24,7 @@ export interface DBFlight {
   name: string;
   country: string;
   date: string;
+  datetime?: string | undefined;
   comment: string;
 }
 
