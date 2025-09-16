@@ -18,7 +18,7 @@
 	} = $props();
 
 	const whatToEdit = $derived(thing?.summary.what_am_i || parent?.whatAreMyChildren);
-  $inspect("what to edit:", whatToEdit);
+  
 </script>
 
 <Popup bind:show>

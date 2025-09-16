@@ -22,7 +22,6 @@
 			: false
 	);
 
-	$inspect('competitor', competitor);
 </script>
 
 <td class="text-center p-0">

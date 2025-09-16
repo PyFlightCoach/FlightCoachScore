@@ -14,7 +14,7 @@
 	} = $props();
 
 	let userProperties = $state({});
-	competitor.user().then((res) => {
+	competitor.getUser().then((res) => {
 		userProperties = res;
 	});
 </script>
@@ -48,16 +48,15 @@
 				<button
 					class="dropdown-item"
 					onclick={() => {
-						if (confirm(`Are you sure you want to delete ${competitor.competitor.name}?`)) {
+						if (confirm(`Are you sure you want to remove ${competitor.competitor.name} from this competition?`)) {
 							competitor
 								.delete()
 								.then(setComp)
 								.catch((err) => {
-									f;
-									alert(`Failed to delete ${competitor.competitor.name}: ${err}`);
+									alert(`Failed to remove ${competitor.competitor.name}: ${err.response?.detail || err.message || err}`);
 								});
 						}
-					}}>Delete</button
+					}}>Remove</button
 				>
 			{/if}
 		</div>

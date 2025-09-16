@@ -11,7 +11,6 @@
 
 	let showAddPilot = $state(false);
 
-  $inspect("activeComp", $activeComp);
 </script>
 
 <div class="table-responsive p-0">

@@ -21,8 +21,6 @@
 		category = cats[0];
 	});
 
-  $inspect("competition:", competition);
-
 	let name: string | undefined = $state(competition?.summary.name);
 	let comment: string | undefined = $state(competition?.summary.comment || undefined);
 	let category: CategoryResponse | undefined = $state();
