@@ -60,7 +60,13 @@
 						}}>Link Flight from DB</button
 					>
 					{#if $bin && !$activeFlight && $isComplete && $isCompFlight}
-						<button class="dropdown-item">Upload & Link Active Flight </button>
+						<button class="dropdown-item"
+              onclick={() => {
+                
+              }}
+            >
+              Upload & Link Active Flight
+            </button>
 					{/if}
 					<button class="dropdown-item">Throw Round</button>
 				{/if}

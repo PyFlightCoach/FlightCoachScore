@@ -14,8 +14,12 @@
 	import { dev, dataSource } from '$lib/stores/shared';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	
+	import Popup from '$lib/components/Popup.svelte';
+  import LoadBinAndAJson from '$lib/flight/LoadBinAndAJson.svelte';
+
 	let importedname: string | undefined;
+  let showBinAJsonPopup: boolean = $state(false);
+
 
 </script>
 
@@ -29,7 +33,7 @@
 	{#if $manNames}
 		<button
 			class="dropdown-item"
-			on:click={() => {
+			onclick={() => {
 				clearDataLoading();
 				if (page.url.pathname.includes('/flight/')) {
 					goto(resolve('/'));
@@ -39,20 +43,16 @@
 		{#if $user?.is_superuser || $dev}
 			<button
 				class="dropdown-item"
-				on:click={() => {
-					exportAnalysis(false).then((res) => {
-						saveAs(res, 'flight.ajson');
-					});
+				onclick={() => {
+					saveAs(exportAnalysis(false), 'flight.ajson');
 				}}
 			>
 				Export Full
 			</button>
 			<button
 				class="dropdown-item"
-				on:click={() => {
-					exportAnalysis(true).then((res) => {
-						saveAs(res, 'flight.ajson');
-					});
+				onclick={() => {
+					saveAs(exportAnalysis(true), 'flight.ajson');
 				}}
 			>
 				Export Short
@@ -62,39 +62,17 @@
 	{:else}
 		<a class="dropdown-item" href={resolve('/flight/create/data')}>Create</a>
 		{#if $user?.is_superuser || $dev}
-			<label class="dropdown-item">
-				<input
-					type="file"
-					name="input-name"
-					style="display: none;"
-					accept=".json, .ajson"
-					on:change={(e) => {
-						const target = e.target as HTMLInputElement | null;
-						if (target && target.files && target.files.length > 0) {
-              loading.set(true);
-							const file = target.files[0];
-							const reader = new FileReader();
-							reader.onload = (e) => {
-								importedname = file.name;
-								importAnalysis(JSON.parse(reader.result as string)).then(() => {
-									dataSource.set('ajson');
-									goto(resolve('/flight/results'));
-								})
-                .finally(() => {
-                  loading.set(false);
-                });
-							};
-							reader.readAsText(file);
-						}
-					}}
-				/>
-				<span>Import</span>
-			</label>
+		<button
+      class="dropdown-item"
+      onclick={() => {showBinAJsonPopup = true;}}
+    >
+      Import
+    </button>
 		{/if}
 		<button
 			class="dropdown-item"
 			data-sveltekit-preload-data="tap"
-			on:click={() => {
+			onclick={() => {
 				$loading = true;
 				loadExample()
 					.then(() => {
@@ -107,3 +85,6 @@
 		</button>
 	{/if}
 </NavMenu>
+<Popup bind:show={showBinAJsonPopup}>
+  <LoadBinAndAJson  onload={()=>{showBinAJsonPopup=false}} />
+</Popup>

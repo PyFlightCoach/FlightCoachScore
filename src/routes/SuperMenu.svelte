@@ -6,6 +6,8 @@
 	import { user } from '$lib/stores/user';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
 	import { goto } from '$app/navigation';
+
+
 </script>
 
 <NavMenu tooltip="Super User Menu">
@@ -61,6 +63,6 @@
       </button>
     {/if}
 	{/if}
-  <small class="dropdown-header">Analysis Options</small>
+  
   
 </NavMenu>

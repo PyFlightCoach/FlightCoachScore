@@ -11,9 +11,6 @@ export async function load({url}) {
     goto(resolve('/flight/results'));
   } 
   
-  console.log(url.pathname);
-  console.log(url);
-
   const fullAnalysisPaths = ["intra", "inter", "positioning", "templates"];
 
   if (fullAnalysisPaths.some(path => url.pathname.includes(path))) {

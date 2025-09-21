@@ -4,7 +4,6 @@
 	import { setComp } from '$lib/stores/contests';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { countries, split_country } from '$lib/utils/countries.js';
-	import { SelectInput } from '$lib/manoeuvre/special_inputs/inputs';
 	import CheckInput from '$lib/components/CheckInput.svelte';
 	import type { CreateFakeUserRequest } from '../compInterfaces';
 	import { loading } from '$lib/stores/shared';

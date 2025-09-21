@@ -1,10 +1,10 @@
-import type { DBSchedule} from '$lib/schedule/db';
+import type { DBSchedule } from '$lib/schedule/db';
 import type { DBFlightMeta, DBFlightScore } from '$lib/flight/db';
 import { dbServer } from '$lib/api/api';
 import { library } from '$lib/schedule/library';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
-  import {prettyPrintHttpError} from '$lib/utils/text';
+import { prettyPrintHttpError } from '$lib/utils/text';
 
 
 export class Flight {
@@ -13,9 +13,9 @@ export class Flight {
 		readonly schedule: DBSchedule
 	) {}
 
-  get isMine() {
-    return this.meta.pilot_id === get(user)?.id.replaceAll('-', '');
-  }
+	get isMine() {
+		return this.meta.pilot_id === get(user)?.id.replaceAll('-', '');
+	}
 
 	static async load(flight_id: string) {
 		const meta = await dbServer.get(`flight/${flight_id}`);
@@ -35,26 +35,21 @@ export class Flight {
 		}
 	}
 
-  get date() {
-    return new Date(this.meta.date);
-  }
-
-
+	get date() {
+		return new Date(this.meta.date);
+	}
 }
 
-
 export async function loadInPlotter(flight_id: string) {
-    return await dbServer
-      .post('flight/holding/copy/' + flight_id)
-      .then((res) => {
-        console.log("Flight copied to holding, expiry:", res.data.detail)
-        window.open(
-          'https://flightcoach.org/viewer/plotter.html?token=' + res.data.id,
-          '_blank'
-        );
-      })
-      .catch((err) => {
-        console.error(err);
-        alert(prettyPrintHttpError(err));
-      });
-  }
+	return await dbServer
+		.post('flight/holding/copy/' + flight_id)
+		.then((res) => {
+			console.log('Flight copied to holding, expiry:', res.data.detail);
+			window.open('https://flightcoach.org/viewer/plotter.html?token=' + res.data.id, '_blank');
+		})
+		.catch((err) => {
+			console.error(err);
+			alert(prettyPrintHttpError(err));
+		});
+}
+

@@ -36,7 +36,7 @@
 </script>
 
 <CheckInput
-  name={"Allow pilots to register and upload their own flights"}
+  name={`Allow pilots to ${whatAmI==="Round" ? "upload their own flights" : "register themselves"}`}
   bind:checked={allowSelfAdd}
   classappend={hasChanged(allowSelfAdd, oldRule?.cd_and_self_add || false)}
   {disabled}

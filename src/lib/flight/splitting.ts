@@ -117,16 +117,16 @@ export function next(last: Split, stop: number | undefined = undefined) {
 
 export function isComp(splits: Split[]) {
 	if (splits.length < 3) {
-		return false;
+		return;
 	}
 	if (
 		(splits[0].alternate_name != 'TakeOff' || splits[splits.length - 1].alternate_name != 'Landing')
 	) {
-		return false;
+		return;
 	}
 
 	if (!splits[1].manoeuvre) {
-		return false
+		return;
 	}
 
 	const schedule = get(library).subset({
@@ -135,13 +135,13 @@ export function isComp(splits: Split[]) {
 	}).first;
 
 	if (splits.length - 2 != schedule.manoeuvres.length) {
-		return false;
+		return;
 	}
 
 	if (schedule.manoeuvres.some((m, i) => m.short_name != splits[i+1].manoeuvre?.short_name)) {
-    return false;
+    return;
   };
-  return true;
+  return schedule;
 }
 
 export class Splitting {

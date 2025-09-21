@@ -63,26 +63,26 @@ library.subscribe((lib)=>{
 })
 
 export const updateTable = async () => {
-  const q = {
-    ...{
-      n_results: getNFlights(get(n_results)),
-      me_only_flag: get(me_only_flag),
-      difficulty: get(difficulty),
-      truncate: get(truncate),
-      schedule_id: get(schedule_id),
-      one_per_pilot_flag: get(sort_by_score_flag) ? get(one_per_pilot_flag) : false,
-      version: get(version)
-    },
-    ...(get(singleman) ? { manoeuvre_ind: get(manoeuvre_ind) } : {}),
-    ...(get(sort_by_score_flag) && get(includeMyBest) ? { include_my_best: get(includeMyBest)-1 } : {}),
-    ...(get(sort_by_score_flag) && get(includeMyLatest) ? { include_my_latest: get(includeMyLatest)-1 } : {}),
-    ...(get(sort_by_score_flag) && get(includeActive) && get(activeFlight)?.isMine ? { include_my_flight_id: `${get(activeFlight)?.meta.flight_id}+${get(includeActive)-1}` } : {}),
-    ...(get(select_by_date) ? { date_after: get(date_after), date_before: get(date_before) } : { n_days: getDays(get(n_days_val)) })
-  };
-  console.debug(q);
-  const _method = get(sort_by_score_flag) ? 'leaderboard' : 'flightlist';
   if (await checkUser()) {
-    
+    const q = {
+      ...{
+        n_results: getNFlights(get(n_results)),
+        me_only_flag: get(me_only_flag),
+        difficulty: get(difficulty),
+        truncate: get(truncate),
+        schedule_id: get(schedule_id),
+        one_per_pilot_flag: get(sort_by_score_flag) ? get(one_per_pilot_flag) : false,
+        version: get(version)
+      },
+      ...(get(singleman) ? { manoeuvre_ind: get(manoeuvre_ind) } : {}),
+      ...(get(sort_by_score_flag) && get(includeMyBest) ? { include_my_best: get(includeMyBest)-1 } : {}),
+      ...(get(sort_by_score_flag) && get(includeMyLatest) ? { include_my_latest: get(includeMyLatest)-1 } : {}),
+      ...(get(sort_by_score_flag) && get(includeActive) && get(activeFlight)?.isMine ? { include_my_flight_id: `${get(activeFlight)?.meta.flight_id}+${get(includeActive)-1}` } : {}),
+      ...(get(select_by_date) ? { date_after: get(date_after), date_before: get(date_before) } : { n_days: getDays(get(n_days_val)) })
+    };
+
+    const _method = get(sort_by_score_flag) ? 'leaderboard' : 'flightlist';
+        
     dbServer.get('analysis/' + _method + '?' + new URLSearchParams(q).toString()).then((res) => {
       table_rows.set(res.data.results.map((row: types.DBFlightRanked | types.DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };

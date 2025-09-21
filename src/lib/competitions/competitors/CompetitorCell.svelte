@@ -44,7 +44,7 @@
 					showUserProperties = !showUserProperties;
 				}}>User Properties</button
 			>
-			{#if $activeComp.isMyComp}
+			{#if $activeComp!.isMyComp}
 				<button
 					class="dropdown-item"
 					onclick={() => {

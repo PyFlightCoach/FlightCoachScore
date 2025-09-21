@@ -3,7 +3,7 @@
 	import { faVersion } from '$lib/stores/shared';
 	import { getCategories, type CategoryResponse } from '$lib/schedule/categories';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { setComp, getComps } from '$lib/stores/contests';
+	import { setComp } from '$lib/stores/contests';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import AddRules from '../rules/AddRules.svelte';
@@ -67,7 +67,6 @@
 					})
 						.then(setComp)
 						.then(() => {
-              getComps();
               oncreated();
 							goto(resolve(`/competition/view`));
 						})
@@ -93,10 +92,7 @@
 							result_rules
 						})
 						.then(setComp)
-						.then(()=>{
-              getComps();
-              oncreated();
-            })
+						.then(oncreated)
 						.catch((error) => {
 							alert(
 								'Error editing competition: ' + error.response?.data?.detail ||

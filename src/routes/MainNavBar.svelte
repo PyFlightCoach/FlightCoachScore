@@ -25,9 +25,9 @@
 				<UserMenu />
 				<FlightMenu />
 				<DataBaseMenu />
-				{#if $user?.is_cd || $user?.is_superuser}
-					<CDMenu />
-				{/if}
+        {#if $user?.is_verified}
+				<CDMenu />
+        {/if}
 				{#if $user?.is_superuser || $dev}
 					<SuperMenu />
 				{/if}

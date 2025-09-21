@@ -5,7 +5,7 @@ import type {
 } from '../compInterfaces';
 import { dbServer } from '$lib/api';
 import { get } from 'svelte/store';
-import { user } from '$lib/stores/user';
+import { user, checkUser } from '$lib/stores/user';
 import { PilotManager } from '$lib/competitions/competitors/PilotManager';
 
 export class ContestManager {
@@ -30,7 +30,9 @@ export class ContestManager {
 
 		this.competitors =
 			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
-		this.iAmCompeting = this.summary.competitors?.some((c) => c.competitor_id == userID) || false;
+
+		this.iAmCompeting = this.summary.competitors?.some((c) => c.id == userID) || false;
+
 		this.iCanEnter = this.summary.add_rules?.cd_and_self_add || false;
 		this.whatAreMyChildren =
 			this.summary.what_am_i === 'Competition'
@@ -110,11 +112,35 @@ export class ContestManager {
 	}
 
 	async addFlight(flight_id: string) {
-		return dbServer
+    return dbServer
 			.post(`competition/round/add_flight`, {
 				round_id: this.summary.id,
 				flight_id
 			})
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
+
+	openRounds() {
+		const openRounds = this.children
+			.filter((s) => s.summary.is_open_now)
+			.flatMap((s) => s.children.filter((r) => r.summary.is_open_now));
+
+		return openRounds;
+	}
+
+	checkSchedule(schedule_id: string | undefined, open: boolean = true) {
+		//Check if this competition has the given schedule_id in one of its rounds
+		return this.children.some((s) =>
+			s.children.some(
+				(r) => r.summary.schedule_id == schedule_id && (!open || r.summary.is_open_now)
+			)
+		);
+	}
+
+  checkCanUpload(schedule_id: string | undefined) {
+    return this.checkSchedule(schedule_id, true) && 
+           (this.iAmCompeting || this.isMyComp) && 
+           this.competitors.length > 0;
+  }
+
 }

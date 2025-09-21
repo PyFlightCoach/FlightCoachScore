@@ -1,12 +1,12 @@
 import { writable, type Writable } from 'svelte/store';
 import { dbServer, formDataFromDict } from '$lib/api/api';
 import { goto } from '$app/navigation';
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
 import { library, loadSchedules } from '$lib/schedule/library';
 import { loadNews, clearNews } from './shared';
 import { requestActivity, clearActivity } from '$lib/stores/userActivity';
 import { get } from 'svelte/store';
-import {getComps, clearComps} from '$lib/stores/contests';
+import {page} from '$app/state';
 
 export interface DBUser {
 	id: string;
@@ -27,6 +27,38 @@ export const user: Writable<DBUser | undefined> = writable();
 
 export const users: Writable<DBUser[]> = writable([]);
 
+class UserCheckInterval {
+  private interval: ReturnType<typeof setInterval> | undefined=undefined;
+  constructor(readonly duration=60000) {}
+
+  start() {
+    this.stop();
+    this.interval = setInterval(() => {
+      dbServer.get('users/me').catch(() => {
+        console.log('Session expired, logging out');
+        user.set(undefined);
+      });
+    }, this.duration);
+  }
+
+  stop() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+}
+
+const interval = new UserCheckInterval();
+
+
+user.subscribe((u) => {
+  if (u) {
+    interval.start();
+  } else {
+    interval.stop();
+  }
+});
+
 export async function getUsers() {
 	if (await checkUser(true, false, false)) {
 		await dbServer.get('users/list').then((res) => {
@@ -40,8 +72,7 @@ export async function postLoginUser() {
 		loadSchedules({ owner: get(user)?.email }),
 		loadNews(),
 		requestActivity(),
-    getUsers(),
-    getComps()
+		getUsers()
 	]);
 }
 
@@ -50,7 +81,6 @@ export async function postLogoutUser() {
 	library.set(get(library).subset({ owner: 'admin@fcscore.org' }));
 	clearNews();
 	clearActivity();
-  clearComps();
 }
 
 export async function loginUser(email: string, password: string) {
@@ -81,7 +111,7 @@ export async function logoutUser() {
 		})
 		.finally(() => {
 			postLogoutUser();
-			goto(base + '/');
+			//goto(resolve('/'));
 		});
 }
 
@@ -99,19 +129,19 @@ export async function checkUser(
 				if (alertFail) {
 					alert('You need to be a superuser to perform this action');
 				}
-				return false;
+				throw new Error('Not a superuser');
 			} else if (require_cd && !me.is_cd && !me.is_superuser) {
 				if (alertFail) {
 					alert('You need to be a CD to perform this action');
 				}
-				return false;
+				throw new Error('Not a CD');
 			} else if (!me.is_verified) {
 				if (alertFail) {
 					if (confirm('Please verify your email address first. Resend verification email?')) {
-						goto(base + '/user/verify-request/?email=' + me.email);
+						goto(resolve('/user/verify-request/') + '?email=' + me.email);
 					}
 				}
-				return false;
+				throw new Error('Email not verified');
 			} else {
 				return true;
 			}
@@ -120,10 +150,10 @@ export async function checkUser(
 			if (alertFail) {
 				logoutUser().then(() => {
 					if (confirm('You need to log in to perform this action, log in now?')) {
-						goto(base + '/user/login');
+						goto(resolve('/user/login'));
 					}
 				});
 			}
-			return false;
+			throw new Error('Not logged in');
 		});
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { setComp, getComps } from '$lib/stores/contests';
+	import { setComp } from '$lib/stores/contests';
 	import ResultRules from '../rules/ResultRules.svelte';
   import FlightRules from '../rules/FlightRules.svelte';
 	import type { ResultRule, FlightRule } from '$lib/competitions/compInterfaces';
@@ -49,7 +49,7 @@
 							result_rules,
               flight_rules
 						})
-						.then((res) => Promise.all([getComps(), setComp(res)]))
+						.then(setComp)
 						.then(oncreated)
 						.catch((error) => {
 							alert(
@@ -69,7 +69,7 @@
 							result_rules,
               flight_rules
 						})
-						.then((res) => Promise.all([getComps(), setComp(res)]))
+						.then(setComp)
 						.then(oncreated)
 						.catch((error) => {
 							alert(

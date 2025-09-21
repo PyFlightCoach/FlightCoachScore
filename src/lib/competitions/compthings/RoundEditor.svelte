@@ -1,7 +1,7 @@
 <script lang="ts">
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { setComp, getComps } from '$lib/stores/contests';
+	import { setComp } from '$lib/stores/contests';
 	import ResultRules from '../rules/ResultRules.svelte';
 	import AddRules from '../rules/AddRules.svelte';
 	import type { ResultRule, AddRule } from '$lib/competitions/compInterfaces';
@@ -66,14 +66,14 @@
 				class="col btn btn-primary mt-2"
 				disabled={!name}
 				onclick={() => {
-					parent
+					parent!
 						.addChild({
 							name,
 							comment,
 							result_rules,
               schedule_id: schedule?.schedule_id
 						})
-						.then((res) => Promise.all([getComps(), setComp(res)]))
+						.then(setComp)
 						.then(oncreated)
 						.catch((error) => {
 							alert(

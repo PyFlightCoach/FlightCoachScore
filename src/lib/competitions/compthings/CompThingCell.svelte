@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getComps, setComp } from '$lib/stores/contests';
+	import { setComp } from '$lib/stores/contests';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -82,10 +82,8 @@
 								.then((res) => {
 									new Promise(async () => {
 										if (thing.summary.what_am_i === 'Competition') {
-											getComps();
 											await goto(resolve('/'));
 										}
-										setComp(res);
 									});
 								})
 								.catch((err) => {

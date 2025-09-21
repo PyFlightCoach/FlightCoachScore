@@ -7,7 +7,7 @@
   import AddCompetitor from '$lib/competitions/competitors/AddCompetitor.svelte';
 	import ScoreCell from '$lib/competitions/competitors/ScoreCell.svelte';
   
-	let nrounds = $derived($activeComp.children.map((stage) => stage.children.length));
+	let nrounds = $derived($activeComp!.children.map((stage) => stage.children.length) );
 
 	let showAddPilot = $state(false);
 
@@ -18,18 +18,18 @@
 		<thead class="table-dark align-middle">
 			<tr>
 				<th>Competition:</th>
-				<CompThingCell competition={$activeComp} thing={$activeComp} colspan={sum(nrounds) + nrounds.length + 2}/>
+				<CompThingCell competition={$activeComp} thing={$activeComp!} colspan={sum(nrounds) + nrounds.length + 2}/>
 			</tr>
 			<tr>
 				<th>Stages:</th>
-				{#each $activeComp.children as stage, i}
+				{#each $activeComp!.children as stage, i}
             <CompThingCell competition={$activeComp} parent={$activeComp} thing={stage} colspan={nrounds[i] + 1}/>
 				{/each}
         <th rowspan="2" class="text-center">Total</th>
 			</tr>
 			<tr>
 				<th>Rounds:</th>
-				{#each $activeComp.children as stage, i}
+				{#each $activeComp!.children as stage, i}
 					{#each stage.children as round}
 						<CompThingCell competition={$activeComp} thing={round} />
 					{/each}
@@ -38,19 +38,19 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each $activeComp.competitors as competitor, i}
+			{#each $activeComp!.competitors as competitor, i}
 				<tr>
 					<CompetitorCell {competitor} />
-					{#each $activeComp.children as stage}
+					{#each $activeComp!.children as stage}
 						{#each stage.children as round}
               <ScoreCell {round} competitorID={competitor.competitor.id} />
 						{/each}
 						<ScoreCell round={stage} competitorID={competitor.competitor.id} />
 					{/each}
-          <ScoreCell round={$activeComp} competitorID={competitor.competitor.id} />
+          <ScoreCell round={$activeComp!} competitorID={competitor.competitor.id} />
 				</tr>
 			{/each}
-			{#if $activeComp.isMyComp}
+			{#if $activeComp!.isMyComp}
 				<tr
 					><td
 						role="button"
@@ -71,7 +71,7 @@
 </div>
 <Popup bind:show={showAddPilot}>
   <AddCompetitor
-    competition={$activeComp}
+    competition={$activeComp!}
     onadded={() => {
       showAddPilot = false;
     }}

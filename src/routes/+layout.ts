@@ -30,9 +30,10 @@ export async function load({ url, fetch }) {
 		.join('')
 		.replace('_', '');
 	helpFileName = helpFileName.endsWith('_') ? helpFileName.slice(0, -1) : helpFileName;
-	const promise2 = fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
+	fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
 		.then((response) => (response.ok ? response.text() : undefined))
-		.then((text) => help.set(text?.replace('/fcscorebase', base)));
+		.then((text) => help.set(text?.replace('/fcscorebase', base)))
+    .catch(() => help.set(undefined));
   
   await promise1;
 }
