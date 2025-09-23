@@ -1,5 +1,5 @@
 import { GPS } from '$lib/utils/geometry';
-import type { DBFlightRanked } from '$lib/flight/db';
+import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 import type {DBSchedule} from '$lib/schedule/db';
 
 export class DBFlightStack {

@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { activeComp, setComp } from '$lib/stores/contests';
+	import { activeComp, reloadDropDownComps, setComp } from '$lib/stores/contests';
 	import Popup from '$lib/components/Popup.svelte';
 	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
+	import { user } from '$lib/stores/user';
+
 	let {
 		competitor,
 		showProperties = $bindable(false),
@@ -28,32 +30,47 @@
 			aria-haspopup="true"
 			aria-expanded="false"
 			title="Competitor options"
+      disabled={!$activeComp?.isMyComp && !$user?.is_superuser}
 		>
 			{competitor.competitor.name}
 		</button>
 		<div class="dropdown-menu">
-			<button
-				class="dropdown-item"
-				onclick={() => {
-					showProperties = !showProperties;
-				}}>Competitor Properties</button
-			>
-			<button
-				class="dropdown-item"
-				onclick={() => {
-					showUserProperties = !showUserProperties;
-				}}>User Properties</button
-			>
-			{#if $activeComp!.isMyComp}
+			{#if $activeComp!.isMyComp || $user?.is_superuser}
 				<button
 					class="dropdown-item"
 					onclick={() => {
-						if (confirm(`Are you sure you want to remove ${competitor.competitor.name} from this competition?`)) {
+						showProperties = !showProperties;
+					}}>
+          Competitor Attributes
+        </button>
+				<button
+					class="dropdown-item"
+					onclick={() => {
+						showUserProperties = !showUserProperties;
+					}}>
+          User Attributes
+        </button>
+
+				<button
+					class="dropdown-item"
+					onclick={() => {
+						if (
+							confirm(
+								`Are you sure you want to remove ${competitor.competitor.name} from this competition?`
+							)
+						) {
 							competitor
 								.delete()
 								.then(setComp)
+								.then(() => {
+									if (competitor.competitor.id === $user!.id.replaceAll('-', '')) {
+										reloadDropDownComps();
+									}
+								})
 								.catch((err) => {
-									alert(`Failed to remove ${competitor.competitor.name}: ${err.response?.detail || err.message || err}`);
+									alert(
+										`Failed to remove ${competitor.competitor.name}: ${err.response?.detail || err.message || err}`
+									);
 								});
 						}
 					}}>Remove</button

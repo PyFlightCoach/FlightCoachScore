@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { ContestManager } from '../compthings/ContestManager';
+	import { ContestManager } from '../compthings/ContestManager';
 	import { resolve } from '$app/paths';
 	import { contestActions, type ContestAction } from './contests';
 	import { includes } from 'lodash';
 	import { user } from '$lib/stores/user';
-	import { setComp } from '$lib/stores/contests';
+	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
 	import {getCategories} from '$lib/schedule/categories';
 	let {
 		competitions,
@@ -82,6 +82,7 @@
 								onclick={() => {
 									comp
 										.addPilot($user!.id)
+                    .then(reloadDropDownComps)
 										.then(onentered)
 										.catch((e) =>
 											alert('Error entering competition: ' + e.response?.data?.detail || e.message)
@@ -100,7 +101,7 @@
                 disabled={!comp.iAmCompeting && !comp.isMyComp}
 								class="btn btn-outline-primary w-100"
 								onclick={() => {
-									onselected(comp);
+									ContestManager.load(comp.summary.id).then(onselected);
 								}}
 							>
 								Select

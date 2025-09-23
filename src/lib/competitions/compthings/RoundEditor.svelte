@@ -4,7 +4,7 @@
 	import { setComp } from '$lib/stores/contests';
 	import ResultRules from '../rules/ResultRules.svelte';
 	import AddRules from '../rules/AddRules.svelte';
-	import type { ResultRule, AddRule } from '$lib/competitions/compInterfaces';
+	import type { ResultRule, AddRule } from '$lib/api/DBInterfaces/competition';
 	import { library } from '$lib/schedule/library';
 	let {
     competition = undefined,

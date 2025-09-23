@@ -1,5 +1,5 @@
 import type { DBSchedule } from '$lib/schedule/db';
-import type { DBFlightMeta, DBFlightScore } from '$lib/flight/db';
+import type { DBFlightMeta, DBFlightScore } from '$lib/api/DBInterfaces/flight';
 import { dbServer } from '$lib/api/api';
 import { library } from '$lib/schedule/library';
 import { user } from '$lib/stores/user';
@@ -14,7 +14,8 @@ export class Flight {
 	) {}
 
 	get isMine() {
-		return this.meta.pilot_id === get(user)?.id.replaceAll('-', '');
+    const userID = get(user)?.id.replaceAll('-', '');
+		return this.meta.pilot_id === userID || this.meta.contributor_id === userID;
 	}
 
 	static async load(flight_id: string) {

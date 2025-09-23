@@ -3,12 +3,12 @@
 	import { faVersion } from '$lib/stores/shared';
 	import { getCategories, type CategoryResponse } from '$lib/schedule/categories';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { setComp } from '$lib/stores/contests';
-	import { goto } from '$app/navigation';
+	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import AddRules from '../rules/AddRules.svelte';
 	import ResultRules from '../rules/ResultRules.svelte';
-	import type { AddRule, ResultRule } from '$lib/competitions/compInterfaces';
+	import type { AddRule, ResultRule } from '$lib/api/DBInterfaces/competition';
 
 	let {
 		competition = undefined,
@@ -66,8 +66,9 @@
 						result_rules
 					})
 						.then(setComp)
-						.then(() => {
+            .then(() => {
               oncreated();
+              reloadDropDownComps();
 							goto(resolve(`/competition/view`));
 						})
 						.catch((error) => {

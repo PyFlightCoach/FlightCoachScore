@@ -108,6 +108,13 @@ export interface CompListRequest {
   i_can_upload_to? : boolean | undefined;
 }
 
+export interface CompListResponse {
+  i_am_cd: boolean;
+  i_am_competitor: boolean;
+  i_can_upload_to: boolean;
+  compthing: CompThingSummary;
+}
+
 export interface CreateFakeUserRequest {
   first_name: string;
   last_name: string;

@@ -1,4 +1,4 @@
-import type { Competitor } from '$lib/competitions/compInterfaces';
+import type { Competitor } from '$lib/api/DBInterfaces/competition';
 import { dbServer } from '$lib/api';
 import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 import type { DBUser } from '$lib/stores/user';

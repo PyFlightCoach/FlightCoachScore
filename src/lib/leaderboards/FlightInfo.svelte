@@ -2,7 +2,7 @@
 	import Plot from '$lib/plots/Plotly.svelte';
 	import { user } from '$lib/stores/user.js';
 	import { difficulty, truncate } from '$lib/leaderboards/stores';
-	import * as types from '$lib/flight/db';
+	import * as types from '$lib/api/DBInterfaces/flight';
 	import { Flight, loadInPlotter } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
 	import { base } from '$app/paths';

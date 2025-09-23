@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AddRule } from '$lib/competitions/compInterfaces';
+	import type { AddRule } from '$lib/api/DBInterfaces/competition';
 	import CheckInput from '$lib/components/CheckInput.svelte';
 
 	let {

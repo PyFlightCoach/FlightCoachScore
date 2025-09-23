@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
 	import type { ContestManager } from '../compthings/ContestManager';
-	import { setComp } from '$lib/stores/contests';
+	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { countries, split_country } from '$lib/utils/countries.js';
 	import CheckInput from '$lib/components/CheckInput.svelte';
-	import type { CreateFakeUserRequest } from '../compInterfaces';
+	import type { CreateFakeUserRequest } from '../../api/DBInterfaces/competition';
 	import { loading } from '$lib/stores/shared';
+  import { user } from '$lib/stores/user';
 
 	interface CompetitorSearchResult {
 		id: string;
@@ -167,6 +168,9 @@
             })
 						.then((res) => {
 							setComp(res);
+              if (selected?.id === $user!.id.replaceAll('-', '')) {
+                reloadDropDownComps();
+              }
 							onadded();
 						})
 						.catch((e) => {

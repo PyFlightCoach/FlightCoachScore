@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
-	import type { DBFlightRanked, DBFlightScore } from '$lib/flight/db';
+	import type { DBFlightRanked, DBFlightScore } from '$lib/api/DBInterfaces/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { faVersion } from '$lib/stores/shared';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';

@@ -5,7 +5,7 @@ import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/flight/fcjson';
 import { analysisServer } from '$lib/api/api';
 import { selectedResult, binData, origin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
-import { faVersion, isAnalysisModified } from '$lib/stores/shared';
+import { isAnalysisModified } from '$lib/stores/shared';
 import { Manoeuvre } from './raw.svelte';
 
 export class MA {

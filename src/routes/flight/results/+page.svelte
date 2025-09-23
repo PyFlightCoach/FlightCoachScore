@@ -24,7 +24,7 @@
 	import { uploadFlight } from '$lib/flight/analysis';
 	import navBarContents from '$lib/stores/navBarContents';
 	import AnalysisMenu from './ResultsMenu.svelte';
-	import { privacyOptions } from '$lib/flight/db';
+	import { privacyOptions } from '$lib/api/DBInterfaces/flight';
 	import { createAnalysisExport, createScoreCSV } from '$lib/flight/analysis';
 	import { user, checkUser } from '$lib/stores/user';
 	import { Flight } from '$lib/database/flight';
@@ -35,7 +35,8 @@
 	import Popup from '$lib/components/Popup.svelte';
 	import { activeComp, setComp } from '$lib/stores/contests';
 	import UploadForCompetitor from '$lib/competitions/competitors/UploadForCompetitor.svelte';
-	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
+	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
+	import type { DBFlightMeta, FlightUploadResponse } from '$lib/api/DBInterfaces/flight';
 
 	$navBarContents = AnalysisMenu;
 
@@ -74,47 +75,42 @@
 	$inspect('pilotId:', pilotId, 'round:', round);
 
 	const upload = async () => {
-		if (await checkUser()) {
-			form_state = 'Uploading Analysis, this can take some time...';
-			$loading = true;
-
-			uploadFlight(
-				createAnalysisExport(true),
-				isNew ? $bin : undefined,
-				privacy,
-				comment,
-				$activeFlight?.meta.flight_id,
-				pilotId
-			)
-				.then((r) => {
-					$bin = undefined;
-					if (round) {
-						round.addFlight(r.data.id).then(setComp);
-					}
-					return Flight.load(r.data.id);
-				})
-				.then((f) => {
-					$activeFlight = f;
-					form_state = 'Upload Successful';
-					if (round) {
-						goto(resolve(`/competition/view`));
-					} else {
-						postUploadSearch();
-						goto(resolve('/database/query/leaderboards'));
-					}
-				})
-				.then(loadGuiLists)
-				.catch((e) => {
-					form_state = 'Upload Failed: ' + e.response?.data?.detail?.detail || e.message;
-					console.error(e);
-				})
-				.finally(() => {
-					$loading = false;
-					unblockProgress();
-				});
-		} else {
-			form_state = undefined;
-		}
+		
+		checkUser(false, false, false)
+			.then(() => {
+        form_state = 'Uploading Analysis, this can take some time...';
+    		$loading = true;
+				return uploadFlight(
+					createAnalysisExport(true),
+					isNew ? $bin : undefined,
+					privacy,
+					comment,
+					$activeFlight?.meta.flight_id,
+					pilotId,
+          round?.summary.id
+				);
+			})
+			.then((res) => res.data)
+			.then((data: FlightUploadResponse) => {
+				$activeFlight = new Flight(data.meta!, $schedule!);
+				form_state = 'Upload Successful';
+				if (data.compthing) {
+					setComp(new ContestManager(data.compthing));
+					goto(resolve(`/competition/view`));
+				} else {
+					postUploadSearch();
+					goto(resolve('/database/query/leaderboards'));
+				}
+			})
+			.then(loadGuiLists)
+			.catch((e) => {
+				form_state = 'Upload Failed: ' + e.response?.data?.detail?.detail || e.message;
+				console.error(e);
+			})
+			.finally(() => {
+				$loading = false;
+				unblockProgress();
+			});
 	};
 </script>
 
@@ -200,7 +196,7 @@
 	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && $dataSource == 'bin'}
 		<div class="container-auto border rounded p-2 mb-2">
 			<UploadForCompetitor
-				bind:competition
+				bind:competition={competition}
 				bind:pilotID={pilotId}
 				bind:round
 				schedule={$schedule}

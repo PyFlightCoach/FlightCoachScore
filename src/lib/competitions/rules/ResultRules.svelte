@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ResultRule } from '$lib/competitions/compInterfaces';
+	import type { ResultRule } from '$lib/api/DBInterfaces/competition';
 
 	let {
 		oldRule = undefined,

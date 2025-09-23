@@ -22,11 +22,9 @@
 	let showForm: boolean = $state(false);
   let showCompSelect: boolean = $state(false);
 
-	let openRounds = $derived(
-		competition?.openRounds()?.filter((r) => !schedule || r.summary.schedule_id == schedule?.schedule_id) ||
-			[]
-	);
-
+	let openRounds = $derived(competition?.openRounds(schedule?.schedule_id) || []);
+  
+  $inspect("openRounds", openRounds);
 	let openRound = $derived(
 		competition?.children
 			.find((s) => s.summary.is_open_now)
@@ -69,7 +67,7 @@
       fullDisplay={false} 
       filterSubset={['Ready', 'Open']}
       actionSubset={['Enter', 'Select']}
-      onselected={()=>{showCompSelect=false}}
+      onselected={()=>{showCompSelect=false; round=openRounds[0]}}
       schedule={schedule}
     />
   </Popup>

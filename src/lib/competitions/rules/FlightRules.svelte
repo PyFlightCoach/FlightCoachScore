@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { FlightRule } from '$lib/competitions/compInterfaces';
+	import type { FlightRule } from '$lib/api/DBInterfaces/competition';
 	import CheckInput from '$lib/components/CheckInput.svelte';
 
 	let {

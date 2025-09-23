@@ -8,6 +8,11 @@
 	import { loadAnalysisFromDB } from '$lib/flight/analysis';
 	import { loadInPlotter } from '$lib/database/flight';
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
+	import { user } from '$lib/stores/user';
+	import { Flight } from '$lib/database/flight';
+	import { setComp } from '$lib/stores/contests';
+	import { prettyPrintHttpError } from '$lib/utils/text';
+
 	let { round, competitorID }: { round: ContestManager; competitorID: string } = $props();
 
 	const competitor: PilotManager = $derived(
@@ -22,20 +27,25 @@
 			: false
 	);
 
+	const flightInfo: Promise<Flight | undefined> = $derived(
+		competitor?.competitor.flight_id
+			? Flight.load(competitor.competitor.flight_id)
+			: Promise.resolve(undefined)
+	);
 </script>
 
 <td class="text-center p-0">
 	<div class="dropdown">
 		<button
 			type="button"
-			class="btn btn-outline-primary w-100 "
+			class="btn btn-outline-primary w-100"
 			data-bs-toggle="dropdown"
 			aria-haspopup="true"
 			aria-expanded="false"
 			title="Score options"
 		>
 			{#if competitor?.competitor.raw_score}
-				<span class="{competitor?.competitor.score_dropped ? 'text-decoration-line-through' : ''}"
+				<span class={competitor?.competitor.score_dropped ? 'text-decoration-line-through' : ''}
 					>{competitor.competitor.raw_score.toFixed(2)}, {competitor.competitor.normalised_score?.toFixed(
 						2
 					)}</span
@@ -45,12 +55,6 @@
 			{/if}
 		</button>
 		<div class="dropdown-menu">
-			<button
-				class="dropdown-item"
-				onclick={() => {
-					showProperties = true;
-				}}>Properties</button
-			>
 			{#if !competitor?.competitor.raw_score}
 				{#if round.summary.is_open_now && (round.isMyComp || round.summary.add_rules?.cd_and_self_add)}
 					<button
@@ -60,34 +64,54 @@
 						}}>Link Flight from DB</button
 					>
 					{#if $bin && !$activeFlight && $isComplete && $isCompFlight}
-						<button class="dropdown-item"
-              onclick={() => {
-                
-              }}
-            >
-              Upload & Link Active Flight
-            </button>
+						<button class="dropdown-item" onclick={() => {}}> Upload & Link Active Flight </button>
 					{/if}
 					<button class="dropdown-item">Throw Round</button>
 				{/if}
 			{:else}
-				{#if round.isMyComp}
-					<button class="dropdown-item">Unlink</button>
-				{/if}
 				{#if competitor.competitor.flight_id}
+					{#await flightInfo}
+						<span class="dropdown-item-text">Loading flight...</span>
+					{:then flight}
+						{#if flight && (flight.meta.privacy !== 'basic' || $user?.is_superuser || flight.isMine)}
+							<button
+								class="dropdown-item"
+								onclick={() => {
+									loadInPlotter(competitor.competitor.flight_id!);
+								}}
+								disabled={!competitor.competitor.flight_id}>View Flight</button
+							>
+							{#if flight.meta.privacy !== 'view_flown' || $user?.is_superuser || flight.isMine}
+								<button
+									class="dropdown-item"
+									onclick={() => loadAnalysisFromDB(competitor.competitor.flight_id!)}
+									disabled={!competitor.competitor.flight_id}>View Analysis</button
+								>
+							{/if}
+						{/if}
+					{/await}
+				{/if}
+				{#if round.isMyComp || $user?.is_superuser}
 					<button
 						class="dropdown-item"
 						onclick={() => {
-							loadInPlotter(competitor.competitor.flight_id!);
-						}}
-						disabled={!competitor.competitor.flight_id}>View Flight</button
-					>
-					<button
-						class="dropdown-item"
-						onclick={() => loadAnalysisFromDB(competitor.competitor.flight_id!)}
-						disabled={!competitor.competitor.flight_id}>View Analysis</button
+							competitor
+								.delete()
+								.then(setComp)
+								.catch((err) => {alert("Failed to Delete: " + prettyPrintHttpError(res) )});
+						}}>Unlink</button
 					>
 				{/if}
+			{/if}
+			{#if round?.isMyComp || $user?.is_superuser}
+				<button
+					class="dropdown-item"
+					onclick={() => {
+						showProperties = true;
+					}}
+				>
+					Attributes
+				</button>
 			{/if}
 		</div>
 	</div>

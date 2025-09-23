@@ -3,7 +3,7 @@
 	import FlightInfo from './FlightInfo.svelte';
 	import { Flight } from '$lib/database/flight';
 	import { activeFlight } from '$lib/stores/shared';
-	import type { DBFlightRanked } from '$lib/flight/db';
+	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
   
 	export let lastResponse: 'leaderboard' | 'flightlist' | undefined = undefined;
 	export let table_rows: DBFlightRanked[];

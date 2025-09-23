@@ -1,27 +1,27 @@
 <script lang="ts">
-  export let tooltip: string=''
+
+	let { tooltip}: { tooltip?: string; } = $props();
+
+  let expanded = $state(false); 
 
 </script>
 
-
-
-<li class="nav-item dropdown">
-	<a
+<div class="nav-item dropdown" >
+	<button
 		class="nav-link dropdown-toggle ms-2"
 		id="navbarDropdown"
-		role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"	
-    title={tooltip}
+		data-bs-toggle="dropdown"
+		title={tooltip}
 	>
-		<slot name="icon" />
-	</a>
-  <ul class="dropdown-menu" style="position:absolute;" aria-labelledby="navbarDropdown" >
-    <slot />
-  </ul>
-  
-</li>
+		<slot name="icon"></slot>
+	</button>
 
-  
-
-
+	<div
+		class="dropdown-menu"
+		style="position:absolute;"
+		aria-labelledby="navbarDropdown"
+    onload={()=>console.log("loaded")}
+	>
+		<slot />
+	</div>
+</div>

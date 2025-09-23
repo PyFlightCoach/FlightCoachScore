@@ -3,7 +3,7 @@ import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { dbServer } from '$lib/api/api';
 import { checkUser } from '$lib/stores/user';
-import * as types from '$lib/flight/db';
+import * as types from '$lib/api/DBInterfaces/flight';
 import { activeFlight, faVersion } from '$lib/stores/shared';
 import { library } from '$lib/schedule/library';
 

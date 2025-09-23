@@ -1,19 +1,22 @@
 <script lang="ts">
-	import { setComp } from '$lib/stores/contests';
+	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import CompThingEditor from './CompThingEditor.svelte';
-  import Popup from '$lib/components/Popup.svelte';
-  import DisplayDict from '$lib/components/DisplayDict.svelte';
+	import Popup from '$lib/components/Popup.svelte';
+	import DisplayDict from '$lib/components/DisplayDict.svelte';
+	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { library } from '$lib/schedule/library';
+	import { user } from '$lib/stores/user';
 
 	let {
-    competition = undefined,
+		competition = undefined,
 		parent = undefined,
 		thing = $bindable(),
 		colspan = 1
 	}: {
-    competition?: ContestManager | undefined;
+		competition?: ContestManager | undefined;
 		parent?: ContestManager | undefined;
 		thing: ContestManager;
 		colspan?: number;
@@ -22,7 +25,7 @@
 
 	let showEditor = $state(false);
 	let showCreator = $state(false);
-  let showProperties = $state(false);
+	let showProperties = $state(false);
 </script>
 
 <th {colspan} class={`${thing.summary.is_open_now ? 'bg-secondary' : ''} p-0`}>
@@ -34,18 +37,22 @@
 			aria-expanded="false"
 			title="{thing.summary.what_am_i} options"
 		>
-			{thing.summary.name}
+			{thing.summary.name}{#if thing.summary.schedule_id}, {$library.subset({
+					schedule_id: thing.summary.schedule_id
+				}).first.schedule_name}{/if}
 		</button>
 		<div class="dropdown-menu">
-      <button class="dropdown-item" 
-        onclick={() => { showProperties = true; }}
-      >Properties</button>
 			<button
 				class="dropdown-item"
 				onclick={() => {
 					showEditor = true;
-				}}>Edit</button
-			>
+				}}>
+        {#if competition?.isMyComp || $user?.is_superuser}
+          Edit
+        {:else}
+          Info
+        {/if}
+      </button>
 			{#if thing.isMyComp}
 				{#if thing.summary.what_am_i === 'Round'}
 					<button
@@ -80,28 +87,39 @@
 							thing
 								.delete()
 								.then((res) => {
-									new Promise(async () => {
-										if (thing.summary.what_am_i === 'Competition') {
-											await goto(resolve('/'));
-										}
-									});
+									if (thing.summary.what_am_i === 'Competition') {
+										reloadDropDownComps();
+										goto('/');
+									}
 								})
 								.catch((err) => {
-									alert(`Failed to delete ${thing.summary.what_am_i}: ${err}`);
+									alert(
+										`Failed to delete ${thing.summary.what_am_i}: ${prettyPrintHttpError(err)}`
+									);
 								});
 						}
-					}}>Delete</button
+					}}
 				>
+					Delete
+				</button>
+        {#if competition?.isMyComp || $user?.is_superuser}
+				<button
+					class="dropdown-item"
+					onclick={() => {
+						showProperties = true;
+					}}>Attributes</button
+				>
+        {/if}
 			{/if}
 		</div>
 	</div>
-{#if showEditor}
-	<CompThingEditor {competition} bind:show={showEditor} {thing} />
-{/if}
-{#if showCreator}
-	<CompThingEditor {competition} bind:show={showCreator} parent={thing} />
-{/if}
-<Popup bind:show={showProperties} >
-  <DisplayDict dict={thing.summary} />
-</Popup>  
+	{#if showEditor}
+		<CompThingEditor {competition} bind:show={showEditor} {thing} />
+	{/if}
+	{#if showCreator}
+		<CompThingEditor {competition} bind:show={showCreator} parent={thing} />
+	{/if}
+	<Popup bind:show={showProperties}>
+		<DisplayDict dict={thing.summary} />
+	</Popup>
 </th>

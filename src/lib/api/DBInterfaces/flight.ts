@@ -1,6 +1,8 @@
 // TODO This seems like a nicer way of doing things.
 // finish populating and refactor to use these types more generally. 
 
+import type { CompThingSummary } from "./competition";
+
 
 
 export const privacyOptions = ['basic', 'view_flown', 'view_analysis'];
@@ -57,3 +59,9 @@ export interface DBFlightHandler extends DBFlightScore{
 }
 
 
+export interface FlightUploadResponse {
+  id: string;
+  meta: DBFlightMeta | null;
+  compthing: CompThingSummary | null;
+
+}

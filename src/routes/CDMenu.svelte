@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import NavMenu from './NavMenu.svelte';
-	import { activeComp } from '$lib/stores/contests';
-	import { listComps } from '$lib/competitions/contests/contests';
+
+	import { myComps, enteredComps, reloadDropDownComps } from '$lib/stores/contests';
 	import Popup from '$lib/components/Popup.svelte';
 	import CompetitionEditor from '$lib/competitions/compthings/CompetitionEditor.svelte';
 	import { user } from '$lib/stores/user';
 
+	let {}: {} = $props();
 	let showPopup = $state(false);
 
-	let myComps = $derived(listComps('Mine', undefined));
-	let enteredComps = $derived(listComps('Entered', undefined));
+	const compListsReady = $derived(reloadDropDownComps());
+
+	//loadComps();
 </script>
 
 <NavMenu tooltip="Competition Menu">
@@ -24,31 +26,27 @@
 			}}
 			data-sveltekit-preload-data="tap">Create Competition</button
 		>
-
-		{#await myComps}
-			<div class="dropdown-item">...Loading</div>
-		{:then comps}
-			{#if comps.length}
-				<div class="dropdown-divider"></div>
-				<div class="dropdown-header">My Competitions</div>
-				{#each comps as comp}
-					<a
-						class="dropdown-item"
-						href={resolve('/competition/load') + `/?id=${comp.summary.id}`}
-						data-sveltekit-preload-data="tap">{comp.summary.name}</a
-					>
-				{/each}
-			{/if}
-		{/await}
 	{/if}
-	{#await enteredComps}
+	{#await compListsReady}
 		<div class="dropdown-item">...Loading</div>
-	{:then comps}
-		{#if comps.length}
+	{:then}
+		{#if $myComps?.length}
+			<div class="dropdown-divider"></div>
+			<div class="dropdown-header">My Competitions</div>
+			{#each $myComps as comp}
+				<a
+					class="dropdown-item"
+					href={resolve('/competition/load') + `/?id=${comp.summary.id}`}
+					data-sveltekit-preload-data="tap">{comp.summary.name}</a
+				>
+			{/each}
+		{/if}
+
+		{#if $enteredComps?.length}
 			<div class="dropdown-divider"></div>
 			<div class="dropdown-header">Entered Competitions</div>
 
-			{#each comps as comp}
+			{#each $enteredComps as comp}
 				<a
 					class="dropdown-item"
 					href={resolve('/competition/load') + `/?id=${comp.summary.id}`}

@@ -1,5 +1,5 @@
 import { ContestManager } from '../compthings/ContestManager';
-import type { CompListRequest, CompThingSummary } from '../compInterfaces';
+import type { CompListRequest, CompThingSummary, CompListResponse } from '../../api/DBInterfaces/competition';
 import { dbServer } from '$lib/api';
 
 
@@ -29,19 +29,16 @@ export async function listComps(
 
 	return dbServer
 		.get('/competition/list/', {params})
-		.then((res) => {
-			return res.data.results.map((res: CompThingSummary) => new ContestManager(res));
-		})
-		.then((comps: ContestManager[]) =>
-			comps.filter((c) => {
-				if (category_id && c.summary.category_id != category_id) {
+		.then((comps) =>
+			comps.data?.results.filter((c: CompListResponse) => {
+				if (category_id && c.compthing.category_id != category_id) {
 					return false;
 				}
-				if (group == 'Open' && (!c.summary.add_rules?.cd_and_self_add || c.iAmCompeting)) {
+				if (group == 'Open' && (!c.compthing.add_rules?.cd_and_self_add || c.i_am_competitor)) {
 					return false;
 				}
         return true;
-			})
+			}).map((c: CompListResponse) => new ContestManager(c.compthing, undefined, c.i_am_cd, c.i_am_competitor, c.i_can_upload_to))
 		);
 }
 

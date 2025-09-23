@@ -4,7 +4,7 @@
 	import { setComp } from '$lib/stores/contests';
 	import ResultRules from '../rules/ResultRules.svelte';
   import FlightRules from '../rules/FlightRules.svelte';
-	import type { ResultRule, FlightRule } from '$lib/competitions/compInterfaces';
+	import type { ResultRule, FlightRule } from '$lib/api/DBInterfaces/competition';
 
 	let {
 		parent,

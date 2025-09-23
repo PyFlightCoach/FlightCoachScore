@@ -1,6 +1,5 @@
 import { objmap } from '$lib/utils/arrays';
 import * as units from '$lib/utils/units';
-import type { D } from 'vitest/dist/chunks/reporters.d.BFLkQcL6.js';
 import { ManInfo } from './info.svelte';
 import { Result } from './scores';
 
