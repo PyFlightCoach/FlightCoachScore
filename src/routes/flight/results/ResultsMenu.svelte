@@ -1,18 +1,10 @@
 <script lang="ts">
-	import { base } from '$app/paths';
-	import { manNames, isComplete, bin } from '$lib/stores/analysis';
-	import { activeFlight } from '$lib/stores/shared';
-	import { analyseAll, clearAnalysis, clearDataLoading } from '$lib/flight/analysis';
+	import { resolve } from '$app/paths';
+	import { manNames} from '$lib/stores/analysis';
+	import { analyseAll, clearDataLoading } from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { user } from '$lib/stores/user';
-
-	$: userId = $user?.id.replaceAll('-', '');
-
-	$: isNewFlight = $bin && !$activeFlight;
-	$: isMyFlight =
-		userId == $activeFlight?.meta.pilot_id || userId == $activeFlight?.meta.contributor_id || isNewFlight;
-	$: console.debug('isNewFlight', isNewFlight, 'isMyFlight', isMyFlight, 'user id', userId, 'activeFlight', $activeFlight, 'isComplete', $isComplete);
+	import { page } from '$app/state';
+	import { user } from '$lib/stores/user';	
 </script>
 
 {#if $manNames && $manNames.length > 0}
@@ -20,23 +12,23 @@
 		class="col-auto nav-item nav-link"
     title="clear all analysis data"    
     data-bs-toggle="tooltip"
-		on:click={() => {
+		onclick={() => {
 			clearDataLoading();
-			goto(base + '/');
+			goto(resolve('/'));
 		}}
 	>
 		Clear
 	</button>
 	
 		<a
-			class="col-auto page-item nav-link {$page.url.pathname.endsWith('results') ? 'active' : ''}"
-			href={base + '/flight/results'}>Results</a
+			class="col-auto page-item nav-link {page.url.pathname.endsWith('results') ? 'active' : ''}"
+			href={resolve('/flight/results')}>Results</a
 		>
 	
 	{#if $user?.is_superuser}
 		<button
 			class="col-auto nav-link"
-			on:click={() => {
+			onclick={() => {
 				analyseAll(true, true);
 			}}
 		>

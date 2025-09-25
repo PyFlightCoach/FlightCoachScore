@@ -14,7 +14,7 @@
 </script>
 
 <div class="table-responsive p-0">
-	<table class="table table-striped table-sm align-middle table-borderless">
+	<table class="table table-sm align-middle table-bordered align-middle">
 		<thead class="table-dark align-middle">
 			<tr>
 				<th>Competition:</th>

@@ -16,7 +16,7 @@
 	} = $props();
 </script>
 
-<div class={'form-check p-2 px-4 ' + classappend}>
+<div class={'form-check mb-2 ' + classappend}>
 	<input type="checkbox" class={'form-check-input'} {name} {disabled} bind:checked {onchange} />
 	<label for="truncate">{name}</label>
 </div>

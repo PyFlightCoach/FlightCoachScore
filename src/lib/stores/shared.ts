@@ -153,7 +153,7 @@ loadedFAVersion.subscribe(checkServerDataLoaded);
 
 export async  function loadAllServerData() {
   serverDataLoaded.set(false);
-  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity(), getUsers()])
+  return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion(), requestActivity()])
     .then(() => {
       console.log('All data loaded successfully.');
       serverDataLoaded.set(true);
@@ -162,4 +162,3 @@ export async  function loadAllServerData() {
       console.error('Error loading required data', e);
     });
 }
-import {getUsers} from '$lib/stores/user';

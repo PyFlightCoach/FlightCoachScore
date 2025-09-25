@@ -1,5 +1,5 @@
 import { ContestManager } from '../compthings/ContestManager';
-import type { CompListRequest, CompThingSummary, CompListResponse } from '../../api/DBInterfaces/competition';
+import type { CompListRequest, CompListResponse } from '../../api/DBInterfaces/competition';
 import { dbServer } from '$lib/api';
 
 

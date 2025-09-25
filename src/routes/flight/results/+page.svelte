@@ -75,11 +75,10 @@
 	$inspect('pilotId:', pilotId, 'round:', round);
 
 	const upload = async () => {
-		
 		checkUser(false, false, false)
 			.then(() => {
-        form_state = 'Uploading Analysis, this can take some time...';
-    		$loading = true;
+				form_state = 'Uploading Analysis, this can take some time...';
+				$loading = true;
 				return uploadFlight(
 					createAnalysisExport(true),
 					isNew ? $bin : undefined,
@@ -87,12 +86,19 @@
 					comment,
 					$activeFlight?.meta.flight_id,
 					pilotId,
-          round?.summary.id
+					round?.summary.id
 				);
 			})
 			.then((res) => res.data)
 			.then((data: FlightUploadResponse) => {
-				$activeFlight = new Flight(data.meta!, $schedule!);
+				if (data.meta) {
+					$activeFlight = new Flight(data.meta, $schedule);
+				} else {
+					Flight.load(data.id).then((f) => {
+						$activeFlight = f;
+					});
+				}
+
 				form_state = 'Upload Successful';
 				if (data.compthing) {
 					setComp(new ContestManager(data.compthing));
@@ -196,7 +202,7 @@
 	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && $dataSource == 'bin'}
 		<div class="container-auto border rounded p-2 mb-2">
 			<UploadForCompetitor
-				bind:competition={competition}
+				bind:competition
 				bind:pilotID={pilotId}
 				bind:round
 				schedule={$schedule}
@@ -205,27 +211,27 @@
 	{/if}
 
 	<div class="container-auto border rounded p-2">
-		<div class="row p-2">
-			<label class="col-auto col-form-label" for="set-privacy">Privacy</label>
-			<select class="col form-select" disabled={!canI} id="set-privacy" bind:value={privacy}>
-				{#each privacyOptions as v}
-					<option value={v}>{v.replace('_', ' ')}</option>
-				{/each}
-			</select>
-		</div>
-		<div class="row p-2">
-			<label class="form-label" for="comments">Comments</label>
-			<textarea
-				id="comments"
-				class="pt-0 form-control"
-				disabled={!canI}
-				name="comments"
-				rows="3"
-				bind:value={comment}
-			></textarea>
-		</div>
-
 		{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'db')}
+			<div class="row p-2">
+				<label class="col-auto col-form-label" for="set-privacy">Privacy</label>
+				<select class="col form-select" disabled={!canI} id="set-privacy" bind:value={privacy}>
+					{#each privacyOptions as v}
+						<option value={v}>{v.replace('_', ' ')}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="row p-2">
+				<label class="form-label" for="comments">Comments</label>
+				<textarea
+					id="comments"
+					class="pt-0 form-control"
+					disabled={!canI}
+					name="comments"
+					rows="3"
+					bind:value={comment}
+				></textarea>
+			</div>
+
 			<div class="row mb-2 px-2">
 				<button class="col btn btn-primary mx-2" type="submit" onclick={upload}
 					>{isNew ? 'Upload' : 'Update'}

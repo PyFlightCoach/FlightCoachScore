@@ -25,7 +25,6 @@
 	function getNormaliseTo(rule: ResultRule | undefined) {
 		return rule?.normalise_best_to_n || rule?.normalise_average_to_n || 1000;
 	}
-
 	let normalisation: string = $state(getNormalisation(oldRule) || '');
 	let normalise_to: number = $state(getNormaliseTo(oldRule));
 	let progressTopN: number | undefined = $state(oldRule?.progress_top_n || undefined);
@@ -42,7 +41,7 @@
 </script>
 
 <div
-	class="row p-2 {hasChanged(normalisation, getNormalisation(oldRule))}"
+	class="row mb-2 {hasChanged(normalisation, getNormalisation(oldRule))}"
 	title="Select how scores are to be normalised, this applies to the final result of this {whatAmI}."
 >
 	<label class="col col-form-label text-nowrap" for="normOption">Normalisation:</label>
@@ -58,7 +57,7 @@
 	</select>
 </div>
 {#if normalisation != 'raw'}
-	<div class="row p-2 {hasChanged(normalise_to, getNormaliseTo(oldRule))}">
+	<div class="row mb-2 {hasChanged(normalise_to, getNormaliseTo(oldRule))}">
 		<label class="col col-form-label" for="normTo">Normalise to:</label>
 		<input
 			class="col form-control"
@@ -70,7 +69,7 @@
 	</div>
 {/if}
 {#if whatAmI === 'Stage'}
-	<div class="row p-2 {hasChanged(progressTopN, oldRule?.progress_top_n)}">
+	<div class="row mb-2 {hasChanged(progressTopN, oldRule?.progress_top_n)}">
 		<label class="col col-form-label" for="progressTopN">Progress top n:</label>
 		<input
 			class="col form-control"
@@ -80,7 +79,7 @@
 			{disabled}
 		/>
 	</div>
-	<div class="row p-2 {hasChanged(useTopN, oldRule?.use_top_n)}">
+	<div class="row mb-2 {hasChanged(useTopN, oldRule?.use_top_n)}">
 		<label class="col col-form-label" for="useTopN">Use top n:</label>
 		<input class="col form-control" type="number" id="useTopN" bind:value={useTopN} {disabled} />
 	</div>

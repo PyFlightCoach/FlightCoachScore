@@ -17,35 +17,33 @@
 	} = $props();
 
 	let name: string | undefined = $state(stage?.summary.name || `Stage ${(parent?.summary.children?.length || 0) + 1}`);
-	let comment: string | undefined = $state(stage?.summary.comment || undefined);
-	let result_rules = $state((stage?.summary.result_rules || {}) as ResultRule);
+	let result_rules = $state((stage?.summary.result_rules || { normalise_best_to_n: 1000 }) as ResultRule);
   let flight_rules = $state((stage?.summary.flight_rules || {}) as FlightRule);
 </script>
 
 <div class="col">
-  <small>{#if !stage}Create{:else}Edit{/if} Stage</small>
+  <small class="row p-2">{#if !stage}Create{:else}Edit{/if} Stage</small>
 	<TextInput name="Name" bind:value={name} />
 	<ResultRules
-		oldRule={{ normalise_best_to_n: 1000 } as ResultRule}
+		oldRule={result_rules}
 		bind:newRule={result_rules}
 		showChanges={false}
 		whatAmI="Stage"
 	/>
   <FlightRules
-    oldRule={{ } as FlightRule}
+    oldRule={flight_rules}
     bind:newRule={flight_rules}
     showChanges={false}
   />
 	<div class="row">
 		{#if !stage}
 			<button
-				class="col btn btn-primary mt-2"
+				class="col btn btn-primary"
 				disabled={!name}
 				onclick={() => {
 					parent!
 						.addChild({
 							name,
-							comment,
 							result_rules,
               flight_rules
 						})
@@ -60,12 +58,11 @@
 			>
 		{:else}
 			<button
-				class="col btn btn-primary mt-2"
+				class="col btn btn-primary"
 				onclick={() => {
 					stage
 						.update({
 							name,
-							comment,
 							result_rules,
               flight_rules
 						})

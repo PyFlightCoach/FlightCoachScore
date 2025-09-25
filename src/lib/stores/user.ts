@@ -59,20 +59,12 @@ user.subscribe((u) => {
   }
 });
 
-export async function getUsers() {
-	if (await checkUser(true, false, false)) {
-		await dbServer.get('users/list').then((res) => {
-			users.set(res.data.results as DBUser[]);
-		});
-	}
-}
 
 export async function postLoginUser() {
 	await Promise.all([
 		loadSchedules({ owner: get(user)?.email }),
 		loadNews(),
-		requestActivity(),
-		getUsers()
+		requestActivity()
 	]);
 }
 

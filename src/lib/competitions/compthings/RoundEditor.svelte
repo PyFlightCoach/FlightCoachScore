@@ -19,8 +19,7 @@
 	} = $props();
 
 	let name: string | undefined = $state(round?.summary.name || `Round ${(parent?.summary.children?.length || 0) + 1}`);
-	let comment: string | undefined = $state(round?.summary.comment || undefined);
-	let result_rules = $state((round?.summary.result_rules || {}) as ResultRule);
+	let result_rules = $state((round?.summary.result_rules || { normalise_best_to_n: 1000 }) as ResultRule);
 	let add_rules = $state((round?.summary.add_rules || {}) as AddRule);
 
 	let schedules = $derived(
@@ -36,10 +35,10 @@
 </script>
 
 <div class="col">
-  <small>{#if !round}Create{:else}Edit{/if} Round</small>
+  <small class="row p-2">{#if !round}Create{:else}Edit{/if} Round</small>
 	<TextInput name="Name" bind:value={name} />
 
-	<div class="row">
+	<div class="row mb-2">
 		<label for="categorySelect" class="col col-form-label">Select Schedule:</label>
 		<select class="col form-select col-form-input" id="categorySelect" bind:value={schedule}>
 			{#each schedules.schedules as schedule}
@@ -47,29 +46,29 @@
 			{/each}
 		</select>
 	</div>
+  {#if false}
 	<AddRules
-		oldRule={round?.summary.add_rules}
+    oldRule={add_rules}
 		bind:newRule={add_rules}
 		showChanges={round != undefined}
 		whatAmI="Round"
 	/>
-
+  {/if}
 	<ResultRules
-		oldRule={{ normalise_best_to_n: 1000 } as ResultRule}
+		oldRule={result_rules}
 		bind:newRule={result_rules}
 		showChanges={false}
 		whatAmI="Round"
 	/>
-	<div class="row">
+	<div class="row ">
 		{#if !round}
 			<button
-				class="col btn btn-primary mt-2"
+				class="col btn btn-primary"
 				disabled={!name}
 				onclick={() => {
 					parent!
 						.addChild({
 							name,
-							comment,
 							result_rules,
               schedule_id: schedule?.schedule_id
 						})
@@ -84,16 +83,15 @@
 			>
 		{:else}
 			<button
-				class="col btn btn-primary mt-2"
+				class="col btn btn-primary"
 				onclick={() => {
 					round
 						.update({
 							name,
-							comment,
 							result_rules,
               schedule_id: schedule?.schedule_id
 						})
-						.then((res) => Promise.all([getComps(), setComp(res)]))
+						.then((res) => Promise.all([setComp(res)]))
 						.then(oncreated)
 						.catch((error) => {
 							alert(

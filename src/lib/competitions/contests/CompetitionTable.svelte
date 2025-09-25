@@ -31,7 +31,6 @@
 			<tr>
 				<th>Name</th>
         <th>Type</th>
-				{#if full}<th>Comment</th>{/if}
 				<th>CD</th>
 				{#if full}<th>Start Date</th>
 					<th>End Date</th>
@@ -55,7 +54,6 @@
               {cats.find(c => c.category_id === comp.summary.category_id)?.category_name.toUpperCase()}
             {/await}
           </td>
-					{#if full}<td>{comp.summary.comment}</td>{/if}
 					<td>{comp.summary.directors?.map((d) => d.name)}</td>
 					{#if full}<td>{comp.summary.date_start || '-'}</td>
 						<td>{comp.summary.date_end || '-'}</td>

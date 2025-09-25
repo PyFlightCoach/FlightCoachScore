@@ -24,7 +24,7 @@ export class ScheduleLibrary {
 	constructor(readonly schedules: DBSchedule[] = []) {}
 
 	get length(): number {
-		return this.schedules.length;
+		return this.schedules.length || 0;
 	}
 	get first(): DBSchedule {
 		return this.schedules[0];

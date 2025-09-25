@@ -47,7 +47,7 @@
   classappend={hasChanged(uploadWhilstOpen, oldRule?.upload_whilst_open || false)}
   {disabled}
 />
-<div class="row p-2 {hasChanged(uploadWithin, oldRule?.upload_within_n_hours)}">
+<div class="row mb-2 {hasChanged(uploadWithin, oldRule?.upload_within_n_hours)}">
   <label class="col col-form-label" for="normTo">upload within (hours from boot):</label>
   <input
     class="col form-control"

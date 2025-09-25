@@ -4,12 +4,12 @@
 	import { getCategories, type CategoryResponse } from '$lib/schedule/categories';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import AddRules from '../rules/AddRules.svelte';
 	import ResultRules from '../rules/ResultRules.svelte';
-	import type { AddRule, ResultRule } from '$lib/api/DBInterfaces/competition';
-
+	import type { AddRule, ResultRule, CompThingMeta } from '$lib/api/DBInterfaces/competition';
+	import EditCompThingMeta from './EditCompThingMeta.svelte';
 	let {
 		competition = undefined,
 		oncreated = () => {}
@@ -22,23 +22,32 @@
 	});
 
 	let name: string | undefined = $state(competition?.summary.name);
-	let comment: string | undefined = $state(competition?.summary.comment || undefined);
 	let category: CategoryResponse | undefined = $state();
 	getCategories().then((categories) => {
 		categories.find((c) => c.category_id === competition?.summary.category_id);
 	});
 
-	let add_rules: AddRule = $state((competition?.summary.add_rules || {}) as AddRule);
-	let result_rules = $state((competition?.summary.result_rules || {}) as ResultRule);
+	let add_rules: AddRule = $state(competition?.summary.add_rules || ({} as AddRule));
+	let result_rules = $state(competition?.summary.result_rules || ({} as ResultRule));
+	let client_meta: CompThingMeta = $state(
+		competition?.summary.client_meta || ({} as CompThingMeta)
+	);
 </script>
 
 <div class="col">
-	<small>{#if !competition}Create{:else}Edit{/if} Competition</small>
+	<small class="col p-2">
+    {#if !competition}Create{:else}Edit{/if} Competition
+  </small>
 	<TextInput name="Name" bind:value={name} />
 
-	<div class="row">
-		<label for="categorySelect" class="col col-form-label">Select Category:</label>
-		<select class="col form-select col-form-input" id="categorySelect" bind:value={category} disabled={!!competition}>
+	<div class="row mb-2">
+		<label for="categorySelect" class="col col-form-label">Category:</label>
+		<select
+			class="col form-select col-form-input"
+			id="categorySelect"
+			bind:value={category}
+			disabled={competition && competition.schedules().length > 0}
+		>
 			{#each categories as cat}
 				<option value={cat}>{cat.category_name}</option>
 			{/each}
@@ -46,29 +55,35 @@
 	</div>
 	<AddRules bind:newRule={add_rules} showChanges={competition != undefined} whatAmI="Competition" />
 	<ResultRules
-		oldRule={{ raw_score: true }}
+		oldRule={result_rules}
 		bind:newRule={result_rules}
+		showChanges={competition != undefined}
+		whatAmI="Competition"
+	/>
+	<EditCompThingMeta
+		oldMeta={competition?.summary.client_meta || {}}
+		bind:newMeta={client_meta}
 		showChanges={competition != undefined}
 		whatAmI="Competition"
 	/>
 	<div class="row">
 		{#if !competition}
 			<button
-				class="col btn btn-primary mt-2"
+				class="col btn btn-primary "
 				disabled={!name || !category}
 				onclick={() => {
 					ContestManager.newCompetition({
 						name,
-						comment,
+						client_meta,
 						category_id: category!.category_id,
 						fa_version: $faVersion,
 						add_rules,
 						result_rules
 					})
 						.then(setComp)
-            .then(() => {
-              oncreated();
-              reloadDropDownComps();
+						.then(() => {
+							oncreated();
+							reloadDropDownComps();
 							goto(resolve(`/competition/view`));
 						})
 						.catch((error) => {
@@ -82,12 +97,12 @@
 			>
 		{:else}
 			<button
-				class="col btn btn-primary mt-2"
+				class="col btn btn-primary"
 				onclick={() => {
 					competition
 						.update({
 							name,
-							comment,
+							client_meta,
 							category_id: category?.category_id,
 							add_rules,
 							result_rules

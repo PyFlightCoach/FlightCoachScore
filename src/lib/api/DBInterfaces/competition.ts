@@ -1,3 +1,4 @@
+import type { BoxLocation } from "$lib/manoeuvre/positioning.svelte";
 
 
 export type Competition="Competition";
@@ -13,12 +14,16 @@ export interface Director {
   country: string;
 }
 
+export interface CompetitorMeta {
+  registration?: string | undefined;
+}
+
 export interface Competitor {
   id: string;
   name: string;
   country: string;
-  is_fake: boolean;
   competitor_id: string;
+  client_meta: CompetitorMeta;
   missed_cut: boolean;
   registration: string | null;
   raw_score: number | null;
@@ -33,9 +38,8 @@ export interface Competitor {
 export interface CompetitorCreate {
   comp_id: string;
   user_id: string;
-  name_override: string | undefined;
   flight_order: number | undefined;
-  registration: string | undefined;
+  client_meta: CompetitorMeta | undefined;
 }
 
 
@@ -59,11 +63,27 @@ export interface FlightRule {
   finalised: boolean | null;
 }
 
+export interface CompLocation {
+  country: string;
+  emoji: string;
+  address?: string;
+  box?: {latitude: number; longitude: number; altitude: number; heading: number} | undefined;
+}
+
+
+export interface CompThingMeta {
+  description?: string | undefined;
+  start_date?: string | undefined;
+  end_date?: string | undefined;
+  location?: string | undefined;
+  url?: string | undefined;
+}
+
 
 export interface CompThingSummary {
   id: string;
   name: string;
-  comment: string | null;
+  client_meta: CompThingMeta | null;
   index: number;
   what_am_i: Thing;
   category_id: string | null;
@@ -85,7 +105,7 @@ export interface CompThingSummary {
 
 export interface CompThingCreateUpdate {
   name: string | undefined;
-  comment?: string | undefined;
+  client_meta?: CompThingMeta;
   parent_id?: string | undefined; 
   category_id?: string | undefined;
   schedule_id?: string | undefined;

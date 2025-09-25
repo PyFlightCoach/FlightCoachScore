@@ -7,13 +7,14 @@ import { dbServer } from '$lib/api';
 import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
 import { PilotManager } from '$lib/competitions/competitors/PilotManager';
+import { library } from '$lib/schedule/library';
 
 export class ContestManager {
 	children: ContestManager[] = [];
 	isMyComp: boolean;
 	iAmCompeting: boolean;
 	iCanEnter: boolean;
-  iCanUpload: boolean;
+	iCanUpload: boolean;
 	competitors: PilotManager[];
 	whatAreMyChildren: 'Stage' | 'Round' | undefined;
 
@@ -28,7 +29,7 @@ export class ContestManager {
 
 		const userID = get(user)?.id.replaceAll('-', '');
 
-		if (i_am_cd=== undefined) {
+		if (i_am_cd === undefined) {
 			this.isMyComp =
 				this.summary.directors?.map((d) => d.id.replaceAll('-', '')).includes(userID || '') ||
 				get(user)?.is_superuser ||
@@ -40,17 +41,21 @@ export class ContestManager {
 		this.competitors =
 			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
 
-    if (i_am_competitor===undefined) {
-      this.iAmCompeting = this.summary.competitors?.some((c) => c.id == userID) || false;
-    } else {
-      this.iAmCompeting = i_am_competitor!;
-    }
-		
-    if (i_can_upload_to===undefined) {
-      this.iCanUpload = this.iAmCompeting && this.summary.is_open_now &&  this.summary.add_rules?.cd_and_self_add || false;
-    } else {
-      this.iCanUpload = i_can_upload_to && this.summary.add_rules?.cd_and_self_add || false;
-    }
+		if (i_am_competitor === undefined) {
+			this.iAmCompeting = this.summary.competitors?.some((c) => c.id == userID) || false;
+		} else {
+			this.iAmCompeting = i_am_competitor!;
+		}
+
+		if (i_can_upload_to === undefined) {
+			this.iCanUpload =
+				(this.iAmCompeting &&
+					this.summary.is_open_now &&
+					this.summary.add_rules?.cd_and_self_add) ||
+				false;
+		} else {
+			this.iCanUpload = (i_can_upload_to && this.summary.add_rules?.cd_and_self_add) || false;
+		}
 
 		this.iCanEnter = this.summary.add_rules?.cd_and_self_add || false;
 		this.whatAreMyChildren =
@@ -139,24 +144,25 @@ export class ContestManager {
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
 
+	get rounds() {
+		return this.children.map((s) => s.children).flat();
+	}
+
 	openRounds(schedule_id: string | undefined) {
-		const openRounds = this.children
-			.filter((s) => s.summary.is_open_now)
-			.flatMap((s) => s.children.filter((r) => {
-        if (!r.summary.is_open_now) return false;
-        if (schedule_id && r.summary.schedule_id && r.summary.schedule_id !== schedule_id) return false;
-        return true;
-      }));
+		const openRounds = this.rounds.filter((r) => {
+			if (!r.summary.is_open_now) return false;
+			if (schedule_id && r.summary.schedule_id && r.summary.schedule_id !== schedule_id)
+				return false;
+			return true;
+		});
 
 		return openRounds;
 	}
 
 	checkSchedule(schedule_id: string | undefined, open: boolean = true) {
 		//Check if this competition has the given schedule_id in one of its rounds
-		return this.children.some((s) =>
-			s.children.some(
-				(r) => r.summary.schedule_id == schedule_id && (!open || r.summary.is_open_now)
-			)
+		return this.rounds.some(
+			(r) => r.summary.schedule_id == schedule_id && (!open || r.summary.is_open_now)
 		);
 	}
 
@@ -165,6 +171,12 @@ export class ContestManager {
 			this.checkSchedule(schedule_id, true) &&
 			(this.iAmCompeting || this.isMyComp) &&
 			this.competitors.length > 0
+		);
+	}
+
+	schedules() {
+		return get(library).downselect(
+			this.rounds.filter((r) => !!r.summary.schedule_id).map((r) => r.summary.schedule_id!)
 		);
 	}
 }

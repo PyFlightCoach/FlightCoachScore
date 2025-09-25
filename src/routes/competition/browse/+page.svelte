@@ -2,10 +2,13 @@
 	import CompetitionSelect from '$lib/competitions/contests/CompetitionSelect.svelte';
 	import { user } from '$lib/stores/user';
 	import { activeComp } from '$lib/stores/contests';
+
+  const filterSubset = $derived($user?.is_cd || $user?.is_superuser ? ['All', 'Mine', 'Entered', 'Open'] : ['All', 'Entered', 'Open']);
+
 </script>
 
 <CompetitionSelect
 	bind:competition={$activeComp}
-	filterSubset={['All', 'Mine', 'Entered', 'Open']}
+	{filterSubset}
 	actionSubset={['View', 'Enter']}
 />

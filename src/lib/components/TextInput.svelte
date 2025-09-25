@@ -22,7 +22,7 @@
   });
 </script>
 
-<div class="row p-2 {classappend} {isValid || !value ? '' : 'bg-warning'}">
+<div class="row mb-2 {classappend} {isValid || !value ? '' : 'bg-warning'}">
 	<label class="col-auto col-form-label" for="textInput">{name}:</label>
 	<input
 		class="col col-form-input form-control"
