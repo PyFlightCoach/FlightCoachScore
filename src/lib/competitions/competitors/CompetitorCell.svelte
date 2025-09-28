@@ -16,30 +16,33 @@
 	} = $props();
 
 	let userProperties = $state({});
-	competitor.getUser().then((res) => {
-		userProperties = res;
-	});
+	if ($user?.is_superuser) {
+		competitor.getUser().then((res) => {
+			userProperties = res;
+		});
+	}
+
 	let active = $state(false);
 </script>
 
-<td
-	class="p-0 px-2 b-0 text-nowrap"
-	role={!$activeComp?.isMyComp && !$user?.is_superuser ? '' : 'button'}
-	class:active
-	onmouseenter={() => {
-		active = true;
-	}}
-	onmouseleave={() => {
-		active = false;
-	}}
-	data-bs-toggle="dropdown"
-	aria-haspopup="true"
-	aria-expanded="false"
-	title="Competitor options"
->
-	{competitor.competitor.name}
-	<div class="dropdown-menu">
-		{#if $activeComp!.isMyComp || $user?.is_superuser}
+{#if $activeComp?.isMyComp || $user?.is_superuser}
+	<th
+		class="p-0 px-2 b-0 text-nowrap"
+		role="button"
+		class:active
+		onmouseenter={() => {
+			active = true;
+		}}
+		onmouseleave={() => {
+			active = false;
+		}}
+		data-bs-toggle="dropdown"
+		aria-haspopup="true"
+		aria-expanded="false"
+		title="Competitor options"
+	>
+		{competitor.competitor.name}
+		<div class="dropdown-menu">
 			<button
 				class="dropdown-item"
 				onclick={() => {
@@ -81,15 +84,17 @@
 					}
 				}}>Remove</button
 			>
-		{/if}
-	</div>
-	<Popup bind:show={showProperties}>
-		<DisplayDict dict={competitor.competitor} />
-	</Popup>
-	<Popup bind:show={showUserProperties}>
-		<DisplayDict bind:dict={userProperties} />
-	</Popup>
-</td>
+		</div>
+		<Popup bind:show={showProperties}>
+			<DisplayDict dict={competitor.competitor} />
+		</Popup>
+		<Popup bind:show={showUserProperties}>
+			<DisplayDict bind:dict={userProperties} />
+		</Popup>
+	</th>
+{:else}
+	<th class="p-0 px-2 b-0 text-nowrap">{competitor.competitor.name}</th>
+{/if}
 
 <style>
 	.active {

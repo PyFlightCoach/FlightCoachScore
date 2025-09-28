@@ -5,12 +5,14 @@
 		oldMeta,
 		newMeta = $bindable(),
 		showChanges = true,
-    whatAmI
+    whatAmI,
+    disabled=false
 	}: {
 		oldMeta: CompThingMeta;
 		newMeta: CompThingMeta;
 		showChanges?: boolean;
     whatAmI: string;
+    disabled?: boolean;
 	} = $props();
 
 	function hasChanged(val1: any, val2: any) {
@@ -32,13 +34,13 @@
 </script>
 
 <label class="row form-label" for="description">Description:</label>
-<textarea class="form-control mb-2 {hasChanged(newMeta?.description, oldMeta.description)}" id="description" rows="3" bind:value={description} ></textarea>
+<textarea class="form-control mb-2 {hasChanged(newMeta?.description, oldMeta.description)}" id="description" rows="3" bind:value={description} {disabled}></textarea>
 
 <div class="row mb-2">
   <label class="col col-form-label" for="startDate">Start Date:</label>
-  <input id="startDate" class="col col-form-input form-control" type="date" bind:value={start_date}/>
+  <input id="startDate" class="col col-form-input form-control" type="date" bind:value={start_date} {disabled}/>
 </div>
 <div class="row mb-2">
-  <label class="col col-form-label" for="startDate">End Date:</label>
-  <input id="startDate" class="col col-form-input  form-control" type="date" bind:value={end_date} />
+  <label class="col col-form-label" for="endDate">End Date:</label>
+  <input id="endDate" class="col col-form-input  form-control" type="date" bind:value={end_date} {disabled}/>
 </div>

@@ -32,13 +32,12 @@
 	let client_meta: CompThingMeta = $state(
 		competition?.summary.client_meta || ({} as CompThingMeta)
 	);
+	let disabled = $derived(!competition?.isMyComp);
 </script>
 
 <div class="col">
-	<small class="col p-2">
-    {#if !competition}Create{:else}Edit{/if} Competition
-  </small>
-	<TextInput name="Name" bind:value={name} />
+	<small class="col p-2">Competition Settings</small>
+	<TextInput name="Name" bind:value={name} {disabled}/>
 
 	<div class="row mb-2">
 		<label for="categorySelect" class="col col-form-label">Category:</label>
@@ -46,26 +45,29 @@
 			class="col form-select col-form-input"
 			id="categorySelect"
 			bind:value={category}
-			disabled={competition && competition.schedules().length > 0}
+			disabled={disabled || (competition && competition.schedules().length > 0)}
 		>
 			{#each categories as cat}
 				<option value={cat}>{cat.category_name}</option>
 			{/each}
 		</select>
 	</div>
-	<AddRules bind:newRule={add_rules} showChanges={competition != undefined} whatAmI="Competition" />
+	<AddRules bind:newRule={add_rules} showChanges={competition != undefined} whatAmI="Competition" {disabled}/>
 	<ResultRules
 		oldRule={result_rules}
 		bind:newRule={result_rules}
 		showChanges={competition != undefined}
 		whatAmI="Competition"
+    {disabled}
 	/>
 	<EditCompThingMeta
 		oldMeta={competition?.summary.client_meta || {}}
 		bind:newMeta={client_meta}
 		showChanges={competition != undefined}
 		whatAmI="Competition"
+    {disabled}
 	/>
+  {#if !disabled}
 	<div class="row">
 		{#if !competition}
 			<button
@@ -120,4 +122,5 @@
 			>
 		{/if}
 	</div>
+  {/if}
 </div>

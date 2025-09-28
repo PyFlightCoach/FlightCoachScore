@@ -26,10 +26,10 @@
 </script>
 
 <div class="table-responsive">
-	<table class="table table-bordered  text-nowrap">
+	<table class="table table-bordered text-nowrap text-center">
 		<thead class="table-dark">
 			<tr>
-				<th>Name</th>
+				<th class="text-start">Name</th>
         <th>Type</th>
 				<th>CD</th>
 				{#if full}<th>Start Date</th>
@@ -46,7 +46,7 @@
       {/if}
 			{#each competitions as comp}
 				<tr class="{comp.iAmCompeting ? 'table-success' : ''}">
-					<td>{comp.summary.name}</td>
+					<th  class="text-start">{comp.summary.name}</th>
           <td>
             {#await categories}
               ...
@@ -55,8 +55,9 @@
             {/await}
           </td>
 					<td>{comp.summary.directors?.map((d) => d.name)}</td>
-					{#if full}<td>{comp.summary.date_start || '-'}</td>
-						<td>{comp.summary.date_end || '-'}</td>
+					{#if full}
+            <td>{comp.summary.client_meta?.start_date || comp.summary.date_start || '-'}</td>
+						<td>{comp.summary.client_meta?.end_date ||comp.summary.date_end || '-'}</td>
 						<td>{comp.summary.fa_version}</td>
 						<td>{comp.summary.is_open_now ? 'Yes' : 'No'}</td>{/if}
 

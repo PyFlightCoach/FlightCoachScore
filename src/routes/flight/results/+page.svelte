@@ -85,7 +85,7 @@
 					privacy,
 					comment,
 					$activeFlight?.meta.flight_id,
-					pilotId,
+					pilotId || (round ? $user?.id : undefined),
 					round?.summary.id
 				);
 			})

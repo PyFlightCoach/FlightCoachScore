@@ -5,9 +5,11 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { countries, split_country } from '$lib/utils/countries.js';
 	import CheckInput from '$lib/components/CheckInput.svelte';
-	import type { CreateFakeUserRequest } from '../../api/DBInterfaces/competition';
+	import type { CompetitorMeta, CreateFakeUserRequest } from '../../api/DBInterfaces/competition';
 	import { loading } from '$lib/stores/shared';
   import { user } from '$lib/stores/user';
+	import EditCompetitorMeta from './EditCompetitorMeta.svelte';
+	import EditCompThingMeta from '../compthings/EditCompThingMeta.svelte';
 
 	interface CompetitorSearchResult {
 		id: string;
@@ -31,6 +33,9 @@
 	let emailFakeUser: boolean = $state(true);
 
 	let fakeUserComplete = $derived(fakePilotForname && fakePilotSurname && fakePilotCountry);
+
+  let competitorMeta: CompetitorMeta = $state({});
+
 
 	let formState: string | undefined = $state();
 </script>
@@ -92,7 +97,7 @@
 				</select>
 			{/if}
 			{#if !showCreateUser}
-				<div class="row p-2">
+				<div class="row mb-2">
 					<button
 						class="btn btn-outline-secondary"
 						onclick={() => {
@@ -106,9 +111,7 @@
 			{/if}
 		{:else}
 			<small>
-				Only use this form if you can't find the pilot you are looking for in the database. If the
-				pilot signs up to FCScore they will be able to link the flights in this competition with
-				their account. Click <em class="fw-bold">Back</em> to try another search.
+				Try to find the pilot in the database first, click Back to try again.
 			</small>
 			<TextInput name="First Name" bind:value={fakePilotForname} />
 			<TextInput name="Last Name" bind:value={fakePilotSurname} />
@@ -134,7 +137,12 @@
 				/>
 			{/if}
 		{/if}
-		<div class="row p-2">
+    {#if selected || fakeUserComplete || showCreateUser}
+      <div class="row mb-2">
+        <EditCompetitorMeta oldMeta={{}} bind:newMeta={competitorMeta} showChanges={false}/>
+      </div>
+    {/if}
+		<div class="row mb-2">
 			<button
 				class="col btn btn-outline-primary"
 				onclick={() => {

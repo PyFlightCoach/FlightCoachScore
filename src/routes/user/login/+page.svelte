@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { base } from '$app/paths';
-	import { goto, afterNavigate } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { goto, afterNavigate, invalidate, invalidateAll } from '$app/navigation';
 	import { user, loginUser } from '$lib/stores/user';
 	import { loading } from '$lib/stores/shared';
 
-	let previousPage: string = base || '/';
+	let previousPage: string = resolve("/");
 
 	let form_state: string | undefined;
 
 	afterNavigate(({ from }) => {
 		previousPage = from?.url.pathname || previousPage;
     if (previousPage.includes('user')) {
-      previousPage = base;
+      previousPage = resolve("/");
     }
 	});
 
@@ -22,7 +22,7 @@
     loginUser(fdata.get('email') as string, fdata.get('current-password') as string)
       .then(() => {
         form_state = undefined;
-        goto(previousPage || base);
+        goto(previousPage || resolve("/")).then(invalidateAll);
       })
       .catch((error) => {
         console.error('Login error:', error);
@@ -59,7 +59,7 @@
 			</div>
 
 			<div class="col">
-				<a href="{base}/user/password-request">Forgotten your password?</a>
+				<a href={resolve("/user/password-request")}>Forgotten your password?</a>
 			</div>
 		</div>
 	</form>
