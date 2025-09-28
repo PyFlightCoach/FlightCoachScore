@@ -20,15 +20,14 @@
 				return;
 			}
 
-			const s_country = split_country(fdata.get('country'));
+			const s_country = split_country(fdata.get('country')! as string);
 
 			const user = {
 				first_name: fdata.get('first_name'),
 				last_name: fdata.get('last_name'),
 				email: fdata.get('email'),
 				password: fdata.get('new-password'),
-				country: s_country[0],
-				country_emoji: s_country[1]
+				...s_country
 			};
 
 			form_state = undefined;

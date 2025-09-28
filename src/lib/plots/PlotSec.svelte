@@ -174,7 +174,6 @@
 		}
 	};
 
-  $inspect(range);
 </script>
 
 <div

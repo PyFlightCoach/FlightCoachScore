@@ -6,6 +6,7 @@ import { get } from 'svelte/store';
 import { BinData } from '$lib/flight/bin/bindata';
 import { isComp, type Split, takeOff} from '$lib/flight/splitting';
 import { isFullSize } from './shared';
+import type { DBSchedule } from '$lib/schedule/db';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 
@@ -16,6 +17,7 @@ export const origin: Writable<Origin | undefined> = writable(Origin.load());
 export const fcj: Writable<FCJson | undefined> = writable();
 export const states: Writable<States | undefined> = writable();
 
+export const schedule = writable<DBSchedule | undefined>();
 
 states.subscribe((sts: States | undefined) => {
 	isFullSize.set(sts ? Math.max(sts.range('z'), sts.range('x'), sts.range('y')) > 1000 : false);
@@ -23,7 +25,12 @@ states.subscribe((sts: States | undefined) => {
 
 export const manSplits: Writable<Split[]> = writable([takeOff()]);
 
-manSplits.subscribe(msplits=>{isCompFlight.set(isComp(msplits))});
+manSplits.subscribe(msplits=>{
+  const scehedule = isComp(msplits)
+  isCompFlight.set(scehedule!==undefined);
+  schedule.set(scehedule);  
+
+});
 
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);

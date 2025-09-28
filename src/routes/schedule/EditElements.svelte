@@ -27,7 +27,6 @@
 	let isPeUpdated = $derived(
 		pes.map((pe, i) => (typeof pe == 'number' ? false : !PE.compare(refpes[i] as PE, pe as PE)))
 	);
-	$inspect(pes);
 </script>
 
 {#each pes as pe, i}

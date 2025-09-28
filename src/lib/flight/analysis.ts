@@ -6,7 +6,7 @@ import {
 	blockProgress,
 	unblockProgress,
 	loading,
-  faVersion
+	faVersion
 } from '$lib/stores/shared';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
@@ -23,6 +23,8 @@ import { base } from '$app/paths';
 import { Flight } from '$lib/database/flight';
 import { takeOff } from '$lib/flight/splitting';
 import { Origin } from '$lib/flight/fcjson';
+import { cat } from '$lib/utils/files';
+import { md5 } from 'js-md5';
 
 export function checkComplete() {
 	return Boolean(
@@ -142,7 +144,7 @@ export async function newAnalysis(states: States, split: Splitting) {
 	});
 }
 
-export async function createAnalysisExport(small: boolean = false) {
+export function createAnalysisExport(small: boolean = false) {
 	return {
 		origin: get(sts.origin),
 		isComp: get(sts.isCompFlight),
@@ -154,34 +156,34 @@ export async function createAnalysisExport(small: boolean = false) {
 }
 
 export function createScoreCSV() {
-  const fl = get(activeFlight);
-  const sinfo = get(sts.analyses[1])?.schedule;
-  const lines = [
-    `#Category: ${sinfo!.category}`,
-    `#Schedule: ${sinfo!.name}`,
-    `#FAVersion: ${get(faVersion)}`,
-    `#Boot Time: ${get(sts.bootTime)?.toISOString() || 'Unknown'}`,
-    `#Pilot: ${fl?.meta.pilot_id || 'Unknown'}`,
-    `#FCSCore ID: ${fl?.meta.flight_id || 'Unknown'}`,
-    `#Dificulty: ${get(sts.difficulty)}`,
-    `#Truncate: ${get(sts.truncate)}`,
-    `#Total Score: ${get(sts.totalScore)}`,
-    'ID,Manoeuvre,K,Score'
-  ];
+	const fl = get(activeFlight);
+	const sinfo = get(sts.analyses[1])?.schedule;
+	const lines = [
+		`#Category: ${sinfo!.category}`,
+		`#Schedule: ${sinfo!.name}`,
+		`#FAVersion: ${get(faVersion)}`,
+		`#Boot Time: ${get(sts.bootTime)?.toISOString() || 'Unknown'}`,
+		`#Pilot: ${fl?.meta.pilot_id || 'Unknown'}`,
+		`#FCSCore ID: ${fl?.meta.flight_id || 'Unknown'}`,
+		`#Dificulty: ${get(sts.difficulty)}`,
+		`#Truncate: ${get(sts.truncate)}`,
+		`#Total Score: ${get(sts.totalScore)}`,
+		'ID,Manoeuvre,K,Score'
+	];
 
-  sts.analyses.forEach((ma) => {
-    const man = get(ma);
-    const score = man?.get_score(get(sts.selectedResult)!, get(sts.difficulty), get(sts.truncate));
-    lines.push(`${man?.id},${man?.name},${man?.k},${score?.total}`);
-  });
-  
-  return new Blob([lines.join('\n')], {
-    type: 'text/csv'
-  });
+	sts.analyses.forEach((ma) => {
+		const man = get(ma);
+		const score = man?.get_score(get(sts.selectedResult)!, get(sts.difficulty), get(sts.truncate));
+		lines.push(`${man?.id},${man?.name},${man?.k},${score?.total}`);
+	});
+
+	return new Blob([lines.join('\n')], {
+		type: 'text/csv'
+	});
 }
 
-export async function exportAnalysis(small: boolean = false) {
-	return new Blob([JSON.stringify(await createAnalysisExport(small), null, 2)], {
+export function exportAnalysis(small: boolean = false) {
+	return new Blob([JSON.stringify(createAnalysisExport(small), null, 2)], {
 		type: 'application/json'
 	});
 }
@@ -194,9 +196,8 @@ export async function importAnalysis(data: Record<string, any>) {
 
 	setupAnalysisArrays(data.mans.map((ma: MA) => ma.name));
 
-	data.mans.forEach(async (ma: ManDef, i: number) => {
+	await data.mans.forEach(async (ma: ManDef, i: number) => {
 		sts.runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
-
 		MA.parse(ma).then(async (res) => {
 			if (res.mdef) {
 				setAnalysis(i, res);
@@ -225,6 +226,16 @@ export async function importAnalysis(data: Record<string, any>) {
 			}
 		});
 	});
+
+	const schedule = get(sts.analyses[1])?.schedule;
+	if (schedule) {
+		sts.schedule.set(
+			get(library).subset({
+				category_name: schedule?.category,
+				schedule_name: schedule?.name
+			}).first
+		);
+	}
 }
 
 export async function loadExample() {
@@ -238,7 +249,7 @@ export async function loadExample() {
 }
 
 export async function loadAJson(flight_id: string) {
-  const zip = new JSZip();
+	const zip = new JSZip();
 	loading.set(true);
 	return await dbServer
 		.get(`flight/ajson/${flight_id}`, {
@@ -248,13 +259,16 @@ export async function loadAJson(flight_id: string) {
 		.then((response) => zip.loadAsync(response.data))
 		.then((res) => Object.values(res.files)[0].async('string'))
 		.then((ajson) => JSON.parse(ajson))
-    .finally(() => {
+		.finally(() => {
 			unblockProgress();
 			loading.set(false);
 		});
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
+	if (get(sts.manNames) && !confirm('Loading from DB will clear current analysis, continue?')) {
+		return;
+	}
 	loading.set(true);
 	await loadAJson(flight_id)
 		.then(importAnalysis)
@@ -268,16 +282,6 @@ export async function loadAnalysisFromDB(flight_id: string) {
 			unblockProgress();
 			loading.set(false);
 		});
-}
-
-export async function loadAnalysisFromHolding(holdingId: string) {
-  loading.set(true);
-  await dbServer
-    .get(`flight/holding/${holdingId}`)
-    .then((response)=>{
-      
-    })
-
 }
 
 export async function analyseMans(ids: number[]) {
@@ -299,7 +303,7 @@ export async function analyseManoeuvre(
 	id: number,
 	force: boolean = false,
 	optimise: boolean | undefined = undefined,
-  reset: boolean = false
+	reset: boolean = false
 ) {
 	const ma = get(sts.analyses[id]);
 
@@ -323,7 +327,7 @@ export async function analyseManoeuvre(
 			.run(optimise, reset)
 			.then((res) => {
 				sts.analyses[id].set(res);
-        sts.runInfo[id].set(res.runinfo);
+				sts.runInfo[id].set(res.runinfo);
 			})
 			.catch((e) => {
 				console.error(e);
@@ -335,14 +339,75 @@ export async function analyseManoeuvre(
 					return v;
 				});
 			});
-
 	}
 }
 
+export async function uploadFlight(
+	ajson: Record<string, never> | undefined = undefined,
+	bin: File,
+	privacy: string = 'view_analysis',
+	comment: string | undefined = undefined,
+	id: string | undefined = undefined,
+	userID: string | undefined = undefined,
+  roundID: string | undefined = undefined
+) {
+	const form_data = new FormData();
+  
+	if (ajson) {  
+		form_data.append(
+			'files',
+			new File(
+				[
+					new Blob([JSON.stringify(createAnalysisExport(true), null, 2)], {
+						type: 'application/octet-stream'
+					})
+				],
+				'analysis.ajson',
+				{ type: 'application/octet-stream' }
+			)
+		);
+	} else {
+		if (!id) {
+			throw new Error('Flight ID must be provided if no analysis JSON is given');
+		}
+	}
 
-export async function loadHoldingData(holdingId: string) {
- const fcj = dbServer.get(`flight/holding?holdingId=${holdingId}`)
+	if (comment) form_data.append('comment', comment);
+	if (privacy) form_data.append('privacy', privacy);
+	if (bin && !id) {
+		form_data.append('files', bin);
+	}
 
+  if (userID && roundID) {
+    return await dbServer.post(
+			`flight/competition/${roundID}/${userID}`,
+			form_data,
+			blockProgress('Uploading Analysis to Database', 'upload')
+		);
+  } else if (!id) {
+		return await dbServer.post(
+			userID ? `flight/${userID}` : 'flight',
+			form_data,
+			blockProgress('Uploading Analysis to Database', 'upload')
+		);
+	} else {
+		return await dbServer.patch(
+			`flight/${id}`,
+			form_data,
+			blockProgress('Uploading Analysis to Database', 'upload')
+		);
+	}
+}
 
-
+export async function checkDuplicate(bin: File) {
+	return cat(bin, 'readAsArrayBuffer')
+		.then((buf) => dbServer.get(`flight/check_duplicate/${md5(buf as ArrayBuffer)}`))
+		.then(() => undefined)
+		.catch((err) => {
+			if (err.status === 409) {
+				return err.response.data.detail.id;
+			} else {
+				throw err;
+			}
+		});
 }

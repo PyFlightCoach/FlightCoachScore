@@ -24,7 +24,7 @@ export class ScheduleLibrary {
 	constructor(readonly schedules: DBSchedule[] = []) {}
 
 	get length(): number {
-		return this.schedules.length;
+		return this.schedules.length || 0;
 	}
 	get first(): DBSchedule {
 		return this.schedules[0];
@@ -113,7 +113,7 @@ export async function loadSchedules(request: ScheduleRequest) {
 	await get(library)
 		.update(request)
 		.then((newlib) => {
-			console.log(`loaded schedules from ${request.owner ? request.owner : 'unknown'}`, newlib);
+			console.log(`loaded schedules from ${request.owner ? request.owner : 'unknown'}`);
 			library.set(newlib);
 		})
 		.catch((e) => {

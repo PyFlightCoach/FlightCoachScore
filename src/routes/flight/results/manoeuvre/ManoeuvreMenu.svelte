@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { base } from '$app/paths';
-	import { manNames, selManID, analyses, running } from '$lib/stores/analysis';
-  import {page} from '$app/stores';
+	import { resolve } from '$app/paths';
+	import { selManID, analyses, running } from '$lib/stores/analysis';
+  import {page} from '$app/state';
 
 	let man = analyses[$selManID!];
-	$: isRunning = $running[$selManID!];
-	const plink = (name: string) => base + '/flight/results/manoeuvre/' + name;
+	
+  const isRunning = $derived($running[$selManID!]);
+	const plink = (name: string) => resolve("/flight/results/manoeuvre/" + name) ;
 
 
-  const isLoaded = (name: string) => $page.url.pathname.endsWith(name + '/') ? 'active' : '';
+  const isLoaded = (name: string) => page.url.pathname.endsWith(name + '/') ? 'active' : '';
   
 
 </script>
@@ -23,4 +24,4 @@
       <a class="col-auto nav-link {isLoaded('templates')}" href={plink('templates')}>Templates</a>
     {/if}
 {/if}
-<a class="col-auto nav-link" href={base + '/flight/results'}>Back</a>
+<a class="col-auto nav-link" href={resolve("/flight/results")}>Back</a>

@@ -24,8 +24,8 @@
 				title="Run Remaining"
 				
 				class="btn btn-outline-primary btn-sm text-nowrap w-100"
-				on:click={() => analyseAll()}
-        on:dblclick={() => analyseAll(true)}
+				onclick={() => analyseAll()}
+        ondblclick={() => analyseAll(true)}
       >
         Run All
       </button>

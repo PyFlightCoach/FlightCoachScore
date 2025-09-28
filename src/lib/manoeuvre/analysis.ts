@@ -65,8 +65,6 @@ export class MA {
 
 	async run(optimise: boolean, reset: boolean) {
 
-
-
 		const res = (
 			await analysisServer.post('analyse', {
 				id: this.id,

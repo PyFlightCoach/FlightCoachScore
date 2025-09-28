@@ -1,0 +1,182 @@
+import type {
+	CompThingCreateUpdate,
+	CompThingSummary,
+	CreateFakeUserRequest
+} from '../../api/DBInterfaces/competition';
+import { dbServer } from '$lib/api';
+import { get } from 'svelte/store';
+import { user } from '$lib/stores/user';
+import { PilotManager } from '$lib/competitions/competitors/PilotManager';
+import { library } from '$lib/schedule/library';
+
+export class ContestManager {
+	children: ContestManager[] = [];
+	isMyComp: boolean;
+	iAmCompeting: boolean;
+	iCanEnter: boolean;
+	iCanUpload: boolean;
+	competitors: PilotManager[];
+	whatAreMyChildren: 'Stage' | 'Round' | undefined;
+
+	constructor(
+		readonly summary: CompThingSummary,
+		readonly parentID: string | undefined = undefined,
+		i_am_cd: boolean | undefined = undefined,
+		i_am_competitor: boolean | undefined = undefined,
+		i_can_upload_to: boolean | undefined = undefined
+	) {
+		this.children = (summary.children || []).map((c) => new ContestManager(c, this.summary.id));
+
+		const userID = get(user)?.id.replaceAll('-', '');
+
+		if (i_am_cd === undefined) {
+			this.isMyComp =
+				this.summary.directors?.map((d) => d.id.replaceAll('-', '')).includes(userID || '') ||
+				get(user)?.is_superuser ||
+				false;
+		} else {
+			this.isMyComp = i_am_cd!;
+		}
+
+		this.competitors =
+			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
+
+		if (i_am_competitor === undefined) {
+			this.iAmCompeting = this.summary.competitors?.some((c) => c.id == userID) || false;
+		} else {
+			this.iAmCompeting = i_am_competitor!;
+		}
+
+		if (i_can_upload_to === undefined) {
+			this.iCanUpload =
+				(this.iAmCompeting &&
+					this.summary.is_open_now &&
+					this.summary.add_rules?.cd_and_self_add) ||
+				false;
+		} else {
+			this.iCanUpload = (i_can_upload_to && this.summary.add_rules?.cd_and_self_add) || false;
+		}
+
+		this.iCanEnter = this.summary.add_rules?.cd_and_self_add || false;
+		this.whatAreMyChildren =
+			this.summary.what_am_i === 'Competition'
+				? 'Stage'
+				: this.summary.what_am_i === 'Stage'
+					? 'Round'
+					: undefined;
+	}
+
+	static async load(id: string) {
+		return await dbServer.get(`/competition/${id}`).then((res) => {
+			return new ContestManager(res.data as CompThingSummary);
+		});
+	}
+
+	static async newCompetition(data: CompThingCreateUpdate): Promise<ContestManager> {
+		return await dbServer.post('/competition', data).then((res) => {
+			return new ContestManager(res.data as CompThingSummary);
+		});
+	}
+
+	async addChild(data: CompThingCreateUpdate) {
+		return await dbServer
+			.post('/competition', { ...data, parent_id: this.summary.id })
+			.then((res) => {
+				return new ContestManager(res.data as CompThingSummary);
+			});
+	}
+
+	async delete() {
+		return dbServer.delete(`competition/${this.summary.id}`).then(() => {
+			if (this.summary.what_am_i != 'Competition') {
+				return dbServer
+					.get(`competition/${this.parentID}`)
+					.then((res) => new ContestManager(res.data as CompThingSummary));
+			}
+		});
+	}
+
+	async toggle_open() {
+		return dbServer
+			.post(`competition/round/${this.summary.is_open_now ? 'stop' : 'start'}/${this.summary.id}`)
+			.then((res) => {
+				return new ContestManager(res.data as CompThingSummary);
+			});
+	}
+
+	async update(updateRequest: CompThingCreateUpdate) {
+		return dbServer
+			.patch(`competition/${this.summary.id}`, updateRequest)
+			.then((res) => new ContestManager(res.data as CompThingSummary));
+	}
+
+	async createPilot(id_or_info: string | CreateFakeUserRequest): Promise<string> {
+		if (typeof id_or_info === 'string') {
+			return id_or_info;
+		} else {
+			return dbServer
+				.post('competition/create_fake_user', id_or_info)
+				.then((res) => res.data.id as string);
+		}
+	}
+
+	async addPilot(
+		id_or_email: string,
+		flight_order: number | undefined = undefined,
+		registration: string | undefined = undefined
+	) {
+		return dbServer
+			.post(`competition/competitor/`, {
+				comp_id: this.summary.id,
+				user_id: id_or_email,
+				flight_order,
+				registration
+			})
+			.then((res) => new ContestManager(res.data as CompThingSummary));
+	}
+
+	async addFlight(flight_id: string) {
+		return dbServer
+			.post(`competition/round/add_flight`, {
+				round_id: this.summary.id,
+				flight_id
+			})
+			.then((res) => new ContestManager(res.data as CompThingSummary));
+	}
+
+	get rounds() {
+		return this.children.map((s) => s.children).flat();
+	}
+
+	openRounds(schedule_id: string | undefined) {
+		const openRounds = this.rounds.filter((r) => {
+			if (!r.summary.is_open_now) return false;
+			if (schedule_id && r.summary.schedule_id && r.summary.schedule_id !== schedule_id)
+				return false;
+			return true;
+		});
+
+		return openRounds;
+	}
+
+	checkSchedule(schedule_id: string | undefined, open: boolean = true) {
+		//Check if this competition has the given schedule_id in one of its rounds
+		return this.rounds.some(
+			(r) => r.summary.schedule_id == schedule_id && (!open || r.summary.is_open_now)
+		);
+	}
+
+	checkCanUpload(schedule_id: string | undefined) {
+		return (
+			this.checkSchedule(schedule_id, true) &&
+			(this.iAmCompeting || this.isMyComp) &&
+			this.competitors.length > 0
+		);
+	}
+
+	schedules() {
+		return get(library).downselect(
+			this.rounds.filter((r) => !!r.summary.schedule_id).map((r) => r.summary.schedule_id!)
+		);
+	}
+}
