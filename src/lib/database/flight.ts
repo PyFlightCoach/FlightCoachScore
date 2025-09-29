@@ -46,11 +46,11 @@ export async function loadInPlotter(flight_id: string) {
 		.post('flight/holding/copy/' + flight_id)
 		.then((res) => {
 			console.log('Flight copied to holding, expiry:', res.data.detail);
-			window.open('https://flightcoach.org/viewer/plotter.html?token=' + res.data.id, '_blank');
+			window.open('https://flightcoach.org/fcviewer/plotter.html?token=' + res.data.id, '_blank');
 		})
 		.catch((err) => {
 			console.error(err);
-			alert(prettyPrintHttpError(err));
+			alert(prettyPrintHttpError(err.response.data.detail.detail));
 		});
 }
 
