@@ -32,7 +32,7 @@
 	let client_meta: CompThingMeta = $state(
 		competition?.summary.client_meta || ({} as CompThingMeta)
 	);
-	let disabled = $derived(!competition?.isMyComp);
+	let disabled = $derived(competition && !competition?.isMyComp);
 </script>
 
 <div class="col">
@@ -45,7 +45,7 @@
 			class="col form-select col-form-input"
 			id="categorySelect"
 			bind:value={category}
-			disabled={disabled || (competition && competition.schedules().length > 0)}
+			disabled={disabled || (competition && competition!.schedules().length > 0)}
 		>
 			{#each categories as cat}
 				<option value={cat}>{cat.category_name}</option>

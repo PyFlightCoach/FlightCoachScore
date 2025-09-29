@@ -90,11 +90,11 @@
 				);
 			})
 			.then((res) => res.data)
-			.then((data: FlightUploadResponse) => {
+			.then(async (data: FlightUploadResponse) => {
 				if (data.meta) {
 					$activeFlight = new Flight(data.meta, $schedule);
 				} else {
-					Flight.load(data.id).then((f) => {
+					await Flight.load(data.id).then((f) => {
 						$activeFlight = f;
 					});
 				}
