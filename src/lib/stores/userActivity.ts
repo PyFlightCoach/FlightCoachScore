@@ -1,5 +1,7 @@
 import { type Writable, writable } from "svelte/store";
 import { dbServer } from "$lib/api/api";
+import {get} from "svelte/store";
+
 
 export interface UserActivityResponse {
   id: string;
@@ -14,14 +16,13 @@ export interface UserActivityResponse {
   total_n: number;
 }
 
-export const userActivity: Writable<UserActivityResponse[]> = writable([]);
-let loadingActivity = false;
+export const userActivity: Writable<UserActivityResponse[] | undefined> = writable();
+let loadingActivity: boolean = false;
+
 export async function requestActivity() {
-  if (loadingActivity) {
-    return;
-  }
-  loadingActivity = true;  
-  await dbServer
+  if (!get(userActivity) && !loadingActivity) {
+    loadingActivity = true;
+    await dbServer
     .get('/analysis/user_activity')
     .then((res) => {
       console.log("User activity loaded");
@@ -34,6 +35,8 @@ export async function requestActivity() {
     .finally(() => {
       loadingActivity = false;
     });
+  }
+  
 };
 
 export async function clearActivity() {
