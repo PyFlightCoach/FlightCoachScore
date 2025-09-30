@@ -96,7 +96,7 @@ export async function loadGuiLists() {
 	await dbServer
 		.get('analysis/guilists')
 		.then((res) => {
-			allFAVersions.set(res.data.fa_versions);
+			allFAVersions.set((res.data.fa_versions as string[]).filter(v=>v.split(".").length==3)); // || (get(dev))
 			activeScheduleIDs.set(res.data.active_schedule_ids);
       loadedGuiLists.set(true);
 		})
