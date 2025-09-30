@@ -4,6 +4,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { user } from '$lib/stores/user';
   import {base} from '$app/paths';
+	import DisplayDict from '$lib/components/DisplayDict.svelte';
 
 	let form_state: string | undefined = undefined;
 
@@ -163,4 +164,20 @@
 			<button type="submit" class="btn btn-primary">Update Password</button>
 		</div>
 	</form>
+
+  <div class="row border rounded mt-4">
+      <div class="row mt-3 mb-3">
+    {#await dbServer.get('/users/me/viewsstats')}
+      <div></div>
+    {:then res}
+
+        <span>Hours: {res.data.results[0].hours}</span>
+        <span>Views: {res.data.results[0].views}</span>
+        <span>Remaining Views: {res.data.results[0].remaining_views}</span>
+        
+
+    {/await}
+    <span>To delete your account, please email <a href="mailto:admin@flightcoachscore.org">admin@fcscore.org</a></span>
+    </div>
+  </div>
 </div>

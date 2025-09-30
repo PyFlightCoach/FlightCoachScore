@@ -1,5 +1,7 @@
 <script lang="ts">
-	let { children, show = $bindable(false) }: { children: any; show: boolean } = $props();
+	let { children, show = $bindable() }: { children: any; show: any | undefined } = $props();
+
+
 </script>
 
 {#if show}
