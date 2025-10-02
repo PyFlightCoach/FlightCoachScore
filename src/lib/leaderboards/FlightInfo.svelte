@@ -12,6 +12,7 @@
 	import { windowWidth, blockProgress } from '$lib/stores/shared';
 	import { saveAs } from 'file-saver';
 	import JSZip from 'jszip';
+	import { prettyPrintHttpError } from '$lib/utils/text';
 
 	let { f = $bindable(), rank = $bindable() }: { f: Flight; rank: number | undefined } = $props();
 
@@ -114,7 +115,15 @@
 					if (isAnalysisLoaded) {
 						goto(resolve('/flight/results'));
 					} else {
-						loadAnalysisFromDB(f.meta.flight_id);
+            $loading = true;
+						loadAnalysisFromDB(f.meta.flight_id)
+            .then(()=>{
+              goto(resolve('/flight/results'));
+            })
+            .catch((err) => {prettyPrintHttpError(err)})
+            .finally(() => {
+							$loading = false;
+						});
 					}
 				}}
 			>

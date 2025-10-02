@@ -83,7 +83,6 @@
 					class="form-select"
 					id="selectUser"
 					size="3"
-					autofocus
 					bind:value={selected}
 					onchange={() => {
 						showCreateUser = false;

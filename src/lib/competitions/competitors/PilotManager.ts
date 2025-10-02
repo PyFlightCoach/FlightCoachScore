@@ -2,6 +2,7 @@ import type { Competitor } from '$lib/api/DBInterfaces/competition';
 import { dbServer } from '$lib/api';
 import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 import type { DBUser } from '$lib/stores/user';
+import type { CompThingSummary } from '$lib/api/DBInterfaces/competition';
 
 export class PilotManager {
 	user: DBUser | undefined = undefined;
@@ -13,10 +14,18 @@ export class PilotManager {
 	async delete() {
 		return dbServer
 			.delete(`competition/competitor/${this.parentID}/${this.competitor.id}`)
-			.then(() => {
-				return ContestManager.load(this.parentID);
+			.then((res) => {
+				return new ContestManager(res.data as CompThingSummary);
 			});
 	}
+
+  async deleteScore() {
+    return dbServer
+      .delete(`competition/round/remove_flight/${this.parentID}/${this.competitor.competitor_id}`)
+      .then((res) => {
+				return new ContestManager(res.data as CompThingSummary);
+			});
+  }
 
 	async getUser() {
 		if (!this.user) {

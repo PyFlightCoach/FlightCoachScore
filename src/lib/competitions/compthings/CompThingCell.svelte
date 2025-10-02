@@ -70,7 +70,7 @@
 							.then(setComp)
 							.catch((err) => {
 								alert(
-									`Failed to ${thing.summary.is_open_now ? 'close' : 'open'} ${thing.summary.what_am_i}: ${err.response?.data?.detail || err}`
+									`Failed to ${thing.summary.is_open_now ? 'close' : 'open'} ${thing.summary.what_am_i}: ${prettyPrintHttpError(err)}`
 								);
 							});
 					}}

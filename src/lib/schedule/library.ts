@@ -1,4 +1,4 @@
-import { dbServer, servers } from '$lib/api/api';
+import { dbServer } from '$lib/api/api';
 import { ManDef, ManOpt } from '$lib/manoeuvre/definition.svelte';
 import { writable, type Writable } from 'svelte/store';
 import { get } from 'svelte/store';
@@ -106,10 +106,8 @@ export class ScheduleLibrary {
 }
 
 export const library: Writable<ScheduleLibrary> = writable(new ScheduleLibrary());
-export const loadedSchedules: Writable<boolean | string> = writable(false);
 
 export async function loadSchedules(request: ScheduleRequest) {
-  loadedSchedules.set(false);
 	await get(library)
 		.update(request)
 		.then((newlib) => {
@@ -124,11 +122,8 @@ export async function loadSchedules(request: ScheduleRequest) {
 
 export async function reloadSchedules() {
 	library.set(new ScheduleLibrary());
-  loadedSchedules.set(false);
 	await loadSchedules({ owner: 'admin@fcscore.org' })
-    .then(() => loadedSchedules.set(true))
     .catch((e) => {
-      loadedSchedules.set(`${e.message}, Failed to load schedules.`);
       throw new Error('Failed to reload schedules', e);
     });
 

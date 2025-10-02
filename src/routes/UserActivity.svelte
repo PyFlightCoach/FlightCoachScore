@@ -46,9 +46,6 @@
 										scheduleSummary[row.best_rank_schedule_id],
 										false
 									)}
-									<!--
-              {@render rankinfo(row.best_norm_rank, $library.subset({schedule_id: row.best_norm_rank_schedule_id}).first, true)}
-            -->
 								</tr>
 							{/if}
 						{/each}

@@ -50,7 +50,7 @@ export async function loadInPlotter(flight_id: string) {
 		})
 		.catch((err) => {
 			console.error(err);
-			alert(prettyPrintHttpError(err.response.data.detail.detail));
+			alert(prettyPrintHttpError(err));
 		});
 }
 
