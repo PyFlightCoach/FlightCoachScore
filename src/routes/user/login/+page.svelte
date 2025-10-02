@@ -22,7 +22,7 @@
     loginUser(fdata.get('email') as string, fdata.get('current-password') as string)
       .then(() => {
         form_state = undefined;
-        goto(previousPage || resolve("/")).then(invalidateAll);
+        goto(previousPage || resolve("/"));
       })
       .catch((error) => {
         console.error('Login error:', error);

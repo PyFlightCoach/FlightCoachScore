@@ -36,7 +36,7 @@
 			: undefined
 	);
 
-	let disabled = $derived(!round?.isMyComp);
+	let disabled = $derived(round && !round?.isMyComp);
 </script>
 
 <div class="col">

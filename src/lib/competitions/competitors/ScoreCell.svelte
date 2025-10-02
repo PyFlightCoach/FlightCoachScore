@@ -107,10 +107,10 @@
 					class="dropdown-item"
 					onclick={() => {
 						competitor
-							.delete()
+							.deleteScore()
 							.then(setComp)
 							.catch((err) => {
-								alert('Failed to Delete: ' + prettyPrintHttpError(res));
+								alert('Failed to Delete: ' + prettyPrintHttpError(err));
 							});
 					}}>Unlink</button
 				>

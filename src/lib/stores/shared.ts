@@ -5,9 +5,7 @@ import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
 import { dbServer, analysisServer} from '$lib/api';
 import {get} from 'svelte/store';
-import { loadedSchedules } from '$lib/schedule/library';
-import { reloadSchedules } from '$lib/schedule/library';
-import { requestActivity } from '$lib/stores/userActivity';
+import { library, reloadSchedules } from '$lib/schedule/library';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -139,7 +137,7 @@ function checkServerDataLoaded(msg: boolean | string) {
       val = msg;
     }
   } else {
-    if (get(loadedGuiLists)==true && get(loadedRules)==true && get(loadedSchedules)==true && get(loadedFAVersion)==true) {
+    if (get(loadedGuiLists)==true && get(loadedRules)==true && get(library).length && get(loadedFAVersion)==true) {
       val = true;
     } 
   }
@@ -147,7 +145,6 @@ function checkServerDataLoaded(msg: boolean | string) {
 }
 loadedGuiLists.subscribe(checkServerDataLoaded);
 loadedRules.subscribe(checkServerDataLoaded);
-loadedSchedules.subscribe(checkServerDataLoaded);
 loadedFAVersion.subscribe(checkServerDataLoaded); 
 
 

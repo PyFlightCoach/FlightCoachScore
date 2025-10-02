@@ -130,7 +130,7 @@ export class ContestManager {
 				comp_id: this.summary.id,
 				user_id: id_or_email,
 				flight_order,
-				registration
+				client_meta: registration ? { registration } : {}
 			})
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}

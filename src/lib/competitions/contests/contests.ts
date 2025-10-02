@@ -28,7 +28,7 @@ export async function listComps(
 	};
 
 	return dbServer
-		.get('/competition/list/', {params})
+		.get('/competition/list', {params})
 		.then((comps) =>
 			comps.data?.results.filter((c: CompListResponse) => {
 				if (category_id && c.compthing.category_id != category_id) {

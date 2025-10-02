@@ -269,19 +269,13 @@ export async function loadAnalysisFromDB(flight_id: string) {
 	if (get(sts.manNames) && !confirm('Loading from DB will clear current analysis, continue?')) {
 		return;
 	}
-	loading.set(true);
-	await loadAJson(flight_id)
+	return loadAJson(flight_id)
 		.then(importAnalysis)
 		.then(() => Flight.load(flight_id))
 		.then((flight) => {
 			dataSource.set('db');
 			activeFlight.set(flight);
-			goto(`${base}/flight/results`);
 		})
-		.finally(() => {
-			unblockProgress();
-			loading.set(false);
-		});
 }
 
 export async function analyseMans(ids: number[]) {

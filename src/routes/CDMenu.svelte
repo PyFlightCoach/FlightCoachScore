@@ -36,7 +36,7 @@
 			{#each $myComps as comp}
 				<a
 					class="dropdown-item"
-					href={resolve('/competition/load') + `/?id=${comp.summary.id}`}
+					href={resolve('/competition/view') + `/?id=${comp.summary.id}`}
 					data-sveltekit-preload-data="tap">{comp.summary.name}</a
 				>
 			{/each}
@@ -49,7 +49,7 @@
 			{#each $enteredComps as comp}
 				<a
 					class="dropdown-item"
-					href={resolve('/competition/load') + `/?id=${comp.summary.id}`}
+					href={resolve('/competition/view') + `/?id=${comp.summary.id}`}
 					data-sveltekit-preload-data="tap">{comp.summary.name}</a
 				>
 			{/each}
