@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { binData, origin, fcj, bin, bootTime, states, manSplits } from '$lib/stores/analysis';
-	import { clearDataLoading } from '$lib/flight/analysis';
+	import { checkDuplicate, clearDataLoading, loadAnalysisFromDB } from '$lib/flight/analysis';
 	import { dataSource, isFullSize } from '$lib/stores/shared';
 	import FlightDataReader from '$lib/flight/FlightDataReader.svelte';
 	import { BoxReader } from '$lib/flight/box';
 	import { MapPlot } from '$lib/plots/map';
 	import PlanViewPlot from '$lib/plots/PlanViewPlot.svelte';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { GPS } from '$lib/utils/geometry';
 	import { States } from '$lib/utils/state';
 	import { goto } from '$app/navigation';
 	import { parseFCJMans, loadManDefs } from '$lib/flight/splitting';
 	import { Origin } from '$lib/flight/fcjson';
 	import BinReader from '$lib/flight/bin/BinReader.svelte';
-	import { dbServer } from '$lib/api';
 	import { Point } from '$lib/utils/geometry';
+	import { user } from '$lib/stores/user';
 
 	let inputMode: 'bin' | 'fcj' | 'state' | 'acrowrx' = $state('bin');
 	let siteInputMode: 'fcsites' | 'fcj' | 'pc' | 'ph' = $state('ph');
@@ -105,26 +105,29 @@
 		<div class="col col-form-input" style:overflow="hidden" id="data-file-input">
 			{#if inputMode == 'bin'}
 				<BinReader
-					bin={$bin}
 					onloaded={(...data) => {
 						reset();
 						let md5: string;
 						[$bin, $binData, $bootTime, md5] = data;
-						dbServer
-							.get(`flight/check_duplicate/${md5}`)
-							.then((r) => {
-								return r.statusText != 'OK';
-							})
-							.catch((e) => {
-								return true;
-							})
-							.then((isDuplicate) => {
-								if (isDuplicate) {
-									form_state =
-										'This bin file already exists on the server, You can analyse the flight but you wont be able to upload it.';
+						checkDuplicate($bin).then((id) => {
+							if (id) {
+								if (
+									$user?.is_verified &&
+									confirm(
+										'This BIN File already exists on the server, do you want to load the existing analysis?'
+									)
+								) {
+									loadAnalysisFromDB(id).then(() => {
+										goto(resolve('/flight/results'));
+									});
+								} else {
 									$bin = undefined;
+									form_state =
+										'This BIN file already exists on the server, you can score it, but you wont be able to upload it.';
 								}
-							});
+								$bin = undefined;
+							}
+						});
 						$origin = checkOrigin($origin, true);
 					}}
 				/>
@@ -135,9 +138,9 @@
 						reset();
 						$fcj = _fcj;
 						$states = _states;
-            shiftx = 0;
-            shifty = 0;
-            shiftz = 0;
+						shiftx = 0;
+						shifty = 0;
+						shiftz = 0;
 						$origin = $fcj?.origin || $origin;
 						form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
 					}}
@@ -170,9 +173,9 @@
 		<hr />
 	{/if}
 
-	{#if inputMode=="acrowrx" && $states}
-    <p>Shift Box:</p>
-    <table class="table table-sm text-center">
+	{#if inputMode == 'acrowrx' && $states}
+		<p>Shift Box:</p>
+		<table class="table table-sm text-center">
 			<tbody>
 				<tr>
 					<td>X</td>
@@ -181,13 +184,28 @@
 				</tr>
 				<tr>
 					<td class="p-0"
-						><input class="form-control w-100 text-center" type="number" bind:value={shiftx} step="10" /></td
+						><input
+							class="form-control w-100 text-center"
+							type="number"
+							bind:value={shiftx}
+							step="10"
+						/></td
 					>
 					<td class="p-0"
-						><input class="form-control w-100  text-center" type="number" bind:value={shifty} step="10" /></td
+						><input
+							class="form-control w-100 text-center"
+							type="number"
+							bind:value={shifty}
+							step="10"
+						/></td
 					>
 					<td class="p-0"
-						><input class="form-control w-100 text-center" type="number" bind:value={shiftz} step="10" /></td
+						><input
+							class="form-control w-100 text-center"
+							type="number"
+							bind:value={shiftz}
+							step="10"
+						/></td
 					>
 				</tr>
 			</tbody>
@@ -209,13 +227,13 @@
 						$states = States.from_xkf1($origin, $binData.orgn, $binData.xkf1);
 					}
 
-          $states = $states!.shift(new Point(shiftx, shifty, shiftz));
-          shiftx = 0;
-          shifty = 0;
-          shiftz = 0;
+					$states = $states!.shift(new Point(shiftx, shifty, shiftz));
+					shiftx = 0;
+					shifty = 0;
+					shiftz = 0;
 					if ($fcj) $manSplits = await parseFCJMans($fcj, $states!).then(loadManDefs);
 
-					goto(base + '/flight/create/manoeuvres');
+					goto(resolve('/flight/create/manoeuvres'));
 				}}
 			>
 				Next
@@ -228,6 +246,6 @@
 	{#if ($origin && !$states) || $binData}
 		<MapPlot bind:origin={$origin} bind:binData={$binData} />
 	{:else if $states}
-		<PlanViewPlot shiftx={shiftx} shifty={shifty} shiftz={shiftz} />
+		<PlanViewPlot {shiftx} {shifty} {shiftz} />
 	{/if}
 </div>
