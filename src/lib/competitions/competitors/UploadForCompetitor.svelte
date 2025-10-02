@@ -24,7 +24,6 @@
 
 	let openRounds = $derived(competition?.openRounds(schedule?.schedule_id) || []);
   
-  $inspect("openRounds", openRounds);
 	let openRound = $derived(
 		competition?.children
 			.find((s) => s.summary.is_open_now)
@@ -84,16 +83,16 @@
 			</select>
 		</div>
 		{#if competition.isMyComp || $user?.is_superuser}
-			<div class="row mb-2 px-2">
-				<label class="col-auto col-form-label" for="selectUser">Select Pilot:</label>
-				<select class="col form-select" id="selectUser" size="5" bind:value={competitor}>
+			
+				<label class="px-2" for="selectUser">Select Pilot:</label>
+				<select class="px-2 form-select" id="selectUser" size="5" bind:value={competitor}>
 					{#each openRound?.competitors || [] as competitor}
-						<option value={competitor}>
-							{competitor.competitor.flight_order}, {competitor.competitor.name}
+						<option value={competitor} class={competitor?.competitor.raw_score ? 'text-muted' : ''} >
+              {competitor.competitor.flight_order}, {competitor.competitor.name}
 						</option>
 					{/each}
 				</select>
-			</div>
+			
 		{/if}
 	{/if}
 {/if}

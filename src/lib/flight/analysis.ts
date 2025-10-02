@@ -266,6 +266,9 @@ export async function loadAJson(flight_id: string) {
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
+  if (flight_id == get(activeFlight)?.meta.flight_id) {
+    return; //already loaded
+  }
 	if (get(sts.manNames) && !confirm('Loading from DB will clear current analysis, continue?')) {
 		return;
 	}
@@ -373,19 +376,19 @@ export async function uploadFlight(
 	}
 
   if (userID && roundID) {
-    return await dbServer.post(
+    return dbServer.post(
 			`flight/competition/${roundID}/${userID}`,
 			form_data,
 			blockProgress('Uploading Analysis to Database', 'upload')
 		);
   } else if (!id) {
-		return await dbServer.post(
+		return dbServer.post(
 			userID ? `flight/${userID}` : 'flight',
 			form_data,
 			blockProgress('Uploading Analysis to Database', 'upload')
 		);
 	} else {
-		return await dbServer.patch(
+		return dbServer.patch(
 			`flight/${id}`,
 			form_data,
 			blockProgress('Uploading Analysis to Database', 'upload')

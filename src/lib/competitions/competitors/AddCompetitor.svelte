@@ -10,6 +10,7 @@
   import { user } from '$lib/stores/user';
 	import EditCompetitorMeta from './EditCompetitorMeta.svelte';
 	import EditCompThingMeta from '../compthings/EditCompThingMeta.svelte';
+	import { prettyPrintHttpError } from '$lib/utils/text';
 
 	interface CompetitorSearchResult {
 		id: string;
@@ -137,9 +138,7 @@
 			{/if}
 		{/if}
     {#if selected || fakeUserComplete || showCreateUser}
-      <div class="row mb-2">
-        <EditCompetitorMeta oldMeta={{}} bind:newMeta={competitorMeta} showChanges={false}/>
-      </div>
+      <EditCompetitorMeta oldMeta={{}} bind:newMeta={competitorMeta} showChanges={false}/>
     {/if}
 		<div class="row mb-2">
 			<button
@@ -182,7 +181,7 @@
 						})
 						.catch((e) => {
               console.log(e);
-							formState = `Failed to add pilot: ${e.response?.data?.detail[0].msg || e}`;
+							formState = `Failed to add pilot: ${prettyPrintHttpError(e)}`;
 						})
             .finally(() => { $loading = false;});
 				}}

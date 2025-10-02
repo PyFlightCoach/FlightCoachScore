@@ -60,6 +60,14 @@
 			$isAnalysisModified ||
 			false
 	);
+	$inspect(
+		'comment',
+		$activeFlight?.meta.comment != comment,
+		'privacy',
+		$activeFlight?.meta.privacy != privacy,
+		'$isAnalysisModified',
+		$isAnalysisModified
+	);
 
 	const canI = $derived($user?.is_verified && (isMine || isNew || $user?.is_superuser));
 
@@ -73,6 +81,20 @@
 	let pilotId: string | undefined = $state();
 
 	$inspect('pilotId:', pilotId, 'round:', round);
+	$inspect(
+		'isNew',
+		isNew,
+		'isUpdated',
+		isUpdated,
+		'canI',
+		canI,
+		'$isComplete',
+		$isComplete,
+		'$isCompFlight',
+		$isCompFlight,
+		'$dataSource',
+		$dataSource
+	);
 
 	const upload = async () => {
 		checkUser(false, false, false)
@@ -91,8 +113,9 @@
 			})
 			.then((res) => res.data)
 			.then(async (data: FlightUploadResponse) => {
+        $isAnalysisModified = false;
 				if (data.meta) {
-					$activeFlight = new Flight(data.meta, $schedule);
+					$activeFlight = new Flight(data.meta, $schedule!);
 				} else {
 					await Flight.load(data.id).then((f) => {
 						$activeFlight = f;
@@ -101,8 +124,7 @@
 
 				form_state = 'Upload Successful';
 				if (data.compthing) {
-					setComp(new ContestManager(data.compthing));
-					goto(resolve(`/competition/view`));
+					goto(resolve(`/competition/view`) + `/?id=${data.compthing.id}`);
 				} else {
 					postUploadSearch();
 					goto(resolve('/database/query/leaderboards'));

@@ -3,11 +3,12 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 import { get } from 'svelte/store';
+import { checkUser } from '$lib/stores/user.js';
 
 export async function load({ url }) {
 	const id = url.searchParams.get('id');
-
-	if (id && id !== get(activeComp)?.summary.id) {
+  await checkUser();
+	if (id) {
 		await ContestManager.load(url.searchParams.get('id') || '')
 			.then((manager) => {
 				activeComp.set(manager);

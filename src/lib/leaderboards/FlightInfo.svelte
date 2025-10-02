@@ -112,19 +112,13 @@
 				class="form-control btn btn-outline-secondary {canAnalyse ? '' : 'disabled'}"
 				data-sveltekit-preload-data="tap"
 				onclick={() => {
-					if (isAnalysisLoaded) {
-						goto(resolve('/flight/results'));
-					} else {
-            $loading = true;
-						loadAnalysisFromDB(f.meta.flight_id)
-            .then(()=>{
-              goto(resolve('/flight/results'));
-            })
-            .catch((err) => {prettyPrintHttpError(err)})
-            .finally(() => {
-							$loading = false;
+					loadAnalysisFromDB(f.meta.flight_id)
+						.then(() => {
+							goto(resolve('/flight/results'));
+						})
+						.catch((err) => {
+							alert('Failed to load analysis: ' + prettyPrintHttpError(err));
 						});
-					}
 				}}
 			>
 				View Analysis

@@ -5,6 +5,7 @@
 		classappend = '',
 		disabled = false,
 		title = '',
+    required = false,
 		validator = (email: string | undefined) => true,
     isValid = $bindable(true)
 	}: {
@@ -13,6 +14,7 @@
 		classappend?: string;
 		disabled?: boolean;
 		title?: string;
+    required?: boolean;
 		validator?: (email: string | undefined) => boolean;
 		isValid?: boolean;
 	} = $props();
@@ -29,7 +31,7 @@
 		id="textInput"
 		type="text"
 		bind:value
-		required
+		{required}
 		{disabled}
 		{title}
     onchange={() => { isValid = validator(value); }}

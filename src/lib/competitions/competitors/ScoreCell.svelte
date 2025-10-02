@@ -12,6 +12,8 @@
 	import { Flight } from '$lib/database/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let { round, competitorID }: { round: ContestManager; competitorID: string } = $props();
 
@@ -56,11 +58,15 @@
 		disabled={!round.summary.is_open_now && !competitor?.competitor.raw_score}
 	>
 		{#if competitor?.competitor.raw_score}
-			<div class={competitor?.competitor.score_dropped ? 'text-decoration-line-through text-secondary' : ''}>
+			<div
+				class={competitor?.competitor.score_dropped
+					? 'text-decoration-line-through text-secondary'
+					: ''}
+			>
 				{#if showRaw}{competitor.competitor.raw_score.toFixed(2)},
 				{/if}
 				{competitor.competitor.normalised_score?.toFixed(2)}
-      </div>
+			</div>
 		{:else}
 			...
 		{/if}
@@ -95,7 +101,15 @@
 						{#if flight.meta.privacy !== 'view_flown' || $user?.is_superuser || flight.isMine}
 							<button
 								class="dropdown-item"
-								onclick={() => loadAnalysisFromDB(competitor.competitor.flight_id!)}
+								onclick={() => {
+									loadAnalysisFromDB(competitor.competitor.flight_id!)
+                  .then(() => {
+                    goto(resolve('/flight/results'));
+                  })
+                  .catch((err) => {
+                    prettyPrintHttpError(err);
+                  });     
+								}}
 								disabled={!competitor.competitor.flight_id}>View Analysis</button
 							>
 						{/if}

@@ -126,7 +126,7 @@ export class ContestManager {
 		registration: string | undefined = undefined
 	) {
 		return dbServer
-			.post(`competition/competitor/`, {
+			.post(`competition/competitor`, {
 				comp_id: this.summary.id,
 				user_id: id_or_email,
 				flight_order,
