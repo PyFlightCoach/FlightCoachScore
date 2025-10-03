@@ -42,7 +42,10 @@
 	class="text-center text-nowrap p-0 px-2 b-0"
 	class:active
 	onmouseenter={() => {
-		active = true;
+    if (!competitor?.competitor.missed_cut) {
+      active = true;
+    }
+		
 	}}
 	onmouseleave={() => {
 		active = false;
@@ -55,7 +58,7 @@
 		aria-haspopup="true"
 		aria-expanded="false"
 		title="Score options"
-		disabled={!round.summary.is_open_now && !competitor?.competitor.raw_score}
+		disabled={(!round.summary.is_open_now && !competitor?.competitor.raw_score) || competitor?.competitor.missed_cut }
 	>
 		{#if competitor?.competitor.raw_score}
 			<div
@@ -67,7 +70,7 @@
 				{/if}
 				{competitor.competitor.normalised_score?.toFixed(2)}
 			</div>
-		{:else}
+		{:else if !competitor?.competitor.missed_cut}
 			...
 		{/if}
 	</button>
