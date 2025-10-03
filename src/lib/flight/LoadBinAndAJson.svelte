@@ -36,7 +36,6 @@
 						loadAnalysisFromDB(id);
 						onload();
 					}
-					binfile = undefined;
 					$bin = undefined;
 				}
 			});

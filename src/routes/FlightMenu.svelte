@@ -4,7 +4,6 @@
 	import {
 		exportAnalysis,
 		loadExample,
-		importAnalysis,
 		clearDataLoading
 	} from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
