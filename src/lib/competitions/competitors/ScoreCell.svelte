@@ -144,7 +144,7 @@
 			</button>
 		{/if}
 	</div>
-	<Popup show={showDBLinkMenu}>
+	<Popup bind:show={showDBLinkMenu}>
 		<LinkDbFlight {round} {competitor} />
 	</Popup>
 	<Popup bind:show={showProperties}>
