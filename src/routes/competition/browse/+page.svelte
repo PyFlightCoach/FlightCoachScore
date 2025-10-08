@@ -2,8 +2,9 @@
 	import CompetitionSelect from '$lib/competitions/contests/CompetitionSelect.svelte';
 	import { user } from '$lib/stores/user';
 	import { activeComp } from '$lib/stores/contests';
-
-	const filterSubset: ('All' | 'Mine' | 'Entered' | 'Open')[] = $derived(
+  import type { ContestGroup } from '$lib/competitions/contests/contests';
+	
+	const filterSubset: ContestGroup[] = $derived(
 		$user?.is_cd || $user?.is_superuser
 			? ['All', 'Mine', 'Entered', 'Open']
 			: ['All', 'Entered', 'Open']

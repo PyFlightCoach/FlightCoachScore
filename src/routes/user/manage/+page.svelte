@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api/api.js';
-	import { invalidateAll } from '$app/navigation';
 	import type { DBUser } from '$lib/stores/user';
 	import Popup from '$lib/components/Popup.svelte';
 	import { prettyPrintHttpError } from '$lib/utils/text';
-
-	let pageMode: string = $state('list');
-	let formState: string | undefined = $state(undefined);
 
 	let users: DBUser[] | undefined = $state();
 
@@ -25,7 +21,7 @@
 			)
 		) {
 			dbServer
-				.patch(`users/${user.id}`, item)
+				.patch(`users/su_patch/${user.id}`, item)
 				.then((res) => {
 					activeUser = res.data;
 					loadUsers();

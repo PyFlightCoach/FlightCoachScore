@@ -1,4 +1,3 @@
-import { objmap } from '$lib/utils/arrays';
 
 export const elementKinds = ['Line', 'Loop', 'Snap', 'Spin', 'Stallturn'];
 export type ElementKind = (typeof elementKinds)[number];

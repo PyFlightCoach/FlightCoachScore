@@ -2,9 +2,7 @@
 
 	import NumberInput from '$lib/manoeuvre/special_inputs/NumberInput.svelte';
 	import * as inputs from '$lib/manoeuvre/special_inputs/inputs';
-	import ArrayInput from '$lib/manoeuvre/special_inputs/ArrayInput.svelte';
 	import type { ManBuilder } from '$lib/manoeuvre/builder.svelte';
-	import { objmap } from '$lib/utils/arrays';
 
 	let {
 		newComps = $bindable(),

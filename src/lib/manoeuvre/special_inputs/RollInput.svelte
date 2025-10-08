@@ -30,7 +30,7 @@
 		inputMode == 'point' ? inputs.re_point_roll.test(value as string) : true
 	);
   
-  const allowedMPS = $derived(objfilter(mpValues, (v)=>v.unit=='rad'));
+  const allowedMPS = $derived(objfilter(mpValues, (_, v)=>v.unit=='rad'));
 
 </script>
 

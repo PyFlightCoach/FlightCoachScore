@@ -7,8 +7,7 @@ import { selectedResult, binData, origin } from '$lib/stores/analysis';
 import { get } from 'svelte/store';
 import { isAnalysisModified } from '$lib/stores/shared';
 import { Manoeuvre } from './raw.svelte';
-import { objfilter, objmap } from '$lib/utils/arrays';
-import { isValidVersion } from '$lib/utils/text';
+import { objmap } from '$lib/utils/arrays';
 
 
 export class MA {
@@ -143,7 +142,7 @@ export class MA {
 			data.flown[data.flown.length - 1].t,
 			Object.setPrototypeOf(data.schedule, ScheduleInfo.prototype),
 			data.schedule_direction,
-      objmap(data.history, FCJManResult.parse),
+      objmap(data.history, (_, v)=>FCJManResult.parse(v as Record<string, any>)),
 			data.mdef?.info.k,
 			data.flown ? States.parse(data.flown) : undefined,
 			data.mdef ? ManDef.parse(data.mdef) : undefined,
@@ -159,6 +158,3 @@ export class MA {
 }
 
 
-export function stripDevVersions(history: Record<string, FCJManResult>) {
-  return objfilter(history, res=>isValidVersion(res.fa_version))
-}

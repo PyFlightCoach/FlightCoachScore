@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PilotManager } from '$lib/competitions/competitors/PilotManager';
-	import { activeFlight } from '$lib/stores/shared';
+	import { activeFlight, loading, unblockProgress } from '$lib/stores/shared';
 	import { bin, isCompFlight, bootTime, isComplete } from '$lib/stores/analysis';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import Popup from '$lib/components/Popup.svelte';
@@ -106,12 +106,6 @@
 								class="dropdown-item"
 								onclick={() => {
 									loadAnalysisFromDB(competitor.competitor.flight_id!)
-                  .then(() => {
-                    goto(resolve('/flight/results'));
-                  })
-                  .catch((err) => {
-                    prettyPrintHttpError(err);
-                  });     
 								}}
 								disabled={!competitor.competitor.flight_id}>View Analysis</button
 							>

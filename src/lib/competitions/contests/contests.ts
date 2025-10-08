@@ -16,7 +16,7 @@ export type ContestGroup = keyof typeof contestGroups;
 export async function listComps(
 	group: ContestGroup = 'All',
 	category_id: string | undefined = undefined
-) {
+): Promise<ContestManager[]> {
 	const params: CompListRequest = {
 		n_days: undefined,
 		date_after: undefined,

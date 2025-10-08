@@ -36,6 +36,8 @@
 			)
 		)
 	);
+
+  $inspect(category);
 </script>
 
 <div class="container-auto">
@@ -58,9 +60,10 @@
 				...
 			{:then cats}
 				<label for="category-select" class="col-auto col-form-label">Category:</label>
-				<select class="col form-input form-select" id="category-select">
-					{#each cats as cat}
-						<option value={cat.category_id} selected={cat.category_id === category}
+				<select class="col form-input form-select" id="category-select" bind:value={category}>
+          <option value="All">ALL</option>
+					{#each cats  as cat}
+						<option value={cat.category_id}
 							>{cat.category_name.toUpperCase()}</option
 						>
 					{/each}
