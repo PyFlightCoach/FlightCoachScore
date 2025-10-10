@@ -28,7 +28,6 @@
 {#if $activeComp?.isMyComp || $user?.is_superuser}
 	<th
 		class="p-0 px-2 b-0 text-nowrap"
-		role="button"
 		class:active
 		onmouseenter={() => {
 			active = true;
@@ -36,26 +35,27 @@
 		onmouseleave={() => {
 			active = false;
 		}}
-		data-bs-toggle="dropdown"
-		aria-haspopup="true"
-		aria-expanded="false"
-		title="Competitor options"
 	>
-		{competitor.competitor.name}
+    <button 
+      class="btn btn-link text-dark w-100 text-nowrap text-decoration-none m-0 text-start fw-bold p-0"
+      data-bs-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+      title="Competitor options">
+      {competitor.competitor.name}
+    </button>
 		<div class="dropdown-menu">
 			<button
 				class="dropdown-item"
 				onclick={() => {
-					showProperties = !showProperties;
+					showProperties = true;
 				}}
 			>
 				Competitor Attributes
 			</button>
 			<button
 				class="dropdown-item"
-				onclick={() => {
-					showUserProperties = !showUserProperties;
-				}}
+				onclick={() => {showUserProperties = true}}
 			>
 				User Attributes
 			</button>

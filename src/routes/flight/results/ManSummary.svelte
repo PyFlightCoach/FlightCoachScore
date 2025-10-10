@@ -124,10 +124,10 @@
 						tabindex="0"
 						class=" btn btn-sm btn-link p-0"
 						data-sveltekit-preload-data="tap"
-						onclick={() => activate_man(id, 'alignment')}
-						title="Failed analyses or unexpectedly low scores may be a result of a failed element alignment. Go to the the alignment page to check and fix it for this manoeuvre."
+						onclick={() => activate_man(id, 'segmentation')}
+						title="Failed analyses or unexpectedly low scores may be a result of a failed element segmentation. Go to the the segmentation page to check and fix it for this manoeuvre."
 					>
-						Check Alignment
+						Check Segmentation
 					</button>
 				{/if}
 			</span>

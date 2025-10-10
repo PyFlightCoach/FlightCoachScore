@@ -39,7 +39,6 @@
 
 	let active = $state(false);
 
-  $inspect(display);
 </script>
 
 <td
@@ -67,7 +66,7 @@
 		{#if competitor?.competitor.raw_score && display === 'Results'}
 			<div
 				class={competitor?.competitor.score_dropped
-					? 'text-decoration-line-through text-secondary'
+					? 'text-decoration-line-through '
 					: ''}
 			>
 				{#if showRaw}{competitor.competitor.raw_score.toFixed(2)},
@@ -76,7 +75,8 @@
 			</div>
 		{:else if !competitor?.competitor.missed_cut}
 			{#if display === 'Running Order'}
-				{competitor.competitor.flight_order}
+      <div class="{competitor.competitor.raw_score ? 'text-decoration-line-through' : ''}">
+				{competitor.competitor.flight_order}</div>
 			{:else}
 				...
 			{/if}

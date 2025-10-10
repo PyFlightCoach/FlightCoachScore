@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { goto} from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import CompThingEditor from './CompThingEditor.svelte';
 	import Popup from '$lib/components/Popup.svelte';
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 	import { library } from '$lib/schedule/library';
 	import { user } from '$lib/stores/user';
+	import RunningOrderEditor from './RunningOrderEditor.svelte';
 
 	let {
 		competition = undefined,
@@ -25,19 +26,23 @@
 	let showEditor = $state(false);
 	let showCreator = $state(false);
 	let showProperties = $state(false);
-  let active = $state(false);
+  let showRunningOrder = $state(false);
+	let active = $state(false);
 </script>
 
-<th {colspan} class={`${thing.summary.is_open_now ? 'bg-secondary' : ''} p-0 px-0`} class:active
+<th
+	{colspan}
+	class={`${thing.summary.is_open_now ? 'bg-secondary' : ''} p-0 px-0`}
+	class:active
 	onmouseenter={() => {
 		active = true;
 	}}
 	onmouseleave={() => {
 		active = false;
 	}}
-  >
+>
 	<button
-		class="btn btn-link text-light w-100 text-nowrap text-decoration-none m-0 "
+		class="btn btn-link text-light w-100 text-nowrap text-decoration-none m-0"
 		data-bs-toggle="dropdown"
 		aria-haspopup="true"
 		aria-expanded="false"
@@ -87,6 +92,22 @@
 					Add New {thing.whatAreMyChildren}
 				</button>
 			{/if}
+      {#if thing.summary.what_am_i === 'Stage'}
+        <button
+          class="dropdown-item"
+          onclick={() =>{showRunningOrder = true;}}
+        >
+        Running Order
+      </button>
+      {/if}
+			{#if competition?.isMyComp || $user?.is_superuser}
+				<button
+					class="dropdown-item"
+					onclick={() => {
+						showProperties = true;
+					}}>Attributes</button
+				>
+			{/if}
 			<button
 				class="dropdown-item"
 				onclick={() => {
@@ -107,14 +128,6 @@
 			>
 				Delete
 			</button>
-			{#if competition?.isMyComp || $user?.is_superuser}
-				<button
-					class="dropdown-item"
-					onclick={() => {
-						showProperties = true;
-					}}>Attributes</button
-				>
-			{/if}
 		{/if}
 	</div>
 
@@ -124,6 +137,11 @@
 	{#if showCreator}
 		<CompThingEditor {competition} bind:show={showCreator} parent={thing} />
 	{/if}
+  
+  <Popup bind:show={showRunningOrder}>
+    <RunningOrderEditor stage={thing} />
+  </Popup>
+  
 	<Popup bind:show={showProperties}>
 		<DisplayDict dict={thing.summary} />
 	</Popup>
