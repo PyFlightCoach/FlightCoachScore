@@ -19,12 +19,13 @@ import { loadManDef, library } from '$lib/schedule/library';
 import { dbServer } from '$lib/api/api';
 import JSZip from 'jszip';
 import { goto } from '$app/navigation';
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
 import { Flight } from '$lib/database/flight';
 import { takeOff } from '$lib/flight/splitting';
 import { Origin } from '$lib/flight/fcjson';
 import { cat } from '$lib/utils/files';
 import { md5 } from 'js-md5';
+import { prettyPrintHttpError } from '$lib/utils/text';
 
 export function checkComplete() {
 	return Boolean(
@@ -250,7 +251,6 @@ export async function loadExample() {
 
 export async function loadAJson(flight_id: string) {
 	const zip = new JSZip();
-	loading.set(true);
 	return await dbServer
 		.get(`flight/ajson/${flight_id}`, {
 			responseType: 'blob',
@@ -259,10 +259,6 @@ export async function loadAJson(flight_id: string) {
 		.then((response) => zip.loadAsync(response.data))
 		.then((res) => Object.values(res.files)[0].async('string'))
 		.then((ajson) => JSON.parse(ajson))
-		.finally(() => {
-			unblockProgress();
-			loading.set(false);
-		});
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
@@ -272,6 +268,7 @@ export async function loadAnalysisFromDB(flight_id: string) {
 	if (get(sts.manNames) && !confirm('Loading from DB will clear current analysis, continue?')) {
 		return;
 	}
+  loading.set(true);
 	return loadAJson(flight_id)
 		.then(importAnalysis)
 		.then(() => Flight.load(flight_id))
@@ -279,6 +276,15 @@ export async function loadAnalysisFromDB(flight_id: string) {
 			dataSource.set('db');
 			activeFlight.set(flight);
 		})
+    .then(() => {
+      goto(resolve('/flight/results'));
+    })
+    .catch((err) => {
+      alert(prettyPrintHttpError(err));
+    }).finally(() => {
+      unblockProgress();
+      loading.set(false);
+    });
 }
 
 export async function analyseMans(ids: number[]) {

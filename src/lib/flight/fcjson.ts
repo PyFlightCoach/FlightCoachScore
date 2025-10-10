@@ -2,9 +2,6 @@ import { browser } from '$app/environment';
 import { GPS, Quaternion, Point } from '$lib/utils/geometry';
 import { analysisServer } from '$lib/api/api';
 import _ from 'lodash';
-import { objfilter } from '$lib/utils/arrays';
-import {isValidVersion } from '$lib/utils/text';
-
 
 export class Origin {
 	lat: number;

@@ -32,7 +32,7 @@
 
 	let eltotals = $derived(
 		summaries
-			? objmap(summaries, (v: Record<string, number>) => v[selectedDg || 'Total'])
+			? objmap(summaries, (_, v: Record<string, number>) => v[selectedDg || 'Total'])
 			: undefined
 	);
 
@@ -157,7 +157,7 @@
 					scale={$isFullSize ? 3 : 1}
 					bind:activeEl={selectedElement}
 					defaultValue="All"
-					labels={eltotals ? objmap(eltotals, (v) => v?.toFixed(2)) : {}}
+					labels={eltotals ? objmap(eltotals, (_, v) => v?.toFixed(2)) : {}}
 				/>
 			{:else if !selectedDg}
 				{@render plotsec()}

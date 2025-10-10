@@ -60,10 +60,11 @@ export const mean = (arr: number[]) => {
 	return sum(arr) / arr.length;
 };
 
-export function objmap(obj: Record<string, any>, fun: (a: any)=>any) {
-  return Object.fromEntries(Object.entries(obj).map(([k, v])=>[k, fun(v)]));
+export function objmap<T, T2>(obj: Record<string, T>, fun: (k: string, v: T)=>T2) {
+  return Object.fromEntries(Object.entries(obj).map(([k, v])=>[k, fun(k, v)]));
 }
 
-export function objfilter(obj: Record<string, any>, fun: (a: any)=>boolean) {
-  return Object.fromEntries(Object.entries(obj).filter(([k, v])=>fun(v)));
+
+export function objfilter<T>(obj: Record<string, T>, fun: (k:string, v: T)=>boolean) {
+  return Object.fromEntries(Object.entries(obj).filter(([k, v])=>fun(k, v)));
 }

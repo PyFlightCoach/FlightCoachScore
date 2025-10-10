@@ -5,7 +5,7 @@ import { library } from '$lib/schedule/library';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 import { prettyPrintHttpError } from '$lib/utils/text';
-
+import { loading } from '$lib/stores/shared';
 
 export class Flight {
 	constructor(
@@ -14,7 +14,7 @@ export class Flight {
 	) {}
 
 	get isMine() {
-    const userID = get(user)?.id.replaceAll('-', '');
+		const userID = get(user)?.id.replaceAll('-', '');
 		return this.meta.pilot_id === userID || this.meta.contributor_id === userID;
 	}
 
@@ -53,4 +53,3 @@ export async function loadInPlotter(flight_id: string) {
 			alert(prettyPrintHttpError(err));
 		});
 }
-

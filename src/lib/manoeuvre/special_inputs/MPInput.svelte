@@ -19,7 +19,7 @@
 		onchange?: (newVal: string | undefined) => void;
 	} = $props();
 
-  const allowedMPS = $derived(objfilter(mpValues, (v)=>v.unit==numInput.unit));
+  const allowedMPS = $derived(objfilter(mpValues, (_, v)=>v.unit==numInput.unit));
 
 	const hasChanged = $derived(equals(value, refvalue) ? '' : 'table-warning');
 </script>

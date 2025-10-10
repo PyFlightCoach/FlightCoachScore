@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NavMenu from './NavMenu.svelte';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { activeFlight, dev } from '$lib/stores/shared';
 	import { servers, dbServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
@@ -14,9 +14,9 @@
 	<span slot="icon"><i class="bi bi-star"></i> </span>
 
 	<small class="dropdown-header">Management</small>
-	<a class="dropdown-item" href="{base}/news">News</a>
-	<a class="dropdown-item" href="{base}/user/manage">Users</a>
-  <a class="dropdown-item" href="{base}/telemetry">Telemetry</a>
+	<a class="dropdown-item" href="{resolve('/news')}">News</a>
+	<a class="dropdown-item" href="{resolve('/user/manage')}">Users</a>
+  <a class="dropdown-item" href="{resolve('/telemetry')}">Telemetry</a>
 	<hr />
 	<small class="dropdown-header">Debugging</small>
 	<button
@@ -56,7 +56,7 @@
         class="dropdown-item"
         onclick={() => {
           postUploadSearch();
-          goto(base + '/database/query/leaderboards');
+          goto(resolve('/database/leaderboards'));
         }}
       >
         Post Upload Test

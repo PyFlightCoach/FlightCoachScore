@@ -1,27 +1,76 @@
+<script lang="ts">
+	import { resolve } from '$app/paths';
 
-<script lang='ts'>
-   
-  import { selManID, analyses, running } from '$lib/stores/analysis';
-  import navBarContents from "$lib/stores/navBarContents";
-  import Menu from './ManoeuvreMenu.svelte';
-  interface Props {
-    children?: import('svelte').Snippet;
-  }
+	import { selManID, analyses, running } from '$lib/stores/analysis';
+	import * as nbc from '$lib/stores/navBarContents';
 
-  let { children }: Props = $props();
-  $navBarContents = Menu;
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
 
-  let man = analyses[$selManID!];
-  let isRunning = $derived($running[$selManID!]);
-  
+	let { children }: Props = $props();
+	nbc.reset([
+		{
+			name: 'Summary',
+			href: resolve('/flight/results/manoeuvre/'),
+			icon: 'bi-card-text',
+			title: 'Show manoeuvre summary',
+			disabled: false
+		},
+		{
+			name: 'Alignment',
+			href: resolve('/flight/results/manoeuvre/alignment/'),
+			icon: 'bi-arrows-angle-contract',
+			title: 'Edit element alignment',
+			disabled: false
+		},
+		{
+			name: 'Intra',
+			href: resolve('/flight/results/manoeuvre/intra/'),
+			icon: 'bi-diagram-3',
+			title: 'Show intra downgrades',
+			disabled: false
+		},
+		{
+			name: 'Inter',
+			href: resolve('/flight/results/manoeuvre/inter/'),
+			icon: 'bi-diagram-3-fill',
+			title: 'Show inter manoeuvre downgrades',
+			disabled: false
+		},
+		{
+			name: 'Positioning',
+			href: resolve('/flight/results/manoeuvre/positioning/'),
+			icon: 'bi-geo-alt',
+			title: 'Show positioning downgrades',
+			disabled: false
+		},
+		{
+			name: 'Templates',
+			href: resolve('/flight/results/manoeuvre/templates/'),
+			icon: 'bi-file-earmark-text',
+			title: 'Show templates',
+			disabled: false
+		},
+		{
+			name: 'Back',
+			href: resolve('/flight/results'),
+			icon: 'bi-arrow-left',
+			title: 'Back to results',
+			disabled: false
+		}
+	]);
+
+	let man = analyses[$selManID!];
+	let isRunning = $derived($running[$selManID!]);
 </script>
 
 {#if $man}
-  {#if !isRunning}
-    {@render children?.()}
-  {:else}
-    <p>Running ...</p>
-  {/if}
+	{#if !isRunning}
+		{@render children?.()}
+	{:else}
+		<p>Running ...</p>
+	{/if}
 {:else}
-  <p>No Internal Data</p>
+	<p>No Internal Data</p>
 {/if}

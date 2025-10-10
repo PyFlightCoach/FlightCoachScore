@@ -26,7 +26,7 @@
 </script>
 
 <div class="table-responsive">
-	<table class="table table-bordered text-nowrap text-center">
+	<table class="table table-bordered text-nowrap text-center table-sm">
 		<thead class="table-dark">
 			<tr>
 				<th class="text-start">Name</th>
@@ -65,7 +65,7 @@
 						<td class="p-0 text-center">
 							<a
 								class="btn btn-outline-primary b-0 w-100 tex-nowrap"
-								href={resolve('/competition/view/') + `?id=${comp.summary.id}`}
+								href="{resolve('/competition/view/')}?id={comp.summary.id}"
 								data-sveltekit-preload-data="tap"
 							>
 								{comp.isMyComp ? 'Edit' : 'View'}

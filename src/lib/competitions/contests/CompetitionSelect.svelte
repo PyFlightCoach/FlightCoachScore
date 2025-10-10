@@ -4,7 +4,7 @@
 
 	import { listComps, type ContestGroup, type ContestAction } from './contests';
 	import CompetitionTable from './CompetitionTable.svelte';
-  import type {DBSchedule} from '$lib/schedule/db';
+	import type { DBSchedule } from '$lib/schedule/db';
 
 	let {
 		competition = $bindable(),
@@ -36,9 +36,11 @@
 			)
 		)
 	);
+
+	$inspect(category);
 </script>
 
-<div class="container-auto">
+<div class="container-auto p-0">
 	<div class="row p-2">
 		<div class="col col-auto btn-group" role="group">
 			{#each filterSubset as grp}
@@ -57,25 +59,31 @@
 			{#await categories}
 				...
 			{:then cats}
-				<label for="category-select" class="col-auto col-form-label">Category:</label>
-				<select class="col form-input form-select" id="category-select">
-					{#each cats as cat}
-						<option value={cat.category_id} selected={cat.category_id === category}
-							>{cat.category_name.toUpperCase()}</option
-						>
-					{/each}
-				</select>
+				<div class="col col-auto">
+					<div class="row">
+						<label for="category-select" class="col-auto col-form-label">Category:</label>
+						<select class="col form-input form-select" id="category-select" bind:value={category}>
+							<option value="All">ALL</option>
+							{#each cats as cat}
+								<option value={cat.category_id}>{cat.category_name.toUpperCase()}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
 			{/await}
 		{/if}
 	</div>
-	<div class="row-auto table-responsive p-0 rounded">
+	<div class="row-auto table-responsive p-0">
 		{#await competitions}
 			...Loading Competitions
 		{:then comps}
 			<CompetitionTable
 				competitions={comps}
 				full={fullDisplay}
-				onselected={(comp)=>{competition=comp; onselected();}}
+				onselected={(comp) => {
+					competition = comp;
+					onselected();
+				}}
 				{actionSubset}
 				{onentered}
 			/>

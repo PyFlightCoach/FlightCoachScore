@@ -1,17 +1,21 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import UserMenu from './UserMenu.svelte';
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
 	import CDMenu from './CDMenu.svelte';
 	import SuperMenu from './SuperMenu.svelte';
 	import { user } from '$lib/stores/user';
-	import { dev, help } from '$lib/stores/shared';
-	import navBarContents from '$lib/stores/navBarContents';
+	import { dev } from '$lib/stores/shared';
+	import * as nbc from '$lib/stores/navBarContents';
 	import { nMans, nRunning } from '$lib/stores/analysis';
 	import { servers } from '$lib/api';
+	import { navBarContents } from '$lib/stores/navBarContents';
+
+	let { hasHelp = $bindable() }: { hasHelp: boolean } = $props();
 
 	const n = $derived($nMans - $nRunning);
+
 </script>
 
 <nav
@@ -20,14 +24,14 @@
 >
 	<div class="container-fluid justify-content-between">
 		<div class="col-auto d-flex flex-row">
-			<a class="col-auto navbar-brand" href={base + '/'}>FCScore</a>
+			<a class="col-auto navbar-brand" href={resolve('/')}>FCScore</a>
 			<ul class="col-auto navbar-nav flex-row">
 				<UserMenu />
 				<FlightMenu />
 				<DataBaseMenu />
-        {#if $user?.is_verified}
-				<CDMenu />
-        {/if}
+				{#if $user?.is_verified}
+					<CDMenu />
+				{/if}
 				{#if $user?.is_superuser || $dev}
 					<SuperMenu />
 				{/if}
@@ -35,7 +39,7 @@
 				{#if $servers != 'uk'}
 					<a
 						class="nav-link"
-						href={base + '/?main'}
+						href="{resolve('/')}?main"
 						aria-label="Server Warning!"
 						data-sveltekit-preload-data="tap"
 						title="You are talking to a {$servers} server, this is not reccommended! Click here to switch to the UK server."
@@ -53,7 +57,7 @@
 						data-bs-toggle="offcanvas"
 						data-bs-target="#help"
 						aria-controls="Offcanvas"
-						disabled={!$help}
+						disabled={!hasHelp}
 					>
 						<span><i class="bi bi-question"></i></span>
 					</button>
@@ -61,8 +65,21 @@
 			</ul>
 		</div>
 
-		<div class="col navbar-nav collapse navbar-collapse" id="pageMenu">
-			<svelte:component this={$navBarContents} />
+		<div class="col navbar-nav d-none d-lg-block" id="pageMenu">
+      <div class="row">
+			{#each $navBarContents.items as pageLink, i }
+				<button
+					class="col nav-link {$navBarContents.active.has(pageLink.name) ? 'active' : ''}"
+					role="link"
+					onclick={() => {nbc.click(i)}}
+					title={pageLink.title}
+					data-sveltekit-preload-data="tap"
+					disabled={pageLink.disabled}
+				>
+					{pageLink.name}
+				</button>
+			{/each}
+      </div>
 		</div>
 
 		<ul class="col-auto justify-content-end navbar-nav">
@@ -94,19 +111,6 @@
 						Not Logged In
 					{/if}
 				</span>
-				{#if $navBarContents}
-					<button
-						class="col-auto navbar-toggler"
-						type="button"
-						data-bs-toggle="collapse"
-						data-bs-target="#pageMenu"
-						aria-controls="pageMenu"
-						aria-expanded="false"
-						aria-label="Toggle navigation"
-					>
-						<span class="navbar-toggler-icon"></span>
-					</button>
-				{/if}
 			</div>
 		</ul>
 	</div>

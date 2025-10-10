@@ -100,10 +100,7 @@
 				class="form-control btn btn-outline-secondary {canView ? '' : 'disabled'}"
 				data-sveltekit-preload-data="tap"
 				onclick={() => {
-					$loading = true;
-					loadInPlotter(f.meta.flight_id).finally(() => {
-						$loading = false;
-					});
+					loadInPlotter(f.meta.flight_id);
 				}}
 			>
 				View Flight
@@ -113,12 +110,6 @@
 				data-sveltekit-preload-data="tap"
 				onclick={() => {
 					loadAnalysisFromDB(f.meta.flight_id)
-						.then(() => {
-							goto(resolve('/flight/results'));
-						})
-						.catch((err) => {
-							alert('Failed to load analysis: ' + prettyPrintHttpError(err));
-						});
 				}}
 			>
 				View Analysis

@@ -1,5 +1,6 @@
 import { objmap } from '$lib/utils/arrays';
 import * as units from '$lib/utils/units';
+import _ from 'lodash';
 import { ManInfo } from './info.svelte';
 import { Result } from './scores';
 
@@ -310,7 +311,7 @@ export class ElDef {
 		return `${this.name} (${this.Kind}) `;
 	}
 	static parse(data: IElDef) {
-		return new ElDef(data.name, data.Kind, data.props, objmap(data.dgs, DG.parse));
+		return new ElDef(data.name, data.Kind, data.props, objmap(data.dgs, (_, v) => DG.parse(v)) as Record<string, DownGrade>);
 	}
 
 	dump() {
@@ -318,7 +319,7 @@ export class ElDef {
 			name: this.name,
 			Kind: this.Kind,
 			props: this.props,
-			dgs: objmap(this.dgs, (d) => d.dump())
+			dgs: objmap(this.dgs, (_, d) => d.dump())
 		} as IElDef;
 	}
 
@@ -358,8 +359,8 @@ export class ManDef {
 		} else {
 			return new ManDef(
 				ManInfo.parse((data as IManDef).info),
-				objmap((data as IManDef).mps, ManParm.parse),
-				objmap((data as IManDef).eds, ElDef.parse),
+				objmap((data as IManDef).mps, (_, v)=>ManParm.parse(v)),
+				objmap((data as IManDef).eds, (_, v)=>ElDef.parse(v)),
 				(data as IManDef).box
 			);
 		}
@@ -368,8 +369,8 @@ export class ManDef {
 	dump(info: ManInfo | undefined = undefined, new_name: string | undefined = undefined) {
 		return {
 			info: info?.dump(new_name) || this.info.dump(),
-			mps: objmap(this.mps, (v) => v.dump()),
-			eds: objmap(this.eds, (e) => e.dump()),
+			mps: objmap(this.mps, (_, v) => v.dump()),
+			eds: objmap(this.eds, (_, e) => e.dump()),
 			box: this.box
 		} as IManDef;
 	}

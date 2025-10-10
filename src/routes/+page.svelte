@@ -1,11 +1,11 @@
 <script lang="ts">
-	import navBarContents from '$lib/stores/navBarContents';
 	import { news } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
 	import About from './About.svelte';
   import UserActivity from './UserActivity.svelte';
+  import * as nbc from '$lib/stores/navBarContents';
 
-	$navBarContents = undefined;
+  nbc.reset();
 	let activeNews = $state(0);
 	let show = $state('About');
 
@@ -17,7 +17,7 @@
 </script>
 
 <div class="row justify-content-around">
-	<div class="col-lg-6 px-lg-3 px-0">
+	<div class="col-lg-{$user ? '6' : '10'} col-auto px-lg-2 px-0">
 		<div class="row mb-3">
 			<h1 class="text-center pt-3 h-1">Flight Coach Score</h1>
 			<lead class="lead text-center text-muted"

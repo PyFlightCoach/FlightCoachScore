@@ -1,6 +1,6 @@
 import { servers } from '$lib/api/api';
-import {  help, serverDataLoaded, loadAllServerData } from '$lib/stores/shared';
-import { base } from '$app/paths';
+import {  serverDataLoaded, loadAllServerData } from '$lib/stores/shared';
+import { checkUser } from '$lib/stores/user.js';
 import { get } from 'svelte/store';
 
 export const prerender = true;
@@ -15,7 +15,7 @@ async function setServer(location: string) {
   }
 }
 
-export async function load({ url, fetch }) {
+export async function load({ url}) {
 
   const mainServer = url.searchParams.get('main') === '';
   const devServer = url.searchParams.get('dev') === '';
@@ -23,17 +23,14 @@ export async function load({ url, fetch }) {
 
   const promise1 = setServer(mainServer ? 'uk' : devServer ? 'dev' : localServer ? 'local' : get(servers));
   
-
-	let helpFileName = url.pathname
-		.replaceAll('/', '_')
-		.split(base.replace('/', '_'))
-		.join('')
-		.replace('_', '');
-	helpFileName = helpFileName.endsWith('_') ? helpFileName.slice(0, -1) : helpFileName;
-	fetch(`https://pyflightcoach.github.io/ScoringInfo/help/${helpFileName || 'home'}.md`)
-		.then((response) => (response.ok ? response.text() : undefined))
-		.then((text) => help.set(text?.replace('/fcscorebase', base)))
-    .catch(() => help.set(undefined));
-  
+  checkUser(false, false, false)
+    .then((u) => {
+      if (u) {
+        console.log('User is logged in, loading user data') ;
+      }
+    })
+    .catch(() => {
+      console.log('User not logged in');
+    });
   await promise1;
 }

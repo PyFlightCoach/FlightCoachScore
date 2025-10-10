@@ -6,7 +6,7 @@ import { library, loadSchedules } from '$lib/schedule/library';
 import { loadNews, clearNews } from './shared';
 import { requestActivity, clearActivity } from '$lib/stores/userActivity';
 import { get } from 'svelte/store';
-import {page} from '$app/state';
+
 
 export interface DBUser {
 	id: string;

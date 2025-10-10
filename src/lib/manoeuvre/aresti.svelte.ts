@@ -42,9 +42,14 @@ export class PE {
 		} as IPE;
 	}
 
-  copy() {
-    return new PE(this.kind, $state.snapshot(this.args), $state.snapshot(this.kwargs), this.centred);
-  }
+	copy() {
+		return new PE(
+			this.kind,
+			$state.snapshot(this.args),
+			$state.snapshot(this.kwargs),
+			this.centred
+		);
+	}
 
 	summary(builder: ElementBuilder) {
 		return `${this.kind} ${builder.args
@@ -95,9 +100,9 @@ export class Combination {
 	dump() {
 		return this.desired;
 	}
-  copy() {
-    return new Combination($state.snapshot(this.desired), this.active);
-  }
+	copy() {
+		return new Combination($state.snapshot(this.desired), this.active);
+	}
 	get values() {
 		return this.desired[this.active];
 	}
@@ -120,45 +125,52 @@ export class Figure {
 		this.relax_back = relax_back;
 	}
 
-  copy() {
-    return new Figure(
-      this.elements.map((el) => typeof el === 'number' ? el : el.copy()),
-      $state.snapshot(this.comparisons),
-      objmap(this.combinations, v => v.copy()),
-      this.relax_back
-    );
-  }
+	copy() {
+		return new Figure(
+			this.elements.map((el) => (typeof el === 'number' ? el : el.copy())),
+			$state.snapshot(this.comparisons),
+			objmap(this.combinations, (_, v) => v.copy()),
+			this.relax_back
+		);
+	}
 
-  static equals(one: Figure, other: Figure) {
-    if (one.elements.length !== other.elements.length) {
-      return false;
-    }
-    if (!one.elements.every((el, i) => {
-      if (typeof el === 'number') {
-        return typeof other.elements[i] === 'number' && el === other.elements[i];
-      } else {
-        return PE.compare(el, other.elements[i] as PE);
-      }
-    })) {
-      return false;
-    }
-    if (!equals(Object.keys(one.comparisons), Object.keys(other.comparisons))) {
-      return false;
-    }
-    if (!equals(Object.values(one.comparisons), Object.values(other.comparisons))) {
-      return false;
-    }
-    if (!equals(Object.keys(one.combinations), Object.keys(other.combinations))) {
-      return false;
-    }
-    if (!equals(Object.values(one.combinations).map(v=>v.desired), Object.values(one.combinations).map(v=>v.desired))) {
-      return false
-    }
-    if (one.relax_back !== other.relax_back) {
-      return false;
-    }
-    return true;
-  }
+	static equals(one: Figure, other: Figure) {
+		if (one.elements.length !== other.elements.length) {
+			return false;
+		}
+		if (
+			!one.elements.every((el, i) => {
+				if (typeof el === 'number') {
+					return typeof other.elements[i] === 'number' && el === other.elements[i];
+				} else {
+					return PE.compare(el, other.elements[i] as PE);
+				}
+			})
+		) {
+			return false;
+		}
+		if (!equals(Object.keys(one.comparisons), Object.keys(other.comparisons))) {
+			return false;
+		}
+		if (!equals(Object.values(one.comparisons), Object.values(other.comparisons))) {
+			return false;
+		}
+		if (!equals(Object.keys(one.combinations), Object.keys(other.combinations))) {
+			return false;
+		}
+		if (
+			!equals(
+				Object.values(one.combinations).map((v) => v.desired),
+				Object.values(one.combinations).map((v) => v.desired)
+			)
+		) {
+			return false;
+		}
+		if (one.relax_back !== other.relax_back) {
+			return false;
+		}
+		return true;
+	}
 
 	static parse(data: IFigure | IFigureOption): { info: ManInfo; figure: Figure | FigOption } {
 		if ('figures' in data) {
@@ -174,8 +186,11 @@ export class Figure {
 						return PE.parse(el);
 					}
 				}),
-				objfilter(data.ndmps, (v) => !Array.isArray(v)),
-				objmap(objfilter(data.ndmps, Array.isArray), (v) => new Combination(v)),
+				objfilter(data.ndmps, (_, v) => !Array.isArray(v)) as Record<string, number>,
+				objmap(
+					objfilter(data.ndmps, (_, v) => Array.isArray(v)),
+					(_, v) => new Combination(v as number[][])
+				),
 				data.relax_back
 			)
 		};
@@ -186,7 +201,7 @@ export class Figure {
 	}
 
 	get ndmps() {
-		return { ...this.comparisons, ...objmap(this.combinations, (v) => v.dump()) };
+		return { ...this.comparisons, ...objmap(this.combinations, (_, v) => v.dump()) };
 	}
 
 	mpValues(builder: ManBuilder) {
@@ -197,11 +212,11 @@ export class Figure {
 		Object.entries(this.comparisons).forEach(([k, v]) => {
 			base_parms[k as keyof typeof base_parms].value = v;
 		});
-    Object.entries(this.combinations).forEach(([k, v]) => {
-      v.desired[v.active].forEach((val, i)=>{
-        base_parms[`${k}[${i}]`] = new MPValue(val, 'rad');
-      });
-    });
+		Object.entries(this.combinations).forEach(([k, v]) => {
+			v.desired[v.active].forEach((val, i) => {
+				base_parms[`${k}[${i}]`] = new MPValue(val, 'rad');
+			});
+		});
 		return base_parms;
 	}
 
@@ -254,7 +269,7 @@ export class FigOption {
 		return this.figures[this.active].combinations;
 	}
 
-  get mpValues() {
-    return this.figures[this.active].mpValues;
-  }
+	get mpValues() {
+		return this.figures[this.active].mpValues;
+	}
 }
