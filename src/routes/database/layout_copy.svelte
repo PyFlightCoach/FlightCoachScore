@@ -71,12 +71,12 @@
 
 			<a
 				class="col nav-link"
-				href={resolve('/database/query/leaderboards')}
+				href={resolve('/database/leaderboards')}
 				aria-label="Leaderboards"
 			>
 				<span><i class="bi bi-trophy"></i></span>
 			</a>
-			<a class="col nav-link" href={resolve('/database/query/map')} aria-label="Map">
+			<a class="col nav-link" href={resolve('/database/map')} aria-label="Map">
 				<span><i class="bi bi-map"></i></span>
 			</a>
 		</div>

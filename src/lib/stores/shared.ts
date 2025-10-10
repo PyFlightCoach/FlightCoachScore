@@ -10,10 +10,6 @@ import { objfilter } from '$lib/utils/arrays';
 
 export const mouse = writable({ x: 0, y: 0 });
 
-export const lastErrorCode: Writable<number | undefined> = writable();
-export const lastErrorText: Writable<string | undefined> = writable();
-export const lastErrorDetail: Writable<string | undefined> = writable();
-
 export const isFullSize: Writable<boolean> = writable(false);
 
 export const loading: Writable<boolean | undefined> = writable();
@@ -25,22 +21,18 @@ export const dataSource: Writable<string | undefined> = writable();
 
 export const dev: Writable<boolean> = writable(isdev);
 
-export const help: Writable<string | undefined> = writable();
-
 export const windowWidth: Writable<number> = writable(1000);
 export const breakPoints = {
 	xxl: 1400,
-  xl: 1200,
+	xl: 1200,
 	lg: 992,
 	md: 768,
 	sm: 576,
 	xs: 0
 };
 export const breakPoint: Readable<keyof typeof breakPoints> = derived(windowWidth, (ww: number) => {
-  return Object.keys(objfilter(breakPoints, (k, min) => ww >= min))[0] as keyof typeof breakPoints;
+	return Object.keys(objfilter(breakPoints, (k, min) => ww >= min))[0] as keyof typeof breakPoints;
 });
-
-
 
 export const windowHeight: Writable<number> = writable(1000);
 
@@ -65,7 +57,15 @@ export const unblockProgress = () => {
 	blockingProgress.set(undefined);
 };
 
-export const news: Writable<[]> = writable([]);
+export const news: Writable<
+	{
+		id: string;
+		headline: string;
+		body: string;
+		link: string;
+		updated_when: string;
+	}[]
+> = writable([]);
 
 export async function loadNews() {
 	dbServer

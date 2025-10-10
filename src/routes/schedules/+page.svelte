@@ -3,16 +3,16 @@
 	import EditSchedule from './EditSchedule.svelte';
 	import PlotAll from './PlotAll.svelte';
 	import EditManoeuvre from './ManoeuvrePage.svelte';
-	import navBarContents from '$lib/stores/navBarContents';
 	import { ScheduleHandler } from '$lib/schedule/schedule_handler.svelte';
+  import * as nbc from '$lib/stores/navBarContents';
 
+  nbc.reset();
 	let form_state: string | undefined = $state();
 	let activeManId: number | undefined = $state();
   
 
 	let schedule: ScheduleHandler | undefined = $state();
 
-	$navBarContents = undefined;
 </script>
 
 <div class="col-md-4 bg-light border pt-3">

@@ -8,8 +8,8 @@
 <NavMenu tooltip="Database Menu">
 	<span slot="icon"><i class="bi bi-database"></i> </span>
 	{#if $user?.is_verified}
-		<a class="dropdown-item" href="{resolve('/database/query/leaderboards')}">Leaderboard</a>
+		<a class="dropdown-item" href="{resolve('/database/leaderboards')}">Leaderboard</a>
 	{/if}
-	<a class="dropdown-item" href="{resolve('/schedule')}">Schedules</a>
+	<a class="dropdown-item" href="{resolve('/schedules')}">Schedules</a>
  
 </NavMenu>

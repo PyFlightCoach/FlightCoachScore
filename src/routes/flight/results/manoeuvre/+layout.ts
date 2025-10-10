@@ -2,7 +2,6 @@ import {goto} from '$app/navigation';
 import {resolve} from '$app/paths';
 import { get } from 'svelte/store';
 import {  selManID, analyses } from '$lib/stores/analysis';
-import type { MA } from '$lib/manoeuvre/analysis';
 import { analyseManoeuvre } from '$lib/flight/analysis';
 
 export async function load({url}) {  

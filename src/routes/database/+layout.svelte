@@ -1,21 +1,37 @@
 <script lang="ts">
 	import LeaderQuery from '$lib/leaderboards/LeaderQuery.svelte';
-	import { resolve } from '$app/paths';
 	import { updateTable } from '$lib/leaderboards/stores';
-	import { windowWidth, activeScheduleIDs, allFAVersions } from '$lib/stores/shared';
+	import { activeScheduleIDs, allFAVersions } from '$lib/stores/shared';
 	import { table_rows } from '$lib/leaderboards/stores';
 	import { onMount } from 'svelte';
 	import SideBarLayout from '$lib/components/SideBarLayout.svelte';
-
-	$effect(() => {
-		//$navBarContents = lg ? DBMenu : undefined;
-	});
-
+	import { resolve } from '$app/paths';
+	import * as nbc from '$lib/stores/navBarContents';
+	
 	onMount(() => {
 		if ($table_rows.length === 0) {
 			updateTable();
 		}
 	});
+
+	//	onNavigate(() => {$navBarContents = []});
+
+	nbc.reset([
+		{
+			href: resolve('/database/leaderboards/'),
+			name: 'Leaderboards',
+			title: 'Show results in a table',
+			icon: 'bi-trophy'
+		} as nbc.NavBarPage,
+		{
+			href: resolve('/database/map/'),
+			name: 'Map',
+			title: 'Show results in a map',
+			icon: 'bi-map'
+		} as nbc.NavBarPage
+	]);
+  nbc.checkUrl();
+
 </script>
 
 <SideBarLayout bp="md">
@@ -39,17 +55,5 @@
 				</div>
 			</div>
 		{/if}
-	{/snippet}
-	{#snippet btmNavs()}
-		<a
-			class="col nav-link"
-			href={resolve('/database/query/leaderboards')}
-			aria-label="Leaderboards"
-		>
-			<span><i class="bi bi-trophy"></i></span>
-		</a>
-		<a class="col nav-link" href={resolve('/database/query/map')} aria-label="Map">
-			<span><i class="bi bi-map"></i></span>
-		</a>
 	{/snippet}
 </SideBarLayout>

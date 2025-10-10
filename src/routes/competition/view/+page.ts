@@ -5,6 +5,7 @@ import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 import { get } from 'svelte/store';
 import { checkUser } from '$lib/stores/user.js';
 
+
 export async function load({ url }) {
 	const id = url.searchParams.get('id');
   await checkUser();

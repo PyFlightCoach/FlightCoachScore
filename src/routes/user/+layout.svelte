@@ -1,15 +1,15 @@
 
 <script lang='ts'>
-   
-  import navBarContents from "$lib/stores/navBarContents";
+  import * as nbc from '$lib/stores/navBarContents';
+
   
   interface Props {
     children?: import('svelte').Snippet;
   }
 
   let { children }: Props = $props();
-  $navBarContents = undefined;
 
+  nbc.reset();
   
 </script>
 

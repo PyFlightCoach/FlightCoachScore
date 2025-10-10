@@ -12,10 +12,12 @@
 	import { Flight } from '$lib/database/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { prettyPrintHttpError } from '$lib/utils/text';
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 
-	let { round, competitorID }: { round: ContestManager; competitorID: string } = $props();
+	let {
+		round,
+		competitorID,
+		display = $bindable('Results')
+	}: { round: ContestManager; competitorID: string; display?: 'Results' | 'Running Order' } = $props();
 
 	const competitor: PilotManager = $derived(
 		(round.competitors || []).find((competitor) => competitor.competitor.id == competitorID)!
@@ -36,16 +38,17 @@
 	);
 
 	let active = $state(false);
+
+  $inspect(display);
 </script>
 
 <td
 	class="text-center text-nowrap p-0 px-2 b-0"
 	class:active
 	onmouseenter={() => {
-    if (!competitor?.competitor.missed_cut) {
-      active = true;
-    }
-		
+		if (!competitor?.competitor.missed_cut) {
+			active = true;
+		}
 	}}
 	onmouseleave={() => {
 		active = false;
@@ -58,9 +61,10 @@
 		aria-haspopup="true"
 		aria-expanded="false"
 		title="Score options"
-		disabled={(!round.summary.is_open_now && !competitor?.competitor.raw_score) || competitor?.competitor.missed_cut }
+		disabled={(!round.summary.is_open_now && !competitor?.competitor.raw_score) ||
+			competitor?.competitor.missed_cut}
 	>
-		{#if competitor?.competitor.raw_score}
+		{#if competitor?.competitor.raw_score && display === 'Results'}
 			<div
 				class={competitor?.competitor.score_dropped
 					? 'text-decoration-line-through text-secondary'
@@ -71,7 +75,11 @@
 				{competitor.competitor.normalised_score?.toFixed(2)}
 			</div>
 		{:else if !competitor?.competitor.missed_cut}
-			...
+			{#if display === 'Running Order'}
+				{competitor.competitor.flight_order}
+			{:else}
+				...
+			{/if}
 		{/if}
 	</button>
 	<div class="dropdown-menu">
@@ -105,7 +113,7 @@
 							<button
 								class="dropdown-item"
 								onclick={() => {
-									loadAnalysisFromDB(competitor.competitor.flight_id!)
+									loadAnalysisFromDB(competitor.competitor.flight_id!);
 								}}
 								disabled={!competitor.competitor.flight_id}>View Analysis</button
 							>

@@ -1,7 +1,7 @@
 <script lang="ts">
-  	import navBarContents from '$lib/stores/navBarContents';
+  import * as nbc from '$lib/stores/navBarContents';
 
-  $navBarContents = undefined;
+  nbc.reset();
 </script>
 
 
