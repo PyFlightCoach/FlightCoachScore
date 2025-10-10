@@ -66,6 +66,16 @@ export class ContestManager {
 					: undefined;
 	}
 
+  sortCompetitors(by: "Running Order" | "Results") {
+    return this.competitors.sort((a, b) => {
+      if (by === "Running Order") {
+        return (a.competitor.flight_order || 0) - (b.competitor.flight_order || 0);
+      } else {
+        return (b.competitor.raw_score || 0) - (a.competitor.raw_score || 0);
+      }
+    });
+  }
+
 	static async load(id: string) {
 		return await dbServer.get(`/competition/${id}`).then((res) => {
 			return new ContestManager(res.data as CompThingSummary);
@@ -178,5 +188,13 @@ export class ContestManager {
 		return get(library).downselect(
 			this.rounds.filter((r) => !!r.summary.schedule_id).map((r) => r.summary.schedule_id!)
 		);
+	}
+
+	async rotateFlightOrder(cont_from_previous: boolean, rotate_by: number) {
+		return dbServer.post(`competition/stage/rotatefo/`, {
+			stage_id: this.summary.id,
+			cont_from_previous,
+			rotate_by
+		}).then((res) => new ContestManager(res.data as CompThingSummary));
 	}
 }

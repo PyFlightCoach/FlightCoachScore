@@ -24,7 +24,7 @@
 	);
 	let flight_rules = $state((stage?.summary.flight_rules || {}) as FlightRule);
 
-	let disabled = $derived(stage &&!stage?.isMyComp);
+	let disabled = $derived(stage && !stage?.isMyComp);
 </script>
 
 <div class="col">

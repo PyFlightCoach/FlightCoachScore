@@ -14,11 +14,7 @@
 	});
 
 	let help = $derived.by(async () => {
-		let helpFileName = page.url.pathname
-			.replaceAll('/', '_')
-			.split(resolve('/').replace('/', '_'))
-			.join('')
-			.replace('_', '');
+		let helpFileName = page.url.pathname.replaceAll('/', ' ').trim().replaceAll(" ", "_");
 
 		helpFileName = helpFileName.endsWith('_') ? helpFileName.slice(0, -1) : helpFileName;
 		return axios

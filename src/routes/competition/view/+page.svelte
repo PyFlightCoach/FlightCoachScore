@@ -13,7 +13,7 @@
 			},
 			{
 				name: 'Running Order',
-				icon: 'bi-table',
+				icon: 'bi-list-ol',
 				title: 'Show running order table'
 			}
 		]

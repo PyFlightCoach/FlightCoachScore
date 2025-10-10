@@ -59,7 +59,7 @@
 						aria-controls="Offcanvas"
 						disabled={!hasHelp}
 					>
-						<span><i class="bi bi-question"></i></span>
+						<span><i class="bi bi-question-lg"></i></span>
 					</button>
 				</div>
 			</ul>
@@ -101,7 +101,7 @@
 				<span
 					class="col-auto navbar-text mr-auto text-nowrap {$user?.is_verified
 						? ''
-						: 'text-danger'} d-none d-sm-block"
+						: 'text-danger'} d-none d-sm-block fw-bold"
 				>
 					{#if $user}
 						{$user.first_name}

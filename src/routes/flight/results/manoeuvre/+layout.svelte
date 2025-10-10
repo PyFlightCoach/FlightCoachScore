@@ -11,38 +11,38 @@
 	let { children }: Props = $props();
 	nbc.reset([
 		{
-			name: 'Summary',
+			name: 'View',
 			href: resolve('/flight/results/manoeuvre/'),
 			icon: 'bi-card-text',
-			title: 'Show manoeuvre summary',
+			title: 'View Manoeuvre',
 			disabled: false
 		},
 		{
-			name: 'Alignment',
-			href: resolve('/flight/results/manoeuvre/alignment/'),
-			icon: 'bi-arrows-angle-contract',
-			title: 'Edit element alignment',
+			name: 'Segmentation',
+			href: resolve('/flight/results/manoeuvre/segmentation/'),
+			icon: 'bi-align-center',
+			title: 'Edit Element Segmentation',
 			disabled: false
 		},
 		{
 			name: 'Intra',
 			href: resolve('/flight/results/manoeuvre/intra/'),
-			icon: 'bi-diagram-3',
-			title: 'Show intra downgrades',
+			icon: 'bi-columns-gap',
+			title: 'Intra Element Downgrades',
 			disabled: false
 		},
 		{
 			name: 'Inter',
 			href: resolve('/flight/results/manoeuvre/inter/'),
-			icon: 'bi-diagram-3-fill',
-			title: 'Show inter manoeuvre downgrades',
+			icon: 'bi-columns',
+			title: 'Inter Element Downgrades',
 			disabled: false
 		},
 		{
 			name: 'Positioning',
 			href: resolve('/flight/results/manoeuvre/positioning/'),
-			icon: 'bi-geo-alt',
-			title: 'Show positioning downgrades',
+			icon: 'bi-box',
+			title: 'Box downgrades',
 			disabled: false
 		},
 		{
@@ -60,7 +60,7 @@
 			disabled: false
 		}
 	]);
-
+  nbc.checkUrl();
 	let man = analyses[$selManID!];
 	let isRunning = $derived($running[$selManID!]);
 </script>

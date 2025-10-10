@@ -50,7 +50,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each $activeComp!.competitors as competitor, i}
+			{#each $activeComp!.sortCompetitors(display) as competitor, i}
 				<tr>
 					<CompetitorCell {competitor} />
 					{#each $activeComp!.children as stage}
