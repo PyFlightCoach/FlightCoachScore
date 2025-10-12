@@ -147,7 +147,7 @@
 		{/if}
 	</div>
 	<Popup bind:show={showDBLinkMenu}>
-		<LinkDbFlight {round} {competitor} />
+		<LinkDbFlight {round} {competitor} bind:show={showDBLinkMenu} />
 	</Popup>
 	<Popup bind:show={showProperties}>
 		<DisplayDict dict={competitor?.competitor} />

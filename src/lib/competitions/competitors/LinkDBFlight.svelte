@@ -6,12 +6,22 @@
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
 
-	let { round, competitor, show=$bindable(false) }: { round: ContestManager; competitor: PilotManager, show?: boolean } = $props();
+	let {
+		round,
+		competitor,
+		show = $bindable(false)
+	}: { round: ContestManager; competitor: PilotManager; show?: boolean } = $props();
 
 	let flights: DBFlightRanked[] = $state([]);
 
 	dbServer
-		.get('analysis/flightlist', { params: { n_results: 100, fa_version: $faVersion } })
+		.get('analysis/flightlist', {
+			params: {
+				n_results: 100,
+				fa_version: $faVersion,
+				schedule_id: round.summary.schedule_id || null
+			}
+		})
 		.then((res) => {
 			flights = res.data.results.filter(
 				(f: DBFlightRanked) => f.pilot_id == competitor.competitor.id
@@ -25,8 +35,8 @@
 		<tr>
 			<th>Pilot</th>
 			<th>Time</th>
-			<th>Score</th>
-			<th></th>
+      <th>Comment</th>
+      <th></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -34,21 +44,22 @@
 			<tr>
 				<td>{flight.name} {flight.country}</td>
 				<td>{new Date(flight.date).toLocaleString()}</td>
-				<td>{flight.score}</td>
+				<td>{flight.comment}</td>
 				<td class="p-1"
 					><button
 						class="btn btn-outline-secondary b-0"
 						title="Link this flight"
 						onclick={() => {
-              round.addFlight(flight.flight_id)
-              .then((res) => {
-                setComp(res); 
-                show = false;
-              })
-              .catch((err) => {
-                alert(`Failed to link flight: ${err}`);
-              });
-            }}
+							round
+								.addFlight(flight.flight_id)
+								.then((res) => {
+									setComp(res);
+									show = false;
+								})
+								.catch((err) => {
+									alert(`Failed to link flight: ${err}`);
+								});
+						}}
 					>
 						Link
 					</button></td
