@@ -52,8 +52,8 @@ export class ManBuilder {
 	static parse(data: IManBuilder) {
 		return new ManBuilder(
 			data.rule,
-			objmap(data.parameters, (p) => ManParm.parse(p)),
-			objmap(data.element_builders, (e) => ElementBuilder.parse(e))
+			objmap(data.parameters, (_, p) => ManParm.parse(p)),
+			objmap(data.element_builders, (_, e) => ElementBuilder.parse(e))
 		);
 	}
 

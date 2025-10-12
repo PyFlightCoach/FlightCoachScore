@@ -6,6 +6,7 @@
 	import { loading, rules } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
   import {dbServer} from '$lib/api';
+	import { prettyPrintHttpError } from '$lib/utils/text';
 
   let { schedule = $bindable() }: { schedule: ScheduleHandler | undefined } = $props();
 
@@ -51,7 +52,7 @@
 			disabled={inputmode == 'DB'}
 			bind:value={rule}
 		>
-			{#each $rules as r}
+			{#each $rules || [] as r}
 				<option value={r}>{r}</option>
 			{/each}
 		</select>
@@ -108,7 +109,9 @@
 		{#if $user?.is_superuser && inputmode == 'DB' && selectedSchedule}
 			<button class="col col-form-control btn btn-outline-secondary mx-2" onclick={() => {
         if (confirm("Are you sure you want to delete this schedule?")) {
-          dbServer.delete(`schedule/${selectedSchedule?.schedule_id}`).then(reloadSchedules);
+          dbServer.delete(`schedule/${selectedSchedule?.schedule_id}`)
+          .then(reloadSchedules)
+          .catch(err => alert(`Error deleting schedule: ${prettyPrintHttpError(err)}`))
         }
       }}>
 				Delete
@@ -123,7 +126,7 @@
 				.then((res) => {
 					schedule = res;
 				})
-				.catch((err) => console.error(err))
+				.catch((err) => {alert(`Error loading schedule: ${prettyPrintHttpError(err)}`)})
 				.finally(() => ($loading = false));
 		}}
 		>{#if inputmode == 'DB'}Load{:else}Create{/if}</button

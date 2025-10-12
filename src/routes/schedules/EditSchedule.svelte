@@ -7,7 +7,8 @@
 	import { BoxLocation } from '$lib/manoeuvre/positioning.svelte';
 	import { loading } from '$lib/stores/shared';
 	import { saveAs } from 'file-saver';
-
+  import { prettyPrintHttpError } from '$lib/utils/text';
+  
 	let {
 		schedule = $bindable(),
 		activeManId = $bindable(),
@@ -120,6 +121,7 @@
 					$loading = true;
 					schedule
 						.post(newScheduleName!, newCategory == 'New' ? newCategoryName! : newCategory!)
+            .catch(err => alert(`Error creating schedule: ${prettyPrintHttpError(err)}`))
 						.finally(() => ($loading = false));
 				}
 			}}

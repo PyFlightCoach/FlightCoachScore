@@ -173,9 +173,9 @@ export class Figure {
 	}
 
 	static parse(data: IFigure | IFigureOption): { info: ManInfo; figure: Figure | FigOption } {
-		if ('figures' in data) {
-			return FigOption.parse(data);
-		}
+		if ('figures' in data || Array.isArray(data)) {
+			return FigOption.parse(data as IFigureOption);
+		} 
 		return {
 			info: ManInfo.parse(data.info),
 			figure: new Figure(
@@ -244,11 +244,14 @@ export class FigOption {
 		this.active = active;
 	}
 
-	dump(info: ManInfo): IFigure[] {
-		return this.figures.map((o) => o.dump(info));
+	dump(info: ManInfo): IFigureOption {
+		return {figures: this.figures.map((o) => o.dump(info))};
 	}
 
 	static parse(data: IFigureOption): { info: ManInfo; figure: Figure | FigOption } {
+    if (Array.isArray(data)) {
+      data = { figures: data };
+    }
 		const figs = data.figures.map((f) => Figure.parse(f));
 		return { info: figs[0].info, figure: new FigOption(figs.map((f) => f.figure as Figure)) };
 	}
