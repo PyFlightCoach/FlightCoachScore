@@ -124,7 +124,11 @@ export class ManoeuvreHandler {
 	) {
 		const definition: ManDef | ManOpt = await analysisServer
 			.post('create_mdef', { rules: rule, figure: figure.dump(info) })
-			.then((res) => ManDef.parse(res.data));
+			.then((res) => ManDef.parse(res.data))
+      .catch((e) => {
+        console.error(`Error creating ${info.short_name} ManDef from figure:`, e);
+        throw e;
+      });
 
 		Object.entries(figure.combinations).forEach(([k, v]) => {
 			definition.setmp(k, v.active);
@@ -145,7 +149,6 @@ export class ManoeuvreHandler {
 		const definition = await dbServer
 			.get(`schedule/manoeuvre/definition/${manoeuvre.id}`)
 			.then((res) => ManDef.parse(res.data));
-
 		return ManoeuvreHandler.build(
 			info || definition.info,
 			figure,
@@ -193,9 +196,9 @@ export class ManoeuvreHandler {
 
 	dumpAresti() {
 		const aresti = this.options.map((o, i) =>
-			o.aresti!.dump(this.info, i ? `${this.info.short_name}_option_${i}` : this.info.short_name)
+			o.aresti!.dump(this.info)//, i ? `${this.info.short_name}_option_${i}` : this.info.short_name)
 		);
-    return aresti.length == 1 ? aresti[0] : aresti;
+    return aresti.length == 1 ? aresti[0] : {figures: aresti};
 	}
 
 	dumpDefinition() {
