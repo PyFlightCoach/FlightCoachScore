@@ -39,6 +39,9 @@
 
 	let active = $state(false);
 
+  let allowDropDown = $derived(
+    round.isMyComp || !competitor?.competitor.missed_cut && (round.summary.is_open_now || $user?.is_superuser)
+  );
 </script>
 
 <td
@@ -60,8 +63,7 @@
 		aria-haspopup="true"
 		aria-expanded="false"
 		title="Score options"
-		disabled={(!round.summary.is_open_now && !competitor?.competitor.raw_score) ||
-			competitor?.competitor.missed_cut}
+		disabled={!allowDropDown}
 	>
 		{#if competitor?.competitor.raw_score && display === 'Results'}
 			<div

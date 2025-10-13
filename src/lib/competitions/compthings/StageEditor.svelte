@@ -11,13 +11,13 @@
 		stage = undefined,
 		oncreated = () => {}
 	}: {
-		parent?: ContestManager | undefined;
+		parent: ContestManager;
 		stage?: ContestManager | undefined;
 		oncreated?: () => void;
 	} = $props();
 
 	let name: string | undefined = $state(
-		stage?.summary.name || `Stage ${(parent?.summary.children?.length || 0) + 1}`
+		stage?.summary.name || `Stage ${(parent.summary.children?.length || 0) + 1}`
 	);
 	let result_rules = $state(
 		(stage?.summary.result_rules || { normalise_best_to_n: 1000 }) as ResultRule
@@ -31,10 +31,10 @@
 	<small class="row p-2">Stage Settings</small>
 	<TextInput name="Name" bind:value={name} {disabled} />
 	<ResultRules
-		oldRule={result_rules}
+    {parent}
+		compThing={stage}
 		bind:newRule={result_rules}
 		showChanges={false}
-		whatAmI="Stage"
 		{disabled}
 	/>
 	<FlightRules oldRule={flight_rules} bind:newRule={flight_rules} showChanges={false} {disabled} />

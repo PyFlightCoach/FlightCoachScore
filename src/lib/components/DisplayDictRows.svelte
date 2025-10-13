@@ -31,7 +31,7 @@
       {/if}
     </tr>
     {#if show[key]}
-      <DDR bind:dict={dict[key]} />
+      <DDR dict={dict[key]} />
     {/if}
   {/each}
   <tr><td colspan="2" class="text-center p-0"><hr/></td></tr>

@@ -13,7 +13,7 @@
 	<div class="table-responsive">
 		<table class="table table-sm">
 			<tbody>
-        <DDR bind:dict={dict} />
+        <DDR dict={dict} />
 			</tbody>
 		</table>
 	</div>

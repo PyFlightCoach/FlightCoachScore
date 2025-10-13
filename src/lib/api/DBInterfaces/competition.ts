@@ -42,10 +42,12 @@ export interface CompetitorCreate {
 
 
 export interface ResultRule {
-  normalise_best_to_n: number | null;
-  normalise_average_to_n: number | null;
-  progress_top_n: number | null;
-  use_top_n: number | null;
+  normalise_best_to_n?: number | null;
+  normalise_average_to_n?: number | null;
+  progress_top_n?: number | null;
+  use_top_n?: number | null;
+  restart_scoring?: boolean | null;
+  score_from_stage_n?: number | null;
 };
 
 

@@ -7,19 +7,17 @@
 	import type { ResultRule, AddRule } from '$lib/api/DBInterfaces/competition';
 	import { library } from '$lib/schedule/library';
 	let {
-		competition = undefined,
-		parent = undefined,
+		stage,
 		round = undefined,
 		oncreated = () => {}
 	}: {
-		competition?: ContestManager | undefined;
-		parent?: ContestManager | undefined;
+		stage: ContestManager;
 		round?: ContestManager | undefined;
 		oncreated?: () => void;
 	} = $props();
 
 	let name: string | undefined = $state(
-		round?.summary.name || `Round ${(parent?.summary.children?.length || 0) + 1}`
+		round?.summary.name || `Round ${(stage?.summary.children?.length || 0) + 1}`
 	);
 	let result_rules = $state(
 		(round?.summary.result_rules || { normalise_best_to_n: 1000 }) as ResultRule
@@ -27,8 +25,10 @@
 	let add_rules = $state((round?.summary.add_rules || {}) as AddRule);
 
 	let schedules = $derived(
-		$library.subset({ category_id: competition?.summary.category_id || undefined })
+		$library.subset({ category_id: stage.parent!.summary.category_id || undefined })
 	);
+
+	let isInherited = $derived(Number.isInteger(result_rules.score_from_stage_n));
 
 	let schedule = $state(
 		round?.summary.schedule_id
@@ -37,25 +37,41 @@
 	);
 
 	let disabled = $derived(round && !round?.isMyComp);
+
+	let createUpdateRequest = $derived({
+		name: isInherited
+			? stage.competition.children[result_rules.score_from_stage_n!].summary.name
+			: name,
+		result_rules,
+		schedule_id: isInherited ? undefined : schedule?.schedule_id
+	});
+
 </script>
 
 <div class="col">
 	<small class="row p-2">Round Settings</small>
-	<TextInput name="Name" bind:value={name} {disabled} />
-
-	<div class="row mb-2">
-		<label for="categorySelect" class="col col-form-label">Schedule:</label>
-		<select
-			class="col form-select col-form-input"
-			id="categorySelect"
-			bind:value={schedule}
-			{disabled}
-		>
-			{#each schedules.schedules as schedule}
-				<option value={schedule}>{schedule.schedule_name}</option>
-			{/each}
-		</select>
-	</div>
+	{#if !isInherited}
+		<TextInput name="Name" bind:value={name} {disabled} />
+		<div class="row mb-2">
+			<label for="categorySelect" class="col col-form-label">Schedule:</label>
+			<select
+				class="col form-select col-form-input"
+				id="categorySelect"
+				bind:value={schedule}
+				{disabled}
+			>
+				{#each schedules.schedules as schedule}
+					<option value={schedule}>{schedule.schedule_name}</option>
+				{/each}
+			</select>
+		</div>
+	{:else}
+		<TextInput
+			name="Name"
+			value={stage.competition.children[result_rules.score_from_stage_n!].summary.name}
+			disabled={true}
+		/>
+	{/if}
 	{#if false}
 		<AddRules
 			oldRule={add_rules}
@@ -65,10 +81,10 @@
 		/>
 	{/if}
 	<ResultRules
-		oldRule={result_rules}
+		parent={stage}
+		compThing={round}
 		bind:newRule={result_rules}
-		showChanges={false}
-		whatAmI="Round"
+		showChanges={round != undefined}
 		{disabled}
 	/>
 	{#if !disabled}
@@ -78,12 +94,8 @@
 					class="col btn btn-primary"
 					disabled={!name}
 					onclick={() => {
-						parent!
-							.addChild({
-								name,
-								result_rules,
-								schedule_id: schedule?.schedule_id
-							})
+						stage!
+							.addChild(createUpdateRequest)
 							.then(setComp)
 							.then(oncreated)
 							.catch((error) => {
@@ -98,11 +110,7 @@
 					class="col btn btn-primary"
 					onclick={() => {
 						round
-							.update({
-								name,
-								result_rules,
-								schedule_id: schedule?.schedule_id
-							})
+							.update(createUpdateRequest)
 							.then((res) => Promise.all([setComp(res)]))
 							.then(oncreated)
 							.catch((error) => {
