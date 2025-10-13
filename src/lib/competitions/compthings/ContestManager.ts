@@ -197,4 +197,11 @@ export class ContestManager {
 			rotate_by
 		}).then((res) => new ContestManager(res.data as CompThingSummary));
 	}
+
+  async addDirector(user_id: string) {
+    return dbServer.post(`competition/director`, {
+      comp_id: this.summary.id,
+      user_id
+    }).then((res) => new ContestManager(res.data as CompThingSummary));
+  }
 }
