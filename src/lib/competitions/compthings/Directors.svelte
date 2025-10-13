@@ -1,13 +1,14 @@
 <script lang="ts">
-	import type { Director } from '$lib/api/DBInterfaces/competition';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import UserSearch from '$lib/components/UserSearch.svelte';
 	import { setComp } from '$lib/stores/contests';
-	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { user } from '$lib/stores/user';
+	import { compareUUIDs, prettyPrintHttpError } from '$lib/utils/text';
 
 	let { competition }: { competition: ContestManager } = $props();
 
 	let showAddDirector = $state(false);
+  $inspect(competition.summary.directors, $user?.id);
 </script>
 
 <div class="container border rounded p-1 mb-2">
@@ -18,13 +19,24 @@
 				<tr class="px-2 text-nowrap">
 					<td>{director.name}</td>
 					<td>{director.country}</td>
-					{#if competition.isMyComp && false}
+					{#if competition.isMyComp && (competition.summary.directors || []).length > 1 && (compareUUIDs(director.id, $user!.id) || $user!.is_superuser)}
 						<!-- Disabled for now, removing directors is not implemented on the backend -->
 						<td class="p-0">
 							<button
 								class="btn btn-sm btn-outline-secondary w-100"
-								disabled={competition.summary.directors!.length == 1}>Remove</button
-							>
+								disabled={competition.summary.directors!.length == 1}
+                onclick={() =>
+                  competition
+                    .removeDirector(director.id!)
+                    .then((comp) => {
+                      setComp(comp);
+                    })
+                    .catch((e) => {
+                      alert(prettyPrintHttpError(e));
+                    })}
+              >
+                Remove
+              </button>
 						</td>
 					{/if}
 				</tr>

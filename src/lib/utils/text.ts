@@ -28,3 +28,10 @@ export function isValidVersion(version: string) {
   
 }
 
+export function compareUUIDs (a: string| undefined, b: string | undefined) {
+  return (a || b) ? a?.replaceAll('-', '') === b?.replaceAll('-', '') : false
+}
+
+export function includesUUID (list: string[], uuid: string | undefined) {
+  return uuid !==undefined && list.some((x) => compareUUIDs(x, uuid));
+}

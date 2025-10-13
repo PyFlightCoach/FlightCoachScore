@@ -8,6 +8,7 @@ import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
 import { PilotManager } from '$lib/competitions/competitors/PilotManager';
 import { library } from '$lib/schedule/library';
+import { includesUUID } from '$lib/utils/text';
 
 export class ContestManager {
 	children: ContestManager[] = [];
@@ -27,13 +28,10 @@ export class ContestManager {
 	) {
 		this.children = (summary.children || []).map((c) => new ContestManager(c, this));
 
-		const userID = get(user)?.id.replaceAll('-', '');
-
 		if (i_am_cd === undefined) {
 			this.isMyComp =
-				this.summary.directors?.map((d) => d.id.replaceAll('-', '')).includes(userID || '') ||
-				get(user)?.is_superuser ||
-				false;
+				includesUUID(summary.directors?.map((d) => d.id) || [], get(user)?.id) ||
+				get(user)!.is_superuser;
 		} else {
 			this.isMyComp = i_am_cd!;
 		}
@@ -42,7 +40,7 @@ export class ContestManager {
 			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
 
 		if (i_am_competitor === undefined) {
-			this.iAmCompeting = this.summary.competitors?.some((c) => c.id == userID) || false;
+			this.iAmCompeting = includesUUID(summary.competitors?.map((d) => d.id) || [], get(user)?.id);
 		} else {
 			this.iAmCompeting = i_am_competitor!;
 		}
@@ -66,15 +64,15 @@ export class ContestManager {
 					: undefined;
 	}
 
-  sortCompetitors(by: "Running Order" | "Results") {
-    return this.competitors.sort((a, b) => {
-      if (by === "Running Order") {
-        return (a.competitor.flight_order || 0) - (b.competitor.flight_order || 0);
-      } else {
-        return (b.competitor.raw_score || 0) - (a.competitor.raw_score || 0);
-      }
-    });
-  }
+	sortCompetitors(by: 'Running Order' | 'Results') {
+		return this.competitors.sort((a, b) => {
+			if (by === 'Running Order') {
+				return (a.competitor.flight_order || 0) - (b.competitor.flight_order || 0);
+			} else {
+				return (b.competitor.raw_score || 0) - (a.competitor.raw_score || 0);
+			}
+		});
+	}
 
 	static async load(id: string) {
 		return await dbServer.get(`/competition/${id}`).then((res) => {
@@ -191,26 +189,35 @@ export class ContestManager {
 	}
 
 	async rotateFlightOrder(cont_from_previous: boolean, rotate_by: number) {
-		return dbServer.post(`competition/stage/rotatefo/`, {
-			stage_id: this.summary.id,
-			cont_from_previous,
-			rotate_by
-		}).then((res) => new ContestManager(res.data as CompThingSummary));
+		return dbServer
+			.post(`competition/stage/rotatefo/`, {
+				stage_id: this.summary.id,
+				cont_from_previous,
+				rotate_by
+			})
+			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
 
-  async addDirector(user_id: string) {
-    return dbServer.post(`competition/director`, {
-      comp_id: this.summary.id,
-      user_id
-    }).then((res) => new ContestManager(res.data as CompThingSummary));
+	async addDirector(user_id: string) {
+		return dbServer
+			.post(`competition/director`, {
+				comp_id: this.summary.id,
+				user_id
+			})
+			.then((res) => new ContestManager(res.data as CompThingSummary));
+	}
+
+  async removeDirector(user_id: string) {
+    return dbServer
+      .delete(`competition/director/${this.summary.id}/${user_id}`)
+      .then((res) => new ContestManager(res.data as CompThingSummary));
   }
 
-  get competition() {
-    let comp: ContestManager = this.parent || this;
-    while (comp.parent) {
-      comp = comp.parent;
-    }
-    return comp;
-  }
-
+	get competition() {
+		let comp: ContestManager = this.parent || this;
+		while (comp.parent) {
+			comp = comp.parent;
+		}
+		return comp;
+	}
 }
