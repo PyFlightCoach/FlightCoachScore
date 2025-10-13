@@ -1,5 +1,3 @@
-import type { BoxLocation } from "$lib/manoeuvre/positioning.svelte";
-
 
 export type Competition="Competition";
 export type Stage="Stage";

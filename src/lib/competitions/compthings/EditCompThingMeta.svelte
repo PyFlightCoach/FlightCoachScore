@@ -33,7 +33,7 @@
 
 </script>
 
-<label class="row form-label" for="description">Description:</label>
+<label class="row mx-1 my-0 form-label" for="description">Description:</label>
 <textarea class="form-control mb-2 {hasChanged(newMeta?.description, oldMeta.description)}" id="description" rows="3" bind:value={description} {disabled}></textarea>
 
 <div class="row mb-2">

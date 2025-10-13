@@ -10,6 +10,8 @@
 	import ResultRules from '../rules/ResultRules.svelte';
 	import type { AddRule, ResultRule, CompThingMeta } from '$lib/api/DBInterfaces/competition';
 	import EditCompThingMeta from './EditCompThingMeta.svelte';
+  import Directors from './Directors.svelte';
+
 	let {
 		competition = undefined,
 		oncreated = () => {}
@@ -24,9 +26,9 @@
 	let name: string | undefined = $state(competition?.summary.name);
 	let category: CategoryResponse | undefined = $state();
 	getCategories().then((categories) => {
-		categories.find((c) => c.category_id === competition?.summary.category_id);
+		category = categories.find((c) => c.category_id === competition?.summary.category_id);
 	});
-
+  $inspect(category);
 	let add_rules: AddRule = $state(competition?.summary.add_rules || ({} as AddRule));
 	let result_rules = $state(competition?.summary.result_rules || ({} as ResultRule));
 	let client_meta: CompThingMeta = $state(
@@ -52,6 +54,9 @@
 			{/each}
 		</select>
 	</div>
+  {#if competition}
+    <Directors competition={competition}/>
+  {/if}
 	<AddRules bind:newRule={add_rules} showChanges={competition != undefined} whatAmI="Competition" {disabled}/>
 	<ResultRules
 		oldRule={result_rules}
