@@ -7,17 +7,15 @@
 
 	let {
 		show = $bindable(false),
-    competition = undefined,
-		parent = undefined,
+    parent = undefined,
 		thing = $bindable(undefined)
 	}: {
 		show?: boolean;
-    competition?: ContestManager | undefined;
-		parent?: ContestManager | undefined;
+    parent?: ContestManager | undefined;
 		thing?: ContestManager | undefined;
 	} = $props();
 
-	const whatToEdit = $derived(thing?.summary.what_am_i || parent?.whatAreMyChildren);
+	const whatToEdit = $derived(thing?.summary.what_am_i || parent?.whatAreMyChildren || "Competition");
   
 </script>
 
@@ -31,7 +29,7 @@
 		/>
 	{:else if whatToEdit == 'Stage'}
 		<StageEditor
-			{parent}
+			parent={parent!}
 			stage={thing}
 			oncreated={() => {
 				show = false;
@@ -39,8 +37,7 @@
 		/>
 	{:else if whatToEdit == 'Round'}
 		<RoundEditor
-      {competition}
-			{parent}
+			stage={parent!}
 			round={thing}
 			oncreated={() => {
 				show = false;

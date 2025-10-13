@@ -21,7 +21,6 @@
 				<tr>
 					<th>Competition:</th>
 					<CompThingCell
-						competition={$activeComp}
 						thing={$activeComp!}
 						colspan={sum(nrounds) + nrounds.length + 2}
 					/>
@@ -30,7 +29,6 @@
 					<th>Stages:</th>
 					{#each $activeComp!.children as stage, i}
 						<CompThingCell
-							competition={$activeComp}
 							parent={$activeComp}
 							thing={stage}
 							colspan={nrounds[i] + 1}
@@ -42,7 +40,7 @@
 					<th>Rounds:</th>
 					{#each $activeComp!.children as stage, i}
 						{#each stage.children as round}
-							<CompThingCell competition={$activeComp} thing={round} />
+							<CompThingCell parent={stage} thing={round} />
 						{/each}
 						<th class="text-center">Total</th>
 					{/each}

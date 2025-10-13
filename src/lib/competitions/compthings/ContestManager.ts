@@ -20,12 +20,12 @@ export class ContestManager {
 
 	constructor(
 		readonly summary: CompThingSummary,
-		readonly parentID: string | undefined = undefined,
+		readonly parent: ContestManager | undefined = undefined,
 		i_am_cd: boolean | undefined = undefined,
 		i_am_competitor: boolean | undefined = undefined,
 		i_can_upload_to: boolean | undefined = undefined
 	) {
-		this.children = (summary.children || []).map((c) => new ContestManager(c, this.summary.id));
+		this.children = (summary.children || []).map((c) => new ContestManager(c, this));
 
 		const userID = get(user)?.id.replaceAll('-', '');
 
@@ -98,9 +98,9 @@ export class ContestManager {
 
 	async delete() {
 		return dbServer.delete(`competition/${this.summary.id}`).then(() => {
-			if (this.summary.what_am_i != 'Competition') {
+			if (this.parent) {
 				return dbServer
-					.get(`competition/${this.parentID}`)
+					.get(`competition/${this.parent.summary.id}`)
 					.then((res) => new ContestManager(res.data as CompThingSummary));
 			}
 		});
@@ -204,4 +204,13 @@ export class ContestManager {
       user_id
     }).then((res) => new ContestManager(res.data as CompThingSummary));
   }
+
+  get competition() {
+    let comp: ContestManager = this.parent || this;
+    while (comp.parent) {
+      comp = comp.parent;
+    }
+    return comp;
+  }
+
 }

@@ -11,12 +11,10 @@
 	import RunningOrderEditor from './RunningOrderEditor.svelte';
 
 	let {
-		competition = undefined,
 		parent = undefined,
 		thing = $bindable(),
 		colspan = 1
 	}: {
-		competition?: ContestManager | undefined;
 		parent?: ContestManager | undefined;
 		thing: ContestManager;
 		colspan?: number;
@@ -59,7 +57,7 @@
 				showEditor = true;
 			}}
 		>
-			{#if competition?.isMyComp || $user?.is_superuser}
+			{#if thing.isMyComp || $user?.is_superuser}
 				Edit
 			{:else}
 				Info
@@ -67,6 +65,7 @@
 		</button>
 		{#if thing.isMyComp}
 			{#if thing.summary.what_am_i === 'Round'}
+        {#if thing.summary.result_rules?.score_from_stage_n === null}
 				<button
 					class="dropdown-item"
 					onclick={() => {
@@ -82,6 +81,7 @@
 				>
 					{thing.summary.is_open_now ? 'Close' : 'Open'}
 				</button>
+        {/if}
 			{:else}
 				<button
 					class="dropdown-item"
@@ -100,7 +100,7 @@
         Running Order
       </button>
       {/if}
-			{#if competition?.isMyComp || $user?.is_superuser}
+			{#if thing.isMyComp || $user?.is_superuser}
 				<button
 					class="dropdown-item"
 					onclick={() => {
@@ -118,7 +118,9 @@
 								if (thing.summary.what_am_i === 'Competition') {
 									reloadDropDownComps();
 									goto('/');
-								}
+								} else {
+                  setComp(res);
+                }
 							})
 							.catch((err) => {
 								alert(`Failed to delete ${thing.summary.what_am_i}: ${prettyPrintHttpError(err)}`);
@@ -132,10 +134,10 @@
 	</div>
 
 	{#if showEditor}
-		<CompThingEditor {competition} bind:show={showEditor} {thing} />
+		<CompThingEditor {parent} bind:show={showEditor} {thing} />
 	{/if}
 	{#if showCreator}
-		<CompThingEditor {competition} bind:show={showCreator} parent={thing} />
+		<CompThingEditor parent={thing} bind:show={showCreator} />
 	{/if}
   
   <Popup bind:show={showRunningOrder}>

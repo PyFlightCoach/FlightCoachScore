@@ -10,7 +10,7 @@
 	import ResultRules from '../rules/ResultRules.svelte';
 	import type { AddRule, ResultRule, CompThingMeta } from '$lib/api/DBInterfaces/competition';
 	import EditCompThingMeta from './EditCompThingMeta.svelte';
-  import Directors from './Directors.svelte';
+	import Directors from './Directors.svelte';
 
 	let {
 		competition = undefined,
@@ -28,7 +28,7 @@
 	getCategories().then((categories) => {
 		category = categories.find((c) => c.category_id === competition?.summary.category_id);
 	});
-  $inspect(category);
+	$inspect(category);
 	let add_rules: AddRule = $state(competition?.summary.add_rules || ({} as AddRule));
 	let result_rules = $state(competition?.summary.result_rules || ({} as ResultRule));
 	let client_meta: CompThingMeta = $state(
@@ -39,7 +39,7 @@
 
 <div class="col">
 	<small class="col p-2">Competition Settings</small>
-	<TextInput name="Name" bind:value={name} {disabled}/>
+	<TextInput name="Name" bind:value={name} {disabled} />
 
 	<div class="row mb-2">
 		<label for="categorySelect" class="col col-form-label">Category:</label>
@@ -54,78 +54,82 @@
 			{/each}
 		</select>
 	</div>
-  {#if competition}
-    <Directors competition={competition}/>
-  {/if}
-	<AddRules bind:newRule={add_rules} showChanges={competition != undefined} whatAmI="Competition" {disabled}/>
-	<ResultRules
-		oldRule={result_rules}
-		bind:newRule={result_rules}
+	{#if competition}
+		<Directors {competition} />
+	{/if}
+	<AddRules
+		bind:newRule={add_rules}
 		showChanges={competition != undefined}
 		whatAmI="Competition"
-    {disabled}
+		{disabled}
+	/>
+	<ResultRules
+		compThing={competition}
+		bind:newRule={result_rules}
+		showChanges={competition != undefined}
+		{disabled}
 	/>
 	<EditCompThingMeta
 		oldMeta={competition?.summary.client_meta || {}}
 		bind:newMeta={client_meta}
 		showChanges={competition != undefined}
 		whatAmI="Competition"
-    {disabled}
+		{disabled}
 	/>
-  {#if !disabled}
-	<div class="row">
-		{#if !competition}
-			<button
-				class="col btn btn-primary "
-				disabled={!name || !category}
-				onclick={() => {
-					ContestManager.newCompetition({
-						name,
-						client_meta,
-						category_id: category!.category_id,
-						fa_version: $faVersion,
-						add_rules,
-						result_rules
-					})
-						.then(setComp)
-						.then(() => {
-							oncreated();
-							reloadDropDownComps();
-							goto(resolve(`/competition/view`));
-						})
-						.catch((error) => {
-							alert(
-								'Error creating competition: ' + error.response?.data?.detail ||
-									error.message ||
-									error
-							);
-						});
-				}}>Create</button
-			>
-		{:else}
-			<button
-				class="col btn btn-primary"
-				onclick={() => {
-					competition
-						.update({
+	{#if !disabled}
+		<div class="row">
+			{#if !competition}
+				<button
+					class="col btn btn-primary"
+					disabled={!name || !category}
+					onclick={() => {
+						ContestManager.newCompetition({
 							name,
 							client_meta,
-							category_id: category?.category_id,
+							category_id: category!.category_id,
+							fa_version: $faVersion,
 							add_rules,
 							result_rules
 						})
-						.then(setComp)
-						.then(oncreated)
-						.catch((error) => {
-							alert(
-								'Error editing competition: ' + error.response?.data?.detail ||
-									error.message ||
-									error
-							);
-						});
-				}}>Save</button
-			>
-		{/if}
-	</div>
-  {/if}
+							.then(setComp)
+							.then(() => {
+								oncreated();
+								reloadDropDownComps();
+								goto(resolve(`/competition/view`));
+							})
+							.catch((error) => {
+								alert(
+									'Error creating competition: ' + error.response?.data?.detail ||
+										error.message ||
+										error
+								);
+							});
+					}}>Create</button
+				>
+			{:else}
+				<button
+					class="col btn btn-primary"
+					onclick={() => {
+						competition
+							.update({
+								name,
+								client_meta,
+								category_id: category?.category_id,
+								add_rules,
+								result_rules
+							})
+							.then(setComp)
+							.then(oncreated)
+							.catch((error) => {
+								alert(
+									'Error editing competition: ' + error.response?.data?.detail ||
+										error.message ||
+										error
+								);
+							});
+					}}>Save</button
+				>
+			{/if}
+		</div>
+	{/if}
 </div>
