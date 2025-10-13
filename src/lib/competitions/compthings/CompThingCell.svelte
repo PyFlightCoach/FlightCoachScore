@@ -40,7 +40,7 @@
 	}}
 >
 	<button
-		class="btn btn-link text-light w-100 text-nowrap text-decoration-none m-0"
+		class="btn btn-link text-light w-100 text-nowrap text-decoration-none m-0 fw-bolder"
 		data-bs-toggle="dropdown"
 		aria-haspopup="true"
 		aria-expanded="false"

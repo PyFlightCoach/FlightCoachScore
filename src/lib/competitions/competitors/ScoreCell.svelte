@@ -67,13 +67,14 @@
 	>
 		{#if competitor?.competitor.raw_score && display === 'Results'}
 			<div
-				class={competitor?.competitor.score_dropped
+				class="{competitor?.competitor.score_dropped
 					? 'text-decoration-line-through '
-					: ''}
+					: ''} row"
 			>
-				{#if showRaw}{competitor.competitor.raw_score.toFixed(2)},
+				{#if showRaw}
+        <div class="col text-muted text-sm fst-italic fw-light">{competitor.competitor.raw_score.toFixed(2)}</div>
 				{/if}
-				{competitor.competitor.normalised_score?.toFixed(2)}
+				<div class="col fw-bold">{competitor.competitor.normalised_score?.toFixed(2)}</div>
 			</div>
 		{:else if !competitor?.competitor.missed_cut}
 			{#if display === 'Running Order'}
