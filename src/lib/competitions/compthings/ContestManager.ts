@@ -190,7 +190,7 @@ export class ContestManager {
 
 	async rotateFlightOrder(cont_from_previous: boolean, rotate_by: number) {
 		return dbServer
-			.post(`competition/stage/rotatefo/`, {
+			.post(`competition/stage/rotatefo`, {
 				stage_id: this.summary.id,
 				cont_from_previous,
 				rotate_by
