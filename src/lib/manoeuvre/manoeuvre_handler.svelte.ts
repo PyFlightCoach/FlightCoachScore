@@ -195,16 +195,12 @@ export class ManoeuvreHandler {
 	}
 
 	dumpAresti() {
-		const aresti = this.options.map((o, i) =>
-			o.aresti!.dump(this.info)//, i ? `${this.info.short_name}_option_${i}` : this.info.short_name)
-		);
+		const aresti = this.options.map((o, i) => o.aresti!.dump(this.info));
     return aresti.length == 1 ? aresti[0] : {figures: aresti};
 	}
 
 	dumpDefinition() {
-		const definition = this.options.map((o, i) =>
-			o.definition!.dump(this.info, i ? `${this.info.short_name}_option_${i}` : this.info.short_name)
-		);
+		const definition = this.options.map((o, i) => o.definition!.dump(this.info));
     return definition.length == 1 ? definition[0] : definition;
 	}
 
