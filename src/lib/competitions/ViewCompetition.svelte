@@ -22,7 +22,7 @@
 					<th>Competition:</th>
 					<CompThingCell
 						thing={$activeComp!}
-						colspan={sum(nrounds) + nrounds.length + 2}
+						colspan={sum(nrounds) + nrounds.length + (display=='Results' ?  2 : 0)}
 					/>
 				</tr>
 				<tr>
@@ -31,10 +31,12 @@
 						<CompThingCell
 							parent={$activeComp}
 							thing={stage}
-							colspan={nrounds[i] + 1}
+							colspan={nrounds[i] + (display=='Results' ? 1 : 0)}
 						/>
 					{/each}
-					<th rowspan="2" class="text-center">Total</th>
+          {#if display == 'Results'}
+					  <th rowspan="2" class="text-center">Total</th>
+          {/if}
 				</tr>
 				<tr>
 					<th>Rounds:</th>
@@ -42,7 +44,9 @@
 						{#each stage.children as round}
 							<CompThingCell parent={stage} thing={round} />
 						{/each}
-						<th class="text-center">Total</th>
+            {#if display == 'Results'}
+						  <th class="text-center">Total</th>
+            {/if}
 					{/each}
 				</tr>
 			</thead>
@@ -56,6 +60,7 @@
 							{/each}
 							<ScoreCell round={stage} competitorID={competitor.competitor.id} bind:display />
 						{/each}
+            
 						<ScoreCell round={$activeComp!} competitorID={competitor.competitor.id} bind:display />
 					</tr>
 				{/each}
