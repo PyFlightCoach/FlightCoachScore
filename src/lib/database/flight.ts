@@ -5,7 +5,7 @@ import { library } from '$lib/schedule/library';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 import { prettyPrintHttpError } from '$lib/utils/text';
-import { loading } from '$lib/stores/shared';
+import { dev } from '$lib/stores/shared';
 
 export class Flight {
 	constructor(
@@ -46,7 +46,11 @@ export async function loadInPlotter(flight_id: string) {
 		.post('flight/holding/copy/' + flight_id)
 		.then((res) => {
 			console.log('Flight copied to holding, expiry:', res.data.detail);
-			window.open('https://flightcoach.org/fcviewer/plotter.html?token=' + res.data.id, '_blank');
+			//dev
+			window.open(
+				`https://flightcoach.org/fcviewer/plotter.html?token=${res.data.id}${get(dev) ? '&server=dev' : ''}`,
+				'_blank'
+			);
 		})
 		.catch((err) => {
 			console.error(err);
