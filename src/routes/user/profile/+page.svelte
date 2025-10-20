@@ -177,7 +177,7 @@
         
 
     {/await}
-    <span>To delete your account, please email <a href="mailto:admin@flightcoachscore.org">admin@fcscore.org</a></span>
+    <span>To delete your account, please email <a href="mailto:admin@fcscore.org">admin@fcscore.org</a></span>
     </div>
   </div>
 </div>
