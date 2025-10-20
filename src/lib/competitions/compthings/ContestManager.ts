@@ -188,11 +188,12 @@ export class ContestManager {
 		);
 	}
 
-	async rotateFlightOrder(cont_from_previous: boolean, rotate_by: number) {
+	async rotateFlightOrder(cont_from_previous: boolean, randomise_first_round: boolean, rotate_by: number) {
 		return dbServer
 			.post(`competition/stage/rotatefo`, {
 				stage_id: this.summary.id,
 				cont_from_previous,
+				randomise_first_round: !cont_from_previous && randomise_first_round,
 				rotate_by
 			})
 			.then((res) => new ContestManager(res.data as CompThingSummary));

@@ -52,15 +52,17 @@ export interface ResultRule {
 
 
 export interface AddRule {
-  cd_and_self_add: boolean | null;
+  cd_and_self_add?: boolean | null;
+  cd_and_self_flight_add?: boolean | null;
 }
 
 
 export interface FlightRule {
-  flown_whilst_open: boolean | null;
-  upload_whilst_open: boolean | null;
-  upload_within_n_hours: number | null;
-  finalised: boolean | null;
+  flown_whilst_open?: boolean | null;
+  upload_whilst_open?: boolean | null;
+  upload_within_n_hours?: number | null;
+  upload_only_once?: boolean | null;
+  finalised?: boolean | null;
 }
 
 export interface CompLocation {
