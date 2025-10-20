@@ -3,9 +3,8 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { countries } from '$lib/utils/countries.js';
 	import CheckInput from '$lib/components/CheckInput.svelte';
-	import type { DBUser } from '$lib/stores/user';
 
-	interface UserSearchResult {
+  interface UserSearchResult {
 		id: string;
 		name: string;
 		country: string;
@@ -21,9 +20,11 @@
 
 	let {
 		allowFake,
+    only_cds = false,
 		onadded = () => {}
 	}: {
 		allowFake: boolean;
+    only_cds?: boolean;
 		onadded?: (user: UserResult) => void;
 	} = $props();
 
@@ -66,7 +67,7 @@
 			disabled={!name_or_email}
 			onclick={() => {
 				dbServer
-					.get('users/search', { params: { name_or_email } })
+					.get('users/search', { params: { name_or_email, only_cds } })
 					.then((res) => {
 						results = (res.data.results as UserSearchResult[]);
 						selected = results?.length ? results[0] : undefined;
