@@ -59,8 +59,8 @@
 	{/if}
 	<AddRules
 		bind:newRule={add_rules}
+    oldRule={competition?.summary.add_rules}
 		showChanges={competition != undefined}
-		whatAmI="Competition"
 		{disabled}
 	/>
 	<ResultRules

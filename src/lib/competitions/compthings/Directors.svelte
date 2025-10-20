@@ -62,6 +62,7 @@
 						<td colspan={competition.isMyComp ? 3 : 2} class="p-0 px-1">
 							<UserSearch
 								allowFake={false}
+                only_cds={true}
 								onadded={(user) =>
 									competition
 										.addDirector(user.id!)

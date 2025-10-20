@@ -22,7 +22,6 @@ export let analysisServer: AxiosInstance;
 export let dbServer: AxiosInstance;
 
 
-
 export const dbServers = {
 	uk: 'https://flightcoach.org:5012',
 	dev: 'https://flightcoach.org:5022',
