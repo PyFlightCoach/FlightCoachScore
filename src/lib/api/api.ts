@@ -24,14 +24,14 @@ export let dbServer: AxiosInstance;
 
 
 export const dbServers = {
-	uk: 'https://flightcoachscore.org:5012',
-	dev: 'https://flightcoachscore.org:5022',
+	uk: 'https://flightcoach.org:5012',
+	dev: 'https://flightcoach.org:5022',
   local: 'http://localhost:8000'
 };
 
 export const anServers = {
-	uk: 'https://flightcoachscore.org:5010',
-	dev: 'https://flightcoachscore.org:5020',
+	uk: 'https://flightcoach.org:5010',
+	dev: 'https://flightcoach.org:5020',
   local: 'http://localhost:5000'
 };
 
