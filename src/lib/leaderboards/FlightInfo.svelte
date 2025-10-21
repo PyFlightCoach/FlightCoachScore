@@ -169,8 +169,15 @@
 					class="form-control btn btn-outline-secondary"
 					onclick={() => {
 						if (confirm('Are you sure you want to delete this flight?')) {
-							dbServer.delete(`flight/${f.meta.flight_id}`);
-							$activeFlight = undefined;
+							dbServer.delete(`flight/${f.meta.flight_id}`)
+              .then(() => {
+                $activeFlight = undefined;
+              })
+              .catch((err) => {
+                alert('Failed to delete flight: ' + prettyPrintHttpError(err));
+                throw err;
+              })
+							
 						}
 					}}
 				>

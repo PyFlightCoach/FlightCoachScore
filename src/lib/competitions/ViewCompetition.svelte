@@ -6,7 +6,7 @@
 	import CompetitorCell from '$lib/competitions/competitors/CompetitorCell.svelte';
 	import AddCompetitor from '$lib/competitions/competitors/AddCompetitor.svelte';
 	import ScoreCell from '$lib/competitions/competitors/ScoreCell.svelte';
-	import { objmap } from '$lib/utils/arrays';
+	
 	let { display = $bindable('Results') }: { display: 'Results' | 'Running Order' } = $props();
 
 	let nrounds = $derived($activeComp!.children.map((stage) => stage.children.length));
@@ -16,9 +16,10 @@
 	let cuts = $derived.by(() => {
 		const cuts = Array($activeComp!.competitors.length).fill(undefined);
 		$activeComp?.children.forEach((stage, i) => {
-			const progress = stage.summary.result_rules?.progress_top_n;
-			if (progress && progress < $activeComp.competitors.length) {
-				cuts[progress] = [...(cuts[progress] || []), stage.summary.name];
+			
+      console.log(stage.summary.name, stage.cutLoc);
+			if (stage.cutLoc < $activeComp.competitors.length) {
+				cuts[stage.cutLoc] = [...(cuts[stage.cutLoc] || []), stage.summary.name];
 			}
 		});
 		return cuts;
