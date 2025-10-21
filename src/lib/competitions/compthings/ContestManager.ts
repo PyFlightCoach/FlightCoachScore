@@ -18,7 +18,8 @@ export class ContestManager {
 	iCanUpload: boolean;
 	competitors: PilotManager[];
 	whatAreMyChildren: 'Stage' | 'Round' | undefined;
-
+  normalise: boolean = false;
+  
 	constructor(
 		readonly summary: CompThingSummary,
 		readonly parent: ContestManager | undefined = undefined,
@@ -28,13 +29,6 @@ export class ContestManager {
 	) {
 		this.children = (summary.children || []).map((c) => new ContestManager(c, this));
 
-		if (i_am_cd === undefined) {
-			this.isMyComp =
-				includesUUID(summary.directors?.map((d) => d.id) || [], get(user)?.id) ||
-				get(user)!.is_superuser;
-		} else {
-			this.isMyComp = i_am_cd!;
-		}
 
 		this.competitors =
 			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
@@ -62,14 +56,25 @@ export class ContestManager {
 				: this.summary.what_am_i === 'Stage'
 					? 'Round'
 					: undefined;
-	}
 
+		if (i_am_cd === undefined) {
+			this.isMyComp =
+				includesUUID(this.competition.summary.directors?.map((d) => d.id) || [], get(user)?.id) ||
+				get(user)!.is_superuser;
+		} else {
+			this.isMyComp = i_am_cd!;
+		}
+
+    this.normalise = this.summary.result_rules?.normalise_best_to_n || this.summary.result_rules?.normalise_average_to_n ? true : false;
+
+	}
+   
 	sortCompetitors(by: 'Running Order' | 'Results') {
 		return this.competitors.sort((a, b) => {
 			if (by === 'Running Order') {
 				return (a.competitor.flight_order || 0) - (b.competitor.flight_order || 0);
 			} else {
-				return (b.competitor.raw_score || 0) - (a.competitor.raw_score || 0);
+				return (a.competitor.position || 0) - (b.competitor.position || 0);
 			}
 		});
 	}
