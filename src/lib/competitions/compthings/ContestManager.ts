@@ -18,8 +18,9 @@ export class ContestManager {
 	iCanUpload: boolean;
 	competitors: PilotManager[];
 	whatAreMyChildren: 'Stage' | 'Round' | undefined;
-  normalise: boolean = false;
-  
+	normalise: boolean = false;
+	cutLoc: number;
+
 	constructor(
 		readonly summary: CompThingSummary,
 		readonly parent: ContestManager | undefined = undefined,
@@ -28,7 +29,6 @@ export class ContestManager {
 		i_can_upload_to: boolean | undefined = undefined
 	) {
 		this.children = (summary.children || []).map((c) => new ContestManager(c, this));
-
 
 		this.competitors =
 			this.summary.competitors?.map((c) => new PilotManager(this.summary.id, c)) || [];
@@ -65,10 +65,18 @@ export class ContestManager {
 			this.isMyComp = i_am_cd!;
 		}
 
-    this.normalise = this.summary.result_rules?.normalise_best_to_n || this.summary.result_rules?.normalise_average_to_n ? true : false;
+		this.normalise =
+			this.summary.result_rules?.normalise_best_to_n ||
+			this.summary.result_rules?.normalise_average_to_n
+				? true
+				: false;
 
+    const nProgress = this.summary.result_rules?.progress_top_n;
+		this.cutLoc = this.competitors
+				.filter((c) => nProgress && c.competitor.position && c.competitor.position <= nProgress )
+				.length;
 	}
-   
+
 	sortCompetitors(by: 'Running Order' | 'Results') {
 		return this.competitors.sort((a, b) => {
 			if (by === 'Running Order') {
@@ -193,7 +201,11 @@ export class ContestManager {
 		);
 	}
 
-	async rotateFlightOrder(cont_from_previous: boolean, randomise_first_round: boolean, rotate_by: number) {
+	async rotateFlightOrder(
+		cont_from_previous: boolean,
+		randomise_first_round: boolean,
+		rotate_by: number
+	) {
 		return dbServer
 			.post(`competition/stage/rotatefo`, {
 				stage_id: this.summary.id,
@@ -213,11 +225,11 @@ export class ContestManager {
 			.then((res) => new ContestManager(res.data as CompThingSummary));
 	}
 
-  async removeDirector(user_id: string) {
-    return dbServer
-      .delete(`competition/director/${this.summary.id}/${user_id}`)
-      .then((res) => new ContestManager(res.data as CompThingSummary));
-  }
+	async removeDirector(user_id: string) {
+		return dbServer
+			.delete(`competition/director/${this.summary.id}/${user_id}`)
+			.then((res) => new ContestManager(res.data as CompThingSummary));
+	}
 
 	get competition() {
 		let comp: ContestManager = this.parent || this;
