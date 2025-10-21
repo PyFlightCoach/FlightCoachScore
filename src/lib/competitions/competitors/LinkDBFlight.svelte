@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
-	import type { DBFlightRanked, DBFlightScore } from '$lib/api/DBInterfaces/flight';
+	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { faVersion } from '$lib/stores/shared';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
+	import { prettyPrintHttpError } from '$lib/utils/text';
 
+  
 	let {
 		round,
 		competitor,
@@ -19,7 +21,9 @@
 			params: {
 				n_results: 100,
 				fa_version: $faVersion,
-				schedule_id: round.summary.schedule_id || null
+				schedule_id: round.summary.schedule_id || null,
+        date_after: round.summary.flight_rules?.flown_whilst_open ? round.summary.date_start : undefined,
+        date_before: round.summary.flight_rules?.flown_whilst_open ? round.summary.date_end : undefined
 			}
 		})
 		.then((res) => {
@@ -57,7 +61,7 @@
 									show = false;
 								})
 								.catch((err) => {
-									alert(`Failed to link flight: ${err}`);
+									alert(`Failed to link flight: ${prettyPrintHttpError(err)}`);
 								});
 						}}
 					>

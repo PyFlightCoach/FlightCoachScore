@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { library } from '$lib/schedule/library';
-	import { userActivity, requestActivity } from '$lib/stores/userActivity';
+	import { type UserActivityResponse } from '$lib/database/userActivity';
 	import { nth } from '$lib/utils/numbers';
+  let {activity} : {activity: UserActivityResponse[];} = $props()
 
 	let scheduleSummary = $derived($library.summarize());
 </script>
@@ -33,8 +34,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#await requestActivity() then _}
-						{#each $userActivity || [] as row, i}
+						{#each activity as row, i}
 							{#if scheduleSummary[row.best_rank_schedule_id]}
 								<tr class="align-middle">
 									<td>{i + 1}</td>
@@ -49,7 +49,6 @@
 								</tr>
 							{/if}
 						{/each}
-					{/await}
 				</tbody>
 			</table>
 		</div>
