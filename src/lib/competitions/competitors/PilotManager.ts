@@ -35,4 +35,19 @@ export class PilotManager {
 		}
 		return this.user as DBUser;
 	}
+
+  get isMe() {
+    return this.competitor.id === this.competitor.id;
+  }
+
+  get display() {
+
+    if (this.competitor.raw_score) {
+      return this.competitor.raw_score.toFixed(2);
+    }
+
+
+  }
+
+
 }
