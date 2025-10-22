@@ -15,17 +15,17 @@
 	}: { round: ContestManager; competitor: PilotManager; show?: boolean } = $props();
 
 	let flights: DBFlightRanked[] = $state([]);
-
-	dbServer
-		.get('analysis/flightlist', {
-			params: {
+  let params = {
 				n_results: 100,
 				fa_version: $faVersion,
 				schedule_id: round.summary.schedule_id || null,
-        date_after: round.parent!.summary.flight_rules?.flown_whilst_open ? round.summary.date_start : undefined,
-        date_before: round.parent!.summary.flight_rules?.flown_whilst_open ? round.summary.date_end : undefined
 			}
-		})
+  if (round.parent!.summary.flight_rules?.flown_whilst_open) {
+    params.date_after = round.summary.date_start;
+  }
+
+	dbServer
+		.get('analysis/flightlist', {params})
 		.then((res) => {
 			flights = res.data.results.filter(
 				(f: DBFlightRanked) => f.pilot_id == competitor.competitor.id
