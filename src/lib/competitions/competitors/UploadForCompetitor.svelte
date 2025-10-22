@@ -18,12 +18,12 @@
 		round?: ContestManager | undefined;
 		schedule?: DBSchedule | undefined;
 	} = $props();
-
+  
 	let showForm: boolean = $state(false);
   let showCompSelect: boolean = $state(false);
 
 	let openRounds = $derived(competition?.openRounds(schedule?.schedule_id) || []);
-  
+  $inspect(openRounds); 
 	let openRound = $derived(
 		competition?.children
 			.find((s) => s.summary.is_open_now)
@@ -67,7 +67,7 @@
       filterSubset={['Ready', 'Open']}
       actionSubset={['Enter', 'Select']}
       onselected={()=>{showCompSelect=false; round=openRounds[0]}}
-      schedule={schedule}
+      {schedule}
     />
   </Popup>
 

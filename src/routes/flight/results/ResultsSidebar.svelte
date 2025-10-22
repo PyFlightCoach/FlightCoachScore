@@ -57,6 +57,7 @@
 	let round: ContestManager | undefined = $state();
 	let pilotId: string | undefined = $state();
 
+
 	const upload = async () => {
 		checkUser(false, false, false)
 			.then(() => {
