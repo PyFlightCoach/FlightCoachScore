@@ -119,7 +119,7 @@
 		<div>
 			<span class="small text-nowrap text-muted w-100 overflow-scroll">
 				{$info}
-				{#if $info && !isRunning && !$info.includes('Imported') && score == 0}
+				{#if $info && !isRunning && !$info.includes('Imported') && !$info.includes('New') && score == 0}
 					<button
 						tabindex="0"
 						class=" btn btn-sm btn-link p-0"
