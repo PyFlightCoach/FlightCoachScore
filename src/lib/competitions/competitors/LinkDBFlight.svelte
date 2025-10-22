@@ -22,8 +22,8 @@
 				n_results: 100,
 				fa_version: $faVersion,
 				schedule_id: round.summary.schedule_id || null,
-        date_after: round.summary.flight_rules?.flown_whilst_open ? round.summary.date_start : undefined,
-        date_before: round.summary.flight_rules?.flown_whilst_open ? round.summary.date_end : undefined
+        date_after: round.parent!.summary.flight_rules?.flown_whilst_open ? round.summary.date_start : undefined,
+        date_before: round.parent!.summary.flight_rules?.flown_whilst_open ? round.summary.date_end : undefined
 			}
 		})
 		.then((res) => {
