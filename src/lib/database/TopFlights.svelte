@@ -7,6 +7,9 @@
 	}: {
 		topflights: { schedule: string; count: number; flights: DBFlightRanked[] }[];
 	} = $props();
+
+
+  
 </script>
 
 <div class="table-responsive rounded text-center">
