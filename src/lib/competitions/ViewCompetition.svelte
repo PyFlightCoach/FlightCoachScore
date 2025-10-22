@@ -24,7 +24,7 @@
 		});
 		return cuts;
 	});
-	$inspect(cuts);
+	
 </script>
 
 <div class="container-auto p-0">
