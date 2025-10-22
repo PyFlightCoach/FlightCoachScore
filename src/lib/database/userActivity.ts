@@ -24,7 +24,7 @@ export async function loadActivity() {
 	});
 }
 
-export async function loadRecent(n_results = 20) {
+export async function loadRecent(n_results = 18) {
 	return dbServer.get('/analysis/flightlist', { params: {n_results} } ).then((res) => {
 		return res.data.results as DBFlightRanked[];
 	});
