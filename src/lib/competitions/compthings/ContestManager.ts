@@ -71,10 +71,10 @@ export class ContestManager {
 				? true
 				: false;
 
-    const nProgress = this.summary.result_rules?.progress_top_n;
-		this.cutLoc = this.competitors
-				.filter((c) => nProgress && c.competitor.position && c.competitor.position <= nProgress )
-				.length;
+		const nProgress = this.summary.result_rules?.progress_top_n;
+		this.cutLoc = this.competitors.filter(
+			(c) => nProgress && c.competitor.position && c.competitor.position <= nProgress
+		).length;
 	}
 
 	sortCompetitors(by: 'Running Order' | 'Results') {
@@ -87,9 +87,20 @@ export class ContestManager {
 		});
 	}
 
-	static async load(id: string) {
+	static async load(
+		id: string,
+		i_am_cd: boolean | undefined = undefined,
+		i_am_competitor: boolean | undefined = undefined,
+		i_can_upload_to: boolean | undefined = undefined
+	) {
 		return await dbServer.get(`/competition/${id}`).then((res) => {
-			return new ContestManager(res.data as CompThingSummary);
+			return new ContestManager(
+				res.data as CompThingSummary,
+				undefined,
+				i_am_cd,
+				i_am_competitor,
+				i_can_upload_to
+			);
 		});
 	}
 
@@ -166,7 +177,13 @@ export class ContestManager {
 	}
 
 	get rounds() {
-		return this.children.map((s) => s.children).flat();
+		if (this.whatAreMyChildren === 'Round') {
+			return this.children;
+		} else if (this.whatAreMyChildren === 'Stage') {
+			return this.children.map((s) => s.children).flat();
+		} else {
+			throw new Error('Cannot get rounds for a round');
+		}
 	}
 
 	openRounds(schedule_id: string | undefined) {
@@ -188,6 +205,7 @@ export class ContestManager {
 	}
 
 	checkCanUpload(schedule_id: string | undefined) {
+		console.log('Checking can upload for schedule:', schedule_id, ' in comp:', this.summary.id);
 		return (
 			this.checkSchedule(schedule_id, true) &&
 			(this.iAmCompeting || this.isMyComp) &&

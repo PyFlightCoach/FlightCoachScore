@@ -24,20 +24,21 @@
 		onentered?: () => void;
 	} = $props();
 
-	let category = $state('All');
+	
 	let categories = $derived(getCategories());
-
+  let category = $state("All");
+  
 	let group: ContestGroup = $state(filterSubset[0]);
 
 	const competitions: Promise<ContestManager[]> = $derived(
-		listComps(group, category === 'All' ? undefined : category).then((comps) =>
-			comps.filter(
-				(c) => !schedule || !c.summary.schedule_id || c.summary.schedule_id == schedule.schedule_id
+		listComps(group, category === 'All' ? undefined : category, true).then((comps) => {
+			return comps.filter(
+				(c) => !schedule || c.checkCanUpload(schedule.schedule_id)
 			)
-		)
+    })
 	);
 
-	$inspect(category);
+	
 </script>
 
 <div class="container-auto p-0">
