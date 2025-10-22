@@ -5,10 +5,8 @@
 	import * as types from '$lib/api/DBInterfaces/flight';
 	import { Flight, loadInPlotter } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
-	import { resolve } from '$app/paths';
 	import { loadAnalysisFromDB, loadAJson } from '$lib/flight/analysis';
-	import { loading, activeFlight } from '$lib/stores/shared';
-	import { goto } from '$app/navigation';
+	import {  activeFlight } from '$lib/stores/shared';
 	import { windowWidth, blockProgress } from '$lib/stores/shared';
 	import { saveAs } from 'file-saver';
 	import JSZip from 'jszip';
