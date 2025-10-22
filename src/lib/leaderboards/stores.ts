@@ -82,8 +82,8 @@ export const updateTable = async () => {
     };
 
     const _method = get(sort_by_score_flag) ? 'leaderboard' : 'flightlist';
-        
-    dbServer.get('analysis/' + _method + '?' + new URLSearchParams(q).toString()).then((res) => {
+
+    dbServer.get(`analysis/${_method}/`, {params:q}).then((res) => {
       table_rows.set(res.data.results.map((row: types.DBFlightRanked | types.DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));

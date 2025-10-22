@@ -68,3 +68,7 @@ export function objmap<T, T2>(obj: Record<string, T>, fun: (k: string, v: T)=>T2
 export function objfilter<T>(obj: Record<string, T>, fun: (k:string, v: T)=>boolean) {
   return Object.fromEntries(Object.entries(obj).filter(([k, v])=>fun(k, v)));
 }
+
+export function objSort<T>(obj: Record<string, T>, fun: (k: string, v: T)=> number) {
+  return Object.fromEntries(Object.entries(obj).sort(([k1, v1], [k2, v2])=>fun(k1, v1) - fun(k2, v2)));
+}

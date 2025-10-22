@@ -2,24 +2,29 @@
 	import { user } from '$lib/stores/user';
 	import About from './About.svelte';
 	import UserActivity from '../lib/database/UserActivity.svelte';
-  import {loadActivity} from '$lib/database/userActivity';
-  import * as nbc from '$lib/stores/navBarContents';
+	import RecentFlights from '$lib/database/RecentFlights.svelte';
+	import TopFlights from '$lib/database/TopFlights.svelte';
+	import { loadActivity, loadRecent, loadTopFlights } from '$lib/database/userActivity';
+	import * as nbc from '$lib/stores/navBarContents';
 	import { dbServer } from '$lib/api';
 
 	nbc.reset();
 	let activeNews = $state(0);
 	let show = $state('About');
 	const getNews = $derived(
-		$user ? dbServer
-			.get('news')
-			.then((res) => {
-				show = 'News';
-				activeNews = 0;
-				return res.data.results;
-			}) : []
+		$user
+			? dbServer.get('news').then((res) => {
+					show = 'News';
+					activeNews = 0;
+					return res.data.results;
+				})
+			: []
 	);
 
-  const getUserActivity = $derived($user ? loadActivity() : undefined)
+	let tableShow = $state('userActivity');
+	const getUserActivity = $derived($user ? loadActivity() : undefined);
+	const getRecent = $derived($user ? loadRecent() : undefined);
+	const getTopFlights = $derived($user ? loadTopFlights(3) : undefined);
 </script>
 
 <div class="row justify-content-around">
@@ -81,11 +86,43 @@
 			{/if}
 		{/await}
 	</div>
-	{#await getUserActivity then userActivity}
-    {#if userActivity}
+	{#if $user}
 		<div class="col-lg-6 justify-content-center px-lg-2 px-0">
-			<UserActivity activity={userActivity} />
+			<div class="button-grp mb-2 text-center py-2">
+				<input
+					type="radio"
+					class="btn-check"
+					value="userActivity"
+					id="userActivity"
+					bind:group={tableShow}
+				/>
+				<label class="btn btn-outline-secondary btn-sm" for="userActivity">Prolific Users</label>
+
+				<input type="radio" class="btn-check" value="last20" id="last20" bind:group={tableShow} />
+				<label class="btn btn-outline-secondary btn-sm" for="last20">Recent Flights</label>
+
+				<input
+					type="radio"
+					class="btn-check"
+					value="topFlights"
+					id="topFlights"
+					bind:group={tableShow}
+				/>
+				<label class="btn btn-outline-secondary btn-sm" for="topFlights">Top Flights</label>
+			</div>
+			{#if tableShow == 'userActivity'}
+				{#await getUserActivity then userActivity}
+					{#if userActivity}<UserActivity activity={userActivity} />{/if}
+				{/await}
+			{:else if tableShow == 'last20'}
+				{#await getRecent then recent}
+					{#if recent}<RecentFlights flightlist={recent} />{/if}
+				{/await}
+			{:else if tableShow == 'topFlights'}
+				{#await getTopFlights then topflights}
+					{#if topflights}<TopFlights {topflights} />{/if}
+				{/await}
+			{/if}
 		</div>
-    {/if}
-	{/await}
+	{/if}
 </div>

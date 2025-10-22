@@ -35,3 +35,10 @@ export function compareUUIDs (a: string| undefined, b: string | undefined) {
 export function includesUUID (list: string[], uuid: string | undefined) {
   return uuid !==undefined && list.some((x) => compareUUIDs(x, uuid));
 }
+
+
+export function numberToPosition(n: number): string {
+  const suffixes = ["th", "st", "nd", "rd"];
+  const value = n % 100;
+  return n + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]);
+}

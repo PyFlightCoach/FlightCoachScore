@@ -2,7 +2,7 @@
 	import { library } from '$lib/schedule/library';
 	import { type UserActivityResponse } from '$lib/database/userActivity';
 	import { nth } from '$lib/utils/numbers';
-  let {activity} : {activity: UserActivityResponse[];} = $props()
+	let { activity }: { activity: UserActivityResponse[] } = $props();
 
 	let scheduleSummary = $derived($library.summarize());
 </script>
@@ -18,39 +18,30 @@
 	<td class="text-nowrap">{ssummary.repr}</td>
 {/snippet}
 
-<div class="row justify-content-center pt-0">
-	<div class="col-auto text-center">
-		<h1 class="h-1 pt-md-3">Top Users</h1>
-		<div class="row table-responsive">
-			<table class="table">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>Pilot</th>
-						<th>Flights</th>
-						<th>Country</th>
-						<th colspan="2">Best Rank</th>
-						<!--<th colspan="2">Best Normalised</th>-->
+<div class="table-responsive rounded">
+	<table class="table table-striped">
+		<thead class="table-dark">
+			<tr>
+				<th>#</th>
+				<th>Pilot</th>
+				<th>Flights</th>
+				<th>Country</th>
+				<th colspan="2">Best Rank</th>
+				<!--<th colspan="2">Best Normalised</th>-->
+			</tr>
+		</thead>
+		<tbody>
+			{#each activity as row, i}
+				{#if scheduleSummary[row.best_rank_schedule_id]}
+					<tr class="align-middle">
+						<td>{i + 1}</td>
+						<td>{row.name}</td>
+						<td>{row.total_n}</td>
+						<td>{row.country}</td>
+						{@render rankinfo(row.best_rank, scheduleSummary[row.best_rank_schedule_id], false)}
 					</tr>
-				</thead>
-				<tbody>
-						{#each activity as row, i}
-							{#if scheduleSummary[row.best_rank_schedule_id]}
-								<tr class="align-middle">
-									<td>{i + 1}</td>
-									<td>{row.name}</td>
-									<td>{row.total_n}</td>
-									<td>{row.country}</td>
-									{@render rankinfo(
-										row.best_rank,
-										scheduleSummary[row.best_rank_schedule_id],
-										false
-									)}
-								</tr>
-							{/if}
-						{/each}
-				</tbody>
-			</table>
-		</div>
-	</div>
+				{/if}
+			{/each}
+		</tbody>
+	</table>
 </div>
