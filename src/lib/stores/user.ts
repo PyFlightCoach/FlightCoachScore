@@ -3,8 +3,6 @@ import { dbServer, formDataFromDict } from '$lib/api/api';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { library, loadSchedules } from '$lib/schedule/library';
-import { loadNews, clearNews } from './shared';
-import { requestActivity, clearActivity } from '$lib/stores/userActivity';
 import { get } from 'svelte/store';
 
 
@@ -63,16 +61,12 @@ user.subscribe((u) => {
 export async function postLoginUser() {
 	await Promise.all([
 		loadSchedules({ owner: get(user)?.email }),
-		loadNews(),
-		requestActivity()
 	]);
 }
 
 export async function postLogoutUser() {
 	user.set(undefined);
 	library.set(get(library).subset({ owner: 'admin@fcscore.org' }));
-	clearNews();
-	clearActivity();
 }
 
 export async function loginUser(email: string, password: string) {
