@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { breakPoints, breakPoint } from '$lib/stores/shared';
 	import { showCollapseToggle } from '$lib/stores/navBarContents';
-
-  
-  //A sidebar that becomes an offcanvas at bp.
-  //below bp a button to show the offcanvas is added to the bottom navbar
-
+	//A sidebar that becomes an offcanvas at bp.
+	//below bp a button to show the offcanvas is added to the bottom navbar
 
 	let {
 		side,
@@ -21,10 +18,9 @@
 
 	let showSidebar = $derived(breakPoints[bp] < breakPoints[$breakPoint]);
 
-  $effect(() => {
-    $showCollapseToggle = !showSidebar;
-  });
-
+	$effect(() => {
+		$showCollapseToggle = !showSidebar;
+	});
 </script>
 
 {#if side}
@@ -44,8 +40,11 @@
 	</div>
 {/if}
 <div
-	class={`${side && showSidebar ? `col-${12 - sideBarWidth}` : 'w-100'} px-0 justify-content-center text-center`}
+	class={`${side && showSidebar ? `col-${12 - sideBarWidth}` : 'w-100'} px-0 justify-content-center text-center pb-5`}
 >
-	{@render main?.()}
+	<div style="position:relative; height: 100%;">
+		<div class="overflow-auto" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+			{@render main?.()}
+		</div>
+	</div>
 </div>
-

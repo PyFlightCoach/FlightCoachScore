@@ -3,9 +3,9 @@
 	import ResultsSidebar from './ResultsSidebar.svelte';
 	import AnalysisSummary from './AnalysisSummary.svelte';
 	import { totalScore } from '$lib/stores/analysis';
-  import * as nbc from '$lib/stores/navBarContents';
+	import * as nbc from '$lib/stores/navBarContents';
 
-  nbc.reset();
+	nbc.reset();
 </script>
 
 <SideBarLayout sideBarWidth={4}>
@@ -14,8 +14,8 @@
 	{/snippet}
 
 	{#snippet main()}
-		<div class="col-auto align-self pt-3">
-			<div class="row px-md-5">
+		<div class="container-fluid">
+			<div class="row justify-content-center">
 				<div class="col-auto">
 					<AnalysisSummary />
 				</div>

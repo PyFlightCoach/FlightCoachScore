@@ -46,14 +46,7 @@
 	{/snippet}
 	{#snippet main()}
 		{#if $table_rows.length}
-			<div style="position:relative; height: 100%;">
-				<div
-					class="overflow-auto"
-					style="position: absolute; top: 0; left: 0; bottom: 0; right: 0;"
-				>
 					<slot />
-				</div>
-			</div>
 		{/if}
 	{/snippet}
 </SideBarLayout>
