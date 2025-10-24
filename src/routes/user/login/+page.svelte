@@ -9,7 +9,7 @@
 	let form_state: string | undefined;
 
 	afterNavigate(({ from }) => {
-		previousPage = from?.url.pathname || previousPage;
+		previousPage = from?.url.href || previousPage;
     if (previousPage.includes('user')) {
       previousPage = resolve("/");
     }
@@ -22,7 +22,7 @@
     loginUser(fdata.get('email') as string, fdata.get('current-password') as string)
       .then(() => {
         form_state = undefined;
-        goto(previousPage || resolve("/"));
+        goto(previousPage);
       })
       .catch((error) => {
         console.error('Login error:', error);
