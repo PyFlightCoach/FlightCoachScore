@@ -263,6 +263,7 @@ export async function loadAJson(flight_id: string) {
 
 export async function loadAnalysisFromDB(flight_id: string) {
   if (flight_id == get(activeFlight)?.meta.flight_id) {
+    goto(resolve('/flight/results'));
     return; //already loaded
   }
 	if (get(sts.manNames) && !confirm('Loading from DB will clear current analysis, continue?')) {
