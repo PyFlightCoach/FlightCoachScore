@@ -16,11 +16,11 @@
 	{#snippet main()}
 		<div class="container-fluid">
 			<div class="row justify-content-center">
-				<div class="col-auto">
+				<div class="col-auto mt-4">
 					<AnalysisSummary />
 				</div>
 
-				<h2>Total Score = {$totalScore}</h2>
+				<h2 class="">Total Score = {$totalScore}</h2>
 			</div>
 		</div>
 	{/snippet}

@@ -128,7 +128,7 @@
 			showResultsSelection = !showResultsSelection;
 		}}
 	>
-		{$faVersion}, {['Easy', 'Medium', 'Hard'][$difficulty - 1]}{#if $truncate}, T{/if}
+		{$selectedResult}, {['Easy', 'Medium', 'Hard'][$difficulty - 1]}{#if $truncate}, T{/if}
 		<i class="bi {showResultsSelection ? 'bi-chevron-up' : 'bi-chevron-down'}"></i>
 	</button>
 </div>
