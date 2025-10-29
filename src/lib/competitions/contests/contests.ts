@@ -35,7 +35,7 @@ export async function listComps(
 					if (category_id && c.compthing.category_id != category_id) {
 						return false;
 					}
-					if (group == 'Open' && (!c.compthing.add_rules?.cd_and_self_add || c.i_am_competitor)) {
+					if (group == 'Open' && (!c.compthing.add_rules?.cd_and_self_add)) {
 						return false;
 					}
 					return true;

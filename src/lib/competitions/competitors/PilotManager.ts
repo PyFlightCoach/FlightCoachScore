@@ -3,6 +3,7 @@ import { dbServer } from '$lib/api';
 import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 import type { DBUser } from '$lib/stores/user';
 import type { CompThingSummary } from '$lib/api/DBInterfaces/competition';
+import { compareUUIDs } from '$lib/utils/text';
 
 export class PilotManager {
 	user: DBUser | undefined = undefined;
@@ -36,8 +37,8 @@ export class PilotManager {
 		return this.user as DBUser;
 	}
 
-  get isMe() {
-    return this.competitor.id === this.competitor.id;
+  isMe(userid: string) {
+    return compareUUIDs(this.competitor.id, userid);
   }
 
   get display() {

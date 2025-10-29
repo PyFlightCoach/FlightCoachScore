@@ -17,7 +17,7 @@ export const loading: Writable<boolean | undefined> = writable();
 export const activeFlight: Writable<Flight | undefined> = writable();
 export const isAnalysisModified: Writable<boolean | undefined> = writable();
 
-export const dataSource: Writable<string | undefined> = writable();
+export const dataSource: Writable<"state" | "bin" | "fcj" | "db" | "acrowrx" | "example"> = writable("bin");
 
 export const dev: Writable<boolean> = writable(isdev);
 

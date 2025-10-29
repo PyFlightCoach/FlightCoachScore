@@ -8,12 +8,13 @@ import { get } from 'svelte/store';
 import { user } from '$lib/stores/user';
 import { PilotManager } from '$lib/competitions/competitors/PilotManager';
 import { library } from '$lib/schedule/library';
-import { includesUUID } from '$lib/utils/text';
+import { includesUUID, compareUUIDs } from '$lib/utils/text';
 
 export class ContestManager {
 	children: ContestManager[] = [];
 	isMyComp: boolean;
 	iAmCompeting: boolean;
+	me: PilotManager | undefined;
 	iCanEnter: boolean;
 	iCanUpload: boolean;
 	competitors: PilotManager[];
@@ -38,6 +39,8 @@ export class ContestManager {
 		} else {
 			this.iAmCompeting = i_am_competitor!;
 		}
+
+		this.me = this.competitors.find((c) => compareUUIDs(c.competitor.id, get(user)?.id));
 
 		if (i_can_upload_to === undefined) {
 			this.iCanUpload =
@@ -182,8 +185,25 @@ export class ContestManager {
 		} else if (this.whatAreMyChildren === 'Stage') {
 			return this.children.map((s) => s.children).flat();
 		} else {
-			throw new Error('Cannot get rounds for a round');
+			return [this];
 		}
+	}
+
+	get stages() {
+		if (this.whatAreMyChildren === 'Stage') {
+			return this.children;
+		} else if (this.summary.what_am_i === 'Round' && this.parent) {
+			return [this.parent];
+		} else {
+			return [this];
+		}
+	}
+
+	get allFlightIds() {
+		return this.rounds
+			.map((r) => r.competitors.map((c) => c.competitor.flight_id))
+			.flat()
+			.filter((f) => !!f) as string[];
 	}
 
 	openRounds(schedule_id: string | undefined) {
@@ -204,13 +224,91 @@ export class ContestManager {
 		);
 	}
 
-	checkCanUpload(schedule_id: string | undefined) {
-		console.log('Checking can upload for schedule:', schedule_id, ' in comp:', this.summary.id);
-		return (
-			this.checkSchedule(schedule_id, true) &&
-			(this.iAmCompeting || this.isMyComp) &&
-			this.competitors.length > 0
-		);
+	checkCanUpload(
+		bootTime: Date | undefined,
+		uploadTime: Date | undefined,
+		user_id: string | undefined,
+		schedule_id: string | undefined
+	) {
+		if (user_id) {
+			console.log('Checking can upload for comp:', this.summary.name);
+			if (this.competitors.length === 0) {
+				console.log('no competitors');
+				return false;
+			}
+
+			// Check the Add rules
+			// I am not the CD and only the CD can add flights
+			if (!this.competition.summary.add_rules?.cd_and_self_flight_add && !this.isMyComp) {
+				console.log('cannot add flights');
+				return false;
+			}
+		}
+
+		//Check all rounds against the flight rules
+		const roundChecks = this.rounds.map((r) => {
+			if (schedule_id && r.summary.schedule_id !== schedule_id) {
+				return 'wrong schedule';
+			}
+			if (!r.summary.is_open_now) {
+				return 'not open';
+			}
+
+			if (user_id && !this.isMyComp) {
+				const competitor = r.competitors.find((c) => compareUUIDs(c.competitor.id, user_id));
+
+				if (!competitor) {
+					return 'not a competitor';
+				}
+
+				//check I am a competitor in this round
+				if (user_id && (!competitor || competitor.competitor.missed_cut)) {
+					return 'not a competitor';
+				}
+
+				// check upload only once
+				if (r.summary.flight_rules?.upload_only_once && competitor.competitor.flight_id) {
+					return 'flight already linked';
+				}
+			}
+
+			const start_time = new Date(r.summary.date_start!).getTime();
+
+			if (bootTime) {
+				const boot_time = bootTime?.getTime();
+				// check booted whilst round is open
+				if (
+					r.parent!.summary.flight_rules?.flown_whilst_open &&
+					r.summary.date_start &&
+					r.summary.is_open_now
+				) {
+					if (start_time > boot_time) {
+						return 'not flown whilst open';
+					}
+				}
+				// check linked within n hours of boot
+				const upload_within = r.parent!.summary.flight_rules?.upload_within_n_hours;
+				if (upload_within && new Date().getTime() > boot_time + upload_within * 3600000) {
+					return 'not uploaded within n hours';
+				}
+			}
+
+			//check upload whilst open
+			if (
+				r.parent!.summary.flight_rules?.upload_whilst_open &&
+				r.summary.date_start &&
+				r.summary.is_open_now &&
+				uploadTime
+			) {
+				if (start_time > uploadTime!.getTime()) {
+					return 'not uploaded whilst open';
+				}
+			}
+
+			return 'Acceptable';
+		});
+		console.log('round checks:', roundChecks);
+		return roundChecks.some((r) => r === 'Acceptable');
 	}
 
 	schedules() {
@@ -255,5 +353,22 @@ export class ContestManager {
 			comp = comp.parent;
 		}
 		return comp;
+	}
+}
+
+export class FlightInfo {
+	constructor(
+		readonly bootTime: Date | undefined,
+		readonly uploadTime: Date | undefined,
+		readonly user_id: string | undefined,
+		readonly schedule_id: string | undefined
+	) {}
+
+	get tBoot() {
+		return this.bootTime ? this.bootTime.getTime() : undefined;
+	}
+
+	get tUpload() {
+		return this.uploadTime ? this.uploadTime.getTime() : new Date().getTime();
 	}
 }

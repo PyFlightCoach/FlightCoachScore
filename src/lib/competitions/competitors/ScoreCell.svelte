@@ -12,8 +12,7 @@
 	import { Flight } from '$lib/database/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { prettyPrintHttpError } from '$lib/utils/text';
-	import { replace } from 'lodash';
-
+	
 	let {
 		round,
 		competitorID,
@@ -41,11 +40,12 @@
 	let allowDropDown = $derived(
 		round.isMyComp ||
 			competitor?.competitor.flight_id ||
-			(round.summary.is_open_now &&
-				round.summary.add_rules?.cd_and_self_flight_add &&
-				competitor.isMe &&
-				round.summary.what_am_i == 'Round')
+			(round.summary.what_am_i == 'Round' && 
+        round.summary.is_open_now &&
+				round.competition.summary.add_rules?.cd_and_self_flight_add &&
+				competitor.isMe($user!.id) )
 	);
+    $inspect(competitor.isMe($user!.id), 'is Me');
 </script>
 
 {#snippet displayValue()}
@@ -60,7 +60,11 @@
 			<div class="col fw-bold">{competitor.competitor.normalised_score?.toFixed(2)}</div>
 		</div>
     {:else if !competitor?.competitor.missed_cut && round.summary.what_am_i === 'Round'}
+      {#if competitor?.isMe($user!.id) || round.competition.isMyComp}
       ...
+      {:else}
+      - 
+      {/if}
     {/if}
   {:else if display === 'Running Order' && !competitor?.competitor.missed_cut}
     <div class={competitor.competitor.raw_score ? 'text-decoration-line-through text-secondary' : 'fw-bold '}>
@@ -98,18 +102,13 @@
 			</button>
 			<div class="dropdown-menu">
 				{#if !competitor?.competitor.raw_score}
-					{#if round.summary.is_open_now && (round.isMyComp || round.summary.add_rules?.cd_and_self_add)}
+					{#if round.summary.is_open_now && (round.isMyComp || (round.competition.summary.add_rules?.cd_and_self_add && competitor.isMe))}
 						<button
 							class="dropdown-item"
 							onclick={() => {
 								showDBLinkMenu = true;
 							}}>Link Flight from DB</button
 						>
-						{#if $bin && !$activeFlight && $isComplete && $isCompFlight}
-							<button class="dropdown-item" onclick={() => {}}>
-								Upload & Link Active Flight
-							</button>
-						{/if}
 						<button class="dropdown-item">Throw Round</button>
 					{/if}
 				{:else}

@@ -5,13 +5,16 @@
 	import { listComps, type ContestGroup, type ContestAction } from './contests';
 	import CompetitionTable from './CompetitionTable.svelte';
 	import type { DBSchedule } from '$lib/schedule/db';
-
+  
 	let {
 		competition = $bindable(),
 		fullDisplay = $bindable(true),
 		filterSubset = ['All', 'Mine', 'Open', 'Entered', 'Ready'],
 		actionSubset = ['View', 'Edit', 'Enter', 'Select'],
 		schedule = undefined,
+    userID = undefined,
+    bootTime = undefined,
+    uploadTime = undefined,
 		onselected = () => {},
 		onentered = () => {}
 	}: {
@@ -20,6 +23,9 @@
 		filterSubset?: ContestGroup[];
 		actionSubset?: ContestAction[];
 		schedule?: DBSchedule | undefined;
+    userID?: string | undefined;
+    bootTime?: Date | undefined;
+    uploadTime?: Date | undefined;
 		onselected?: () => void;
 		onentered?: () => void;
 	} = $props();
@@ -33,7 +39,7 @@
 	const competitions: Promise<ContestManager[]> = $derived(
 		listComps(group, category === 'All' ? undefined : category, true).then((comps) => {
 			return comps.filter(
-				(c) => !schedule || c.checkCanUpload(schedule.schedule_id)
+				(c) => c.checkCanUpload(bootTime, uploadTime, category=="Open" ? userID : undefined, schedule?.schedule_id)
 			)
     })
 	);
@@ -86,7 +92,12 @@
 					onselected();
 				}}
 				{actionSubset}
-				{onentered}
+				onentered={()=>{
+          if (filterSubset.includes("Ready")) {
+            group="Ready";
+          }
+          onentered();
+        }}
 			/>
 		{/await}
 	</div>

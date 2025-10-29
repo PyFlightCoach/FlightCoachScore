@@ -16,7 +16,7 @@
 		bp?: keyof typeof breakPoints;
 	} = $props();
 
-	let showSidebar = $derived(breakPoints[bp] < breakPoints[$breakPoint]);
+	let showSidebar = $derived(breakPoints[bp] <= breakPoints[$breakPoint]);
 
 	$effect(() => {
 		$showCollapseToggle = !showSidebar;

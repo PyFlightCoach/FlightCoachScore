@@ -94,7 +94,7 @@
 							</button>
 						</td>
 					{/if}
-					{#if includes(actionSubset, 'Select')}
+					{#if includes(actionSubset, 'Select') && comp.isMyComp || comp.iAmCompeting}
 						<td class="p-0 text-center b-0">
 							<button
                 disabled={!comp.iAmCompeting && !comp.isMyComp}

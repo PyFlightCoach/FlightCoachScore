@@ -27,7 +27,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
-	import { saveAs } from 'file-saver';
 	import Popup from '$lib/components/Popup.svelte';
 	import { activeComp } from '$lib/stores/contests';
 	import UploadForCompetitor from '$lib/competitions/competitors/UploadForCompetitor.svelte';
@@ -50,14 +49,16 @@
 		$user?.is_verified && ($activeFlight?.isMine || isNew || $user?.is_superuser)
 	);
 
+  
 	let competition = $state(
-		$activeComp?.checkCanUpload($schedule?.schedule_id) ? $activeComp : undefined
+		$activeComp?.checkCanUpload($bootTime, new Date(), $user?.id, $schedule?.schedule_id) ? $activeComp : undefined
 	);
 
+  let pilotId: string | undefined = $state();
 	let showCompetitionForm = $state(false);
 	let showResultsSelection: boolean = $state(false);
 	let round: ContestManager | undefined = $state();
-	let pilotId: string | undefined = $state();
+	
 
 	const upload = async () => {
 		checkUser(false, false, false)
@@ -90,10 +91,10 @@
 					goto(resolve('/database/leaderboards'));
 				}
 			})
-			.then(loadGuiLists)
-			.catch((e) => {
-				alert('Upload failed: ' + prettyPrintHttpError(e));
+      .catch((e) => {
+				alert(prettyPrintHttpError(e));
 			})
+			.then(loadGuiLists)
 			.finally(() => {
 				$loading = false;
 				unblockProgress();
@@ -175,7 +176,8 @@
 
 {#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && $dataSource == 'bin'}
 	<div class="container-auto border rounded p-2 mb-2">
-		<UploadForCompetitor bind:competition bind:pilotID={pilotId} bind:round schedule={$schedule} />
+		<UploadForCompetitor bind:competition bind:pilotID={pilotId} bind:round schedule={$schedule} 
+      bootTime={$bootTime} />
 	</div>
 {/if}
 
@@ -200,7 +202,7 @@
 		></textarea>
 	</div>
 
-	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'db')}
+	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'db') && (!round || pilotId)}
 		<div class="row mb-2 px-2">
 			<button
 				class="col btn btn-primary mx-2"
@@ -233,6 +235,8 @@
 			<span>Nothing to update</span>
 		{:else if !$isComplete}
 			<span>Run all analyses for the latest analysis version before uploading</span>
+    {:else if round && !pilotId}
+      <span>Either select a pilot or dont select a competition</span>
 		{/if}
 	</div>
 </div>

@@ -16,8 +16,7 @@
 	import { Point } from '$lib/utils/geometry';
 	import { user } from '$lib/stores/user';
 
-	let inputMode: 'bin' | 'fcj' | 'state' | 'acrowrx' = $state('bin');
-	let siteInputMode: 'fcsites' | 'fcj' | 'pc' | 'ph' = $state('ph');
+  let siteInputMode: 'fcsites' | 'fcj' | 'pc' | 'ph' = $state('ph');
 	let form_state: string | undefined = $state();
 	let box_state: string | undefined = $state();
 
@@ -91,7 +90,7 @@
 		<select
 			class="col col-form-input form-select"
 			id="data-input-mode"
-			bind:value={inputMode}
+			bind:value={$dataSource}
 			onchange={reset}
 		>
 			{#each Object.entries(inputModes) as [k, v]}
@@ -101,9 +100,9 @@
 	</div>
 
 	<div class="row p-2">
-		<label class="col col-form-label" for="data-input-mode">{inputModes[inputMode]}:</label>
+		<label class="col col-form-label" for="data-input-mode">{inputModes[$dataSource]}:</label>
 		<div class="col col-form-input" style:overflow="hidden" id="data-file-input">
-			{#if inputMode == 'bin'}
+			{#if $dataSource == 'bin'}
 				<BinReader
 					onloaded={(...data) => {
 						reset();
@@ -133,7 +132,7 @@
 				/>
 			{:else}
 				<FlightDataReader
-					bind:inputMode
+					bind:inputMode={$dataSource}
 					onloaded={(_fcj, _states) => {
 						reset();
 						$fcj = _fcj;
@@ -142,7 +141,7 @@
 						shifty = 0;
 						shiftz = 0;
 						$origin = $fcj?.origin || $origin;
-						form_state = `You can can analyse a ${inputMode} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
+						form_state = `You can can analyse a ${$dataSource} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
 					}}
 				/>
 			{/if}
@@ -173,7 +172,7 @@
 		<hr />
 	{/if}
 
-	{#if inputMode == 'acrowrx' && $states}
+	{#if $dataSource == 'acrowrx' && $states}
 		<p>Shift Box:</p>
 		<table class="table table-sm text-center">
 			<tbody>
@@ -219,7 +218,6 @@
 				id="select-manoeuvres"
 				class="btn btn-outline-primary col mx-2"
 				onclick={async () => {
-					$dataSource = inputMode;
 					if ($origin) {
 						$origin.save();
 					}

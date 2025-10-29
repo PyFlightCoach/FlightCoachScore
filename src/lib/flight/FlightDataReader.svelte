@@ -3,6 +3,7 @@
 	import { State, States } from '$lib/utils/state';
 	import { analysisServer } from '$lib/api';
 	import { blockProgress, unblockProgress } from '$lib/stores/shared';
+	import { bootTime } from '$lib/stores/analysis';
 
 	let {
 		inputMode = $bindable('fcj'),
@@ -29,7 +30,8 @@
 					}
 				})
 				.then((response) => {
-					states = States.parse(response.data);
+					states = States.parse(response.data.data);
+          bootTime.set(new Date(response.data.bootTime));
 					onloaded(undefined, states);
 				})
 				.finally(unblockProgress);

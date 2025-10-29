@@ -62,6 +62,7 @@
 				<th>#</th>
 				<th>Name</th>
 				<th>Country</th>
+        <th>Joined</th>
 				<th>Status</th>
 			</tr>
 		</thead>
@@ -77,6 +78,7 @@
 						<td>{i + 1}</td>
 						<td>{u.first_name} {u.last_name}</td>
 						<td>{u.country}</td>
+            <td>{u.joined_when}</td>
 						<td>
 							{#if u.is_active}A{:else}-{/if}
 							{#if u.is_verified}V{:else}-{/if}
