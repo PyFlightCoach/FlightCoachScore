@@ -2,7 +2,7 @@ import { analysisServer, dbServer } from '$lib/api'
 import { faVersion } from '$lib/stores/shared';
 import { ManoeuvreHandler } from '../manoeuvre/manoeuvre_handler.svelte';
 import { DBSchedule } from './db';
-import { type ParseOlanResponse } from '../manoeuvre/olan';
+import type { ParseOlanResponse } from '../manoeuvre/olan';
 import { ManBuilder } from '$lib/manoeuvre/builder.svelte';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
@@ -28,7 +28,7 @@ export class ScheduleHandler {
 		return new ScheduleHandler(
 			await ManBuilder.load(rule),
 			await analysisServer.post('parse_olan', { olan, rules: rule }).then((res) =>
-				res.data.map((data: ParseOlanResponse) => {
+				res.data.figures.map((data: ParseOlanResponse) => {
 					return ManoeuvreHandler.parseOlanResponse(data);
 				})
 			)

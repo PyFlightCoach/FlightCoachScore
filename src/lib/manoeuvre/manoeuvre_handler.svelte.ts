@@ -169,7 +169,7 @@ export class ManoeuvreHandler {
 
 	static parseOlanResponse(olanRes: ParseOlanResponse) {
 		const { info, figure } = Figure.parse(olanRes.aresti);
-		return new ManoeuvreHandler(info, undefined, olanRes.olan, [
+		return new ManoeuvreHandler(info, undefined, undefined, [
 			new ManHandler(
 				figure as Figure,
 				ManDef.parse(olanRes.definition) as ManDef,

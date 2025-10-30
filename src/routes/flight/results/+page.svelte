@@ -4,8 +4,28 @@
 	import AnalysisSummary from './AnalysisSummary.svelte';
 	import { totalScore } from '$lib/stores/analysis';
 	import * as nbc from '$lib/stores/navBarContents';
+	import { user } from '$lib/stores/user';
+  import { analyseAll } from '$lib/flight/analysis';
 
 	nbc.reset();
+
+	$effect(() => {
+		if ($user?.is_superuser) {
+			nbc.reset([
+				{
+					name: 'Optimise All',
+					onclick: () => {
+						analyseAll(true, true);
+					},
+					icon: 'bi-plus-circle',
+					title: 'Load flight data',
+					disabled: false
+				}
+			]);
+		} else {
+			nbc.reset();
+		}
+	});
 </script>
 
 <SideBarLayout sideBarWidth={4}>
