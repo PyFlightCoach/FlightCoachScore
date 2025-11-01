@@ -35,7 +35,13 @@ export async function loadScheduleFlights(schedule_id: string, n_results: number
 		.get('/analysis/leaderboard', {
 			params: { schedule_id, n_results, version: get(faVersion), one_per_pilot_flag: true }
 		})
-		.then((res) => res.data.results as DBFlightRanked[]);
+		.then((res) => {
+      const flights: (DBFlightRanked | null)[] = res.data.results as DBFlightRanked[];
+      for (let i = flights.length; i < n_results; i++) {
+        flights.push(null);
+      }
+      return flights;    
+    });
 }
 
 export async function loadTopFlights(n_results = 3) {

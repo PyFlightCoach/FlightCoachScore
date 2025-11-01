@@ -92,8 +92,8 @@ export function clearDataLoading() {
 	sts.origin.set(Origin.load());
 	sts.fcj.set(undefined);
 	sts.bin.set(undefined);
+  sts.acrowrxMeta.set(undefined);
 	sts.manSplits.set([takeOff()]);
-	dataSource.set(undefined);
 	clearAnalysis();
 }
 

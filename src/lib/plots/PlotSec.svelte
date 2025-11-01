@@ -195,7 +195,6 @@
 				data={traces}
 				{layout}
 				onclick={(e) => {
-					console.log(e);
 					if (e.points?.length) {
 						const offset = {
 							fl: range[0],

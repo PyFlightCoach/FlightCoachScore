@@ -16,7 +16,7 @@ export const bootTime: Writable<Date | undefined> = writable();
 export const origin: Writable<Origin | undefined> = writable(Origin.load());
 export const fcj: Writable<FCJson | undefined> = writable();
 export const states: Writable<States | undefined> = writable();
-
+export const acrowrxMeta: Writable<Record<string, string> | undefined> = writable();
 export const schedule = writable<DBSchedule | undefined>();
 
 states.subscribe((sts: States | undefined) => {

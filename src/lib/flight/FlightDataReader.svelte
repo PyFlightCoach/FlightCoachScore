@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FCJson } from '$lib/flight/fcjson';
+	import { FCJson, Origin } from '$lib/flight/fcjson';
 	import { State, States } from '$lib/utils/state';
 	import { analysisServer } from '$lib/api';
 	import { blockProgress, unblockProgress } from '$lib/stores/shared';
@@ -14,7 +14,13 @@
 		inputMode?: 'fcj' | 'state' | 'acrowrx';
 		fcj?: FCJson;
 		states?: States;
-		onloaded: (fcj: FCJson | undefined, states: States) => void;
+		onloaded: (
+			states: States,
+			fcj?: FCJson | undefined,
+			bin?: File | undefined,
+			bootTime?: Date | undefined,
+			origin?: Origin | undefined
+		) => void;
 	} = $props();
 
 	let files: FileList | undefined = $state();
@@ -31,8 +37,13 @@
 				})
 				.then((response) => {
 					states = States.parse(response.data.data);
-          bootTime.set(new Date(response.data.bootTime));
-					onloaded(undefined, states);
+					onloaded(
+						states,
+						undefined,
+						file,
+						new Date(response.data.boot_time),
+						Object.setPrototypeOf( response.data.origin, Origin.prototype)
+					);
 				})
 				.finally(unblockProgress);
 		} else {
@@ -41,12 +52,12 @@
 				switch (inputMode) {
 					case 'state':
 						states = States.read_csv(reader.result as string);
-						onloaded(undefined, states);
+						onloaded(states);
 						break;
 					case 'fcj':
 						fcj = FCJson.parse(JSON.parse(reader.result! as string));
 						states = States.from_fcj(fcj);
-						onloaded(fcj, states);
+						onloaded(states, fcj, undefined, undefined, fcj.origin);
 						break;
 				}
 			};

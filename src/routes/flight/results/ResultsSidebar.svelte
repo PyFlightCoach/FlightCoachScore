@@ -32,6 +32,7 @@
 	import UploadForCompetitor from '$lib/competitions/competitors/UploadForCompetitor.svelte';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { prettyPrintHttpError } from '$lib/utils/text';
+	import UploadForOtherPilot from './UploadForOtherPilot.svelte';
 
 	let comment: string | undefined = $state($activeFlight?.meta.comment || '');
 	let privacy: string | undefined = $state($activeFlight?.meta.privacy || 'view_analysis');
@@ -49,16 +50,16 @@
 		$user?.is_verified && ($activeFlight?.isMine || isNew || $user?.is_superuser)
 	);
 
-  
 	let competition = $state(
-		$activeComp?.checkCanUpload($bootTime, new Date(), $user?.id, $schedule?.schedule_id) ? $activeComp : undefined
+		$activeComp?.checkCanUpload($bootTime, new Date(), $user?.id, $schedule?.schedule_id)
+			? $activeComp
+			: undefined
 	);
 
-  let pilotId: string | undefined = $state();
+	let pilotId: string | undefined = $state();
 	let showCompetitionForm = $state(false);
 	let showResultsSelection: boolean = $state(false);
 	let round: ContestManager | undefined = $state();
-	
 
 	const upload = async () => {
 		checkUser(false, false, false)
@@ -91,7 +92,7 @@
 					goto(resolve('/database/leaderboards'));
 				}
 			})
-      .catch((e) => {
+			.catch((e) => {
 				alert(prettyPrintHttpError(e));
 			})
 			.then(loadGuiLists)
@@ -174,11 +175,19 @@
 	</div>
 {/if}
 
-{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && $dataSource == 'bin'}
+{#if canI && $isComplete && isNew && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'acrowrx')}
 	<div class="container-auto border rounded p-2 mb-2">
-		<UploadForCompetitor bind:competition bind:pilotID={pilotId} bind:round schedule={$schedule} 
-      bootTime={$bootTime} />
+		<UploadForCompetitor
+			bind:competition
+			bind:pilotID={pilotId}
+			bind:round
+			schedule={$schedule}
+			bootTime={$bootTime}
+		/>
 	</div>
+	{#if !round && $user?.is_superuser}
+		<UploadForOtherPilot bind:pilotID={pilotId} />
+	{/if}
 {/if}
 
 <div class="container-auto border rounded p-2">
@@ -202,13 +211,13 @@
 		></textarea>
 	</div>
 
-	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'db') && (!round || pilotId)}
+	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'db' || $dataSource == 'acrowrx') && (!round || pilotId)}
 		<div class="row mb-2 px-2">
 			<button
 				class="col btn btn-primary mx-2"
 				type="submit"
 				onclick={upload}
-        disabled={$loading}
+				disabled={$loading}
 				data-bs-dismiss="offcanvas"
 				>{isNew ? 'Upload' : 'Update'}
 			</button>
@@ -216,8 +225,8 @@
 	{/if}
 
 	<div class="row mb-2 px-2">
-		{#if $dataSource != 'bin' && $dataSource != 'db'}
-			<span>You can only upload original flights loaded from a .bin file</span>
+		{#if $dataSource != 'bin' && $dataSource != 'db' && $dataSource != 'acrowrx'}
+			<span>You can only upload original flights loaded from a .bin file or from Acrowrx</span>
 		{:else if !$isCompFlight}
 			<span>Only complete flights can be uploaded</span>
 		{:else if !canI}
@@ -235,11 +244,10 @@
 			<span>Nothing to update</span>
 		{:else if !$isComplete}
 			<span>Run all analyses for the latest analysis version before uploading</span>
-    {:else if round && !pilotId}
-      <span>Either select a pilot or dont select a competition</span>
+		{:else if round && !pilotId}
+			<span>Either select a pilot or dont select a competition</span>
 		{/if}
 	</div>
 </div>
-
 
 <Popup bind:show={showCompetitionForm}>Competition Selection</Popup>

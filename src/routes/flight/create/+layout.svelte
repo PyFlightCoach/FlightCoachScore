@@ -5,25 +5,24 @@
 
 	nbc.reset();
 
-	$effect(() => {
-		nbc.reset([
-			{
-				name: '1. Data',
-				href: resolve('/flight/create/data/'),
-				icon: 'bi-plus-circle',
-				title: 'Load flight data',
-				disabled: false
-			},
-			{
-				name: '2. Manoeuvres',
-				href: resolve('/flight/create/manoeuvres/'),
-				icon: 'bi-plus-circle',
-				title: 'Load flight data',
-				disabled: !$origin || !$binData
-			}
-		]);
-    nbc.checkUrl();
-	});
+  nbc.reset([
+    {
+      name: '1. Data',
+      href: resolve('/flight/create/data/'),
+      icon: 'bi-plus-circle',
+      title: 'Load flight data',
+      disabled: false
+    },
+    {
+      name: '2. Manoeuvres',
+      href: resolve('/flight/create/manoeuvres/'),
+      icon: 'bi-plus-circle',
+      title: 'Load flight data',
+      disabled: !$origin || !$binData
+    }
+  ]);
+  nbc.checkUrl();
+
 
 </script>
 
