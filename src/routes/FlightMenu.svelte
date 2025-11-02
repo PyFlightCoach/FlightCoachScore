@@ -11,28 +11,20 @@
 	import { page } from '$app/state';
 	import Popup from '$lib/components/Popup.svelte';
 	import LoadBinAndAJson from '$lib/flight/LoadBinAndAJson.svelte';
+  import {flight} from '$lib/stores/flight';
 
 	let showBinAJsonPopup: boolean = $state(false);
 </script>
 
 <NavMenu tooltip="Flight Analysis Menu">
-	<span slot="icon"><i class="bi {$manNames ? 'bi-airplane-fill' : 'bi-airplane'}"></i></span>
-	{#if $states || $manNames?.length}
-		<small class="px-2 text-start">{$bin?.name || `Loaded ${$dataSource}`}</small>
-		{#if $bootTime}
-			<small class="dropdown-header text-nowrap px-2 text-start">
-				{$bootTime.toLocaleString()}
-			</small>
-		{/if}
-	{/if}
-	{#if $manNames}
+	<span slot="icon"><i class="bi {$flight ? 'bi-airplane-fill' : 'bi-airplane'}"></i></span>
+	{#if $flight}
+		<small class="px-2 text-start text-nowrap">{$flight?.source.description || 'unknown'}</small>
+    <small class="px-2 text-start text-nowrap">{$flight?.source?.bootTime?.toLocaleString()}</small>
 		<button
 			class="dropdown-item"
 			onclick={() => {
-				clearDataLoading();
-				if (page.url.pathname.includes('/flight/')) {
-					goto(resolve('/'));
-				}
+				$flight=undefined;
 			}}>Clear</button
 		>
 		{#if $user?.is_superuser || $dev}
@@ -55,8 +47,9 @@
 		{/if}
 		<a class="dropdown-item" href={resolve('/flight/results')}>Results</a>
 	{:else}
-    <a class="dropdown-item" href={resolve('/flight/create/bin')}>Create</a>
+    <a class="dropdown-item" href={resolve('/flight/create/bin')}>Load Ardupilot BIN File</a>
 		{#if $user?.is_superuser || $dev}
+      <a class="dropdown-item" href={resolve('/flight/create/acrowrx')}>Load Acrowrx File</a>
 			<button
 				class="dropdown-item"
 				onclick={() => {

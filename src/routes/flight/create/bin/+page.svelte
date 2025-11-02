@@ -4,8 +4,14 @@
 	import { BinData, BinField } from '$lib/flight/bin/bindata';
 	import { md5 } from 'js-md5';
 	import { loading } from '$lib/stores/shared';
-  import * as sts from '$lib/stores/analysis';
-  
+	import { flight } from '$lib/stores/flight';
+	import { Flight, FlightDataSource } from '$lib/flight/flight';
+	import { States } from '$lib/utils/state';
+	import { parseFCJMans, loadManDefs } from '$lib/flight/splitting';
+	import { binDataMapTrace } from '$lib/plots/map';
+  import { goto } from '$app/navigation';
+  import {resolve} from '$app/paths';
+
 	let fcjFile: File | undefined = $state();
 	let fcjson: fcj.FCJson | undefined = $state();
 
@@ -16,6 +22,24 @@
 
 	let duration = $derived(binData ? binData.att?.time_boot_s[binData.att?.length - 1] / 60 : 0);
 	let binOrigin = $derived(binData?.findOrigin() || undefined);
+
+  let fcjDuration = $derived(
+    fcjson ? fcjson.data[fcjson.data.length - 1].time / 1000000 / 60 : 0
+  )
+
+	let origin = $derived(
+		fcjson?.origin || (binOrigin
+			? new fcj.Origin(binOrigin!.lat, binOrigin!.lon, binOrigin!.alt, 0)
+			: undefined)
+	);
+
+	let states = $derived(
+		origin && binData ? States.from_xkf1(origin, binData.orgn, binData.xkf1) : undefined
+	);
+
+	let manSplits = $derived(
+		fcjson && states ? parseFCJMans(fcjson, states).then(loadManDefs) : undefined
+	);
 </script>
 
 <div class="container-auto py-4" style="max-width: 800px;">
@@ -78,18 +102,19 @@
 				<small>Duration: {Math.floor(duration)} minutes {(duration % 60).toFixed(0)} seconds</small>
 				<br />
 				<small
-					>Origin: {binOrigin?.lat.toFixed(6)}, {binOrigin?.lon.toFixed(6)}, {binOrigin?.alt.toFixed(
-						2
-					)}</small
-				>
+					>Origin:
+					{binOrigin?.lat.toFixed(6)},
+					{binOrigin?.lon.toFixed(6)},
+					{binOrigin?.alt.toFixed(2)}
+				</small>
 			</div>
 		</div>
 
 		<hr />
 
 		<p>
-			If a flight coach json file is included the box and manoeuvre splitting can be
-			loaded from it. This can also be set up manually within FCScore.
+			If a flight coach json file is included the box and manoeuvre splitting can be loaded from it.
+			This can also be set up manually within FCScore.
 		</p>
 
 		<div class="row">
@@ -112,12 +137,41 @@
 				}}
 			/>
 		</div>
+    {#if fcjson}
+    <div class="row text-nowrap">
+      <div class="col"></div>
+			<div class="col">
+				<small>Duration: {Math.floor(fcjDuration)} minutes {(fcjDuration % 60).toFixed(0)} seconds</small>
+        <br/>
+        <small
+					>Origin:
+					{fcjson?.origin.lat.toFixed(6)},
+					{fcjson?.origin.lng.toFixed(6)},
+					{fcjson?.origin.alt.toFixed(2)},
+          {(fcjson?.origin.heading).toFixed(2)}&deg;
+				</small>
+			</div>
+    </div>
+    {/if}
 		<hr />
 		<div class="row">
 			<div class="col"></div>
-			<button class="col btn btn-outline-primary" onclick={() => {
-        
-      }}> Next </button>
+			{#await manSplits then splits}
+				<button
+					class="col btn btn-outline-primary"
+					onclick={() => {
+						$flight = new Flight(
+							new FlightDataSource(bin, 'bin', undefined, bootTime, binData),
+							origin,
+              states,
+							splits
+						);
+            goto(resolve('/flight/create/box'));
+					}}
+				>
+					Next
+				</button>
+			{/await}
 		</div>
 	{/if}
 </div>

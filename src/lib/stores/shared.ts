@@ -57,31 +57,6 @@ export const unblockProgress = () => {
 	blockingProgress.set(undefined);
 };
 
-export const news: Writable<
-	{
-		id: string;
-		headline: string;
-		body: string;
-		link: string;
-		updated_when: string;
-	}[]
-> = writable([]);
-
-export async function loadNews() {
-	dbServer
-		.get('news', { validateStatus: (status) => status == 200 })
-		.then((res) => {
-			news.set(res.data.results);
-		})
-		.catch(() => {
-			news.set([]);
-		});
-}
-
-export function clearNews() {
-	news.set([]);
-}
-
 export const faVersion: Writable<string | undefined> = writable(undefined);
 export const loadedFAVersion: Writable<boolean | string> = writable(false);
 

@@ -1,28 +1,24 @@
 <script lang="ts">
 	import PlotSec from '$lib/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/flight/analysis.js';
-	import { states, fcj, bin, manSplits } from '$lib/stores/analysis';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { FCJson } from '$lib/flight/fcjson';
 	import { loadManDef, library } from '$lib/schedule/library.js';
 	import ManSelect from '$lib/flight/ManoeuvreSelecter.svelte';
 	import * as ms from '$lib/flight/splitting.js';
-  import {isFullSize} from '$lib/stores/shared';
+	import { isFullSize } from '$lib/stores/shared';
+	import { flight } from '$lib/stores/flight';
+	import { Flight } from '$lib/flight/flight';
 
-	const { data } = $props();
-
-	let mans = $state(data.baseSplits);
-
-	$effect(() => {
-		$manSplits = mans;
-	});
+	const baseSplits = $flight!.splitting || [ms.takeOff()];
+	let mans = $state(baseSplits);
 
 	let activeManId: number = $state(0);
 
 	let range: [number, number] = $state([
 		0,
-		data.baseSplits[0].stop || Math.min(3000, $states!.data.length - 1)
+		baseSplits[0].stop || Math.min(3000, $flight!.states!.data.length - 1)
 	]);
 
 	let activeIndex: number = $state(range[1]);
@@ -42,11 +38,11 @@
 		let newStart = activeManId == 0 ? 0 : mans[activeManId - 1].stop!;
 		if (!newStop) {
 			if (activeManId == 0) {
-				newStop = $states!.data.length / 8;
+				newStop = $flight!.states!.data.length / 8;
 			} else {
 				newStop = 2 * newStart - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
 			}
-			range = [newStart, Math.min(newStop + 500, $states!.data.length - 1)];
+			range = [newStart, Math.min(newStop + 500, $flight!.states!.data.length - 1)];
 		} else {
 			range = [newStart, newStop];
 		}
@@ -66,15 +62,15 @@
 
 	const reset = () => {
 		activeManId = 0;
-    mans = [ms.takeOff()];
+		mans = [ms.takeOff()];
 		resetRange();
 	};
 
 	const setRange = () => {
 		const lastAllowedIndex =
 			activeManId == mans.length - 1
-				? $states!.data.length - 1
-				: mans[activeManId + 1].stop || $states!.data.length - 1;
+				? $flight!.states!.data.length - 1
+				: mans[activeManId + 1].stop || $flight!.states!.data.length - 1;
 
 		if (activeIndex > lastAllowedIndex) {
 			alert('Cannot set point beyone the end of the next manoeuvre');
@@ -86,17 +82,11 @@
 	};
 
 	const parseFCJ = (file: File) => {
-		$fcj = undefined;
 		const reader = new FileReader();
 		reader.onload = (e) => {
-			$fcj = FCJson.parse(JSON.parse(e.target?.result as string));
-			ms.parseFCJMans($fcj, $states!)
-				.then(res => {
-          return ms.loadManDefs(res);
-        })
-				.then((res) => {
-					mans = res;
-				});
+			ms.parseFCJMans(FCJson.parse(JSON.parse(e.target?.result as string)), $flight!.states!)
+				.then((res) => ms.loadManDefs(res))
+				.then((res) => {mans = res});
 		};
 		reader.readAsText(file);
 	};
@@ -123,9 +113,9 @@
 	style="max-height: 100%;"
 >
 	<div class="row">
-		{#if $bin || $fcj}
+		{#if $flight!.source.kind === 'bin' }
 			<span class="col-auto">Source File:</span>
-			<span class="col text-nowrap overflow-auto">{$bin?.name || $fcj?.name || 'unknown'}</span>
+			<span class="col text-nowrap overflow-auto">{$flight?.source?.file?.name || 'unknown'}</span>
 		{/if}
 	</div>
 	<div class="row pt-2">
@@ -156,10 +146,7 @@
 				<button
 					id="clear-splitting"
 					class="btn btn-outline-secondary form-control-sm col"
-					onclick={() => {
-						$fcj = undefined;
-						reset();
-					}}
+					onclick={() => {reset()}}
 				>
 					Clear
 				</button>
@@ -274,8 +261,8 @@
 			<button
 				class="btn btn-outline-primary form-control-sm"
 				onclick={() => {
-					newAnalysis($states!, new ms.Splitting(mans));
-					goto(base + '/flight/results');
+					newAnalysis($flight!.states!, new ms.Splitting(mans));
+					resolve('/flight/results');
 				}}
 			>
 				Complete
@@ -285,14 +272,14 @@
 </div>
 
 <div class="col-md-8">
-	{#if $states}
+	{#if $flight!.states}
 		<PlotSec
 			bind:i={activeIndex}
 			bind:range
-			flst={$states}
+			flst={$flight!.states!}
 			greyUnselected={true}
 			controls={['slider', 'modelClick', 'scale']}
-      scale={$isFullSize ? 3.5 : 1.5}
+			scale={$isFullSize ? 3.5 : 1.5}
 		/>
 	{/if}
 </div>
