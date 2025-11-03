@@ -20,7 +20,7 @@ import { dbServer } from '$lib/api/api';
 import JSZip from 'jszip';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { Flight } from '$lib/database/flight';
+import { DBFlight } from '$lib/database/flight';
 import { takeOff } from '$lib/flight/splitting';
 import { Origin } from '$lib/flight/fcjson';
 import { cat } from '$lib/utils/files';
@@ -71,7 +71,6 @@ function setAnalysis(i: number, man: MA) {
 
 export function clearAnalysis() {
 	console.log('clearing analysis');
-	activeFlight.set(undefined);
 	sts.selManID.set(undefined);
 	sts.manNames.set(undefined);
 	sts.scores.set(undefined);
@@ -92,8 +91,8 @@ export function clearDataLoading() {
 	sts.origin.set(Origin.load());
 	sts.fcj.set(undefined);
 	sts.bin.set(undefined);
+  sts.acrowrxMeta.set(undefined);
 	sts.manSplits.set([takeOff()]);
-	dataSource.set(undefined);
 	clearAnalysis();
 }
 
@@ -272,7 +271,7 @@ export async function loadAnalysisFromDB(flight_id: string) {
   loading.set(true);
 	return loadAJson(flight_id)
 		.then(importAnalysis)
-		.then(() => Flight.load(flight_id))
+		.then(() => DBFlight.load(flight_id))
 		.then((flight) => {
 			dataSource.set('db');
 			activeFlight.set(flight);

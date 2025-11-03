@@ -24,8 +24,8 @@
     target: GPS;
 		origin: Origin;
 		onorigin: (neworigin: Origin) => void;
-		onfcj: (newfcj: FCJson) => void;
-    siteInputMode: keyof typeof inputNames;
+		onfcj?: (newfcj: FCJson) => void;
+    siteInputMode?: keyof typeof inputNames;
 	} = $props();
 
 

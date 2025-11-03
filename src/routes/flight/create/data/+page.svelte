@@ -25,7 +25,7 @@
 		form_state = undefined;
 		box_state = undefined;
 	};
-
+  $inspect($dataSource);
 	const checkOrigin = (newOrigin: Origin | undefined = undefined, fix: boolean) => {
 		//return a new Origin and warn in box_state
 		//if fix is true an attemt will be made to fix the origin.
@@ -80,6 +80,7 @@
 	let shiftx = $state(0);
 	let shifty = $state(0);
 	let shiftz = $state(0);
+
 </script>
 
 <div class="col-md-4 pt-3 bg-light border">
@@ -132,16 +133,18 @@
 				/>
 			{:else}
 				<FlightDataReader
-					bind:inputMode={$dataSource}
-					onloaded={(_fcj, _states) => {
+					bind:inputMode={$dataSource as 'fcj' | 'state' | 'acrowrx'}
+					onloaded={(_states, _fcj, _bin, _bootTime, _origin) => {
 						reset();
+            $origin = _origin;
 						$fcj = _fcj;
 						$states = _states;
+            $bin = _bin;
+            $bootTime = _bootTime;
 						shiftx = 0;
 						shifty = 0;
 						shiftz = 0;
 						$origin = $fcj?.origin || $origin;
-						form_state = `You can can analyse a ${$dataSource} file but you wont be able to upload it. Please use an Ardupilot bin file if possible.`;
 					}}
 				/>
 			{/if}
@@ -220,11 +223,11 @@
 				onclick={async () => {
 					if ($origin) {
 						$origin.save();
+            if ($binData && !$states) {
+              $states = States.from_xkf1($origin, $binData.orgn, $binData.xkf1);
+            }
 					}
-					if ($binData && $origin) {
-						$states = States.from_xkf1($origin, $binData.orgn, $binData.xkf1);
-					}
-
+					
 					$states = $states!.shift(new Point(shiftx, shifty, shiftz));
 					shiftx = 0;
 					shifty = 0;

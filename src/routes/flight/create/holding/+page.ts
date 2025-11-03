@@ -5,7 +5,7 @@ import JSZip from 'jszip';
 import { library } from '$lib/schedule/library';
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
-import { states, bin as binfile, bootTime } from '$lib/stores/analysis';
+import { states, bin as binfile, bootTime, origin, acrowrxMeta } from '$lib/stores/analysis';
 import { States } from '$lib/utils/state.js';
 import { resolve } from '$app/paths';
 import { prettyPrintHttpError } from '$lib/utils/text.js';
@@ -17,7 +17,7 @@ export async function load({ url }) {
 	// need to change to the holding roots when they are available.
 
 	const id = url.searchParams.get('id');
-  const acrowrx = url.searchParams.get('acrowrx') === '';
+	const acrowrx = url.searchParams.get('acrowrx') === '';
 
 	const dataPromise = dbServer
 		.get(`flight/holding/meta/${id}`, {
@@ -38,7 +38,7 @@ export async function load({ url }) {
 			return archive.files['flightlog.bin'].async('arraybuffer');
 		})
 		.then((res) => {
-			return new File([res], 'flightlog.bin');
+			return new File([res], acrowrx ? 'acrowrx_file.dat' : 'flightlog.bin');
 		});
 
 	const [file, metadata] = await Promise.all([binPromise, dataPromise])
@@ -62,7 +62,9 @@ export async function load({ url }) {
 				states.set(States.parse(response.data.data));
 				binfile.set(file);
 				dataSource.set('acrowrx');
-        bootTime.set(new Date(response.data.bootTime));
+				bootTime.set(new Date(response.data.boot_time));
+				origin.set(Object.setPrototypeOf(response.data.origin, Origin.prototype));
+				acrowrxMeta.set(response.data.meta);
 				goto(resolve('/flight/create/data'));
 			})
 			.catch((e) => {
@@ -71,10 +73,8 @@ export async function load({ url }) {
 				throw e;
 			})
 			.finally(unblockProgress);
-      
 	} else {
 		dataSource.set('bin');
-		const origin = Object.setPrototypeOf(metadata.origin, Origin.prototype);
 
 		const splits = metadata.splits;
 		const sinfo = await ScheduleInfo.from_fcj_sch(metadata.schedule).to_pfc();
@@ -84,6 +84,11 @@ export async function load({ url }) {
 			schedule_name: sinfo.name
 		}).only;
 
-		return { bin:file, origin, splits, schedule };
+		return {
+			bin: file,
+			origin: Object.setPrototypeOf(metadata.origin, Origin.prototype),
+			splits,
+			schedule
+		};
 	}
 }

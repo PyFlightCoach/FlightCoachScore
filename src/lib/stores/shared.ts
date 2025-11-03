@@ -1,5 +1,5 @@
 import { writable, type Writable, type Readable, derived } from 'svelte/store';
-import { Flight } from '$lib/database/flight';
+import { DBFlight } from '$lib/database/flight';
 import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
@@ -7,6 +7,7 @@ import { dbServer, analysisServer } from '$lib/api';
 import { get } from 'svelte/store';
 import { library, reloadSchedules } from '$lib/schedule/library';
 import { objfilter } from '$lib/utils/arrays';
+import type { Flight } from '$lib/flight/flight';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -14,7 +15,10 @@ export const isFullSize: Writable<boolean> = writable(false);
 
 export const loading: Writable<boolean | undefined> = writable();
 
-export const activeFlight: Writable<Flight | undefined> = writable();
+
+export const flight: Writable<Flight | undefined> = writable(undefined);
+export const activeFlight: Writable<DBFlight | undefined> = writable();  // need to replace this with the above
+
 export const isAnalysisModified: Writable<boolean | undefined> = writable();
 
 export const dataSource: Writable<"state" | "bin" | "fcj" | "db" | "acrowrx" | "example"> = writable("bin");
@@ -56,31 +60,6 @@ export const unblockProgress = () => {
 	blockingProgressTitle.set(undefined);
 	blockingProgress.set(undefined);
 };
-
-export const news: Writable<
-	{
-		id: string;
-		headline: string;
-		body: string;
-		link: string;
-		updated_when: string;
-	}[]
-> = writable([]);
-
-export async function loadNews() {
-	dbServer
-		.get('news', { validateStatus: (status) => status == 200 })
-		.then((res) => {
-			news.set(res.data.results);
-		})
-		.catch(() => {
-			news.set([]);
-		});
-}
-
-export function clearNews() {
-	news.set([]);
-}
 
 export const faVersion: Writable<string | undefined> = writable(undefined);
 export const loadedFAVersion: Writable<boolean | string> = writable(false);

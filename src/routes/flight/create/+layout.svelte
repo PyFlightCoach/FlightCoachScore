@@ -1,30 +1,30 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-  import { binData, bin, origin } from '$lib/stores/analysis';
-  import * as nbc from '$lib/stores/navBarContents';
+	import { binData, bin, origin } from '$lib/stores/analysis';
+	import * as nbc from '$lib/stores/navBarContents';
+		import { flight } from '$lib/stores/shared';
 
 	nbc.reset();
 
-	$effect(() => {
+	$effect(() =>
 		nbc.reset([
 			{
-				name: '1. Data',
-				href: resolve('/flight/create/data/'),
-				icon: 'bi-plus-circle',
-				title: 'Load flight data',
-				disabled: false
+				name: 'Box',
+				href: resolve('/flight/create/box/'),
+				icon: 'bi-box',
+				title: 'Locate the aerobatic box',
+				disabled: !$flight
 			},
 			{
-				name: '2. Manoeuvres',
+				name: 'Manoeuvres',
 				href: resolve('/flight/create/manoeuvres/'),
-				icon: 'bi-plus-circle',
-				title: 'Load flight data',
-				disabled: !$origin || !$binData
+				icon: 'bi-scissors',
+				title: 'Segment the flight into manoeuvres',
+				disabled: !$flight?.states
 			}
-		]);
-    nbc.checkUrl();
-	});
-
+		])
+	);
+	nbc.checkUrl();
 </script>
 
 <slot />

@@ -1,45 +1,42 @@
 <script lang="ts">
-  import Plot from '$lib/plots/Plotly.svelte';
-  import {binDataMapTrace, originMapTraces} from './mapTraces';
-	import { GPS } from '$lib/utils/geometry';
-	import type { BinData } from '$lib/flight/bin';
+	import Plot from '$lib/plots/Plotly.svelte';
+	import { mapTrace, originMapTraces } from './mapTraces';
+	import { GPS, Point } from '$lib/utils/geometry';
 	import type { Origin } from '$lib/flight/fcjson';
 
-  export let origin: Origin |undefined;
-  export let binData: BinData | undefined;
-  export let kind: string = 'F3A';
+	let {
+		origin = $bindable(),
+		data = $bindable(),
+		kind = $bindable('F3A')
+	}: { origin: Origin | undefined; data: GPS[]; kind: 'F3A' | 'IMAC' | 'IAC' } = $props();
 
-  let centre: GPS | undefined;
-  
-  $: if (binData) {
-    centre = new GPS(binData?.pos.Lat[0], binData?.pos.Lng[0], 0);
-  }
+  let nedCentre = $derived(
+    origin ? new Point(Math.cos(origin.heading), Math.sin(origin.heading), 0) : new Point(150, 0, 0)
+  );
 
-  $: if (origin) {
-    centre = new GPS(origin?.lat, origin.lng, 0);
-  }
+	let centre: GPS | undefined = $derived(
+		(origin ? new GPS(origin.lat, origin.lng, origin.alt) : data[0]).offset(nedCentre)
+	);
+
 
 </script>
 
-
 <Plot
-		data={
-      [
-        ...(binData ? [binDataMapTrace(binData)] : []),
-        ...(origin ? originMapTraces(origin, kind) : [])
-      ]
-  }
-		layout={{
-			map: {
-				bearing: 0,
-				center: {
-					lat: centre?.lat,
-					lon: centre?.lon
-				},
-				pitch: 0,
-				zoom: 13,
-				style: 'satellite'
+	data={[
+		...(data ? [mapTrace(data)] : []),
+		...(origin ? originMapTraces(origin, kind) : [])
+	]}
+	layout={{
+		map: {
+			bearing: 0,
+			center: {
+				lat: centre?.lat,
+				lon: centre?.lon
 			},
-			margin: { l: 0, r: 0, t: 0, b: 0 }
-		}}
-	/>
+			pitch: 0,
+			zoom: 13,
+			style: 'satellite'
+		},
+		margin: { l: 0, r: 0, t: 0, b: 0 }
+	}}
+/>

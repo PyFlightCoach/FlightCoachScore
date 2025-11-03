@@ -9,7 +9,7 @@
 	import { loadInPlotter } from '$lib/database/flight';
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
 	import { user } from '$lib/stores/user';
-	import { Flight } from '$lib/database/flight';
+	import { DBFlight } from '$lib/database/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 

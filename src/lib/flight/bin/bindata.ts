@@ -115,5 +115,13 @@ export class BinData {
     return new GPS(this.gps.Lat[gpsindex], this.gps.Lng[gpsindex], this.gps.Alt[gpsindex]);
   }
 
+  getGPS() {
+    const gps: GPS[] = [];
+    const pos = this.pos;
+    for (let i = 0; i < pos.length; i++) {
+      gps.push(new GPS(pos.Lat[i], pos.Lng[i], pos.Alt[i]));
+    }
+    return gps;
+  }
 
 }

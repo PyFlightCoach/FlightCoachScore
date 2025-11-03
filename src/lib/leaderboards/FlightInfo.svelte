@@ -3,7 +3,7 @@
 	import { user } from '$lib/stores/user.js';
 	import { difficulty, truncate } from '$lib/leaderboards/stores';
 	import * as types from '$lib/api/DBInterfaces/flight';
-	import { Flight, loadInPlotter } from '$lib/database/flight';
+	import { DBFlight, loadInPlotter } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
 	import { loadAnalysisFromDB, loadAJson } from '$lib/flight/analysis';
 	import {  activeFlight } from '$lib/stores/shared';
@@ -12,7 +12,7 @@
 	import JSZip from 'jszip';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 
-	let { f = $bindable(), rank = $bindable() }: { f: Flight; rank: number | undefined } = $props();
+	let { f = $bindable(), rank = $bindable() }: { f: DBFlight; rank: number | undefined } = $props();
 
 	let selectedVersion = $state(Object.keys(f.meta.scores)[0]);
 	const score: types.DBFlightScore = $derived(f.getScore($difficulty, $truncate, selectedVersion));
@@ -83,7 +83,7 @@
 						fd.append('comment', newComment);
 						dbServer.patch(`flight/${f.meta.flight_id}`, fd).then(() => {
 							dbServer.get(`flight/${f.meta.flight_id}`).then((res) => {
-								f = new Flight(res.data, f.schedule);
+								f = new DBFlight(res.data, f.schedule);
 								targetPrivacy = f.meta.privacy;
 								newComment = f.meta.comment;
 							});

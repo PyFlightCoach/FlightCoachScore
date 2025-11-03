@@ -39,15 +39,15 @@
 		$states = States.from_xkf1($origin!, $binData!.orgn, $binData!.xkf1);
 		const stTime = $states.t;
 
-		$manSplits = [split.takeOff(lookupMonotonic(data.splits[0], stTime))];
-		data.splits
-			.slice(1, data.splits.length - 1)
+		$manSplits = [split.takeOff(lookupMonotonic(data.splits![0], stTime))];
+		data.splits!
+			.slice(1, data.splits!.length - 1)
 			.forEach((m, i) =>
 				$manSplits.push(
 					split.build(
-						data.schedule.category_name,
-						data.schedule.schedule_name,
-						data.schedule.manoeuvres[i],
+						data.schedule!.category_name,
+						data.schedule!.schedule_name,
+						data.schedule!.manoeuvres[i],
 						lookupMonotonic(m, stTime)
 					)
 				)
