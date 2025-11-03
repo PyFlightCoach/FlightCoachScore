@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import {flight} from '$lib/stores/flight';
+import { flight } from '$lib/stores/shared';
 
 export async function load({fetch}) {
 	if (!get(flight)) {

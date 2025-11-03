@@ -23,7 +23,7 @@
 	import { privacyOptions } from '$lib/api/DBInterfaces/flight';
 	import { createAnalysisExport, createScoreCSV } from '$lib/flight/analysis';
 	import { user, checkUser } from '$lib/stores/user';
-	import { Flight } from '$lib/database/flight';
+	import { DBFlight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
@@ -78,9 +78,9 @@
 			.then(async (res) => {
 				$isAnalysisModified = false;
 				if (res.data.meta) {
-					$activeFlight = new Flight(res.data.meta, $schedule!);
+					$activeFlight = new DBFlight(res.data.meta, $schedule!);
 				} else {
-					await Flight.load(res.data.id).then((f) => {
+					await DBFlight.load(res.data.id).then((f) => {
 						$activeFlight = f;
 					});
 				}

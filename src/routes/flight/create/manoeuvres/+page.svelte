@@ -8,8 +8,9 @@
 	import ManSelect from '$lib/flight/ManoeuvreSelecter.svelte';
 	import * as ms from '$lib/flight/splitting.js';
 	import { isFullSize } from '$lib/stores/shared';
-	import { flight } from '$lib/stores/flight';
-	import { Flight } from '$lib/flight/flight';
+		import { flight } from '$lib/stores/shared';
+  import * as sts from '$lib/stores/analysis';
+  import { BinData } from '$lib/flight/bin';
 
 	const baseSplits = $flight!.splitting || [ms.takeOff()];
 	let mans = $state(baseSplits);
@@ -18,7 +19,8 @@
 
 	let range: [number, number] = $state([
 		0,
-		baseSplits[0].stop || Math.min(3000, $flight!.states!.data.length - 1)
+		baseSplits[0].stop || Math.min(3000, 
+    $flight!.states!.data.length - 1)
 	]);
 
 	let activeIndex: number = $state(range[1]);
@@ -261,8 +263,11 @@
 			<button
 				class="btn btn-outline-primary form-control-sm"
 				onclick={() => {
+					sts.binData.set($flight?.source.rawData instanceof BinData ? $flight!.source.rawData : undefined);
+          sts.origin.set($flight!.origin);
+          sts.manSplits.set(mans);
 					newAnalysis($flight!.states!, new ms.Splitting(mans));
-					resolve('/flight/results');
+					goto(resolve('/flight/results'));
 				}}
 			>
 				Complete

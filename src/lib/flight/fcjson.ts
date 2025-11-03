@@ -70,7 +70,10 @@ export class Origin {
 		return new Origin(this.lat, this.lng, this.alt, this.heading);
 	}
 
-	static from_centre(pil: GPS, centre: GPS) {
+	static from_centre(pil: GPS, centre: GPS | undefined = undefined) {
+    if (!centre) {
+      return new Origin(pil.lat, pil.lon, pil.alt, 0);
+    }
 		const vec = GPS.sub(centre, pil);
 		return new Origin(pil.lat, pil.lon, pil.alt, (Math.atan2(vec.y, vec.x) * 180) / Math.PI, 0, 0);
 	}

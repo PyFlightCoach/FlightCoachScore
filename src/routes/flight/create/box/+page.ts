@@ -1,4 +1,4 @@
-import {flight } from '$lib/stores/flight';
+import { flight } from '$lib/stores/shared';
 import {goto} from '$app/navigation';
 import { get } from 'svelte/store';
 import {resolve} from '$app/paths';

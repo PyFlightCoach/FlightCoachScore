@@ -11,7 +11,7 @@
 	import { page } from '$app/state';
 	import Popup from '$lib/components/Popup.svelte';
 	import LoadBinAndAJson from '$lib/flight/LoadBinAndAJson.svelte';
-  import {flight} from '$lib/stores/flight';
+  	import { flight } from '$lib/stores/shared';
 
 	let showBinAJsonPopup: boolean = $state(false);
 </script>
@@ -25,6 +25,7 @@
 			class="dropdown-item"
 			onclick={() => {
 				$flight=undefined;
+        goto(resolve('/'));
 			}}>Clear</button
 		>
 		{#if $user?.is_superuser || $dev}

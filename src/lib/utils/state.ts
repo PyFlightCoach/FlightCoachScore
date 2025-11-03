@@ -169,6 +169,24 @@ export class State{
 	direction_str() {
 		return this.direction() > 0 ? 'LTOR' : 'RTOL';
 	}
+
+  transform(pos: Point, att: Quaternion) {
+    const newpos = att.transform_point(this.pos).offset(pos);
+    const newatt = Quaternion.mul(att, this.att);
+    return State.parse({
+      ...this,
+      x: newpos.x,
+      y: newpos.y,
+      z: newpos.z,
+      rw: newatt.w,
+      rx: newatt.x,
+      ry: newatt.y,
+      rz: newatt.z
+    });
+  
+
+  }
+
 }
 
 export class States {
@@ -273,6 +291,12 @@ export class States {
 		const offset = Point.distance(this.pos[0], start);
 		return this.shift(offset);
 	}
+
+  transform(pos: Point, att: Quaternion) {
+    return new States(
+      this.data.map((st) => st.transform(pos, att))
+    );
+  }
 
 	body_to_world(p: Point) {
 		return this.data.map((st) => st.body_to_world(p));

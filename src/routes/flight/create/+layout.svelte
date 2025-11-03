@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { binData, bin, origin } from '$lib/stores/analysis';
 	import * as nbc from '$lib/stores/navBarContents';
-	import { flight } from '$lib/stores/flight';
+		import { flight } from '$lib/stores/shared';
 
 	nbc.reset();
 

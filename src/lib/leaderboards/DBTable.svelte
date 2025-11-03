@@ -1,6 +1,6 @@
 <script lang="ts">
 	import FlightInfo from './FlightInfo.svelte';
-	import { Flight } from '$lib/database/flight';
+	import { DBFlight } from '$lib/database/flight';
 	import { activeFlight } from '$lib/stores/shared';
 	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 	import { prettyPrintHttpError } from '$lib/utils/text';
@@ -81,7 +81,7 @@
 					{#if showFlight?.flight_id == row.flight_id}
 						<tr class="p-0">
 							<td colspan={col_heads.length + 1} class="p-1">
-                {#await Flight.load(row.flight_id) then res}
+                {#await DBFlight.load(row.flight_id) then res}
                   <FlightInfo f={res} rank={row.rank} />
                 {:catch error}
                   Error loading flight: {prettyPrintHttpError(error)}

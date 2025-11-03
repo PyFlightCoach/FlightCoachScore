@@ -9,6 +9,16 @@ export const F3AGround = [
   new Point(259.80762, 150, 0)
 ]
 
+
+export const IMACGround = [
+  new Point(300, 50, 0),
+  new Point(300, 500, 0),
+  new Point(-300, 500, 0),
+  new Point(-300, 50, 0),
+  new Point(300, 50, 0)
+]
+
+
 export const IACGround = [
   new Point(500, 200, 0),
   new Point(500, 1200, 0),
@@ -20,7 +30,8 @@ export const IACGround = [
 export function drawBoxInWorld(origin: Origin, kind: string) {
   const points = {
     F3A: F3AGround,
-    IAC: IACGround
+    IAC: IACGround,
+    IMAC: IMACGround
   }[kind];  
   return points!.map((point) => origin.pilot.offset(origin.rotation.transform_point(point)));
 }

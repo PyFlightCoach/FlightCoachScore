@@ -7,7 +7,7 @@ import { get } from 'svelte/store';
 import { prettyPrintHttpError } from '$lib/utils/text';
 import { dev } from '$lib/stores/shared';
 
-export class Flight {
+export class DBFlight {
 	constructor(
 		readonly meta: DBFlightMeta,
 		readonly schedule: DBSchedule
@@ -21,7 +21,7 @@ export class Flight {
 	static async load(flight_id: string) {
 		const meta = await dbServer.get(`flight/${flight_id}`);
 		const schedule = get(library).subset({ schedule_id: meta.data.schedule_id }).only;
-		return new Flight(meta.data, schedule);
+		return new DBFlight(meta.data, schedule);
 	}
 
 	getScore(difficulty: number, truncate: boolean, version: string): DBFlightScore {

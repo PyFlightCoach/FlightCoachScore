@@ -9,7 +9,7 @@
 	import { loadInPlotter } from '$lib/database/flight';
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
 	import { user } from '$lib/stores/user';
-	import { Flight } from '$lib/database/flight';
+	import { DBFlight } from '$lib/database/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 	
@@ -29,9 +29,9 @@
 	let showDBLinkMenu = $state(false);
 	let showProperties = $state(false);
 
-	const flightInfo: Promise<Flight | undefined> = $derived(
+	const flightInfo: Promise<DBFlight | undefined> = $derived(
 		competitor?.competitor.flight_id
-			? Flight.load(competitor.competitor.flight_id)
+			? DBFlight.load(competitor.competitor.flight_id)
 			: Promise.resolve(undefined)
 	);
 

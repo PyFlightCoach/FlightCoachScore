@@ -4,13 +4,13 @@
 	import { BinData, BinField } from '$lib/flight/bin/bindata';
 	import { md5 } from 'js-md5';
 	import { loading } from '$lib/stores/shared';
-	import { flight } from '$lib/stores/flight';
+		import { flight } from '$lib/stores/shared';
 	import { Flight, FlightDataSource } from '$lib/flight/flight';
 	import { States } from '$lib/utils/state';
 	import { parseFCJMans, loadManDefs } from '$lib/flight/splitting';
-	import { binDataMapTrace } from '$lib/plots/map';
-  import { goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
   import {resolve} from '$app/paths';
+	import { GPS } from '$lib/utils/geometry';
 
 	let fcjFile: File | undefined = $state();
 	let fcjson: fcj.FCJson | undefined = $state();
@@ -21,17 +21,22 @@
 	let md5Sum: string | undefined = $state();
 
 	let duration = $derived(binData ? binData.att?.time_boot_s[binData.att?.length - 1] / 60 : 0);
-	let binOrigin = $derived(binData?.findOrigin() || undefined);
+	let binOrigin = $derived(binData? fcj.Origin.from_centre(binData?.findOrigin()) : undefined);
+
+  let localStorageOrigin = $derived.by(()=>{
+    const local = fcj.Origin.load();
+    if (binOrigin && local && GPS.sub(binOrigin.pilot, local.pilot).length() < 300) {
+      return local;
+    } else {
+      return undefined;
+    }
+  });
 
   let fcjDuration = $derived(
     fcjson ? fcjson.data[fcjson.data.length - 1].time / 1000000 / 60 : 0
-  )
+  );
 
-	let origin = $derived(
-		fcjson?.origin || (binOrigin
-			? new fcj.Origin(binOrigin!.lat, binOrigin!.lon, binOrigin!.alt, 0)
-			: undefined)
-	);
+	let origin = $derived(fcjson?.origin || localStorageOrigin || binOrigin);
 
 	let states = $derived(
 		origin && binData ? States.from_xkf1(origin, binData.orgn, binData.xkf1) : undefined
@@ -104,7 +109,7 @@
 				<small
 					>Origin:
 					{binOrigin?.lat.toFixed(6)},
-					{binOrigin?.lon.toFixed(6)},
+					{binOrigin?.lng.toFixed(6)},
 					{binOrigin?.alt.toFixed(2)}
 				</small>
 			</div>

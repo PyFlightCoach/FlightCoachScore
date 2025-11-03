@@ -4,8 +4,8 @@
 	import { loading } from '$lib/stores/shared';
 	import { States } from '$lib/utils/state';
 	import { Origin } from '$lib/flight/fcjson';
-	import { flight } from '$lib/stores/flight';
-	import { Flight, FlightDataSource } from '$lib/flight/flight';
+		import { flight } from '$lib/stores/shared';
+	import { Flight, FlightDataSource, GlobalState } from '$lib/flight/flight';
 	import { goto } from '$app/navigation';
 </script>
 
@@ -31,17 +31,16 @@
 							}
 						})
 						.then((response) => {
+              const origin = Object.setPrototypeOf(response.data.origin, Origin.prototype)
+              const bootTime = new Date(Date.parse(response.data.boot_time));
 							$flight = new Flight(
 								new FlightDataSource(
 									file,
 									'acrowrx',
 									undefined,
-									response.data.boot_time,
-									States.parse(response.data.data)
+									bootTime,
+									new GlobalState(origin, response.data.boot_time, States.parse(response.data.data))
 								),
-								Object.setPrototypeOf(response.data.origin, Origin.prototype),
-								undefined,
-								undefined
 							);
 						})
 						.finally(() => {
