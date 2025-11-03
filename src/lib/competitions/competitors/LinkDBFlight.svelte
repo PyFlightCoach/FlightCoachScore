@@ -25,7 +25,6 @@
 			: undefined
 	};
 
-	$inspect(round.summary.schedule_id, 'schedule id');
 	dbServer.get('analysis/flightlist', { params }).then((res) => {
 		flights = res.data.results.filter((f: DBFlightRanked) => {
 			return (

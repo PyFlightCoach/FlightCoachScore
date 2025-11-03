@@ -2,7 +2,7 @@ import { type FCJson, type FCJMan } from '$lib/flight/fcjson';
 import { States } from '$lib/utils/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
 import { loadManDef, library } from '$lib/schedule/library';
-import { type DBManoeuvre } from '$lib/schedule/db';
+import { DBSchedule, type DBManoeuvre } from '$lib/schedule/db';
 import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
@@ -172,6 +172,10 @@ export class Splitting {
 	get manNames() {
 		return this.analysisMans.map((iman) => this.mans[iman].manoeuvre!.short_name);
 	}
+
+  get schedule(): DBSchedule | undefined {
+    return isComp(this.mans);
+  }
 }
 
 export async function parseFCJMans(fcj: FCJson, states: States) {

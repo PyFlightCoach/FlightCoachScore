@@ -4,7 +4,7 @@
 	import { loading } from '$lib/stores/shared';
 	import { States } from '$lib/utils/state';
 	import { Origin } from '$lib/flight/fcjson';
-		import { activeFlight } from '$lib/stores/shared';
+  import { activeFlight } from '$lib/stores/shared';
 	import { Flight, FlightDataSource, GlobalState } from '$lib/flight/flight';
 	import { goto } from '$app/navigation';
 </script>

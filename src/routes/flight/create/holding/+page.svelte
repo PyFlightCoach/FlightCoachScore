@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { binData, origin, fcj, bin, bootTime, states, manSplits } from '$lib/stores/analysis';
 	import { newAnalysis } from '$lib/flight/analysis.js';
-	import { dataSource, isFullSize } from '$lib/stores/shared';
 	import BinReader from '$lib/flight/bin/BinReader.svelte';
 	import { dbServer } from '$lib/api';
 	import { split_states, States } from '$lib/utils/state';

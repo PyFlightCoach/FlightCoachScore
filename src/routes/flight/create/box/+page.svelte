@@ -16,7 +16,7 @@
 		$activeFlight!.origin ||
 			($activeFlight!.source!.rawData! instanceof BinData
 				? Origin.from_centre($activeFlight!.source!.rawData!.findOrigin())
-				: $activeFlight!.source!.rawData!.origin)
+				: $activeFlight!.source!.rawData!.origin as Origin)
 	);
 	let newStates = $derived($activeFlight!.source.states(newOrigin!));
 
@@ -26,7 +26,7 @@
   $effect(() => {
     $isFullSize = boxDisplay === 'IAC';
   });
-  $inspect($activeFlight?.source.gps());
+  
 </script>
 
 <SideBarLayout sideBarWidth={4}>
@@ -118,7 +118,7 @@
 			<button
 				class="col btn btn-outline-primary"
 				onclick={() => {
-					$activeFlight = new Flight($activeFlight!.source, newOrigin, newStates, $activeFlight?.splitting);
+					$activeFlight = new Flight($activeFlight!.source, newOrigin, newStates, $activeFlight?.segments);
 					shiftz = 0;
 					goto(resolve('/flight/create/manoeuvres'));
 				}}>Next</button

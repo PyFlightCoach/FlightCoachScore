@@ -1,8 +1,13 @@
 <script lang="ts">
 	import FileInput from '$lib/components/FileInput.svelte';
-	import { loading, dataSource, activeFlight } from '$lib/stores/shared';
-	import { bin, bootTime } from '$lib/stores/analysis';
-	import { importAnalysis, checkDuplicate, loadAnalysisFromDB } from '$lib/flight/analysis';
+	import { loading, activeFlight } from '$lib/stores/shared';
+	import {
+		importAnalysis,
+		checkDuplicate,
+		loadAnalysisFromDB,
+		clearDataLoading,
+		clearAnalysis
+	} from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { cat } from '$lib/utils/files';
@@ -14,7 +19,7 @@
 	let ajsonfile: File | undefined = $state();
 	let form_state: string | undefined = $state();
 
-	$inspect('binFile', binfile, 'ajsonfile', ajsonfile);
+
 </script>
 
 {#if form_state}
@@ -37,7 +42,7 @@
 						loadAnalysisFromDB(id);
 						onload();
 					}
-					$bin = undefined;
+					binfile = undefined;
 				}
 			});
 		}
@@ -50,12 +55,23 @@
 		$loading = true;
 		cat(ajsonfile!, 'readAsText')
 			.then((text) => JSON.parse(text as string))
-			.then(async (data) => importAnalysis(data).then(()=>{return data}))
-      .then((data)=>{
-        $activeFlight = new Flight(new FlightDataSource(undefined, binfile ? 'bin' : 'ajson', undefined, data.bootTime, undefined), data.origin);
-        onload();
+			.then(async (data) => {
+				clearAnalysis();
+				clearDataLoading();
+				$activeFlight = new Flight(
+					new FlightDataSource(
+						undefined,
+						binfile ? 'bin' : 'ajson',
+						undefined,
+						new Date(Date.parse(data.bootTime)),
+						data
+					),
+					data.origin,
+				);
+				importAnalysis(data);
+				onload();
 				goto(resolve('/flight/results'));
-      })
+			})
 			.finally(() => {
 				loading.set(false);
 			});

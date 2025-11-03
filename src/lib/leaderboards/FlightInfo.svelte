@@ -5,12 +5,13 @@
 	import * as types from '$lib/api/DBInterfaces/flight';
 	import { DBFlight, loadInPlotter } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
-	import { loadAnalysisFromDB, loadAJson } from '$lib/flight/analysis';
+	import { loadAnalysisFromDB } from '$lib/flight/analysis';
 	import {  activeFlight } from '$lib/stores/shared';
 	import { windowWidth, blockProgress } from '$lib/stores/shared';
 	import { saveAs } from 'file-saver';
 	import JSZip from 'jszip';
 	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { Flight } from '$lib/flight/flight';
 
 	let { f = $bindable(), rank = $bindable() }: { f: DBFlight; rank: number | undefined } = $props();
 
@@ -116,8 +117,9 @@
 				<button
 					class="form-control btn btn-outline-secondary"
 					onclick={() => {
-						loadAJson(f.meta.flight_id).then((res) => {
-							const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
+            Flight.download(f)
+						.then(flight => {
+							const blob = new Blob([JSON.stringify(flight.source.rawData)], { type: 'application/json' });
 							saveAs(blob, `${f.meta.flight_id}.analysis.json`);
 						});
 					}}

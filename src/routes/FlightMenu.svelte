@@ -1,17 +1,16 @@
 <script lang="ts">
 	import NavMenu from './NavMenu.svelte';
-	import { manNames, bin, bootTime, states } from '$lib/stores/analysis';
 	import { exportAnalysis, loadExample, clearDataLoading } from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
 	import { saveAs } from 'file-saver';
 	import { loading } from '$lib/stores/shared';
 	import { user } from '$lib/stores/user';
-	import { dev, dataSource } from '$lib/stores/shared';
+	import { dev, activeFlight } from '$lib/stores/shared';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Popup from '$lib/components/Popup.svelte';
 	import LoadBinAndAJson from '$lib/flight/LoadBinAndAJson.svelte';
-  	import { activeFlight } from '$lib/stores/shared';
+  
 
 	let showBinAJsonPopup: boolean = $state(false);
 </script>

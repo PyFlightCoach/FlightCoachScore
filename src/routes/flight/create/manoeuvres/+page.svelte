@@ -8,19 +8,16 @@
 	import ManSelect from '$lib/flight/ManoeuvreSelecter.svelte';
 	import * as ms from '$lib/flight/splitting.js';
 	import { isFullSize } from '$lib/stores/shared';
-		import { activeFlight } from '$lib/stores/shared';
-  import * as sts from '$lib/stores/analysis';
-  import { BinData } from '$lib/flight/bin';
+	import { activeFlight } from '$lib/stores/shared';
 
-	const baseSplits = $activeFlight!.splitting || [ms.takeOff()];
+	const baseSplits = $activeFlight!.segments || [ms.takeOff()];
 	let mans = $state(baseSplits);
 
 	let activeManId: number = $state(0);
 
 	let range: [number, number] = $state([
 		0,
-		baseSplits[0].stop || Math.min(3000, 
-    $activeFlight!.states!.data.length - 1)
+		baseSplits[0].stop || Math.min(3000, $activeFlight!.states!.data.length - 1)
 	]);
 
 	let activeIndex: number = $state(range[1]);
@@ -88,7 +85,9 @@
 		reader.onload = (e) => {
 			ms.parseFCJMans(FCJson.parse(JSON.parse(e.target?.result as string)), $activeFlight!.states!)
 				.then((res) => ms.loadManDefs(res))
-				.then((res) => {mans = res});
+				.then((res) => {
+					mans = res;
+				});
 		};
 		reader.readAsText(file);
 	};
@@ -115,9 +114,11 @@
 	style="max-height: 100%;"
 >
 	<div class="row">
-		{#if $activeFlight!.source.kind === 'bin' }
+		{#if $activeFlight!.source.kind === 'bin'}
 			<span class="col-auto">Source File:</span>
-			<span class="col text-nowrap overflow-auto">{$activeFlight?.source?.file?.name || 'unknown'}</span>
+			<span class="col text-nowrap overflow-auto"
+				>{$activeFlight?.source?.file?.name || 'unknown'}</span
+			>
 		{/if}
 	</div>
 	<div class="row pt-2">
@@ -148,7 +149,9 @@
 				<button
 					id="clear-splitting"
 					class="btn btn-outline-secondary form-control-sm col"
-					onclick={() => {reset()}}
+					onclick={() => {
+						reset();
+					}}
 				>
 					Clear
 				</button>
@@ -263,10 +266,10 @@
 			<button
 				class="btn btn-outline-primary form-control-sm"
 				onclick={() => {
-					sts.binData.set($activeFlight?.source.rawData instanceof BinData ? $activeFlight!.source.rawData : undefined);
-          sts.origin.set($activeFlight!.origin);
-          sts.manSplits.set(mans);
-					newAnalysis($activeFlight!.states!, new ms.Splitting(mans));
+					$activeFlight = Object.assign($activeFlight!, {
+						segments: mans
+					});
+					newAnalysis($activeFlight!);
 					goto(resolve('/flight/results'));
 				}}
 			>

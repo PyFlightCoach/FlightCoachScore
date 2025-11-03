@@ -5,6 +5,6 @@ import {resolve} from '$app/paths';
 
 
 export function load() {
-  if (!get(activeFlight)) goto(resolve('/flight/create/bin'));
+  if (!get(activeFlight)) goto(resolve('/'));
 
 }

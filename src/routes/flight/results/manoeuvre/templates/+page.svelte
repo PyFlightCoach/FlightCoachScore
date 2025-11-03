@@ -2,7 +2,7 @@
 	import Plot from '$lib/plots/Plotly.svelte';
 	import { modeltrace, ribbon } from '$lib/plots/traces';
 	import { layout3d } from '$lib/plots/layouts';
-	import { analyses, selManID, fcj } from '$lib/stores/analysis';
+	import { analyses, selManID } from '$lib/stores/analysis';
 	import type { States } from '$lib/utils/state';
 	import colddraft from '$lib/plots/colddraft.js';
 

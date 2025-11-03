@@ -1,5 +1,4 @@
 import { writable, type Writable, type Readable, derived } from 'svelte/store';
-import { DBFlight } from '$lib/database/flight';
 import { dev as isdev } from '$app/environment';
 import { newCookieStore } from '$lib/utils/cookieStore';
 import { type AxiosProgressEvent } from 'axios';
@@ -20,8 +19,6 @@ export const activeFlight: Writable<Flight | undefined> = writable(undefined);
 //export const activeFlight: Writable<DBFlight | undefined> = writable();  // need to replace this with the above
 
 export const isAnalysisModified: Writable<boolean | undefined> = writable();
-
-export const dataSource: Writable<"state" | "bin" | "fcj" | "db" | "acrowrx" | "example"> = writable("bin");
 
 export const dev: Writable<boolean> = writable(isdev);
 

@@ -65,7 +65,7 @@ export async function load({ url }) {
 				bootTime.set(new Date(response.data.boot_time));
 				origin.set(Object.setPrototypeOf(response.data.origin, Origin.prototype));
 				acrowrxMeta.set(response.data.meta);
-				goto(resolve('/flight/create/data'));
+				goto(resolve('/'));
 			})
 			.catch((e) => {
 				alert(prettyPrintHttpError(e));

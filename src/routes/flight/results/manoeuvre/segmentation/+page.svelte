@@ -1,36 +1,38 @@
 <script lang="ts">
-	import { analyses, selManID, fcj } from '$lib/stores/analysis';
+	import { analyses, selManID } from '$lib/stores/analysis';
 	import { analyseManoeuvre } from '$lib/flight/analysis';
   import {isFullSize} from '$lib/stores/shared';
 	import PlotDTW from '$lib/plots/PlotDTW.svelte';
   import { loadManDef, library } from '$lib/schedule/library';
+	import { States } from '$lib/utils/state';
 
-	$: man = analyses[$selManID!];
+	let step: number = $state(0.2);
+  let element: string | undefined = $state();
 
-	let step: number = 0.2;
-
-	$: elements = $man?.flown?.element;
-	$: end_info = $man?.flown?.end_info();
-
-	let element: string | undefined;
+  const man = $derived(analyses[$selManID!]);
+  const flown = $derived($man!.flown as States)
+  const elements = $derived(flown.element);
+	const end_info = $derived(flown.end_info());
+  const states = $derived(flown.split());
 
 	const editsplit = (stp: number, elname: string | undefined) => {
 		if (elname == null) return;
-		const elindex = elements!.lastIndexOf(elname);
+		const elindex: number = elements!.lastIndexOf(elname);
+    const ename: string = elements![elindex]!;
 		let i = 0;
 		if (stp > 0) {
 			const endt = Math.min(
 				end_info[elname].lastt + stp,
-				end_info[elements![elindex + 1]].lastt - 0.1
+				end_info[elements![elindex + 1] as string].lastt - 0.1
 			);
-			while ($man!.flown!.data[end_info[elements![elindex]].lastid + i].t < endt) {
-				$man!.flown!.data[end_info[elements![elindex]].lastid + i].element = elname;
+			while (flown.data[end_info[ename].lastid + i as number].t < endt) {
+				flown.data[end_info[ename].lastid + i].element = ename;
 				i++;
 			}
 		} else {
 			const endt = Math.max(end_info[elname].lastt + stp, end_info[elname].firstt + 0.1);
-			while ($man!.flown!.data[end_info[elements![elindex]].lastid - i].t > endt) {
-				$man!.flown!.data[end_info[elements![elindex]].lastid - i].element = elements![elindex + 1];
+			while (flown.data[end_info[ename].lastid - i].t > endt) {
+				flown.data[end_info[ename].lastid - i].element = elements![elindex + 1];
 				i++;
 			}
 		}
@@ -38,7 +40,7 @@
 		$man!.reset();
 	};
 
-	$: states = $man!.flown!.split();
+
 </script>
 
 <div class="col-12 border">
@@ -70,14 +72,14 @@
 				<button
 					class="btn btn-outline-secondary"
 					title="Adjust split location backwards"
-					on:click={() => {
+					onclick={() => {
 						editsplit(-Number(step), element);
 					}}>&#60</button
 				>
 				<button
 					class="btn btn-outline-secondary"
 					title="Adjust split location forwards"
-					on:click={() => {
+					onclick={() => {
 						editsplit(Number(step), element);
 					}}>&#62</button
 				>
@@ -86,21 +88,21 @@
 				<button
 					class="btn btn-outline-secondary"
 					title="Run aligment optimisation"
-					on:click={() => {
+					onclick={() => {
 						analyseManoeuvre($selManID!, true, true);
 					}}>Optimise</button
 				>
 				<button
 					class="btn btn-outline-secondary"
 					title="Recalculate score without optimisation"
-					on:click={() => {
+					onclick={() => {
 						analyseManoeuvre($selManID!, true, false);
 					}}>Score</button
 				>
         <button
           class="btn btn-outline-secondary"
           title="Rerun the analysis from scratch, inluding the initial DTW alignment"
-          on:click={() => {
+          onclick={() => {
             loadManDef(
               $library.subset({
                 category_name: $man!.schedule.category,

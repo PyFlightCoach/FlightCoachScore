@@ -3,12 +3,11 @@ import { ManDef, ManOpt } from '$lib/manoeuvre/definition.svelte';
 import { ManoeuvreResult } from '$lib/manoeuvre/scores';
 import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/flight/fcjson';
 import { analysisServer } from '$lib/api/api';
-import { selectedResult, binData, origin } from '$lib/stores/analysis';
-import { get } from 'svelte/store';
+import { selectedResult } from '$lib/stores/analysis';
 import { isAnalysisModified } from '$lib/stores/shared';
 import { Manoeuvre } from './raw.svelte';
 import { objmap } from '$lib/utils/arrays';
-
+import { BinDataState, GlobalState } from '$lib/flight/flight';
 
 export class MA {
 	constructor(
@@ -20,7 +19,7 @@ export class MA {
 		readonly scheduleDirection: string,
 		readonly history: Record<string, FCJManResult> = {},
 		readonly k: number | undefined = undefined,
-		readonly flown: States | undefined = undefined,
+		readonly flown: States | BinDataState,
 		readonly mdef: ManDef | ManOpt | undefined = undefined,
 		readonly manoeuvre: Manoeuvre | undefined = undefined,
 		readonly template: States | undefined = undefined,
@@ -72,8 +71,8 @@ export class MA {
 				id: this.id,
 				mdef: this.mdef!.dump(),
 				optimise_alignment: optimise,
-				flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
-				origin: get(origin),
+				flown: this.flown! instanceof States ? this.flown.data : this.flown.data,
+				origin: this.flown! instanceof BinDataState ? this.flown.origin : undefined,
 				schedule_direction: this.scheduleDirection,
         reset
 			})
@@ -117,7 +116,7 @@ export class MA {
 			id: this.id,
 			schedule: this.schedule,
 			schedule_direction: this.scheduleDirection,
-			flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
+			flown: this.flown?.data,
 			history: this.history
 		};
 	}
@@ -142,9 +141,9 @@ export class MA {
 			data.flown[data.flown.length - 1].t,
 			Object.setPrototypeOf(data.schedule, ScheduleInfo.prototype),
 			data.schedule_direction,
-      objmap(data.history, (_, v)=>FCJManResult.parse(v as Record<string, any>)),
+      objmap(data.history, (_, v)=>FCJManResult.parse(v)),
 			data.mdef?.info.k,
-			data.flown ? States.parse(data.flown) : undefined,
+			States.parse(data.flown),
 			data.mdef ? ManDef.parse(data.mdef) : undefined,
 			data.manoeuvre,
 			data.template ? States.parse(data.template) : undefined,

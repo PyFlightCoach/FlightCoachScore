@@ -36,7 +36,7 @@
     fcjson ? fcjson.data[fcjson.data.length - 1].time / 1000000 / 60 : 0
   );
 
-	let origin = $derived(fcjson?.origin || localStorageOrigin || binOrigin);
+	let origin = $derived(fcjson?.origin.noMove() || localStorageOrigin || binOrigin);
 
 	let states = $derived(
 		origin && binData ? States.from_xkf1(origin, binData.orgn, binData.xkf1) : undefined

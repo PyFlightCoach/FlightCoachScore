@@ -43,7 +43,7 @@
 				round.competition.summary.add_rules?.cd_and_self_flight_add &&
 				competitor.isMe($user!.id) )
 	);
-    $inspect(competitor.isMe($user!.id), 'is Me');
+    
 </script>
 
 {#snippet displayValue()}

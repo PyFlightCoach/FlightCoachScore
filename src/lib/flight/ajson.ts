@@ -1,10 +1,8 @@
-import type { Origin, ScheduleInfo, FCJManResult } from "./fcjson";
 import type { Direction } from "$lib/manoeuvre/positioning.svelte";
-import type { ManoeuvreResult } from "$lib/manoeuvre/scores";
 import type { IManOpt, IManDef } from "$lib/manoeuvre/definition.svelte";
 
 
-export interface MA {
+export interface AJMan {
     //name: str
     //id: int
     //schedule: ScheduleInfo
@@ -20,10 +18,10 @@ export interface MA {
     //scores: dict | None = None
     name: string;
     id: number;
-    schedule: ScheduleInfo;
+    schedule: record<string, string>;
     schedule_direction?: Direction;
     flown: Record<string, any>[];
-    history?: Record<string, FCJManResult>;
+    history?: Record<string, any>;
     mdef?: IManDef | IManOpt[];
     manoeuvre?: Record<string, any> | Record<string, any>[];
     template?: Record<string, any> | Record<string, any>[];
@@ -41,10 +39,10 @@ export interface AJson {
     //sourceFCJ: str | None = None
     //bootTime: datetime | None = None
     //mans: list[MA]
-  origin: Origin;
+  origin: Record<string, number>;
   isComp: boolean;
   sourceBin?: string;
   sourceFCJ?: string;
-  bootTime?: Date;
-  mans: MA[];
+  bootTime?: string;
+  mans: AJMan[];
 }

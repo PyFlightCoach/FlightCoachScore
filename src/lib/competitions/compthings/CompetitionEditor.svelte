@@ -28,7 +28,7 @@
 	getCategories().then((categories) => {
 		category = categories.find((c) => c.category_id === competition?.summary.category_id);
 	});
-	$inspect(category);
+  
 	let add_rules: AddRule = $state(competition?.summary.add_rules || ({} as AddRule));
 	let result_rules = $state(competition?.summary.result_rules || ({} as ResultRule));
 	let client_meta: CompThingMeta = $state(

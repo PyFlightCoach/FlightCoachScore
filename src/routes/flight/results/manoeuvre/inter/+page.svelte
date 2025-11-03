@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { analyses, selManID, fcj } from '$lib/stores/analysis';
+	import { analyses, selManID } from '$lib/stores/analysis';
 	import PlotInter from '$lib/plots/PlotInter.svelte';
   import { d3Color } from '$lib/plots/styling';
   import {isFullSize} from '$lib/stores/shared';
-	
+	import type { States } from '$lib/utils/state';
+  
 	const man = analyses[$selManID!];
 
-	let states = $derived($man!.flown!.split());
+	let states = $derived(($man!.flown! as States).split());
 
 	let name: string | undefined = $state();
 	let mp = $derived(name ? $man!.mdef!.mps[name] : undefined);

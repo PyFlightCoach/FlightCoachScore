@@ -4,5 +4,5 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 
 export async function load() {
-	if (!get(manNames)) goto(resolve("/flight/create/data"))
+	if (!get(manNames)) goto(resolve("/"));
 }
