@@ -4,7 +4,7 @@
 	import { BinData, BinField } from '$lib/flight/bin/bindata';
 	import { md5 } from 'js-md5';
 	import { loading } from '$lib/stores/shared';
-		import { flight } from '$lib/stores/shared';
+		import { activeFlight } from '$lib/stores/shared';
 	import { Flight, FlightDataSource } from '$lib/flight/flight';
 	import { States } from '$lib/utils/state';
 	import { parseFCJMans, loadManDefs } from '$lib/flight/splitting';
@@ -165,7 +165,7 @@
 				<button
 					class="col btn btn-outline-primary"
 					onclick={() => {
-						$flight = new Flight(
+						$activeFlight = new Flight(
 							new FlightDataSource(bin, 'bin', undefined, bootTime, binData),
 							origin,
               states,

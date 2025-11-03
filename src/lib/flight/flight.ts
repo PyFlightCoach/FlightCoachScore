@@ -32,10 +32,10 @@ export class GlobalState {
 export class FlightDataSource {
 	constructor(
 		readonly file: File | undefined,
-		readonly kind: 'bin' | 'acrowrx' | 'example' | 'db',
-		readonly db: DBFlight | undefined,
-		readonly bootTime: Date | undefined,
-		readonly rawData: BinData | GlobalState | undefined
+		readonly kind: 'bin' | 'acrowrx' | 'example' | 'db' | 'ajson',
+		readonly db: DBFlight | undefined = undefined,
+		readonly bootTime: Date | undefined = undefined,
+		readonly rawData: BinData | GlobalState | undefined = undefined
 	) {}
 
   gps() {

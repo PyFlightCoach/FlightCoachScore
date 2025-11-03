@@ -11,20 +11,20 @@
 	import { page } from '$app/state';
 	import Popup from '$lib/components/Popup.svelte';
 	import LoadBinAndAJson from '$lib/flight/LoadBinAndAJson.svelte';
-  	import { flight } from '$lib/stores/shared';
+  	import { activeFlight } from '$lib/stores/shared';
 
 	let showBinAJsonPopup: boolean = $state(false);
 </script>
 
 <NavMenu tooltip="Flight Analysis Menu">
-	<span slot="icon"><i class="bi {$flight ? 'bi-airplane-fill' : 'bi-airplane'}"></i></span>
-	{#if $flight}
-		<small class="px-2 text-start text-nowrap">{$flight?.source.description || 'unknown'}</small>
-    <small class="px-2 text-start text-nowrap">{$flight?.source?.bootTime?.toLocaleString()}</small>
+	<span slot="icon"><i class="bi {$activeFlight ? 'bi-airplane-fill' : 'bi-airplane'}"></i></span>
+	{#if $activeFlight}
+		<small class="px-2 text-start text-nowrap">{$activeFlight?.source.description || 'unknown'}</small>
+    <small class="px-2 text-start text-nowrap">{$activeFlight?.source?.bootTime?.toLocaleString()}</small>
 		<button
 			class="dropdown-item"
 			onclick={() => {
-				$flight=undefined;
+				$activeFlight=undefined;
         goto(resolve('/'));
 			}}>Clear</button
 		>

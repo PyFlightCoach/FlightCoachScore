@@ -16,8 +16,8 @@ export const isFullSize: Writable<boolean> = writable(false);
 export const loading: Writable<boolean | undefined> = writable();
 
 
-export const flight: Writable<Flight | undefined> = writable(undefined);
-export const activeFlight: Writable<DBFlight | undefined> = writable();  // need to replace this with the above
+export const activeFlight: Writable<Flight | undefined> = writable(undefined);
+//export const activeFlight: Writable<DBFlight | undefined> = writable();  // need to replace this with the above
 
 export const isAnalysisModified: Writable<boolean | undefined> = writable();
 

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import FileInput from '$lib/components/FileInput.svelte';
 	import { loading, dataSource, activeFlight } from '$lib/stores/shared';
-	import { bin } from '$lib/stores/analysis';
+	import { bin, bootTime } from '$lib/stores/analysis';
 	import { importAnalysis, checkDuplicate, loadAnalysisFromDB } from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { cat } from '$lib/utils/files';
+	import { Flight, FlightDataSource } from './flight';
 
 	let { onload = () => {} }: { onload: () => void } = $props();
 
@@ -49,13 +50,9 @@
 		$loading = true;
 		cat(ajsonfile!, 'readAsText')
 			.then((text) => JSON.parse(text as string))
-			.then((data) => {
-				$activeFlight = undefined;
-        return importAnalysis(data);
-			})
-      .then(()=>{
-        $dataSource = binfile ? 'bin' : 'ajson';
-				$bin = binfile;
+			.then(async (data) => importAnalysis(data).then(()=>{return data}))
+      .then((data)=>{
+        $activeFlight = new Flight(new FlightDataSource(undefined, binfile ? 'bin' : 'ajson', undefined, data.bootTime, undefined), data.origin);
         onload();
 				goto(resolve('/flight/results'));
       })

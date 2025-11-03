@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { PilotManager } from '$lib/competitions/competitors/PilotManager';
-	import { activeFlight } from '$lib/stores/shared';
-	import { bin, isCompFlight, isComplete } from '$lib/stores/analysis';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import Popup from '$lib/components/Popup.svelte';
 	import LinkDbFlight from '$lib/competitions/competitors/LinkDBFlight.svelte';
