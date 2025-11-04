@@ -10,7 +10,7 @@
 	import { isFullSize } from '$lib/stores/shared';
 	import { activeFlight } from '$lib/stores/shared';
 
-	const baseSplits = $activeFlight!.segments || [ms.takeOff()];
+	const baseSplits = $activeFlight!.segmentation?.mans!;
 	let mans = $state(baseSplits);
 
 	let activeManId: number = $state(0);
@@ -114,10 +114,10 @@
 	style="max-height: 100%;"
 >
 	<div class="row">
-		{#if $activeFlight!.source.kind === 'bin'}
+		{#if $activeFlight!.kind === 'bin'}
 			<span class="col-auto">Source File:</span>
 			<span class="col text-nowrap overflow-auto"
-				>{$activeFlight?.source?.file?.name || 'unknown'}</span
+				>{$activeFlight?.file?.name || 'unknown'}</span
 			>
 		{/if}
 	</div>
@@ -267,7 +267,7 @@
 				class="btn btn-outline-primary form-control-sm"
 				onclick={() => {
 					$activeFlight = Object.assign($activeFlight!, {
-						segments: mans
+						segmentation: new ms.Splitting(mans)
 					});
 					newAnalysis($activeFlight!);
 					goto(resolve('/flight/results'));

@@ -6,7 +6,7 @@ import { dbServer, analysisServer } from '$lib/api';
 import { get } from 'svelte/store';
 import { library, reloadSchedules } from '$lib/schedule/library';
 import { objfilter } from '$lib/utils/arrays';
-import type { Flight } from '$lib/flight/flight';
+import type { FlightDataSource } from '$lib/flight/flight';
 
 export const mouse = writable({ x: 0, y: 0 });
 
@@ -15,7 +15,7 @@ export const isFullSize: Writable<boolean> = writable(false);
 export const loading: Writable<boolean | undefined> = writable();
 
 
-export const activeFlight: Writable<Flight | undefined> = writable(undefined);
+export const activeFlight: Writable<FlightDataSource | undefined> = writable(undefined);
 //export const activeFlight: Writable<DBFlight | undefined> = writable();  // need to replace this with the above
 
 export const isAnalysisModified: Writable<boolean | undefined> = writable();

@@ -11,7 +11,7 @@
 	import { saveAs } from 'file-saver';
 	import JSZip from 'jszip';
 	import { prettyPrintHttpError } from '$lib/utils/text';
-	import { Flight } from '$lib/flight/flight';
+	import { FlightDataSource } from '$lib/flight/flight';
 
 	let { f = $bindable(), rank = $bindable() }: { f: DBFlight; rank: number | undefined } = $props();
 
@@ -21,7 +21,7 @@
 	let targetPrivacy = $state(f.meta.privacy);
 	let newComment = $state(f.meta.comment);
 
-	const isAnalysisLoaded = $derived(f.meta.flight_id == $activeFlight?.meta.flight_id);
+	const isAnalysisLoaded = $derived(f.meta.flight_id == $activeFlight?.db!.flight_id);
 	const canEdit = $derived(f.isMine || $user?.is_superuser);
 	const canView = $derived(canEdit || types.privacyOptions.indexOf(f.meta.privacy) > 0);
 	const canAnalyse = $derived(canEdit || types.privacyOptions.indexOf(f.meta.privacy) > 1);
@@ -117,10 +117,10 @@
 				<button
 					class="form-control btn btn-outline-secondary"
 					onclick={() => {
-            Flight.download(f)
+            FlightDataSource.db(f.meta)
 						.then(flight => {
-							const blob = new Blob([JSON.stringify(flight.source.rawData)], { type: 'application/json' });
-							saveAs(blob, `${f.meta.flight_id}.analysis.json`);
+							const blob = new Blob([JSON.stringify(flight.rawData)], { type: 'application/json' });
+							saveAs(blob, `${f.meta.flight_id}.ajson`);
 						});
 					}}
 				>

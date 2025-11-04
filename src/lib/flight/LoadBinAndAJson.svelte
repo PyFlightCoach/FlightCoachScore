@@ -11,7 +11,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { cat } from '$lib/utils/files';
-	import { Flight, FlightDataSource } from './flight';
+	import { FlightDataSource } from './flight';
 
 	let { onload = () => {} }: { onload: () => void } = $props();
 
@@ -58,16 +58,14 @@
 			.then(async (data) => {
 				clearAnalysis();
 				clearDataLoading();
-				$activeFlight = new Flight(
-					new FlightDataSource(
+				$activeFlight = new FlightDataSource(
 						undefined,
 						binfile ? 'bin' : 'ajson',
 						undefined,
 						new Date(Date.parse(data.bootTime)),
-						data
-					),
-					data.origin,
-				);
+						data,
+            data.origin
+					);
 				importAnalysis(data);
 				onload();
 				goto(resolve('/flight/results'));

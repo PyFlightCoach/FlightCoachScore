@@ -3,7 +3,7 @@ import { activeFlight, isAnalysisModified, loading, faVersion } from '$lib/store
 import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
 import { schedule as getScheduleFromSplit } from '$lib/flight/splitting';
-import { ScheduleInfo } from './fcjson';
+import { Origin, ScheduleInfo } from './fcjson';
 import { loadManDef, library } from '$lib/schedule/library';
 import { dbServer } from '$lib/api/api';
 import { goto } from '$app/navigation';
@@ -11,7 +11,7 @@ import { resolve } from '$app/paths';
 import { cat } from '$lib/utils/files';
 import { md5 } from 'js-md5';
 import { prettyPrintHttpError } from '$lib/utils/text';
-import { Flight } from './flight';
+import { FlightDataSource, GlobalState } from './flight';
 import type { AJson, AJMan } from './ajson';
 
 export function checkComplete() {
@@ -76,7 +76,7 @@ export function clearDataLoading() {
 	clearAnalysis();
 }
 
-export async function newAnalysis(flight: Flight) {
+export async function newAnalysis(flight: FlightDataSource) {
 	const segmentation = flight.segmentation!;
 
 	sts.schedule.set(segmentation.schedule);
@@ -103,7 +103,6 @@ export async function newAnalysis(flight: Flight) {
 		sts.runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
 		const sch = getScheduleFromSplit(segmentation.mans[id]);
 
-		const { istart, tstart, istop, tstop } = flight.sliceInfo(id);
 		const data = flight.slice(id);
 
 		setAnalysis(
@@ -111,8 +110,6 @@ export async function newAnalysis(flight: Flight) {
 			new MA(
 				segmentation.mans[id].manoeuvre!.short_name,
 				id,
-				tstart,
-				tstop,
 				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
 				{},
@@ -128,9 +125,9 @@ export function createAnalysisExport(small: boolean = false) {
 	return {
 		origin: get(activeFlight)!.origin!,
 		isComp: get(sts.isCompFlight),
-		sourceBin: get(activeFlight)!.source.file?.name || undefined,
+		sourceBin: get(activeFlight)!.file?.name || undefined,
 		sourceFCJ: undefined,
-		bootTime: get(activeFlight)!.source.bootTime?.toISOString() || undefined,
+		bootTime: get(activeFlight)!.bootTime?.toISOString() || undefined,
 		mans: sts.analyses.map((_ma) => (small ? get(_ma)!.shortExport() : get(_ma)!.longExport()))
 	} as unknown as AJson;
 }
@@ -143,34 +140,16 @@ export function exportAnalysis(small: boolean = false) {
 
 export async function importAnalysis(data: AJson) {
 	sts.isCompFlight.set(data.isComp);
-
+  const origin = Object.setPrototypeOf(data.origin, Origin.prototype);
 	setupAnalysisArrays(data.mans.map((m) => m.name));
 
 	data.mans.forEach(async (ma: AJMan, i: number) => {
 		sts.runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
-		MA.parse(ma).then(async (res) => {
-			const mdef = res.mdef
-				? res.mdef
-				: await loadManDef(
-						get(library).subset({
-							category_name: res.schedule.category,
-							schedule_name: res.schedule.name
-						}).first!.manoeuvres[res.id - 1].id
-					);
+    
+		MA.parse(ma, origin).then(async (res) => {
 			setAnalysis(
 				i,
-				new MA(
-					res.name,
-					res.id,
-					res.tStart,
-					res.tStop,
-					res.schedule,
-					res.scheduleDirection,
-					res.history,
-					mdef.info.k,
-					res.flown,
-					mdef
-				)
+				res
 			);
 		});
 	});
@@ -187,16 +166,16 @@ export async function importAnalysis(data: AJson) {
 }
 
 export async function loadExample() {
-	return Flight.example().then((flight) => {
+	return FlightDataSource.example().then((flight) => {
 		clearAnalysis();
 		clearDataLoading();
 		activeFlight.set(flight);
-		importAnalysis(flight.source.rawData as AJson);
+		importAnalysis(flight.rawData as AJson);
 	});
 }
 
 export async function loadAnalysisFromDB(flight_id: string) {
-	if (flight_id == get(activeFlight)?.source.db?.meta.flight_id) {
+	if (flight_id == get(activeFlight)?.db?.flight_id) {
 		goto(resolve('/flight/results'));
 		return; //already loaded
 	}
@@ -204,9 +183,9 @@ export async function loadAnalysisFromDB(flight_id: string) {
 		return;
 	}
 	loading.set(true);
-	return Flight.download(flight_id)
+	return FlightDataSource.db(flight_id)
 		.then((f) => {
-			importAnalysis(f.source.rawData as AJson);
+			importAnalysis(f.rawData as AJson);
 			activeFlight.set(f);
 		})
 		.then(() => {

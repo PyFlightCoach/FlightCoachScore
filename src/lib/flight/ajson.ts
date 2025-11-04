@@ -18,17 +18,17 @@ export interface AJMan {
     //scores: dict | None = None
     name: string;
     id: number;
-    schedule: record<string, string>;
+    schedule: Record<string, string>;
     schedule_direction?: Direction;
-    flown: Record<string, any>[];
-    history?: Record<string, any>;
+    flown: Record<string, unknown>[];
+    history?: Record<string, unknown>;
     mdef?: IManDef | IManOpt[];
-    manoeuvre?: Record<string, any> | Record<string, any>[];
-    template?: Record<string, any> | Record<string, any>[];
-    templates?: Record<string, any> | Record<string, any>[];
-    corrected?: Record<string, any> ;
-    corrected_template?: Record<string, any> | Record<string, any>[];
-    scores?: Record<string, any>;
+    manoeuvre?: Record<string, unknown> | Record<string, unknown>[];
+    template?: Record<string, unknown> | Record<string, unknown>[];
+    templates?: Record<string, unknown> | Record<string, unknown>[];
+    corrected?: Record<string, unknown>;
+    corrected_template?: Record<string, unknown> | Record<string, unknown>[];
+    scores?: Record<string, unknown>;
 }
 
 

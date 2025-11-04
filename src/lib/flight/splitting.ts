@@ -7,6 +7,7 @@ import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
 
+
 export interface Split {
 	category_name?: string | undefined;
 	schedule_name?: string | undefined;
@@ -175,6 +176,22 @@ export class Splitting {
 
   get schedule(): DBSchedule | undefined {
     return isComp(this.mans);
+  }
+
+  sliceInfo(id: number, t: number[]) {
+		const istart = id > 0 ? this.mans[id - 1].stop! : 0;
+		const istop = this.mans[id].stop!;
+		return { istart, tstart: t[istart], istop, tstop:t[istop] };
+	}
+
+  static async parseFCJ(fcj: FCJson, states: States) {
+    return parseFCJMans(fcj, states)
+    .then(loadManDefs)
+    .then((splits) => new Splitting(splits));
+  }
+
+  static default() {
+    return new Splitting([takeOff()]);
   }
 }
 

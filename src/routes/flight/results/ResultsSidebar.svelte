@@ -18,7 +18,6 @@
 	import { privacyOptions } from '$lib/api/DBInterfaces/flight';
 	import { createAnalysisExport } from '$lib/flight/analysis';
 	import { user, checkUser } from '$lib/stores/user';
-	import { DBFlight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
@@ -29,27 +28,27 @@
 	import { prettyPrintHttpError } from '$lib/utils/text';
 	import UploadForOtherPilot from './UploadForOtherPilot.svelte';
 
-	let comment: string | undefined = $state($activeFlight?.source.db?.meta.comment || '');
+	let comment: string | undefined = $state($activeFlight?.db?.comment || '');
 	let privacy: string | undefined = $state(
-		$activeFlight?.source.db?.meta.privacy || 'view_analysis'
+		$activeFlight?.db?.privacy || 'view_analysis'
 	);
 
-	const isNew = $derived($activeFlight?.source.file);
+	const isNew = $derived($activeFlight?.file);
 
 	const isUpdated = $derived(
-		$activeFlight?.source.db?.meta.comment != comment ||
-			$activeFlight?.source.db?.meta.privacy != privacy ||
+		$activeFlight?.db?.comment != comment ||
+			$activeFlight?.db?.privacy != privacy ||
 			$isAnalysisModified ||
 			false
 	);
 
 	const canI = $derived(
-		$user?.is_verified && ($activeFlight?.source.db?.isMine || isNew || $user?.is_superuser)
+		$user?.is_verified && ($activeFlight?.isMine || $user?.is_superuser)
 	);
 
 	let competition = $state(
 		$activeComp?.checkCanUpload(
-			$activeFlight?.source.bootTime,
+			$activeFlight?.bootTime,
 			new Date(),
 			$user?.id,
 			$schedule?.schedule_id
@@ -63,6 +62,7 @@
 	let showResultsSelection: boolean = $state(false);
 	let round: ContestManager | undefined = $state();
 
+  $inspect($activeFlight);
 	const upload = async () => {
 		$loading = true;
 		const ajson = createAnalysisExport(true);
@@ -102,19 +102,19 @@
 	<span>
 		{#if $selectedResult}
 			Showing results for
-			{#if $activeFlight?.source.kind == 'example'}
+			{#if $activeFlight?.kind == 'example'}
 				the example flight.
-			{:else if $activeFlight?.source.kind == 'db'}
-				a flight by {$activeFlight?.source.db?.meta.name}, loaded from the db.
+			{:else if $activeFlight?.kind == 'db'}
+				a flight by {$activeFlight?.db?.name}, loaded from the db.
 			{:else}
-				your flight imported from a {$activeFlight?.source.kind} file.
+				your flight imported from a {$activeFlight?.kind} file.
 			{/if}
 		{:else if $fa_versions.length == 0}
 			Run some analyses to view result
 		{/if}
 	</span>
 
-	<span> Boot time: {$activeFlight?.source.bootTime?.toISOString()}. </span>
+	<span> Boot time: {$activeFlight?.bootTime?.toISOString()}. </span>
 </div>
 {#if $fa_versions.length}
 	<div class="row p-2">
@@ -177,7 +177,7 @@
 			bind:pilotID={pilotId}
 			bind:round
 			schedule={$schedule}
-			bootTime={$activeFlight?.source.bootTime}
+			bootTime={$activeFlight?.bootTime}
 		/>
 	</div>
 	{#if !round && $user?.is_superuser}
@@ -220,7 +220,7 @@
 
     {:else}
 	<div class="row mb-2 px-2">
-		{#if !$activeFlight?.source.file || !$activeFlight?.source.db}
+		{#if !$activeFlight?.isMine}
 			<span>You can only upload original flights loaded from an Ardupilot BIN file or from Acrowrx</span>
 		{:else if !$isCompFlight}
 			<span>Only complete flights can be uploaded</span>
@@ -229,7 +229,7 @@
 				<span>Log in to upload</span>
 			{:else if !$user.is_verified}
 				<span>Verify your email to upload</span>
-			{:else if !($activeFlight?.source.db?.isMine) || !isNew}
+			{:else if !($activeFlight?.db?.isMine) || !isNew}
 				<span>Only the pilot or contributor can edit a flight record</span>
 			{/if}
 		{:else if !(isNew || isUpdated)}

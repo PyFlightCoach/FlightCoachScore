@@ -5,12 +5,13 @@
 	import { md5 } from 'js-md5';
 	import { loading } from '$lib/stores/shared';
 		import { activeFlight } from '$lib/stores/shared';
-	import { Flight, FlightDataSource } from '$lib/flight/flight';
+	import { FlightDataSource } from '$lib/flight/flight';
 	import { States } from '$lib/utils/state';
 	import { parseFCJMans, loadManDefs } from '$lib/flight/splitting';
 	import { goto } from '$app/navigation';
   import {resolve} from '$app/paths';
 	import { GPS } from '$lib/utils/geometry';
+  import { Splitting } from '$lib/flight/splitting';
 
 	let fcjFile: File | undefined = $state();
 	let fcjson: fcj.FCJson | undefined = $state();
@@ -42,9 +43,10 @@
 		origin && binData ? States.from_xkf1(origin, binData.orgn, binData.xkf1) : undefined
 	);
 
-	let manSplits = $derived(
-		fcjson && states ? parseFCJMans(fcjson, states).then(loadManDefs) : undefined
+	let loadSegmentation = $derived(
+		fcjson && states ? Splitting.parseFCJ(fcjson, states) : Splitting.default()
 	);
+
 </script>
 
 <div class="container-auto py-4" style="max-width: 800px;">
@@ -161,16 +163,19 @@
 		<hr />
 		<div class="row">
 			<div class="col"></div>
-			{#await manSplits then splits}
+			{#await loadSegmentation then segmentation}
 				<button
 					class="col btn btn-outline-primary"
 					onclick={() => {
-						$activeFlight = new Flight(
-							new FlightDataSource(bin, 'bin', undefined, bootTime, binData),
-							origin,
-              states,
-							splits
-						);
+						$activeFlight = new FlightDataSource(
+              bin, 
+              'bin',
+              undefined, 
+              bootTime, 
+              binData,
+              origin,
+              segmentation
+            );
             goto(resolve('/flight/create/box'));
 					}}
 				>

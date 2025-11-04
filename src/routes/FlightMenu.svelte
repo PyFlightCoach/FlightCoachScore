@@ -18,8 +18,8 @@
 <NavMenu tooltip="Flight Analysis Menu">
 	<span slot="icon"><i class="bi {$activeFlight ? 'bi-airplane-fill' : 'bi-airplane'}"></i></span>
 	{#if $activeFlight}
-		<small class="px-2 text-start text-nowrap">{$activeFlight?.source.description || 'unknown'}</small>
-    <small class="px-2 text-start text-nowrap">{$activeFlight?.source?.bootTime?.toLocaleString()}</small>
+		<small class="px-2 text-start text-nowrap">{$activeFlight?.description || 'unknown'}</small>
+    <small class="px-2 text-start text-nowrap">{$activeFlight?.bootTime?.toLocaleString()}</small>
 		<button
 			class="dropdown-item"
 			onclick={() => {
