@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SideBarLayout from '$lib/components/SideBarLayout.svelte';
 	import PlotSec from '$lib/plots/PlotSec.svelte';
 	import { newAnalysis } from '$lib/flight/analysis.js';
 	import { resolve } from '$app/paths';
@@ -10,7 +11,7 @@
 	import { isFullSize } from '$lib/stores/shared';
 	import { activeFlight } from '$lib/stores/shared';
 
-	const baseSplits = $activeFlight!.segmentation?.mans!;
+  const baseSplits = $activeFlight!.segmentation?.mans!;
 	let mans = $state(baseSplits);
 
 	let activeManId: number = $state(0);
@@ -109,24 +110,15 @@
 	}}
 />
 
-<div
-	class="col-md-4 pt-3 bg-light border mh-100 d-flex flex-column overflow-auto"
-	style="max-height: 100%;"
->
-	<div class="row">
-		{#if $activeFlight!.kind === 'bin'}
-			<span class="col-auto">Source File:</span>
-			<span class="col text-nowrap overflow-auto"
-				>{$activeFlight?.file?.name || 'unknown'}</span
-			>
-		{/if}
-	</div>
-	<div class="row pt-2">
-		{#if mans.length == 1}
-			<div class="row mb-2">
-				<label for="load-fcj" class="col-8 col-form-label">Load FC Json File:</label>
-				<div id="load-fcj" class="col-4">
-					<label class="btn btn-outline-secondary">
+<SideBarLayout sideBarWidth={3}>
+	{#snippet side()}
+    <div class="row">
+      <span class="h4 fw-bold text-start px-4 mt-2">Segment into Manoeuvres</span>
+    </div>
+    <hr class="mt-0"/>
+		<div class="pt-2 btn-group w-100">
+			
+					<label class="btn btn-outline-secondary" >
 						<input
 							type="file"
 							name="input-name"
@@ -135,159 +127,156 @@
 							onchange={(e: Event) => {
 								const files = (e.target as HTMLInputElement).files!;
 								if (files.length > 0) {
+                  reset();
 									parseFCJ(files[0]);
 								}
 							}}
+              
 						/>
-						<span>Browse</span>
+						<span>FC Json</span>
 					</label>
-				</div>
-			</div>
-		{:else}
-			<div class="row pt-2">
-				<label for="clear-splitting" class="col col-form-label">Clear Manoeuvres:</label>
+			
+					<button
+						id="clear-splitting"
+						class="btn btn-outline-secondary"
+						onclick={() => {
+							reset();
+						}}
+					>
+						Clear
+					</button>
+			
+		</div>
+		<hr />
+		<div class="row">
+			<table class="table table-sm align-middle text-center table-noborder">
+				<thead>
+					<tr>
+						<th scope="col" class="col-1"></th>
+						<th scope="col" class="col-2 text-start">Manoeuvre</th>
+						<th colspan="2" scope="col" class="col-7">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each mans as man, i}
+						<tr>
+							<td
+								><input
+									class="radio"
+									type="radio"
+									name="manSelect"
+									bind:group={activeManId}
+									onchange={resetRange}
+									value={i}
+								/></td
+							>
+
+							{#if i == 0 || activeManId != i}
+								<td class="text-start">
+									{#if man.manoeuvre}{man.manoeuvre?.index}:
+									{/if}{man.manoeuvre?.short_name || man.alternate_name}
+								</td>
+							{:else if activeManId == i}
+								<td>
+									<ManSelect
+										library={$library}
+										old_man={man}
+										onselected={(nms: ms.Split) => {
+											mans[i] = Object.assign(mans[i], nms);
+										}}
+										ondeselect={() => {
+											mans[i].manoeuvre = undefined;
+											mans[i].mdef = undefined;
+										}}
+										specialManoeuvres={i == mans.length - 1 ? ['Break', 'Landing'] : ['Break']}
+									/>
+								</td>
+							{/if}
+							{#if activeManId == i}
+								{#if mans[activeManId].alternate_name != 'Landing'}
+									<td>
+										<button
+											class="btn btn-outline-secondary w-100"
+											data-bs-toggle="tooltip"
+											title="Set the end point of this manoeuvre to the point identified by the little plane"
+											onclick={() => {
+												setRange();
+											}}
+										>
+											{mans[activeManId].stop ? 'Update' : 'Set (⏎)'}
+										</button>
+									</td>
+								{/if}
+								{#if !man.fixed}
+									<td>
+										<button
+											class="btn btn-outline-secondary w-100"
+											data-bs-toggle="tooltip"
+											title="Delete this manoeuvre"
+											onclick={() => {
+												activeManId = activeManId - 1;
+												mans.splice(activeManId + 1, 1);
+												resetRange();
+											}}
+										>
+											Delete
+										</button>
+									</td>
+								{/if}
+							{:else}
+								<td colspan="2"></td>
+							{/if}
+						</tr>
+					{/each}
+					{#if canAdd}
+						<tr>
+							<td colspan="6">
+								<button
+									class="btn btn-outline-secondary w-100"
+									onclick={() => {
+										addMan();
+									}}
+								>
+									Add{mans[activeManId].stop &&
+									(mans[activeManId].manoeuvre || mans[activeManId].alternate_name)
+										? '(⏎)'
+										: ''}
+								</button>
+							</td>
+						</tr>
+					{/if}
+				</tbody>
+			</table>
+		</div>
+
+		{#if mans.length && mans[mans.length - 1].alternate_name == 'Landing'}
+			<hr />
+			<div class="row">
 				<button
-					id="clear-splitting"
-					class="btn btn-outline-secondary form-control-sm col"
+					class="btn btn-outline-primary form-control-sm"
 					onclick={() => {
-						reset();
+						$activeFlight = Object.assign($activeFlight!, {
+							segmentation: new ms.Splitting(mans)
+						});
+						newAnalysis($activeFlight!);
+						goto(resolve('/flight/results'));
 					}}
 				>
-					Clear
+					Complete
 				</button>
 			</div>
 		{/if}
-	</div>
-	<hr />
-	<div class="row">
-		<table class="table-sm align-middle text-center">
-			<thead>
-				<tr>
-					<th scope="col" class="col-1"></th>
-					<th scope="col" class="col-2 text-start">Manoeuvre</th>
-					<th colspan="2" scope="col" class="col-7">Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each mans as man, i}
-					<tr>
-						<td
-							><input
-								class="radio"
-								type="radio"
-								name="manSelect"
-								bind:group={activeManId}
-								onchange={resetRange}
-								value={i}
-							/></td
-						>
-
-						{#if i == 0 || activeManId != i}
-							<td class="text-start">
-								{#if man.manoeuvre}{man.manoeuvre?.index}:
-								{/if}{man.manoeuvre?.short_name || man.alternate_name}
-							</td>
-						{:else if activeManId == i}
-							<td>
-								<ManSelect
-									library={$library}
-									old_man={man}
-									onselected={(nms: ms.Split) => {
-										mans[i] = Object.assign(mans[i], nms);
-									}}
-									ondeselect={() => {
-										mans[i].manoeuvre = undefined;
-										mans[i].mdef = undefined;
-									}}
-									specialManoeuvres={i == mans.length - 1 ? ['Break', 'Landing'] : ['Break']}
-								/>
-							</td>
-						{/if}
-						{#if activeManId == i}
-							{#if mans[activeManId].alternate_name != 'Landing'}
-								<td>
-									<button
-										class="btn btn-outline-secondary w-100"
-										data-bs-toggle="tooltip"
-										title="Set the end point of this manoeuvre to the point identified by the little plane"
-										onclick={() => {
-											setRange();
-										}}
-									>
-										{mans[activeManId].stop ? 'Update' : 'Set (⏎)'}
-									</button>
-								</td>
-							{/if}
-							{#if !man.fixed}
-								<td>
-									<button
-										class="btn btn-outline-secondary w-100"
-										data-bs-toggle="tooltip"
-										title="Delete this manoeuvre"
-										onclick={() => {
-											activeManId = activeManId - 1;
-											mans.splice(activeManId + 1, 1);
-											resetRange();
-										}}
-									>
-										Delete
-									</button>
-								</td>
-							{/if}
-						{:else}
-							<td colspan="2"></td>
-						{/if}
-					</tr>
-				{/each}
-				{#if canAdd}
-					<tr>
-						<td colspan="6">
-							<button
-								class="btn btn-outline-secondary w-100"
-								onclick={() => {
-									addMan();
-								}}
-							>
-								Add{mans[activeManId].stop &&
-								(mans[activeManId].manoeuvre || mans[activeManId].alternate_name)
-									? '(⏎)'
-									: ''}
-							</button>
-						</td>
-					</tr>
-				{/if}
-			</tbody>
-		</table>
-	</div>
-
-	{#if mans.length && mans[mans.length - 1].alternate_name == 'Landing'}
-		<hr />
-		<div class="row">
-			<button
-				class="btn btn-outline-primary form-control-sm"
-				onclick={() => {
-					$activeFlight = Object.assign($activeFlight!, {
-						segmentation: new ms.Splitting(mans)
-					});
-					newAnalysis($activeFlight!);
-					goto(resolve('/flight/results'));
-				}}
-			>
-				Complete
-			</button>
-		</div>
-	{/if}
-</div>
-
-<div class="col-md-8">
-	{#if $activeFlight!.states}
-		<PlotSec
-			bind:i={activeIndex}
-			bind:range
-			flst={$activeFlight!.states!}
-			greyUnselected={true}
-			controls={['slider', 'modelClick', 'scale']}
-			scale={$isFullSize ? 3.5 : 1.5}
-		/>
-	{/if}
-</div>
+	{/snippet}
+	{#snippet main()}
+		{#if $activeFlight!.states}
+			<PlotSec
+				bind:i={activeIndex}
+				bind:range
+				flst={$activeFlight!.states!}
+				greyUnselected={true}
+				controls={['slider', 'modelClick', 'scale']}
+				scale={$isFullSize ? 3.5 : 1.5}
+			/>
+		{/if}
+	{/snippet}
+</SideBarLayout>

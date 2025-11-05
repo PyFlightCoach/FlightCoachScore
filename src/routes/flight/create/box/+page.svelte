@@ -21,11 +21,15 @@
   $effect(() => {
     $isFullSize = boxDisplay === 'IAC';
   });
-  
+
 </script>
 
 <SideBarLayout sideBarWidth={4}>
 	{#snippet side()}
+    <div class="row">
+      <span class="h4 fw-bold text-start px-4 mt-2">Define the Box</span>
+    </div>
+    <hr class="mt-0"/>
 		<div class="row">
 			<label for="displayOptions" class="col-auto col-form-label">Display:</label>
 			<div id="displayOptions" class="col mb-2 py-2 btn-group">

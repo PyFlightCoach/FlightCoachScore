@@ -62,7 +62,7 @@
 	let showResultsSelection: boolean = $state(false);
 	let round: ContestManager | undefined = $state();
 
-  $inspect($activeFlight);
+
 	const upload = async () => {
 		$loading = true;
 		const ajson = createAnalysisExport(true);
