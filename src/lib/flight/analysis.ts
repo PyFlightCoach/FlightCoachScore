@@ -81,6 +81,7 @@ export function clearDataLoading() {
 	console.log('clearing data loading');
 	activeFlight.set(undefined);
 	clearAnalysis();
+  goto(resolve('/'));
 }
 
 export async function newAnalysis(flight: FlightDataSource) {
@@ -226,6 +227,7 @@ export async function loadAcrowrx(file: File): Promise<void> {
 					States.parse(response.data.data),
 					Object.setPrototypeOf(response.data.origin, Origin.prototype),
 					Splitting.default(),
+          undefined,
 					response.data.meta
 				)
 			);

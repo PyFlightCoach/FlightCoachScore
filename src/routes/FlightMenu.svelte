@@ -10,6 +10,7 @@
 	import Popup from '$lib/components/Popup.svelte';
 	import LoadBinAndAJson from '$lib/flight/LoadBinAndAJson.svelte';
 	import { prettyDate } from '$lib/utils/text';
+	import { manNames } from '$lib/stores/analysis';
   
 
 	let showBinAJsonPopup: boolean = $state(false);
@@ -18,9 +19,10 @@
 <NavMenu tooltip="Flight Analysis Menu">
 	<span slot="icon"><i class="bi {$activeFlight ? 'bi-airplane-fill' : 'bi-airplane'}"></i></span>
 	{#if $activeFlight}
-		<small class="px-2 text-start text-nowrap text-body-secondary">{$activeFlight?.description || 'unknown'}</small>
+		<small class="px-2 text-start text-nowrap text-body-secondary">{$activeFlight?.sourceDescription || 'unknown'}</small>
     <small class="px-2 text-start text-nowrap text-body-secondary">{prettyDate($activeFlight?.bootTime)}</small>
-		<a class="dropdown-item" href={resolve('/flight/results')}>Results</a>
+		{#if $manNames}
+    <a class="dropdown-item" href={resolve('/flight/results')}>Results</a>
     {#if $user?.is_superuser || $dev}
 			<button
 				class="dropdown-item"
@@ -39,6 +41,10 @@
 				Export Short
 			</button>
 		{/if}
+    {:else}
+      <a class="dropdown-item" href={resolve('/flight/create/box')}>Box</a>
+      <a class="dropdown-item" href={resolve('/flight/create/manoeuvres')}>Manoeuvres</a>
+    {/if}
     <button
 			class="dropdown-item"
 			onclick={() => {

@@ -8,9 +8,10 @@ import { dbServer, analysisServer } from '$lib/api';
 import JSZip from 'jszip';
 import { blockProgress, unblockProgress } from '$lib/stores/shared';
 import type { DBFlightMeta } from '$lib/api/DBInterfaces/flight';
-import { compareUUIDs } from '$lib/utils/text';
+import { compareUUIDs, prettyDate } from '$lib/utils/text';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
+import type { DBSchedule } from '$lib/schedule/db';
 
 
 export class BinDataState {
@@ -44,6 +45,7 @@ export class FlightDataSource {
 		readonly rawData: BinData | States | AJson | undefined = undefined,
 		readonly origin: Origin | undefined = undefined,
 		readonly segmentation: Splitting | undefined = undefined,
+    readonly schedule: DBSchedule | undefined = undefined,
     readonly acroWrxMeta: {flightFileName: string; sequenceFolderName: string} | undefined = undefined
 	) {}
 
@@ -145,7 +147,7 @@ export class FlightDataSource {
 	}
 
 
-	get description(): string {
+	get sourceDescription(): string {
 		switch (this.kind) {
 			case 'example':
 				return 'Example Flight';
@@ -161,6 +163,10 @@ export class FlightDataSource {
 				throw new Error(`Unknown flight data source ${this.kind}`);
 		}
 	}
+
+  get description(): string | undefined {
+    return prettyDate(this.bootTime);
+  }
 
 	async upload(
 		ajson: AJson | undefined = undefined,

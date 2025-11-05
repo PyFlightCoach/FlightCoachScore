@@ -63,7 +63,7 @@
 							splitting
 						)
 					);
-					importAnalysis(get(activeFlight)!.rawData as AJson);
+					newAnalysis($activeFlight!);
 					goto(resolve('/flight/results'));
 				});
 			});

@@ -1,6 +1,6 @@
 import { dbServer } from '$lib/api/api';
 import { Origin, ScheduleInfo } from '$lib/flight/fcjson';
-import { blockProgress, unblockProgress} from '$lib/stores/shared';
+import { blockProgress, unblockProgress } from '$lib/stores/shared';
 import JSZip from 'jszip';
 import { library } from '$lib/schedule/library';
 import { get } from 'svelte/store';
@@ -40,18 +40,18 @@ export async function load({ url }) {
 		.then((res) => {
 			return new File([res], acrowrx ? 'acrowrx_file.dat' : 'flightlog.bin');
 		})
-    .finally(unblockProgress);
+		.finally(unblockProgress);
 
-	const [file, metadata] = await Promise.all([binPromise, dataPromise])
-		.catch((e) => {
-			alert(prettyPrintHttpError(e));
-			goto(resolve('/'));
-			throw e;
-		})
-		
+	const [file, metadata] = await Promise.all([binPromise, dataPromise]).catch((e) => {
+		alert(prettyPrintHttpError(e));
+		goto(resolve('/'));
+		throw e;
+	});
 
 	if (acrowrx) {
-    loadAcrowrx(file);
+		loadAcrowrx(file).then(() => {
+			goto(resolve('/flight/create/box'));
+		});
 	} else {
 		const splits = metadata.splits;
 		const sinfo = await ScheduleInfo.from_fcj_sch(metadata.schedule).to_pfc();
