@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { analysisServer } from '$lib/api';
-	import { loading } from '$lib/stores/shared';
-	import { States } from '$lib/utils/state';
-	import { Origin } from '$lib/flight/fcjson';
-	import { activeFlight } from '$lib/stores/shared';
-	import { FlightDataSource } from '$lib/flight/flight';
+  import { loading } from '$lib/stores/shared';
 	import { goto } from '$app/navigation';
-	import { Splitting } from '$lib/flight/splitting';
+
+	import { loadAcrowrx } from '$lib/flight/analysis';
+
+  let file: File | undefined = $state()
 </script>
 
 <div class="container-auto py-4" style="max-width: 800px;">
@@ -20,45 +18,21 @@
 			accept=""
 			onchange={(e: Event) => {
 				console.log(e);
-				const file = (e.target as HTMLInputElement).files?.item(0) || undefined;
-				if (file) {
-					$loading = true;
-					const fd = new FormData();
-					fd.append('acrowrx_file', file);
-					analysisServer
-						.post('/read_acrowrx', fd, {
-							headers: {
-								'Content-Type': 'multipart/form-data'
-							}
-						})
-						.then((response) => {
-							const origin = Object.setPrototypeOf(response.data.origin, Origin.prototype);
-							const bootTime = new Date(Date.parse(response.data.boot_time));
-							$activeFlight = new FlightDataSource(
-								file,
-								'acrowrx',
-								undefined,
-								bootTime,
-								States.parse(response.data.data),
-								origin,
-								Splitting.default()
-							);
-						})
-						.finally(() => {
-							$loading = false;
-						});
-				}
+				file = (e.target as HTMLInputElement).files?.item(0) || undefined;
 			}}
-		/>
+		/>  
 	</div>
-	{#if $activeFlight}
+	{#if file}
 		<div class="row py-4">
 			<div class="col"></div>
 
 			<button
 				class="col btn btn-outline-primary"
 				onclick={() => {
-					goto(resolve('/flight/create/box'));
+          loadAcrowrx(file!).then(() => {
+            goto(resolve('/flight/create/box'));
+          });
+					
 				}}>Next</button
 			>
 		</div>

@@ -25,7 +25,7 @@
 	import { activeComp } from '$lib/stores/contests';
 	import UploadForCompetitor from '$lib/competitions/competitors/UploadForCompetitor.svelte';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { prettyDate, prettyPrintHttpError } from '$lib/utils/text';
 	import UploadForOtherPilot from './UploadForOtherPilot.svelte';
 
 	let comment: string | undefined = $state($activeFlight?.db?.comment || '');
@@ -88,6 +88,7 @@
 				}
 			})
 			.catch((e) => {
+        console.error(e);
 				alert(prettyPrintHttpError(e));
 			})
 			.then(loadGuiLists)
@@ -99,7 +100,7 @@
 </script>
 
 <div class="row p-2" style="max-width:450px">
-	<span>
+	<span >
 		{#if $selectedResult}
 			Showing results for
 			{#if $activeFlight?.kind == 'example'}
@@ -114,7 +115,7 @@
 		{/if}
 	</span>
 
-	<span> Boot time: {$activeFlight?.bootTime?.toISOString()}. </span>
+	<span> Boot time: {prettyDate($activeFlight?.bootTime)}. </span>
 </div>
 {#if $fa_versions.length}
 	<div class="row p-2">

@@ -60,3 +60,5 @@ truncate.subscribe((value) => {
 });
 
 export const isComplete: Writable<boolean> = writable(false);
+
+

@@ -43,14 +43,14 @@ export const postUploadSearch = () => {
   const fl = get(activeFlight)!;
 
   select_by_date.set(true);
-  const dbefore = fl!.source.bootTime!;
+  const dbefore = fl!.bootTime!;
   dbefore.setDate(dbefore.getDate() + 1);
   date_before.set(dbefore.toISOString().split('T')[0]);
-  const dafter = fl!.source.bootTime!;
+  const dafter = fl!.bootTime!;
   dafter.setDate(dafter.getDate() - 30);
   date_after.set(dafter.toISOString().split('T')[0]);
   //n_days_val.set(30);
-  schedule_id.set(fl!.source.db!.meta?.schedule_id || '');
+  schedule_id.set(fl!.db?.schedule_id || '');
   sort_by_score_flag.set(false);
   version.set(get(faVersion)!);
   n_results.set(20);

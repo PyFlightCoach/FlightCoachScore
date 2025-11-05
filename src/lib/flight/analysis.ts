@@ -1,18 +1,25 @@
 import * as sts from '$lib/stores/analysis';
-import { activeFlight, isAnalysisModified, loading, faVersion } from '$lib/stores/shared';
+import {
+	activeFlight,
+	isAnalysisModified,
+	loading,
+	faVersion,
+	unblockProgress,
+	blockProgress
+} from '$lib/stores/shared';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
-import { schedule as getScheduleFromSplit } from '$lib/flight/splitting';
+import { schedule as getScheduleFromSplit, Splitting } from '$lib/flight/splitting';
 import { Origin, ScheduleInfo } from './fcjson';
-import { loadManDef, library } from '$lib/schedule/library';
-import { dbServer } from '$lib/api/api';
+import { library } from '$lib/schedule/library';
+import { analysisServer, dbServer } from '$lib/api/api';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { cat } from '$lib/utils/files';
-import { md5 } from 'js-md5';
 import { prettyPrintHttpError } from '$lib/utils/text';
-import { FlightDataSource, GlobalState } from './flight';
+import { FlightDataSource } from './flight';
 import type { AJson, AJMan } from './ajson';
+import { States } from '$lib/utils/state';
+import { checkUser } from '$lib/stores/user';
 
 export function checkComplete() {
 	return Boolean(
@@ -41,7 +48,7 @@ function setAnalysis(i: number, man: MA) {
 			if (ma) {
 				s![i] =
 					ma.get_score(get(sts.selectedResult)!, get(sts.difficulty), get(sts.truncate)).total *
-					(ma.mdef?.info.k || ma.k!);
+					ma.k;
 			} else {
 				s![i] = 0;
 			}
@@ -112,10 +119,9 @@ export async function newAnalysis(flight: FlightDataSource) {
 				id,
 				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
-				{},
-				segmentation.mans[id].manoeuvre!.k,
 				data,
-				segmentation.mans[id].mdef
+				segmentation.mans[id].mdef,
+        {},
 			)
 		);
 	});
@@ -140,17 +146,14 @@ export function exportAnalysis(small: boolean = false) {
 
 export async function importAnalysis(data: AJson) {
 	sts.isCompFlight.set(data.isComp);
-  const origin = Object.setPrototypeOf(data.origin, Origin.prototype);
+	const origin = Object.setPrototypeOf(data.origin, Origin.prototype);
 	setupAnalysisArrays(data.mans.map((m) => m.name));
 
 	data.mans.forEach(async (ma: AJMan, i: number) => {
 		sts.runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
-    
+
 		MA.parse(ma, origin).then(async (res) => {
-			setAnalysis(
-				i,
-				res
-			);
+			setAnalysis(i, res);
 		});
 	});
 
@@ -197,6 +200,42 @@ export async function loadAnalysisFromDB(flight_id: string) {
 		.finally(() => {
 			loading.set(false);
 		});
+}
+
+export async function loadAcrowrx(file: File): Promise<void> {
+	const fd = new FormData();
+	fd.append('acrowrx_file', file);
+	await analysisServer
+		.post('/read_acrowrx', fd, {
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			},
+			...blockProgress(`Reading Acrowrx File`)
+		})
+		.then(async (response) => {
+			await checkDuplicate(response.data.meta.flightFileName.split('/')[1]);
+			return response;
+		})
+		.then((response) => {
+			activeFlight.set(
+				new FlightDataSource(
+					file,
+					'acrowrx',
+					undefined,
+					new Date(Date.parse(response.data.boot_time)),
+					States.parse(response.data.data),
+					Object.setPrototypeOf(response.data.origin, Origin.prototype),
+					Splitting.default(),
+					response.data.meta
+				)
+			);
+		})
+		.catch((e) => {
+			alert(prettyPrintHttpError(e));
+			goto(resolve('/'));
+			throw e;
+		})
+		.finally(unblockProgress);
 }
 
 export async function analyseMans(ids: number[]) {
@@ -257,15 +296,35 @@ export async function analyseManoeuvre(
 	}
 }
 
-export async function checkDuplicate(bin: File) {
-	return cat(bin, 'readAsArrayBuffer')
-		.then((buf) => dbServer.get(`flight/check_duplicate/${md5(buf as ArrayBuffer)}`))
-		.then(() => undefined)
+export async function checkDuplicate(md5: string, onload: () => void = ()=>{}) {
+	//await cat(bin, 'readAsArrayBuffer').then(md5);
+	return dbServer
+		.get(`flight/check_duplicate/${md5}`)
+		.then((res) => {
+			console.log(res);
+			return undefined;
+		})
 		.catch((err) => {
+			console.log(err);
 			if (err.status === 409) {
-				return err.response.data.detail.id;
+				const id = err.response.data.detail.split('id[')[1].split(']')[0];
+				return id;
 			} else {
-				throw err;
+				alert('Error checking duplicate: ' + prettyPrintHttpError(err));
+			}
+		})
+		.then(async (duplicate: string | undefined) => {
+			if (duplicate && confirm('BIN file already exists on server, do you want to load it?')) {
+				return checkUser().then(() =>
+					FlightDataSource.db(duplicate).then((fl) => {
+						activeFlight.set(fl);
+						importAnalysis(fl.rawData as AJson);
+						goto(resolve('/flight/results'));
+            onload();
+					})
+				);
+			} else if (duplicate) {
+				throw new Error('Duplicate flight');
 			}
 		});
 }

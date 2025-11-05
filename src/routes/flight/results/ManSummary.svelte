@@ -117,7 +117,7 @@
 
 	<td>
 		<div>
-			<span class="small text-nowrap text-muted w-100 overflow-scroll">
+			<span class="small text-nowrap text-muted w-100 overflow-auto">
 				{$info}
 				{#if $info && !isRunning && !$info.includes('Imported') && !$info.includes('New') && score == 0}
 					<button

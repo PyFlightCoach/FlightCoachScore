@@ -19,7 +19,7 @@
 				href: resolve('/flight/create/manoeuvres/'),
 				icon: 'bi-scissors',
 				title: 'Segment the flight into manoeuvres',
-				disabled: !$activeFlight?.states
+				disabled: !$activeFlight?.segmentation
 			}
 		])
 	);

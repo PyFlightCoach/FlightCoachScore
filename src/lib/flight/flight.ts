@@ -10,7 +10,8 @@ import { blockProgress, unblockProgress } from '$lib/stores/shared';
 import type { DBFlightMeta } from '$lib/api/DBInterfaces/flight';
 import { compareUUIDs } from '$lib/utils/text';
 import { user } from '$lib/stores/user';
-import {get} from 'svelte/store';
+import { get } from 'svelte/store';
+
 
 export class BinDataState {
 	constructor(
@@ -42,7 +43,8 @@ export class FlightDataSource {
 		readonly bootTime: Date | undefined = undefined,
 		readonly rawData: BinData | States | AJson | undefined = undefined,
 		readonly origin: Origin | undefined = undefined,
-		readonly segmentation: Splitting | undefined = undefined
+		readonly segmentation: Splitting | undefined = undefined,
+    readonly acroWrxMeta: {flightFileName: string; sequenceFolderName: string} | undefined = undefined
 	) {}
 
 	gps() {
@@ -73,17 +75,17 @@ export class FlightDataSource {
 		return this.states.transform(vec, rot);
 	}
 
-  withNewOrigin(newOrigin: Origin): FlightDataSource {
-    return new FlightDataSource(
-      this.file,
-      this.kind,
-      this.db,
-      this.bootTime,
-      this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
-      newOrigin,
-      this.segmentation
-    );
-  }
+	withNewOrigin(newOrigin: Origin): FlightDataSource {
+		return new FlightDataSource(
+			this.file,
+			this.kind,
+			this.db,
+			this.bootTime,
+			this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
+			newOrigin,
+			this.segmentation
+		);
+	}
 
 	slice(id: number) {
 		const { istart, tstart, istop, tstop } = this.segmentation!.sliceInfo(id, this.states.t);
@@ -110,9 +112,9 @@ export class FlightDataSource {
 			.finally(unblockProgress);
 	}
 
-  get isMine() {
-    return this.db ? compareUUIDs(get(user)!.id, this.db.pilot_id) : !!this.file
-  }
+	get isMine() {
+		return this.db ? compareUUIDs(get(user)!.id, this.db.pilot_id) : !!this.file;
+	}
 
 	static async db(f: DBFlightMeta | string) {
 		if (typeof f === 'string') {
@@ -141,6 +143,7 @@ export class FlightDataSource {
 			})
 			.finally(unblockProgress);
 	}
+
 
 	get description(): string {
 		switch (this.kind) {
@@ -189,7 +192,7 @@ export class FlightDataSource {
 
 		if (comment) form_data.append('comment', comment);
 		if (privacy) form_data.append('privacy', privacy);
-		if (!this.db) {
+		if (this.file && !this.db) {
 			form_data.append('files', this.file!);
 		}
 
@@ -204,11 +207,12 @@ export class FlightDataSource {
 			route = `flight`;
 		}
 
-		return (this.db ? dbServer.patch : dbServer.post)(
-			route,
-			form_data,
-			blockProgress('Uploading Analysis to Database', 'upload')
-		)
+		return (this.db ? dbServer.patch : dbServer.post)(route, form_data, {
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			},
+			...blockProgress('Uploading Analysis to Database', 'upload')
+		})
 			.then(async (res) => {
 				return {
 					flight: new FlightDataSource(
@@ -224,6 +228,5 @@ export class FlightDataSource {
 				};
 			})
 			.finally(unblockProgress);
-
 	}
 }

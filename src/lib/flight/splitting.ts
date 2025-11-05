@@ -193,6 +193,10 @@ export class Splitting {
   static default() {
     return new Splitting([takeOff()]);
   }
+
+  async loadManDefs() {
+    return new Splitting(await loadManDefs(this.mans));
+  }
 }
 
 export async function parseFCJMans(fcj: FCJson, states: States) {

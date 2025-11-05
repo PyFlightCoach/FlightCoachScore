@@ -28,7 +28,7 @@
 		id="sidebar"
 		class="{showSidebar
 			? `col-${sideBarWidth}`
-			: 'offcanvas offcanvas-start'} bg-light border overflow-scroll"
+			: 'offcanvas offcanvas-start'} bg-light border overflow-auto"
 	>
 		{#if !showSidebar}
 			<div class="offcanvas-header">

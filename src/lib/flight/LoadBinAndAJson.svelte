@@ -4,7 +4,6 @@
 	import {
 		importAnalysis,
 		checkDuplicate,
-		loadAnalysisFromDB,
 		clearDataLoading,
 		clearAnalysis
 	} from '$lib/flight/analysis';
@@ -12,6 +11,7 @@
 	import { resolve } from '$app/paths';
 	import { cat } from '$lib/utils/files';
 	import { FlightDataSource } from './flight';
+  import { md5 } from 'js-md5';
 
 	let { onload = () => {} }: { onload: () => void } = $props();
 
@@ -35,16 +35,8 @@
 	onchange={(file: File | undefined) => {
 		form_state = undefined;
 		if (file) {
-			checkDuplicate(file).then((id: string) => {
-				if (id) {
-					form_state = 'BIN file already exists on server';
-					if (confirm(form_state + ', do you want to load it?')) {
-						loadAnalysisFromDB(id);
-						onload();
-					}
-					binfile = undefined;
-				}
-			});
+      cat(file, 'readAsArrayBuffer')
+      .then(b=>checkDuplicate(md5(b as ArrayBuffer), onload))
 		}
 	}}
 />
@@ -59,7 +51,7 @@
 				clearAnalysis();
 				clearDataLoading();
 				$activeFlight = new FlightDataSource(
-						undefined,
+						binfile,
 						binfile ? 'bin' : 'ajson',
 						undefined,
 						new Date(Date.parse(data.bootTime)),

@@ -18,10 +18,9 @@ export class MA {
 		readonly id: number,
 		readonly schedule: ScheduleInfo,
 		readonly scheduleDirection: string,
-		readonly history: Record<string, FCJManResult> = {},
-		readonly k: number | undefined = undefined,
 		readonly data: GlobalState | BinDataState,
-		readonly mdef: ManDef | ManOpt | undefined = undefined,
+		readonly mdef: ManDef | ManOpt,
+    readonly history: Record<string, FCJManResult> = {},
 		readonly manoeuvre: Manoeuvre | undefined = undefined,
 		readonly template: States | undefined = undefined,
 		readonly corrected: Manoeuvre | undefined = undefined,
@@ -32,6 +31,10 @@ export class MA {
 
   get flown() {
     return this.data.states
+  }
+
+  get k () {
+    return this.mdef?.info.k || 1;
   }
 
 	summary() {
@@ -60,10 +63,9 @@ export class MA {
       this.id,
       this.schedule,
       this.scheduleDirection,
-      this.history,
-      this.k,
       this.data,
       newmd || this.mdef,
+      this.history,
     );
   }
 
@@ -98,10 +100,9 @@ export class MA {
 			this.id,
 			this.schedule,
 			this.scheduleDirection,
-			{ ...this.history, [res.fa_version]: results },
-			res.mdef.info.k,
 			new GlobalState(States.parse(res.flown), this.data.origin),
 			ManDef.parse(res.mdef),
+      { ...this.history, [res.fa_version]: results },
 			res.manoeuvre ? Manoeuvre.parse(res.manoeuvre): undefined,
 			res.template ? States.parse(res.template) : undefined,
 			res.corrected ? Manoeuvre.parse(res.corrected) : undefined,
@@ -148,10 +149,9 @@ export class MA {
 			data.id,
 			Object.setPrototypeOf(data.schedule, ScheduleInfo.prototype),
 			data.schedule_direction,
-      data.history ? objmap(data.history, (_, v)=>FCJManResult.parse(v)): undefined,
-			data.mdef?.info.k,
 			new GlobalState(States.parse(data.flown), origin),
 			mdef,
+      data.history ? objmap(data.history, (_, v)=>FCJManResult.parse(v)): undefined,
 			data.manoeuvre,
 			data.template ? States.parse(data.template) : undefined,
 			data.corrected,
