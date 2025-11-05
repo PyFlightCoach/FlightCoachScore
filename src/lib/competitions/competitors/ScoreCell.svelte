@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { PilotManager } from '$lib/competitions/competitors/PilotManager';
-	import { activeFlight } from '$lib/stores/shared';
-	import { bin, isCompFlight, isComplete } from '$lib/stores/analysis';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import Popup from '$lib/components/Popup.svelte';
 	import LinkDbFlight from '$lib/competitions/competitors/LinkDBFlight.svelte';
@@ -45,7 +43,7 @@
 				round.competition.summary.add_rules?.cd_and_self_flight_add &&
 				competitor.isMe($user!.id) )
 	);
-    $inspect(competitor.isMe($user!.id), 'is Me');
+    
 </script>
 
 {#snippet displayValue()}

@@ -8,19 +8,16 @@
 	import ManSelect from '$lib/flight/ManoeuvreSelecter.svelte';
 	import * as ms from '$lib/flight/splitting.js';
 	import { isFullSize } from '$lib/stores/shared';
-		import { flight } from '$lib/stores/shared';
-  import * as sts from '$lib/stores/analysis';
-  import { BinData } from '$lib/flight/bin';
+	import { activeFlight } from '$lib/stores/shared';
 
-	const baseSplits = $flight!.splitting || [ms.takeOff()];
+	const baseSplits = $activeFlight!.segmentation?.mans!;
 	let mans = $state(baseSplits);
 
 	let activeManId: number = $state(0);
 
 	let range: [number, number] = $state([
 		0,
-		baseSplits[0].stop || Math.min(3000, 
-    $flight!.states!.data.length - 1)
+		baseSplits[0].stop || Math.min(3000, $activeFlight!.states!.data.length - 1)
 	]);
 
 	let activeIndex: number = $state(range[1]);
@@ -40,11 +37,11 @@
 		let newStart = activeManId == 0 ? 0 : mans[activeManId - 1].stop!;
 		if (!newStop) {
 			if (activeManId == 0) {
-				newStop = $flight!.states!.data.length / 8;
+				newStop = $activeFlight!.states!.data.length / 8;
 			} else {
 				newStop = 2 * newStart - (activeManId > 1 ? mans[activeManId - 2].stop! : 0);
 			}
-			range = [newStart, Math.min(newStop + 500, $flight!.states!.data.length - 1)];
+			range = [newStart, Math.min(newStop + 500, $activeFlight!.states!.data.length - 1)];
 		} else {
 			range = [newStart, newStop];
 		}
@@ -71,8 +68,8 @@
 	const setRange = () => {
 		const lastAllowedIndex =
 			activeManId == mans.length - 1
-				? $flight!.states!.data.length - 1
-				: mans[activeManId + 1].stop || $flight!.states!.data.length - 1;
+				? $activeFlight!.states!.data.length - 1
+				: mans[activeManId + 1].stop || $activeFlight!.states!.data.length - 1;
 
 		if (activeIndex > lastAllowedIndex) {
 			alert('Cannot set point beyone the end of the next manoeuvre');
@@ -86,9 +83,11 @@
 	const parseFCJ = (file: File) => {
 		const reader = new FileReader();
 		reader.onload = (e) => {
-			ms.parseFCJMans(FCJson.parse(JSON.parse(e.target?.result as string)), $flight!.states!)
+			ms.parseFCJMans(FCJson.parse(JSON.parse(e.target?.result as string)), $activeFlight!.states!)
 				.then((res) => ms.loadManDefs(res))
-				.then((res) => {mans = res});
+				.then((res) => {
+					mans = res;
+				});
 		};
 		reader.readAsText(file);
 	};
@@ -115,9 +114,11 @@
 	style="max-height: 100%;"
 >
 	<div class="row">
-		{#if $flight!.source.kind === 'bin' }
+		{#if $activeFlight!.kind === 'bin'}
 			<span class="col-auto">Source File:</span>
-			<span class="col text-nowrap overflow-auto">{$flight?.source?.file?.name || 'unknown'}</span>
+			<span class="col text-nowrap overflow-auto"
+				>{$activeFlight?.file?.name || 'unknown'}</span
+			>
 		{/if}
 	</div>
 	<div class="row pt-2">
@@ -148,7 +149,9 @@
 				<button
 					id="clear-splitting"
 					class="btn btn-outline-secondary form-control-sm col"
-					onclick={() => {reset()}}
+					onclick={() => {
+						reset();
+					}}
 				>
 					Clear
 				</button>
@@ -263,10 +266,10 @@
 			<button
 				class="btn btn-outline-primary form-control-sm"
 				onclick={() => {
-					sts.binData.set($flight?.source.rawData instanceof BinData ? $flight!.source.rawData : undefined);
-          sts.origin.set($flight!.origin);
-          sts.manSplits.set(mans);
-					newAnalysis($flight!.states!, new ms.Splitting(mans));
+					$activeFlight = Object.assign($activeFlight!, {
+						segmentation: new ms.Splitting(mans)
+					});
+					newAnalysis($activeFlight!);
 					goto(resolve('/flight/results'));
 				}}
 			>
@@ -277,11 +280,11 @@
 </div>
 
 <div class="col-md-8">
-	{#if $flight!.states}
+	{#if $activeFlight!.states}
 		<PlotSec
 			bind:i={activeIndex}
 			bind:range
-			flst={$flight!.states!}
+			flst={$activeFlight!.states!}
 			greyUnselected={true}
 			controls={['slider', 'modelClick', 'scale']}
 			scale={$isFullSize ? 3.5 : 1.5}

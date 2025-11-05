@@ -80,6 +80,24 @@ export class ContestManager {
 		).length;
 	}
 
+  get startTime() {
+    const date = this.summary.client_meta?.start_date || this.summary.date_start;
+    if (date) {
+      return new Date(Date.parse(date))
+    } else {
+      return undefined
+    }
+  }
+
+  get endTime () {
+    const date = this.summary.client_meta?.end_date || this.summary.date_end;
+    if (date) {
+      return new Date(Date.parse(date))
+    } else {
+      return undefined
+    }
+  }
+
 	sortCompetitors(by: 'Running Order' | 'Results') {
 		return this.competitors.sort((a, b) => {
 			if (by === 'Running Order') {

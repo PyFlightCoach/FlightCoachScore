@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-
+  import { loading } from '$lib/stores/shared';
 	import { selManID, analyses, running } from '$lib/stores/analysis';
 	import * as nbc from '$lib/stores/navBarContents';
 
@@ -61,16 +61,10 @@
 		}
 	]);
   nbc.checkUrl();
-	let man = analyses[$selManID!];
-	let isRunning = $derived($running[$selManID!]);
+
+  $effect(() =>{
+	$loading = $selManID ? $running[$selManID!] : false;
+  })
 </script>
 
-{#if $man}
-	{#if !isRunning}
-		{@render children?.()}
-	{:else}
-		<p>Running ...</p>
-	{/if}
-{:else}
-	<p>No Internal Data</p>
-{/if}
+{@render children()}

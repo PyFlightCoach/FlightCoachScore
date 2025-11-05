@@ -2,10 +2,11 @@ import { type FCJson, type FCJMan } from '$lib/flight/fcjson';
 import { States } from '$lib/utils/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
 import { loadManDef, library } from '$lib/schedule/library';
-import { type DBManoeuvre } from '$lib/schedule/db';
+import { DBSchedule, type DBManoeuvre } from '$lib/schedule/db';
 import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
+
 
 export interface Split {
 	category_name?: string | undefined;
@@ -172,6 +173,30 @@ export class Splitting {
 	get manNames() {
 		return this.analysisMans.map((iman) => this.mans[iman].manoeuvre!.short_name);
 	}
+
+  get schedule(): DBSchedule | undefined {
+    return isComp(this.mans);
+  }
+
+  sliceInfo(id: number, t: number[]) {
+		const istart = id > 0 ? this.mans[id - 1].stop! : 0;
+		const istop = this.mans[id].stop!;
+		return { istart, tstart: t[istart], istop, tstop:t[istop] };
+	}
+
+  static async parseFCJ(fcj: FCJson, states: States) {
+    return parseFCJMans(fcj, states)
+    .then(loadManDefs)
+    .then((splits) => new Splitting(splits));
+  }
+
+  static default() {
+    return new Splitting([takeOff()]);
+  }
+
+  async loadManDefs() {
+    return new Splitting(await loadManDefs(this.mans));
+  }
 }
 
 export async function parseFCJMans(fcj: FCJson, states: States) {

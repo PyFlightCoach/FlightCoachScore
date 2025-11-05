@@ -6,6 +6,7 @@
 	import { user } from '$lib/stores/user';
 	import { reloadDropDownComps, setComp } from '$lib/stores/contests';
 	import {getCategories} from '$lib/schedule/categories';
+	import { prettyDate } from '$lib/utils/text';
 	let {
 		competitions,
 		full = true,
@@ -32,7 +33,8 @@
 				<th class="text-start">Name</th>
         <th>Type</th>
 				<th>CD</th>
-				{#if full}<th>Start Date</th>
+				{#if full}
+          <th>Start Date</th>
 					<th>End Date</th>
 					<th>FA Version</th>
 					<th>Open</th>
@@ -56,8 +58,8 @@
           </td>
 					<td>{comp.summary.directors?.map((d) => d.name)}</td>
 					{#if full}
-            <td>{comp.summary.client_meta?.start_date || comp.summary.date_start || '-'}</td>
-						<td>{comp.summary.client_meta?.end_date ||comp.summary.date_end || '-'}</td>
+            <td>{prettyDate(comp.startTime, false)}</td>
+						<td>{prettyDate(comp.endTime, false)}</td>
 						<td>{comp.summary.fa_version}</td>
 						<td>{comp.summary.is_open_now ? 'Yes' : 'No'}</td>{/if}
 

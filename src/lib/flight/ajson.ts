@@ -1,10 +1,8 @@
-import type { Origin, ScheduleInfo, FCJManResult } from "./fcjson";
 import type { Direction } from "$lib/manoeuvre/positioning.svelte";
-import type { ManoeuvreResult } from "$lib/manoeuvre/scores";
 import type { IManOpt, IManDef } from "$lib/manoeuvre/definition.svelte";
 
 
-export interface MA {
+export interface AJMan {
     //name: str
     //id: int
     //schedule: ScheduleInfo
@@ -20,17 +18,17 @@ export interface MA {
     //scores: dict | None = None
     name: string;
     id: number;
-    schedule: ScheduleInfo;
+    schedule: Record<string, string>;
     schedule_direction?: Direction;
-    flown: Record<string, any>[];
-    history?: Record<string, FCJManResult>;
+    flown: Record<string, unknown>[];
+    history?: Record<string, unknown>;
     mdef?: IManDef | IManOpt[];
-    manoeuvre?: Record<string, any> | Record<string, any>[];
-    template?: Record<string, any> | Record<string, any>[];
-    templates?: Record<string, any> | Record<string, any>[];
-    corrected?: Record<string, any> ;
-    corrected_template?: Record<string, any> | Record<string, any>[];
-    scores?: Record<string, any>;
+    manoeuvre?: Record<string, unknown> | Record<string, unknown>[];
+    template?: Record<string, unknown> | Record<string, unknown>[];
+    templates?: Record<string, unknown> | Record<string, unknown>[];
+    corrected?: Record<string, unknown>;
+    corrected_template?: Record<string, unknown> | Record<string, unknown>[];
+    scores?: Record<string, unknown>;
 }
 
 
@@ -41,10 +39,10 @@ export interface AJson {
     //sourceFCJ: str | None = None
     //bootTime: datetime | None = None
     //mans: list[MA]
-  origin: Origin;
+  origin: Record<string, number>;
   isComp: boolean;
   sourceBin?: string;
   sourceFCJ?: string;
-  bootTime?: Date;
-  mans: MA[];
+  bootTime?: string;
+  mans: AJMan[];
 }

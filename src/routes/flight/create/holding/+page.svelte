@@ -1,14 +1,19 @@
 <script lang="ts">
-	import { binData, origin, fcj, bin, bootTime, states, manSplits } from '$lib/stores/analysis';
-	import { newAnalysis } from '$lib/flight/analysis.js';
-	import { dataSource, isFullSize } from '$lib/stores/shared';
+	import { checkDuplicate, newAnalysis } from '$lib/flight/analysis.js';
 	import BinReader from '$lib/flight/bin/BinReader.svelte';
-	import { dbServer } from '$lib/api';
-	import { split_states, States } from '$lib/utils/state';
+	import { States } from '$lib/utils/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import * as split from '$lib/flight/splitting';
 	import { lookupMonotonic } from '$lib/utils/arrays';
+	import { activeFlight } from '$lib/stores/shared';
+	import { FlightDataSource } from '$lib/flight/flight';
+	import * as fcj from '$lib/flight/fcjson';
+	import { importAnalysis } from '$lib/flight/analysis.js';
+	import type { AJson } from '$lib/flight/ajson';
+	import { cat } from '$lib/utils/files.js';
+	import { md5 } from 'js-md5';
+	import { get } from 'svelte/store';
 
 	const { data } = $props();
 
@@ -19,45 +24,49 @@
 <BinReader
 	bind:bin={binfile}
 	bind:percent
-	onloaded={(...parseddata) => {
-		let md5: string;
-		[$bin, $binData, $bootTime, md5] = parseddata;
-		dbServer
-			.get(`flight/check_duplicate/${md5}`)
-			.then((r) => {
-				return r.statusText != 'OK';
-			})
-			.catch((e) => {
-				return true;
-			})
-			.then((isDuplicate) => {
-				if (isDuplicate) {
-					$bin = undefined;
-				}
-			});
-		$origin = data.origin;
-		$states = States.from_xkf1($origin!, $binData!.orgn, $binData!.xkf1);
-		const stTime = $states.t;
+	onloaded={async (...parseddata) => {
+		const [bin, binData, bootTime] = parseddata;
 
-		$manSplits = [split.takeOff(lookupMonotonic(data.splits![0], stTime))];
-		data.splits!
-			.slice(1, data.splits!.length - 1)
-			.forEach((m, i) =>
-				$manSplits.push(
-					split.build(
-						data.schedule!.category_name,
-						data.schedule!.schedule_name,
-						data.schedule!.manoeuvres[i],
-						lookupMonotonic(m, stTime)
-					)
-				)
-			);
-		$manSplits.push(split.landing($states.data.length));
-		split.loadManDefs($manSplits).then((newSplits) => {
-			$manSplits = newSplits;
-			newAnalysis($states!, new split.Splitting($manSplits));
-			goto(resolve('/flight/results'));
-		});
+		cat(bin!)
+			.then((fileData) => checkDuplicate(md5(fileData as ArrayBuffer)))
+			.then(() => {
+				const states = States.from_xkf1(
+					Object.setPrototypeOf(data.origin, fcj.Origin.prototype),
+					binData.orgn,
+					binData.xkf1
+				);
+
+				const manSplits = [split.takeOff(lookupMonotonic(data.splits![0], states.t))];
+				data
+					.splits!.slice(1, data.splits!.length - 1)
+					.forEach((m, i) =>
+						manSplits.push(
+							split.build(
+								data.schedule!.category_name,
+								data.schedule!.schedule_name,
+								data.schedule!.manoeuvres[i],
+								lookupMonotonic(m, states.t)
+							)
+						)
+					);
+				manSplits.push(split.landing(states.data.length));
+
+				new split.Splitting(manSplits).loadManDefs().then(async (splitting) => {
+					activeFlight.set(
+						new FlightDataSource(
+							bin,
+							'bin',
+							undefined,
+							bootTime,
+							binData,
+							Object.setPrototypeOf(data.origin, fcj.Origin.prototype),
+							splitting
+						)
+					);
+					importAnalysis(get(activeFlight)!.rawData as AJson);
+					goto(resolve('/flight/results'));
+				});
+			});
 	}}
 	showInput={false}
 />

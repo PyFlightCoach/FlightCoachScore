@@ -5,12 +5,13 @@
 	import * as types from '$lib/api/DBInterfaces/flight';
 	import { DBFlight, loadInPlotter } from '$lib/database/flight';
 	import { dbServer } from '$lib/api/api';
-	import { loadAnalysisFromDB, loadAJson } from '$lib/flight/analysis';
+	import { loadAnalysisFromDB } from '$lib/flight/analysis';
 	import {  activeFlight } from '$lib/stores/shared';
 	import { windowWidth, blockProgress } from '$lib/stores/shared';
 	import { saveAs } from 'file-saver';
 	import JSZip from 'jszip';
 	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { FlightDataSource } from '$lib/flight/flight';
 
 	let { f = $bindable(), rank = $bindable() }: { f: DBFlight; rank: number | undefined } = $props();
 
@@ -20,7 +21,7 @@
 	let targetPrivacy = $state(f.meta.privacy);
 	let newComment = $state(f.meta.comment);
 
-	const isAnalysisLoaded = $derived(f.meta.flight_id == $activeFlight?.meta.flight_id);
+	const isAnalysisLoaded = $derived(f.meta.flight_id == $activeFlight?.db!.flight_id);
 	const canEdit = $derived(f.isMine || $user?.is_superuser);
 	const canView = $derived(canEdit || types.privacyOptions.indexOf(f.meta.privacy) > 0);
 	const canAnalyse = $derived(canEdit || types.privacyOptions.indexOf(f.meta.privacy) > 1);
@@ -116,9 +117,10 @@
 				<button
 					class="form-control btn btn-outline-secondary"
 					onclick={() => {
-						loadAJson(f.meta.flight_id).then((res) => {
-							const blob = new Blob([JSON.stringify(res.data)], { type: 'application/json' });
-							saveAs(blob, `${f.meta.flight_id}.analysis.json`);
+            FlightDataSource.db(f.meta)
+						.then(flight => {
+							const blob = new Blob([JSON.stringify(flight.rawData)], { type: 'application/json' });
+							saveAs(blob, `${f.meta.flight_id}.ajson`);
 						});
 					}}
 				>

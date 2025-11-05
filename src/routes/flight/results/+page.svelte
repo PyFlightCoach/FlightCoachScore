@@ -6,7 +6,10 @@
 	import * as nbc from '$lib/stores/navBarContents';
 	import { user } from '$lib/stores/user';
   import { analyseAll } from '$lib/flight/analysis';
-
+  
+  import { activeFlight } from '$lib/stores/shared';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	nbc.reset();
 
 	$effect(() => {
@@ -26,6 +29,12 @@
 			nbc.reset();
 		}
 	});
+
+  $effect(() =>{
+    if (!$activeFlight){
+      goto(resolve("/"));
+    }
+  })
 </script>
 
 <SideBarLayout sideBarWidth={4}>
