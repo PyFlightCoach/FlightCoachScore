@@ -47,7 +47,7 @@
 				onadded();
 			})
 			.catch((e) => {
-				console.log(e);
+				console.error(e);
 				formState = `Failed to add pilot: ${prettyPrintHttpError(e)}`;
 			})
 			.finally(() => {

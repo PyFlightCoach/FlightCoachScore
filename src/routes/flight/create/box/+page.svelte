@@ -13,8 +13,6 @@
 	
   let newStates = $derived($activeFlight!.statesAtNewOrigin(newOrigin!));
 
-  $inspect(newOrigin);
-
 	let boxDisplay: 'F3A' | 'IMAC' | 'IAC' = $state($activeFlight?.kind === 'acrowrx' ? 'IAC' : 'F3A');
 	let display: 'map' | 'state' = $state($activeFlight!.origin ? 'state' : 'map');
 

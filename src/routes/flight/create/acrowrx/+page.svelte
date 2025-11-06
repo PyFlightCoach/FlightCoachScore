@@ -17,7 +17,6 @@
 			type="file"
 			accept=""
 			onchange={(e: Event) => {
-				console.log(e);
 				file = (e.target as HTMLInputElement).files?.item(0) || undefined;
 			}}
 		/>  

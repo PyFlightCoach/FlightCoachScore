@@ -61,7 +61,6 @@
 				accept=".bin, .BIN"
 				bind:value={filename}
 				onchange={async (e: Event) => {
-					console.log(e);
 					const file = (e.target as HTMLInputElement).files?.item(0) || undefined;
 
 					if (file) {
@@ -152,7 +151,6 @@
 					type="file"
 					accept=".json, .f3a, .F3A"
 					onchange={(e) => {
-						console.log('loaded fcj file', e);
 						fcjFile = (e.target as HTMLInputElement).files?.item(0) || undefined;
 						if (fcjFile) {
 							const reader = new FileReader();
