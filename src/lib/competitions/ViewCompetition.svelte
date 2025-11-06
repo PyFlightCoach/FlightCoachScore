@@ -17,7 +17,6 @@
 		const cuts = Array($activeComp!.competitors.length).fill(undefined);
 		$activeComp?.children.forEach((stage, i) => {
 			
-      console.log(stage.summary.name, stage.cutLoc);
 			if (stage.cutLoc < $activeComp.competitors.length) {
 				cuts[stage.cutLoc] = [...(cuts[stage.cutLoc] || []), stage.summary.name];
 			}

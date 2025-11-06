@@ -98,7 +98,6 @@
 			accept=".json"
 			onchange={(e) => {
 				files = (e.target as HTMLInputElement).files ?? undefined;
-				console.log(files);
 			}}
 		/>
 	</div>

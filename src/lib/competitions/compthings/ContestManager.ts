@@ -249,16 +249,13 @@ export class ContestManager {
 		schedule_id: string | undefined
 	) {
 		if (user_id) {
-			console.log('Checking can upload for comp:', this.summary.name);
 			if (this.competitors.length === 0) {
-				console.log('no competitors');
 				return false;
 			}
 
 			// Check the Add rules
 			// I am not the CD and only the CD can add flights
 			if (!this.competition.summary.add_rules?.cd_and_self_flight_add && !this.isMyComp) {
-				console.log('cannot add flights');
 				return false;
 			}
 		}

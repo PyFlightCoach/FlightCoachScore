@@ -20,7 +20,6 @@
 		class="dropdown-menu"
 		style="position:absolute;"
 		aria-labelledby="navbarDropdown"
-    onload={()=>console.log("loaded")}
 	>
 		<slot />
 	</div>

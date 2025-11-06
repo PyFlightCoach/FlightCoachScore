@@ -40,7 +40,7 @@
 </script>
 
 {#if lastResponse}
-	<div class="table-responsive">
+  <div class="table-responsive w-100">
 		<table class="table table-striped text-center">
 			<thead class="table-dark" style="z-index:-1">
 				<tr>
@@ -93,4 +93,5 @@
 			</tbody>
 		</table>
 	</div>
+
 {/if}
