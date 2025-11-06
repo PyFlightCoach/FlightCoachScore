@@ -51,6 +51,13 @@ export class Origin {
 		}
 	}
 
+  static equals(a: Origin | undefined, b: Origin | undefined) {
+    if (a===undefined || b===undefined) {
+      return a==b;
+    }
+    return a.lat == b.lat && a.lng == b.lng && a.alt == b.alt && a.heading == b.heading;
+  }
+
 	get radHeading() {
 		return (this.heading * Math.PI) / 180;
 	}

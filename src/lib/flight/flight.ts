@@ -1,5 +1,5 @@
 import { GPS, Point, Quaternion } from '$lib/utils/geometry';
-import { States } from '$lib/utils/state';
+import { States, type IState } from '$lib/utils/state';
 import type { AJson } from './ajson';
 import { BinData } from './bin';
 import { Origin } from './fcjson';
@@ -52,13 +52,11 @@ export class FlightDataSource {
 	gps() {
 		if (this.rawData instanceof BinData) {
 			return this.rawData.getGPS();
-		} else if (this.rawData instanceof States) {
-			const ned_sts = this.rawData.transform(new Point(0, 0, 0), this.origin!.rotation);
+		} else {
+			const ned_sts = this.states.transform(new Point(0, 0, 0), this.origin!.rotation);
 			const pilot = this.origin!.pilot;
 			return ned_sts.data.map((s) => pilot.offset(s.pos));
-		} else {
-			throw new Error('Cannot get GPS from this data source');
-		}
+    }
 	}
 
 	get states(): States {
@@ -67,7 +65,7 @@ export class FlightDataSource {
 		} else if (this.rawData instanceof BinData) {
 			return States.from_xkf1(this.origin!, this.rawData.orgn, this.rawData.xkf1);
 		} else {
-			throw new Error('Cannot get States from this data source');
+      return States.parse(this.rawData?.mans.map(m=>m.flown).flat() as unknown as IState[])
 		}
 	}
 
@@ -78,16 +76,18 @@ export class FlightDataSource {
 	}
 
 	withNewOrigin(newOrigin: Origin): FlightDataSource {
-		return new FlightDataSource(
-			this.file,
-			this.kind,
-			this.db,
-			this.bootTime,
-			this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
-			newOrigin,
-			this.segmentation
-		);
+    return Object.assign(this, {
+      rawData: this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
+      origin: newOrigin
+    })
 	}
+
+  withNewSegmentation(newSegmentation: Splitting) : FlightDataSource {
+    return Object.assign(this, {
+      segmentation: newSegmentation,
+      rawData: this.rawData instanceof BinData ? this.rawData : this.states
+    })
+  }
 
 	slice(id: number) {
 		const { istart, tstart, istop, tstop } = this.segmentation!.sliceInfo(id, this.states.t);
@@ -133,14 +133,17 @@ export class FlightDataSource {
 			.then((response) => zip.loadAsync(response.data))
 			.then((res) => Object.values(res.files)[0].async('string'))
 			.then((ajson) => JSON.parse(ajson))
-			.then((data: AJson) => {
+			.then(async (data: AJson) => {
+        const segmentation = await Splitting.parseAJson(data)
 				return new FlightDataSource(
 					undefined,
 					'db',
 					f,
 					data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined,
 					data,
-					Object.setPrototypeOf(data.origin, Origin.prototype)
+					Object.setPrototypeOf(data.origin, Origin.prototype),
+          segmentation,
+          segmentation.schedule
 				);
 			})
 			.finally(unblockProgress);

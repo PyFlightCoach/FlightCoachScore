@@ -28,6 +28,20 @@ export function checkComplete() {
 	);
 }
 
+export function clearAnalysis() {
+	console.log('clearing analysis');
+	sts.selManID.set(undefined);
+	sts.manNames.set(undefined);
+	sts.scores.set(undefined);
+	sts.selectedResult.set(undefined);
+	sts.fa_versions.set([]);
+	sts.analyses.length = 0;
+	sts.running.set([]);
+	sts.runInfo.length = 0;
+	activeFlight.set(undefined);
+	isAnalysisModified.set(undefined);
+}
+
 function setupAnalysisArrays(mnames: string[]) {
 	sts.manNames.set(mnames);
 	sts.scores.set(new Array(mnames.length).fill(0));
@@ -63,19 +77,6 @@ function setAnalysis(i: number, man: MA) {
 	});
 }
 
-export function clearAnalysis() {
-	console.log('clearing analysis');
-	sts.selManID.set(undefined);
-	sts.manNames.set(undefined);
-	sts.scores.set(undefined);
-	sts.selectedResult.set(undefined);
-	sts.fa_versions.set([]);
-	sts.analyses.length = 0;
-	sts.running.set([]);
-	sts.runInfo.length = 0;
-	activeFlight.set(undefined);
-	isAnalysisModified.set(undefined);
-}
 
 export function clearDataLoading() {
 	console.log('clearing data loading');
@@ -121,7 +122,7 @@ export async function newAnalysis(flight: FlightDataSource) {
 				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
 				data,
-				segmentation.mans[id].mdef,
+				segmentation.mans[id].mdef!,
         {},
 			)
 		);
