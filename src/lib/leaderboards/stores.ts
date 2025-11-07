@@ -6,6 +6,7 @@ import { checkUser } from '$lib/stores/user';
 import * as types from '$lib/api/DBInterfaces/flight';
 import { activeFlight, faVersion } from '$lib/stores/shared';
 import { library } from '$lib/schedule/library';
+import { prettyPrintHttpError } from '$lib/utils/text';
 
 export const n_results = newCookieStoreInt('n_results', 10);
 export const n_days_val = newCookieStoreInt('search_n_days', 30);
@@ -50,7 +51,7 @@ export const postUploadSearch = () => {
   dafter.setDate(dafter.getDate() - 30);
   date_after.set(dafter.toISOString().split('T')[0]);
   //n_days_val.set(30);
-  schedule_id.set(fl!.db?.schedule_id || '');
+  schedule_id.set(fl!.schedule?.schedule_id || '');
   sort_by_score_flag.set(false);
   version.set(get(faVersion)!);
   n_results.set(20);
@@ -87,7 +88,11 @@ export const updateTable = async () => {
       table_rows.set(res.data.results.map((row: types.DBFlightRanked | types.DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));
-    }).catch((e) => {console.error(e);});
+    }).catch((e) => {
+      console.error(e);
+      alert('Error fetching leaderboard: ' + prettyPrintHttpError(e));
+      table_rows.set([]);
+    });
     lastResponse.set(_method);
   }
 }

@@ -26,6 +26,17 @@ export class Origin {
 		this.move_north = move_north;
 	}
 
+  static parse (data: Record<string, number>) {
+    return new Origin(
+      data.lat,
+      data.lng,
+      data.alt,
+      data.heading,
+      data.move_east || 0,
+      data.move_north || 0
+    );
+  }
+
 	save() {
 		localStorage.setItem('orginLat', this.lat.toFixed(10));
 		localStorage.setItem('orginLon', this.lng.toFixed(10));

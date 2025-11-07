@@ -12,7 +12,7 @@
 	}: {
 		side?: any;
 		main?: any;
-		sideBarWidth?: number;
+		sideBarWidth?: number | "auto";
 		bp?: keyof typeof breakPoints;
 	} = $props();
 
@@ -44,7 +44,7 @@
 	</div>
 {/if}
 <div
-	class={`${side && showSidebar ? `col-${12 - sideBarWidth}` : 'w-100'} px-0 justify-content-center text-center`}
+	class={`${side && showSidebar ? `col` : 'w-100'} px-0 justify-content-center text-center`}
 >
 	<div style="position:relative; height: 100%;">
 		<div class="container-auto w-100 overflow-auto" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0;">

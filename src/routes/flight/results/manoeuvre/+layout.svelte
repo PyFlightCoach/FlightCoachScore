@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-  import { loading } from '$lib/stores/shared';
-	import { selManID, analyses, running } from '$lib/stores/analysis';
+  import { selManID, analyses, running } from '$lib/stores/analysis';
 	import * as nbc from '$lib/stores/navBarContents';
 
 	interface Props {
@@ -62,9 +61,12 @@
 	]);
   nbc.checkUrl();
 
-  $effect(() =>{
-	$loading = $selManID ? $running[$selManID!] : false;
-  })
 </script>
 
-{@render children()}
+
+{#if $running[$selManID!]}
+  ...running
+  <div class="col-auto spinner-border" role="status"></div>
+{:else}
+  {@render children()}
+{/if}

@@ -256,11 +256,16 @@
 					class="btn btn-outline-primary form-control-sm"
 					onclick={() => {
             const newSplitting = new ms.Splitting(mans);
+
+            console.log("states length: ", $activeFlight?.states?.data.length);
+            console.log("old     :", $activeFlight?.segmentation?.stops);
+            console.log("new     :", newSplitting.stops);
+            
+
             if (!ms.Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
+              console.log("splitting has been modified");
               $activeFlight = $activeFlight!.withNewSegmentation(newSplitting);
             }
-						
-						newAnalysis($activeFlight!);
 						goto(resolve('/flight/results'));
 					}}
 				>

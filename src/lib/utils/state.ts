@@ -237,6 +237,16 @@ export class States {
 		return fcjl;
 	}
 
+  removeLabels() {
+    return new States(this.data.map((st)=>{
+      return State.parse({
+        ...st,
+        manoeuvre: undefined,
+        element: undefined
+      });
+    }));
+  }
+
   get t() {
     return this.data.map((state) => state.t);
   }
@@ -376,7 +386,7 @@ export class States {
 	}
 
 	slice(start: number, stop: number) {
-		return new States(this.data.slice(start, stop));
+		return new States(this.data.slice(start, stop+1));
 	}
 
 	range(col: string) {
@@ -456,6 +466,20 @@ export class States {
 			})
 		);
 	}
+
+  static stack(statesList: States[]) {
+    return new States(statesList.map((sts, i)=>{
+      if (sts.data.length > 0) {
+        if (i < statesList.length - 1) {
+          return sts.data.slice(0, sts.data.length - 1);
+        } else {
+          return sts.data;
+        }
+      }
+    }).filter(sts=>!!sts).flat());
+  }
+
+
 }
 
 export function state_range(state: State[], col: string, extend: number = 0) {

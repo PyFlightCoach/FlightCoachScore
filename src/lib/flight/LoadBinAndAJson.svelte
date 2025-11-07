@@ -11,15 +11,17 @@
 	import { resolve } from '$app/paths';
 	import { cat } from '$lib/utils/files';
 	import { FlightDataSource } from './flight';
-  import { md5 } from 'js-md5';
+	import { md5 } from 'js-md5';
+	import { Splitting } from './splitting';
+	import type { AJson } from './ajson';
+	import { Origin } from './fcjson';
+	import { split } from 'lodash';
 
 	let { onload = () => {} }: { onload: () => void } = $props();
 
 	let binfile: File | undefined = $state();
 	let ajsonfile: File | undefined = $state();
 	let form_state: string | undefined = $state();
-
-
 </script>
 
 {#if form_state}
@@ -35,8 +37,7 @@
 	onchange={(file: File | undefined) => {
 		form_state = undefined;
 		if (file) {
-      cat(file, 'readAsArrayBuffer')
-      .then(b=>checkDuplicate(md5(b as ArrayBuffer), onload))
+			cat(file, 'readAsArrayBuffer').then((b) => checkDuplicate(md5(b as ArrayBuffer), onload));
 		}
 	}}
 />
@@ -47,18 +48,22 @@
 		$loading = true;
 		cat(ajsonfile!, 'readAsText')
 			.then((text) => JSON.parse(text as string))
-			.then(async (data) => {
+			.then(async (data: AJson) => {
 				clearAnalysis();
 				clearDataLoading();
+        const splitting = await Splitting.parseAJson(data);
 				$activeFlight = new FlightDataSource(
-						binfile,
-						binfile ? 'bin' : 'ajson',
-						undefined,
-						new Date(Date.parse(data.bootTime)),
-						data,
-            data.origin
-					);
-				importAnalysis(data);
+					binfile,
+					binfile ? 'bin' : 'ajson',
+					undefined,
+					new Date(Date.parse(data.bootTime!)),
+					data,
+					Origin.parse(data.origin),
+          splitting,
+          splitting.schedule,
+          undefined,
+          data.mans.map(m=>m.history || {})
+				);
 				onload();
 				goto(resolve('/flight/results'));
 			})

@@ -4,7 +4,6 @@
 		exportAnalysis,
 		loadExample,
 		clearDataLoading,
-		clearAnalysis
 	} from '$lib/flight/analysis';
 	import { goto } from '$app/navigation';
 	import { saveAs } from 'file-saver';

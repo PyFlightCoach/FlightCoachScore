@@ -18,8 +18,14 @@ export interface Split {
 	mdef?: ManDef | ManOpt | undefined;
 }
 
-function equals (a: Split, b: Split) {
-  return a.category_name==b.category_name && a.schedule_name == b.schedule_name && a.manoeuvre?.id == b.manoeuvre?.id && a.stop == b.stop && a.alternate_name == b.alternate_name;
+export function equals(a: Split, b: Split) {
+	return (
+		a.category_name == b.category_name &&
+		a.schedule_name == b.schedule_name &&
+		a.manoeuvre?.id == b.manoeuvre?.id &&
+		a.stop == b.stop &&
+		a.alternate_name == b.alternate_name
+	);
 }
 
 export function build(
@@ -153,9 +159,13 @@ export function isComp(splits: Split[]) {
 export class Splitting {
 	constructor(readonly mans: Split[]) {}
 
-  get length() {
-    return this.mans.length;
+  get stops() {
+    return this.mans.map(m=>m.stop).join(", ");
   }
+
+	get length() {
+		return this.mans.length;
+	}
 
 	get analysisMans() {
 		const oMans: number[] = [];
@@ -200,16 +210,17 @@ export class Splitting {
 	}
 
 	static async parseAJson(ajson: AJson) {
-    let lasti=0
+		let lasti = 0;
 		const ajmans = ajson.mans.map((ajman) => {
-      lasti += ajman.flown.length
+
+			lasti += ajman.flown.length-1;
 			return build(
 				ajman.schedule.category,
 				ajman.schedule.name,
 				get(library).subset({
 					schedule_name: ajman.schedule.name,
 					category_name: ajman.schedule.category
-				}).first.manoeuvres[ajman.id-1],
+				}).first.manoeuvres[ajman.id - 1],
 				lasti
 			);
 		});
@@ -224,20 +235,20 @@ export class Splitting {
 		return new Splitting(await loadManDefs(this.mans));
 	}
 
-  static equals(a: Splitting | undefined, b: Splitting | undefined) {
-    if (a===undefined || b===undefined) {
-      return a===b
-    }
-    if (a.length != b.length) {
-      return false;
-    }
-    for (let i=0; i++; i< a.length) {
-      if (!equals(a.mans[i], b.mans[i])) {
-        return false
-      }
-    }
-    return true;
-  }
+	static equals(a: Splitting | undefined, b: Splitting | undefined) {
+		if (a === undefined || b === undefined) {
+			return a === b;
+		}
+		if (a.length != b.length) {
+			return false;
+		}
+		for (let i = 0; i < a.length; i++) {
+			if (!equals(a.mans[i], b.mans[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
 export async function parseFCJMans(fcj: FCJson, states: States) {
