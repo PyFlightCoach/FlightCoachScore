@@ -89,7 +89,7 @@ export class FlightDataSource {
 	withNewSegmentation(newSegmentation: Splitting): FlightDataSource {
 
     const updatedHistory = newSegmentation.mans.slice(1,-1).map((m, i) => {
-      if (equals(m, this.segmentation?.mans[i+1] || {})) {
+      if (equals(m, this.segmentation?.mans[i+1] || {}) || !this.history[i]) {
         return this.history[i];
       } else {
         return objfilter(this.history[i], (k)=> k != get(faVersion));

@@ -105,10 +105,12 @@
 				><th class="p-0 bg-light">Source:</th>
 				<td class="p-0 bg-light"> {$activeFlight?.kind}</td></tr
 			>
-			<tr
-				><th class="p-0 bg-light">Pilot:</th>
-				<td class="p-0 bg-light"> {$activeFlight?.db?.name}</td></tr
-			>
+      {#if $activeFlight?.db}
+        <tr
+          ><th class="p-0 bg-light">Pilot:</th>
+          <td class="p-0 bg-light"> {$activeFlight?.db?.name}</td></tr
+        >
+      {/if}
 			<tr
 				><th class="p-0 bg-light">Schedule:</th>
 				<td class="p-0 bg-light"> {$schedule?.repr().toUpperCase()}</td></tr
