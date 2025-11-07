@@ -28,11 +28,11 @@
 		<small class="px-2 text-start text-nowrap text-body-secondary"
 			>{prettyDate($activeFlight?.bootTime)}</small
 		>
-		<a class="dropdown-item" href={resolve('/flight/create/box')}>Box</a>
-		<a class="dropdown-item" href={resolve('/flight/create/manoeuvres')}>Manoeuvres</a>
+		<a class="dropdown-item" href={resolve('/flight/create/box')} data-sveltekit-preload-data="tap">Box</a>
+		<a class="dropdown-item" href={resolve('/flight/create/manoeuvres')} data-sveltekit-preload-data="tap">Manoeuvres</a>
 
 		{#if $manNames}
-			<a class="dropdown-item" href={resolve('/flight/results')}>Results</a>
+			<a class="dropdown-item" href={resolve('/flight/results')} data-sveltekit-preload-data="tap">Results</a>
 			{#if $user?.is_superuser || $dev}
 				<button
 					class="dropdown-item"
@@ -59,9 +59,9 @@
 			}}>Clear</button
 		>
 	{:else}
-		<a class="dropdown-item" href={resolve('/flight/create/bin')}>Load Ardupilot BIN File</a>
+		<a class="dropdown-item" href={resolve('/flight/create/bin')}  data-sveltekit-preload-data="tap">Load Ardupilot BIN File</a>
 		{#if $user?.is_superuser || $dev}
-			<a class="dropdown-item" href={resolve('/flight/create/acrowrx')}>Load Acrowrx File</a>
+			<a class="dropdown-item" href={resolve('/flight/create/acrowrx')} data-sveltekit-preload-data="tap">Load Acrowrx File</a>
 			<button
 				class="dropdown-item"
 				onclick={() => {

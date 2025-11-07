@@ -195,7 +195,8 @@
 							bootTime,
 							binData,
 							origin,
-							segmentation
+							segmentation,
+              segmentation.schedule,
 						);
 						goto(resolve('/flight/create/box'));
 					}}

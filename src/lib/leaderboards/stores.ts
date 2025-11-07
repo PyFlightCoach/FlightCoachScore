@@ -51,7 +51,7 @@ export const postUploadSearch = () => {
   dafter.setDate(dafter.getDate() - 30);
   date_after.set(dafter.toISOString().split('T')[0]);
   //n_days_val.set(30);
-  schedule_id.set(fl!.schedule?.schedule_id || '');
+  schedule_id.set(fl!.schedule!.schedule_id || '');
   sort_by_score_flag.set(false);
   version.set(get(faVersion)!);
   n_results.set(20);
