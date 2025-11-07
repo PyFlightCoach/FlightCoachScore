@@ -16,7 +16,6 @@
 	});
 
 	//	onNavigate(() => {$navBarContents = []});
-	let showSidebar = $derived(breakPoints['md'] <= breakPoints[$breakPoint]);
 
 	nbc.reset([
 		{

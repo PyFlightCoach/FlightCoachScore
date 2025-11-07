@@ -28,6 +28,7 @@
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import { prettyDate, prettyPrintHttpError } from '$lib/utils/text';
 	import UploadForOtherPilot from './UploadForOtherPilot.svelte';
+	import { breakPoints, breakPoint } from '$lib/stores/shared';
 
 	let comment: string | undefined = $state($activeFlight?.db?.comment || '');
 	let privacy: string | undefined = $state($activeFlight?.db?.privacy || 'view_analysis');
@@ -225,7 +226,8 @@
 				type="submit"
 				onclick={upload}
 				disabled={$loading}
-				data-bs-dismiss="offcanvas"
+        data-bs-dismiss={breakPoints['lg'] > breakPoints[$breakPoint] ? 'offcanvas' : undefined}
+
 				>{isNew ? 'Upload' : 'Update'}
 			</button>
 		</div>

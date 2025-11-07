@@ -261,7 +261,10 @@ export class FlightDataSource {
 						this.bootTime,
 						ajson,
 						this.origin,
-						this.segmentation
+						this.segmentation,
+            this.schedule,
+            this.acroWrxMeta,
+            this.history
 					),
 					compthing: res.data.compthing
 				};

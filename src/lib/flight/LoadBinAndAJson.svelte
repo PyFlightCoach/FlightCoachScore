@@ -15,8 +15,7 @@
 	import { Splitting } from './splitting';
 	import type { AJson } from './ajson';
 	import { Origin } from './fcjson';
-	import { split } from 'lodash';
-
+	
 	let { onload = () => {} }: { onload: () => void } = $props();
 
 	let binfile: File | undefined = $state();

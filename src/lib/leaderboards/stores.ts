@@ -44,11 +44,11 @@ export const postUploadSearch = () => {
   const fl = get(activeFlight)!;
 
   select_by_date.set(true);
-  const dbefore = fl!.bootTime!;
+  const dbefore = new Date(fl!.bootTime!.getTime());
   dbefore.setDate(dbefore.getDate() + 1);
   date_before.set(dbefore.toISOString().split('T')[0]);
-  const dafter = fl!.bootTime!;
-  dafter.setDate(dafter.getDate() - 30);
+  const dafter = new Date(fl!.bootTime!.getTime());
+  dafter.setDate(dafter.getMonth() - 1);
   date_after.set(dafter.toISOString().split('T')[0]);
   //n_days_val.set(30);
   schedule_id.set(fl!.schedule!.schedule_id || '');
