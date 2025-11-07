@@ -324,14 +324,16 @@ export async function checkDuplicate(md5: string, onload: () => void = () => {})
 		})
 		.then(async (duplicate: string | undefined) => {
 			if (duplicate && confirm('BIN file already exists on server, do you want to load it?')) {
-				return checkUser().then(() =>
-					FlightDataSource.db(duplicate).then((fl) => {
-						activeFlight.set(fl);
-						importAnalysis(fl.rawData as AJson);
-						goto(resolve('/flight/results'));
-						onload();
-					})
-				);
+				return checkUser().then(() => FlightDataSource.db(duplicate))
+          .then((fl) => {
+            activeFlight.set(fl);
+            return importAnalysis(fl.rawData as AJson)
+          })
+          .then(()=>{
+            goto(resolve('/flight/results'));
+            onload();
+          });
+            
 			} else if (duplicate) {
 				throw new Error('Duplicate flight');
 			}
