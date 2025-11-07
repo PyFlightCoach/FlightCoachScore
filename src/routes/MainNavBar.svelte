@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base, resolve } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import UserMenu from './UserMenu.svelte';
 	import FlightMenu from './FlightMenu.svelte';
 	import DataBaseMenu from './DataBaseMenu.svelte';
@@ -66,10 +66,10 @@
 		</div>
 
 		<div class="col navbar-nav d-none d-lg-block" id="pageMenu">
-      <div class="row">
+      <div class="row px-4">
 			{#each $navBarContents.items as pageLink, i }
 				<button
-					class="col nav-link {$navBarContents.active.has(pageLink.name) ? 'active' : ''}"
+					class="col-auto px-3 nav-link {$navBarContents.active.has(pageLink.name) ? 'active' : ''}"
 					role="link"
 					onclick={() => {nbc.click(i)}}
 					title={pageLink.title}

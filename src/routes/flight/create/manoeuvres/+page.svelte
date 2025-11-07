@@ -18,7 +18,7 @@
 
 	let range: [number, number] = $state([
 		0,
-		baseSplits[0].stop || Math.min(3000, $activeFlight!.states!.data.length - 1)
+		baseSplits[0].stop === undefined ? Math.min(3000, $activeFlight!.states!.data.length - 1) : baseSplits[0].stop
 	]);
 
 	let activeIndex: number = $state(range[1]);
@@ -36,7 +36,7 @@
 	const resetRange = () => {
 		let newStop = mans[activeManId].stop;
 		let newStart = activeManId == 0 ? 0 : mans[activeManId - 1].stop!;
-		if (!newStop) {
+		if (newStop===undefined) {
 			if (activeManId == 0) {
 				newStop = $activeFlight!.states!.data.length / 8;
 			} else {
@@ -255,10 +255,17 @@
 				<button
 					class="btn btn-outline-primary form-control-sm"
 					onclick={() => {
-						$activeFlight = Object.assign($activeFlight!, {
-							segmentation: new ms.Splitting(mans)
-						});
-						newAnalysis($activeFlight!);
+            const newSplitting = new ms.Splitting(mans);
+
+            console.log("states length: ", $activeFlight?.states?.data.length);
+            console.log("old     :", $activeFlight?.segmentation?.stops);
+            console.log("new     :", newSplitting.stops);
+            
+
+            if (!ms.Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
+              console.log("splitting has been modified");
+              $activeFlight = $activeFlight!.withNewSegmentation(newSplitting);
+            }
 						goto(resolve('/flight/results'));
 					}}
 				>

@@ -6,7 +6,7 @@ import { DBSchedule, type DBManoeuvre } from '$lib/schedule/db';
 import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
-
+import type { AJson, AJMan } from './ajson';
 
 export interface Split {
 	category_name?: string | undefined;
@@ -16,6 +16,16 @@ export interface Split {
 	fixed?: boolean;
 	alternate_name?: 'TakeOff' | 'Landing' | 'Break' | undefined;
 	mdef?: ManDef | ManOpt | undefined;
+}
+
+export function equals(a: Split, b: Split) {
+	return (
+		a.category_name == b.category_name &&
+		a.schedule_name == b.schedule_name &&
+		a.manoeuvre?.id == b.manoeuvre?.id &&
+		a.stop == b.stop &&
+		a.alternate_name == b.alternate_name
+	);
 }
 
 export function build(
@@ -121,7 +131,8 @@ export function isComp(splits: Split[]) {
 		return;
 	}
 	if (
-		(splits[0].alternate_name != 'TakeOff' || splits[splits.length - 1].alternate_name != 'Landing')
+		splits[0].alternate_name != 'TakeOff' ||
+		splits[splits.length - 1].alternate_name != 'Landing'
 	) {
 		return;
 	}
@@ -139,14 +150,22 @@ export function isComp(splits: Split[]) {
 		return;
 	}
 
-	if (schedule.manoeuvres.some((m, i) => m.short_name != splits[i+1].manoeuvre?.short_name)) {
-    return;
-  };
-  return schedule;
+	if (schedule.manoeuvres.some((m, i) => m.short_name != splits[i + 1].manoeuvre?.short_name)) {
+		return;
+	}
+	return schedule;
 }
 
 export class Splitting {
 	constructor(readonly mans: Split[]) {}
+
+  get stops() {
+    return this.mans.map(m=>m.stop).join(", ");
+  }
+
+	get length() {
+		return this.mans.length;
+	}
 
 	get analysisMans() {
 		const oMans: number[] = [];
@@ -174,29 +193,62 @@ export class Splitting {
 		return this.analysisMans.map((iman) => this.mans[iman].manoeuvre!.short_name);
 	}
 
-  get schedule(): DBSchedule | undefined {
-    return isComp(this.mans);
-  }
-
-  sliceInfo(id: number, t: number[]) {
-		const istart = id > 0 ? this.mans[id - 1].stop! : 0;
-		const istop = this.mans[id].stop!;
-		return { istart, tstart: t[istart], istop, tstop:t[istop] };
+	get schedule(): DBSchedule | undefined {
+		return isComp(this.mans);
 	}
 
-  static async parseFCJ(fcj: FCJson, states: States) {
-    return parseFCJMans(fcj, states)
-    .then(loadManDefs)
-    .then((splits) => new Splitting(splits));
-  }
+	sliceInfo(id: number, t: number[]) {
+		const istart = id > 0 ? this.mans[id - 1].stop! : 0;
+		const istop = this.mans[id].stop!;
+		return { istart, tstart: t[istart], istop, tstop: t[istop] };
+	}
 
-  static default() {
-    return new Splitting([takeOff()]);
-  }
+	static async parseFCJ(fcj: FCJson, states: States) {
+		return parseFCJMans(fcj, states)
+			.then(loadManDefs)
+			.then((splits) => new Splitting(splits));
+	}
 
-  async loadManDefs() {
-    return new Splitting(await loadManDefs(this.mans));
-  }
+	static async parseAJson(ajson: AJson) {
+		let lasti = 0;
+		const ajmans = ajson.mans.map((ajman) => {
+
+			lasti += ajman.flown.length-1;
+			return build(
+				ajman.schedule.category,
+				ajman.schedule.name,
+				get(library).subset({
+					schedule_name: ajman.schedule.name,
+					category_name: ajman.schedule.category
+				}).first.manoeuvres[ajman.id - 1],
+				lasti
+			);
+		});
+		return new Splitting([takeOff(0), ...ajmans, landing(lasti)]).loadManDefs();
+	}
+
+	static default() {
+		return new Splitting([takeOff()]);
+	}
+
+	async loadManDefs() {
+		return new Splitting(await loadManDefs(this.mans));
+	}
+
+	static equals(a: Splitting | undefined, b: Splitting | undefined) {
+		if (a === undefined || b === undefined) {
+			return a === b;
+		}
+		if (a.length != b.length) {
+			return false;
+		}
+		for (let i = 0; i < a.length; i++) {
+			if (!equals(a.mans[i], b.mans[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
 export async function parseFCJMans(fcj: FCJson, states: States) {

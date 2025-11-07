@@ -26,6 +26,17 @@ export class Origin {
 		this.move_north = move_north;
 	}
 
+  static parse (data: Record<string, number>) {
+    return new Origin(
+      data.lat,
+      data.lng,
+      data.alt,
+      data.heading,
+      data.move_east || 0,
+      data.move_north || 0
+    );
+  }
+
 	save() {
 		localStorage.setItem('orginLat', this.lat.toFixed(10));
 		localStorage.setItem('orginLon', this.lng.toFixed(10));
@@ -50,6 +61,13 @@ export class Origin {
 			return undefined;
 		}
 	}
+
+  static equals(a: Origin | undefined, b: Origin | undefined) {
+    if (a===undefined || b===undefined) {
+      return a==b;
+    }
+    return a.lat == b.lat && a.lng == b.lng && a.alt == b.alt && a.heading == b.heading;
+  }
 
 	get radHeading() {
 		return (this.heading * Math.PI) / 180;

@@ -10,7 +10,7 @@ import {
 import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
 import { schedule as getScheduleFromSplit, Splitting } from '$lib/flight/splitting';
-import { Origin, ScheduleInfo } from './fcjson';
+import { FCJManResult, Origin, ScheduleInfo } from './fcjson';
 import { library } from '$lib/schedule/library';
 import { analysisServer, dbServer } from '$lib/api/api';
 import { goto } from '$app/navigation';
@@ -20,12 +20,28 @@ import { FlightDataSource } from './flight';
 import type { AJson, AJMan } from './ajson';
 import { States } from '$lib/utils/state';
 import { checkUser } from '$lib/stores/user';
+import { BinData } from './bin';
+import { objmap } from '$lib/utils/arrays';
 
 export function checkComplete() {
 	return Boolean(
 		get(sts.manNames)?.length &&
 			sts.analyses.every((a) => get(a) && get(a)?.history[get(faVersion)!]?.results?.length)
 	);
+}
+
+export function clearAnalysis() {
+	console.log('clearing analysis');
+	sts.origin.set(undefined);
+	sts.selManID.set(undefined);
+	sts.manNames.set(undefined);
+	sts.scores.set(undefined);
+	sts.selectedResult.set(undefined);
+	sts.fa_versions.set([]);
+	sts.analyses.length = 0;
+	sts.running.set([]);
+	sts.runInfo.length = 0;
+	isAnalysisModified.set(undefined);
 }
 
 function setupAnalysisArrays(mnames: string[]) {
@@ -63,30 +79,22 @@ function setAnalysis(i: number, man: MA) {
 	});
 }
 
-export function clearAnalysis() {
-	console.log('clearing analysis');
-	sts.selManID.set(undefined);
-	sts.manNames.set(undefined);
-	sts.scores.set(undefined);
-	sts.selectedResult.set(undefined);
-	sts.fa_versions.set([]);
-	sts.analyses.length = 0;
-	sts.running.set([]);
-	sts.runInfo.length = 0;
-	activeFlight.set(undefined);
-	isAnalysisModified.set(undefined);
-}
-
 export function clearDataLoading() {
 	console.log('clearing data loading');
 	activeFlight.set(undefined);
 	clearAnalysis();
-  goto(resolve('/'));
+	goto(resolve('/'));
 }
 
 export async function newAnalysis(flight: FlightDataSource) {
+	if (
+		!(flight.rawData instanceof BinData) &&
+		!(flight.rawData instanceof States)
+	) {
+		return importAnalysis(flight.rawData!);
+	}
 	const segmentation = flight.segmentation!;
-
+	sts.origin.set(flight.origin);
 	sts.schedule.set(segmentation.schedule);
 	sts.isCompFlight.set(!!segmentation.schedule);
 	setupAnalysisArrays(segmentation.manNames);
@@ -121,8 +129,8 @@ export async function newAnalysis(flight: FlightDataSource) {
 				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
 				data,
-				segmentation.mans[id].mdef,
-        {},
+				segmentation.mans[id].mdef!,
+				objmap(flight.history[i] || {}, (_, v) => FCJManResult.parse(v as Record<string, unknown>)),
 			)
 		);
 	});
@@ -147,17 +155,17 @@ export function exportAnalysis(small: boolean = false) {
 
 export async function importAnalysis(data: AJson) {
 	sts.isCompFlight.set(data.isComp);
-	const origin = Object.setPrototypeOf(data.origin, Origin.prototype);
+	sts.origin.set(Object.setPrototypeOf(data.origin, Origin.prototype));
 	setupAnalysisArrays(data.mans.map((m) => m.name));
 
-	data.mans.forEach(async (ma: AJMan, i: number) => {
+	const mbuilders = data.mans.map(async (ma: AJMan, i: number) => {
 		sts.runInfo[i].set(`Imported Analysis at ${new Date().toLocaleTimeString()}`);
 
-		MA.parse(ma, origin).then(async (res) => {
+		return MA.parse(ma, get(sts.origin)!).then(async (res) => {
 			setAnalysis(i, res);
 		});
 	});
-
+  await Promise.all(mbuilders);
 	const schedule = get(sts.analyses[1])?.schedule;
 	if (schedule) {
 		sts.schedule.set(
@@ -174,7 +182,7 @@ export async function loadExample() {
 		clearAnalysis();
 		clearDataLoading();
 		activeFlight.set(flight);
-		importAnalysis(flight.rawData as AJson);
+		return importAnalysis(get(activeFlight)!.rawData as AJson);
 	});
 }
 
@@ -189,10 +197,8 @@ export async function loadAnalysisFromDB(flight_id: string) {
 	loading.set(true);
 	return FlightDataSource.db(flight_id)
 		.then((f) => {
-			importAnalysis(f.rawData as AJson);
+			//importAnalysis(f.rawData as AJson);
 			activeFlight.set(f);
-		})
-		.then(() => {
 			goto(resolve('/flight/results'));
 		})
 		.catch((err) => {
@@ -204,6 +210,7 @@ export async function loadAnalysisFromDB(flight_id: string) {
 }
 
 export async function loadAcrowrx(file: File): Promise<void> {
+	clearDataLoading();
 	const fd = new FormData();
 	fd.append('acrowrx_file', file);
 	await analysisServer
@@ -227,7 +234,7 @@ export async function loadAcrowrx(file: File): Promise<void> {
 					States.parse(response.data.data),
 					Object.setPrototypeOf(response.data.origin, Origin.prototype),
 					Splitting.default(),
-          undefined,
+					undefined,
 					response.data.meta
 				)
 			);
@@ -298,7 +305,7 @@ export async function analyseManoeuvre(
 	}
 }
 
-export async function checkDuplicate(md5: string, onload: () => void = ()=>{}) {
+export async function checkDuplicate(md5: string, onload: () => void = () => {}) {
 	//await cat(bin, 'readAsArrayBuffer').then(md5);
 	return dbServer
 		.get(`flight/check_duplicate/${md5}`)
@@ -322,7 +329,7 @@ export async function checkDuplicate(md5: string, onload: () => void = ()=>{}) {
 						activeFlight.set(fl);
 						importAnalysis(fl.rawData as AJson);
 						goto(resolve('/flight/results'));
-            onload();
+						onload();
 					})
 				);
 			} else if (duplicate) {

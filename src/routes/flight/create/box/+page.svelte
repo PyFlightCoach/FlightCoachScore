@@ -9,8 +9,9 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
+
 	let newOrigin = $state($activeFlight!.origin );
-	
+
   let newStates = $derived($activeFlight!.statesAtNewOrigin(newOrigin!));
 
 	let boxDisplay: 'F3A' | 'IMAC' | 'IAC' = $state($activeFlight?.kind === 'acrowrx' ? 'IAC' : 'F3A');
@@ -45,16 +46,14 @@
 
 			<label for="boxOptions" class="col-auto col-form-label">Box:</label>
 			<div id="boxOptions" class="col mb-2 py-2 btn-group">
-				{#if $activeFlight!.kind !== 'acrowrx'}
-					<input
-						type="radio"
-						class="btn-check"
-						value="F3A"
-						id="F3ADisplay"
-						bind:group={boxDisplay}
-					/>
-					<label class="btn btn-outline-secondary btn-sm" for="F3ADisplay">F3A</label>
-				{/if}
+        <input
+          type="radio"
+          class="btn-check"
+          value="F3A"
+          id="F3ADisplay"
+          bind:group={boxDisplay}
+        />
+        <label class="btn btn-outline-secondary btn-sm" for="F3ADisplay">F3A</label>
 				<input
 					type="radio"
 					class="btn-check"
@@ -67,41 +66,19 @@
 				<label class="btn btn-outline-secondary btn-sm" for="IACDisplay">IAC/CIVA</label>
 			</div>
 		</div>
-		{#if $activeFlight!.kind === 'bin'}
+    {#if $activeFlight!.kind === 'acrowrx'}
+			<p>
+				The position of the box has been taken from Acrowrx, but all judging in FCScore assumes a
+        base height of 100m. You can shift the box here to suit your flight using the input below. 
+			</p>
+		{/if}
+
 			<BoxReader
 				target={($activeFlight!.rawData as BinData).findOrigin()}
 				origin={newOrigin!}
 				onorigin={(neworigin: Origin) => (newOrigin = neworigin)}
 				siteInputMode={newOrigin ? 'ph' : 'fcsites'}
 			/>
-		{:else if $activeFlight!.kind === 'acrowrx' && boxDisplay === 'IAC'}
-			<p>
-				The position of the box has been taken from Acrowrx, but all judging in FCScore assumes a
-        base height of 100m. You can shift the box vertically to suit your using the input below. 
-			</p>
-			<div class="row mb-2">
-				<label class="col col-form-label" for="z_shift">Z Shift (m):</label>
-				<input
-					id="z_shift"
-					class="col col-form-input form-control"
-					type="number"
-					step="10"
-					value={0}
-					onchange={(e) => {
-						const val = parseFloat((e.target as HTMLInputElement).value);
-						if (!isNaN(val)) {
-							const oldOrigin: Origin = $activeFlight!.origin!;
-							newOrigin = new Origin(
-								oldOrigin!.lat,
-								oldOrigin!.lng,
-								oldOrigin!.alt + val,
-								oldOrigin!.heading
-							);
-						}
-					}}
-				/>
-			</div>
-		{/if}
 
 		<div class="row px-2">
 			<button
@@ -115,8 +92,9 @@
 			<button
 				class="col btn btn-outline-primary"
 				onclick={() => {
-					$activeFlight = $activeFlight!.withNewOrigin(newOrigin!);
-
+          if (!Origin.equals(newOrigin, $activeFlight?.origin)) {
+            $activeFlight = $activeFlight!.withNewOrigin(newOrigin!);
+          }
 					goto(resolve('/flight/create/manoeuvres'));
 				}}>Next</button
 			>

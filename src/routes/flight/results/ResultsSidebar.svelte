@@ -6,7 +6,8 @@
 		difficulty,
 		truncate,
 		isCompFlight,
-		schedule
+		schedule,
+		totalScore
 	} from '$lib/stores/analysis';
 	import {
 		activeFlight,
@@ -29,9 +30,7 @@
 	import UploadForOtherPilot from './UploadForOtherPilot.svelte';
 
 	let comment: string | undefined = $state($activeFlight?.db?.comment || '');
-	let privacy: string | undefined = $state(
-		$activeFlight?.db?.privacy || 'view_analysis'
-	);
+	let privacy: string | undefined = $state($activeFlight?.db?.privacy || 'view_analysis');
 
 	const isNew = $derived($activeFlight?.file);
 
@@ -42,9 +41,7 @@
 			false
 	);
 
-	const canI = $derived(
-		$user?.is_verified && ($activeFlight?.isMine || $user?.is_superuser)
-	);
+	const canI = $derived($user?.is_verified && ($activeFlight?.isMine || $user?.is_superuser));
 
 	let competition = $state(
 		$activeComp?.checkCanUpload(
@@ -62,24 +59,23 @@
 	let showResultsSelection: boolean = $state(false);
 	let round: ContestManager | undefined = $state();
 
-
 	const upload = async () => {
 		$loading = true;
 		const ajson = createAnalysisExport(true);
 		checkUser(false, false, false)
 			.then(() => {
-        return $activeFlight!.upload(
-          ajson,
-          privacy,
-          comment,
-          pilotId || (round ? $user?.id : undefined),
-          round?.summary.id
-        );
+				return $activeFlight!.upload(
+					ajson,
+					privacy,
+					comment,
+					pilotId || (round ? $user?.id : undefined),
+					round?.summary.id
+				);
 			})
 			.then(async (res) => {
-        $activeFlight = res!.flight;
+				$activeFlight = res!.flight;
 				$isAnalysisModified = false;
-				
+
 				if (res.compthing) {
 					goto(resolve(`/competition/view`) + `/?id=${res.compthing.id}`);
 				} else {
@@ -88,7 +84,7 @@
 				}
 			})
 			.catch((e) => {
-        console.error(e);
+				console.error(e);
 				alert(prettyPrintHttpError(e));
 			})
 			.then(loadGuiLists)
@@ -99,23 +95,33 @@
 	};
 </script>
 
-<div class="row p-2" style="max-width:450px">
-	<span >
-		{#if $selectedResult}
-			Showing results for
-			{#if $activeFlight?.kind == 'example'}
-				the example flight.
-			{:else if $activeFlight?.kind == 'db'}
-				a flight by {$activeFlight?.db?.name}, loaded from the db.
-			{:else}
-				your flight imported from a {$activeFlight?.kind} file.
-			{/if}
-		{:else if $fa_versions.length == 0}
-			Run some analyses to view result
-		{/if}
-	</span>
-
-	<span> Boot time: {prettyDate($activeFlight?.bootTime)}. </span>
+<div class="row">
+	<span class="h4 fw-bold text-start px-4 mt-2">View Results</span>
+</div>
+<div class="row p-2">
+	<table class="table table-borderless table-sm p-0">
+		<tbody>
+			<tr
+				><th class="p-0 bg-light">Source:</th>
+				<td class="p-0 bg-light"> {$activeFlight?.kind}</td></tr
+			>
+			<tr
+				><th class="p-0 bg-light">Pilot:</th>
+				<td class="p-0 bg-light"> {$activeFlight?.db?.name}</td></tr
+			>
+			<tr
+				><th class="p-0 bg-light">Schedule:</th>
+				<td class="p-0 bg-light"> {$schedule?.repr().toUpperCase()}</td></tr
+			>
+			<tr
+				><th class="p-0 bg-light">Boot Time: </th>
+				<td class="p-0 bg-light"> {prettyDate($activeFlight?.bootTime)}. </td></tr
+			>
+			<tr
+				><th class="p-0 bg-light">Total Score:</th> <td class="p-0 bg-light"> {$totalScore}</td></tr
+			>
+		</tbody>
+	</table>
 </div>
 {#if $fa_versions.length}
 	<div class="row p-2">
@@ -186,7 +192,11 @@
 	{/if}
 {/if}
 
-<div class="container-auto border rounded p-2">
+<div class="row">
+	<span class="h4 fw-bold text-start px-4 mt-2">Share to the Database</span>
+</div>
+
+{#if canI && $isComplete && $isCompFlight && (!round || pilotId)}
 	<div class="row p-2">
 		<label class="col-auto col-form-label" for="set-privacy">Privacy</label>
 		<select class="col form-select" disabled={!canI} id="set-privacy" bind:value={privacy}>
@@ -206,8 +216,7 @@
 			bind:value={comment}
 		></textarea>
 	</div>
-
-	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && (!round || pilotId)}
+	{#if isNew || isUpdated}
 		<div class="row mb-2 px-2">
 			<button
 				class="col btn btn-primary mx-2"
@@ -218,11 +227,13 @@
 				>{isNew ? 'Upload' : 'Update'}
 			</button>
 		</div>
-
-    {:else}
+	{/if}
+{:else}
 	<div class="row mb-2 px-2">
 		{#if !$activeFlight?.isMine}
-			<span>You can only upload original flights loaded from an Ardupilot BIN file or from Acrowrx</span>
+			<span
+				>You can only upload original flights loaded from an Ardupilot BIN file or from Acrowrx</span
+			>
 		{:else if !$isCompFlight}
 			<span>Only complete flights can be uploaded</span>
 		{:else if !canI}
@@ -230,7 +241,7 @@
 				<span>Log in to upload</span>
 			{:else if !$user.is_verified}
 				<span>Verify your email to upload</span>
-			{:else if !($activeFlight?.db?.isMine) || !isNew}
+			{:else if !$activeFlight?.isMine || !isNew}
 				<span>Only the pilot or contributor can edit a flight record</span>
 			{/if}
 		{:else if !(isNew || isUpdated)}
@@ -244,7 +255,6 @@
 			<span>Either select a pilot or dont select a competition</span>
 		{/if}
 	</div>
-  	{/if}
-</div>
+{/if}
 
 <Popup bind:show={showCompetitionForm}>Competition Selection</Popup>

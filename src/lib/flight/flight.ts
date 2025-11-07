@@ -1,17 +1,18 @@
 import { GPS, Point, Quaternion } from '$lib/utils/geometry';
 import { States } from '$lib/utils/state';
-import type { AJson } from './ajson';
+import type { AJMan, AJson } from './ajson';
 import { BinData } from './bin';
 import { Origin } from './fcjson';
-import { Splitting } from './splitting';
+import { Splitting, equals } from './splitting';
 import { dbServer, analysisServer } from '$lib/api';
 import JSZip from 'jszip';
-import { blockProgress, unblockProgress } from '$lib/stores/shared';
+import { blockProgress, faVersion, unblockProgress } from '$lib/stores/shared';
 import type { DBFlightMeta } from '$lib/api/DBInterfaces/flight';
 import { compareUUIDs, prettyDate } from '$lib/utils/text';
 import { user } from '$lib/stores/user';
 import { get } from 'svelte/store';
 import type { DBSchedule } from '$lib/schedule/db';
+import { objfilter } from '$lib/utils/arrays';
 
 
 export class BinDataState {
@@ -45,19 +46,20 @@ export class FlightDataSource {
 		readonly rawData: BinData | States | AJson | undefined = undefined,
 		readonly origin: Origin | undefined = undefined,
 		readonly segmentation: Splitting | undefined = undefined,
-    readonly schedule: DBSchedule | undefined = undefined,
-    readonly acroWrxMeta: {flightFileName: string; sequenceFolderName: string} | undefined = undefined
+		readonly schedule: DBSchedule | undefined = undefined,
+		readonly acroWrxMeta:
+			| { flightFileName: string; sequenceFolderName: string }
+			| undefined = undefined,
+		readonly history: Record<string, unknown>[] = []
 	) {}
 
 	gps() {
 		if (this.rawData instanceof BinData) {
 			return this.rawData.getGPS();
-		} else if (this.rawData instanceof States) {
-			const ned_sts = this.rawData.transform(new Point(0, 0, 0), this.origin!.rotation);
+		} else {
+			const ned_sts = this.states.transform(new Point(0, 0, 0), this.origin!.rotation);
 			const pilot = this.origin!.pilot;
 			return ned_sts.data.map((s) => pilot.offset(s.pos));
-		} else {
-			throw new Error('Cannot get GPS from this data source');
 		}
 	}
 
@@ -67,7 +69,7 @@ export class FlightDataSource {
 		} else if (this.rawData instanceof BinData) {
 			return States.from_xkf1(this.origin!, this.rawData.orgn, this.rawData.xkf1);
 		} else {
-			throw new Error('Cannot get States from this data source');
+			return States.stack(this.rawData!.mans.map((m) => States.parse(m.flown)));
 		}
 	}
 
@@ -78,15 +80,30 @@ export class FlightDataSource {
 	}
 
 	withNewOrigin(newOrigin: Origin): FlightDataSource {
-		return new FlightDataSource(
-			this.file,
-			this.kind,
-			this.db,
-			this.bootTime,
-			this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
-			newOrigin,
-			this.segmentation
-		);
+		return Object.assign(this, {
+			rawData: this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
+			origin: newOrigin
+		});
+	}
+
+	withNewSegmentation(newSegmentation: Splitting): FlightDataSource {
+
+    const updatedHistory = newSegmentation.mans.slice(1,-1).map((m, i) => {
+      if (equals(m, this.segmentation?.mans[i+1] || {})) {
+        return this.history[i];
+      } else {
+        return objfilter(this.history[i], (k)=> k != get(faVersion));
+      }
+    });
+
+
+
+		return Object.assign(this, {
+			segmentation: newSegmentation,
+			schedule: newSegmentation.schedule,
+			rawData: this.rawData instanceof BinData ? this.rawData : this.states,
+      history: updatedHistory
+		});
 	}
 
 	slice(id: number) {
@@ -94,21 +111,33 @@ export class FlightDataSource {
 		if (this.rawData instanceof BinData) {
 			return new BinDataState(this.rawData.slice(tstart, tstop), this.origin!);
 		} else {
-			return new GlobalState(this.states!.slice(istart, istop), this.origin!);
+
+      let states: States = this.states!.slice(istart, istop);
+      const elements = states.element;
+      if (elements[0] != "entry_line" || elements[elements.length - 1] != "exit_line") {
+        states = states.removeLabels();
+      }
+
+			return new GlobalState(states, this.origin!);
 		}
 	}
 
 	static async example() {
 		return analysisServer
 			.get('example', blockProgress('Downloading Example'))
-			.then((res) => {
+			.then(async (res) => {
+        const splitting = await Splitting.parseAJson(res.data);
 				return new FlightDataSource(
 					undefined,
 					'example',
 					undefined,
 					new Date(Date.parse(res.data.bootTime)),
 					res.data as AJson,
-					Object.setPrototypeOf(res.data.origin, Origin.prototype)
+					Object.setPrototypeOf(res.data.origin, Origin.prototype),
+          splitting,
+          splitting.schedule,
+          undefined,
+          res.data.mans.map((m: AJMan) => m.history || {})
 				);
 			})
 			.finally(unblockProgress);
@@ -133,19 +162,23 @@ export class FlightDataSource {
 			.then((response) => zip.loadAsync(response.data))
 			.then((res) => Object.values(res.files)[0].async('string'))
 			.then((ajson) => JSON.parse(ajson))
-			.then((data: AJson) => {
+			.then(async (data: AJson) => {
+				const segmentation = await Splitting.parseAJson(data);
 				return new FlightDataSource(
 					undefined,
 					'db',
 					f,
 					data.bootTime ? new Date(Date.parse(data.bootTime)) : undefined,
 					data,
-					Object.setPrototypeOf(data.origin, Origin.prototype)
+					Object.setPrototypeOf(data.origin, Origin.prototype),
+					segmentation,
+					segmentation.schedule,
+					undefined,
+					data.mans.map((m) => m.history || {})
 				);
 			})
 			.finally(unblockProgress);
 	}
-
 
 	get sourceDescription(): string {
 		switch (this.kind) {
@@ -164,9 +197,9 @@ export class FlightDataSource {
 		}
 	}
 
-  get description(): string | undefined {
-    return prettyDate(this.bootTime);
-  }
+	get description(): string | undefined {
+		return prettyDate(this.bootTime);
+	}
 
 	async upload(
 		ajson: AJson | undefined = undefined,

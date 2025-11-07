@@ -2,11 +2,12 @@ import { writable, type Writable, type Readable, derived } from 'svelte/store';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get } from 'svelte/store';
 import type { DBSchedule } from '$lib/schedule/db';
+import { Origin } from '$lib/flight/fcjson';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 
 export const schedule = writable<DBSchedule | undefined>();
-
+export const origin: Writable<Origin | undefined> = writable();
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);
 export const analyses: Writable<MA | undefined>[] = [];

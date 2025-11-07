@@ -1,5 +1,6 @@
 import type { Direction } from "$lib/manoeuvre/positioning.svelte";
 import type { IManOpt, IManDef } from "$lib/manoeuvre/definition.svelte";
+import type { IState } from "$lib/utils/state";
 
 
 export interface AJMan {
@@ -20,14 +21,14 @@ export interface AJMan {
     id: number;
     schedule: Record<string, string>;
     schedule_direction?: Direction;
-    flown: Record<string, unknown>[];
+    flown: IState[];
     history?: Record<string, unknown>;
     mdef?: IManDef | IManOpt[];
     manoeuvre?: Record<string, unknown> | Record<string, unknown>[];
-    template?: Record<string, unknown> | Record<string, unknown>[];
-    templates?: Record<string, unknown> | Record<string, unknown>[];
+    template?: IState[];
+    templates?: IState[] | Record<string, IState[]>;
     corrected?: Record<string, unknown>;
-    corrected_template?: Record<string, unknown> | Record<string, unknown>[];
+    corrected_template?: IState[] | Record<string, IState[]>;
     scores?: Record<string, unknown>;
 }
 

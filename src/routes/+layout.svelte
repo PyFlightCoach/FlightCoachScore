@@ -36,6 +36,8 @@
 	polyfillCountryFlagEmojis();
 
 	let pageHasHelp = $state(false);
+
+  
 </script>
 
 <svelte:window bind:innerWidth={$windowWidth} bind:innerHeight={$windowHeight} />
