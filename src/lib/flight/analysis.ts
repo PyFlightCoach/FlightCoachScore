@@ -316,8 +316,8 @@ export async function checkDuplicate(md5: string, onload: () => void = () => {})
 		.catch((err) => {
 			console.log(err);
 			if (err.status === 409) {
-				const id = err.response.data.detail.split('id[')[1].split(']')[0];
-				return id;
+        const detail: string | {is_a_duplicate: boolean; reason: string; id: string} = err.response.data.detail
+				return typeof detail == 'string' ? detail.split('id[')[1].split(']')[0] : detail.id;
 			} else {
 				alert('Error checking duplicate: ' + prettyPrintHttpError(err));
 			}
