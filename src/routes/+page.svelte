@@ -5,10 +5,8 @@
 	import RecentFlights from '$lib/database/RecentFlights.svelte';
 	import TopFlights from '$lib/database/TopFlights.svelte';
 	import { loadActivity, loadRecent, loadTopFlights } from '$lib/database/userActivity';
-	import * as nbc from '$lib/stores/navBarContents';
 	import { dbServer } from '$lib/api';
 
-	nbc.reset();
 	let activeNews = $state(0);
 	let show = $state('About');
 	const getNews = $derived(

@@ -196,6 +196,7 @@
 			<Plot
 				data={traces}
 				{layout}
+        config={{responsive:true}}
 				onclick={(e) => {
 					if (e.points?.length) {
 						const offset = {

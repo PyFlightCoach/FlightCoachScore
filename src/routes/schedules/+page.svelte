@@ -4,9 +4,7 @@
 	import PlotAll from './PlotAll.svelte';
 	import EditManoeuvre from './ManoeuvrePage.svelte';
 	import { ScheduleHandler } from '$lib/schedule/schedule_handler.svelte';
-  import * as nbc from '$lib/stores/navBarContents';
 
-  nbc.reset();
 	let form_state: string | undefined = $state();
 	let activeManId: number | undefined = $state();
   

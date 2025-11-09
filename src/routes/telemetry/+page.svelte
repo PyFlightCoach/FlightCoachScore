@@ -3,10 +3,8 @@
 	import { analysisServer } from '$lib/api/api';
 	import { user } from '$lib/stores/user';
 	import { saveAs } from 'file-saver';
-  import * as nbc from '$lib/stores/navBarContents';
-
-  nbc.reset();
-	let telemetry: Record<string, string[]> | undefined = $state();
+  
+  let telemetry: Record<string, string[]> | undefined = $state();
 
 	const loadTelemetry = () => {
 		if ($user?.is_superuser) {

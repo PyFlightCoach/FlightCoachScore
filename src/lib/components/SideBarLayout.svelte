@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { breakPoints, breakPoint } from '$lib/stores/shared';
-	import { showCollapseToggle } from '$lib/stores/navBarContents';
+  import {showCollapseToggle} from '$lib/stores/navBarContents';
 	//A sidebar that becomes an offcanvas at bp.
 	//below bp a button to show the offcanvas is added to the bottom navbar
 
@@ -18,9 +18,9 @@
 
 	let showSidebar = $derived(breakPoints[bp] <= breakPoints[$breakPoint]);
 
-	$effect(() => {
-		$showCollapseToggle = !showSidebar;
-	});
+  $effect (() => {
+    $showCollapseToggle = !showSidebar;
+  });
 </script>
 
 {#if side}

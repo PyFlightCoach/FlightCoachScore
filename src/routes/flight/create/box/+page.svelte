@@ -8,11 +8,11 @@
 	import { BinData } from '$lib/flight/bin';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-
+  import { GPS, Quaternion } from '$lib/utils/geometry';
 
 	let newOrigin = $state($activeFlight!.origin );
 
-  let newStates = $derived($activeFlight!.statesAtNewOrigin(newOrigin!));
+	let newStates = $derived($activeFlight!.statesAtNewOrigin(newOrigin!));
 
 	let boxDisplay: 'F3A' | 'IMAC' | 'IAC' = $state($activeFlight?.kind === 'acrowrx' ? 'IAC' : 'F3A');
 	let display: 'map' | 'state' = $state($activeFlight!.origin ? 'state' : 'map');

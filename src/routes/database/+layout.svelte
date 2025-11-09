@@ -5,8 +5,7 @@
 	import { table_rows } from '$lib/leaderboards/stores';
 	import { onMount } from 'svelte';
 	import SideBarLayout from '$lib/components/SideBarLayout.svelte';
-	import { resolve } from '$app/paths';
-	import * as nbc from '$lib/stores/navBarContents';
+
 	import { breakPoints, breakPoint } from '$lib/stores/shared';
 
 	onMount(() => {
@@ -15,23 +14,7 @@
 		}
 	});
 
-	//	onNavigate(() => {$navBarContents = []});
-
-	nbc.reset([
-		{
-			href: resolve('/database/leaderboards/'),
-			name: 'Leaderboards',
-			title: 'Show results in a table',
-			icon: 'bi-trophy'
-		} as nbc.NavBarPage,
-		{
-			href: resolve('/database/map/'),
-			name: 'Map',
-			title: 'Show results in a map',
-			icon: 'bi-map'
-		} as nbc.NavBarPage
-	]);
-	nbc.checkUrl();
+	
 </script>
 
 <SideBarLayout bp="lg" sideBarWidth={4}>

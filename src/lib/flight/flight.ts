@@ -53,16 +53,7 @@ export class FlightDataSource {
 		readonly history: Record<string, unknown>[] = []
 	) {}
 
-	gps() {
-		if (this.rawData instanceof BinData) {
-			return this.rawData.getGPS();
-		} else {
-			const ned_sts = this.states.transform(new Point(0, 0, 0), this.origin!.rotation);
-			const pilot = this.origin!.pilot;
-			return ned_sts.data.map((s) => pilot.offset(s.pos));
-		}
-	}
-
+	
 	get states(): States {
 		if (this.rawData instanceof States) {
 			return this.rawData;
@@ -73,10 +64,16 @@ export class FlightDataSource {
 		}
 	}
 
-	statesAtNewOrigin(newOrigin: Origin): States {
-		const vec = GPS.sub(newOrigin.pilot, this.origin!.pilot);
-		const rot = Quaternion.mul(this.origin!.rotation.inverse(), newOrigin.rotation);
-		return this.states.transform(vec, rot);
+	statesAtNewOrigin(newOrigin: Origin): States {    
+    const vec = GPS.sub(this.origin!.pilot, newOrigin.pilot);
+    const rot = Quaternion.mul(this.origin!.rotation.inverse(), newOrigin.rotation);
+    return this.states.transform(vec, rot);
+	}
+
+gps() {
+		const ned_sts = this.states.transform(new Point(0, 0, 0), this.origin!.rotation);
+    const pilot = this.origin!.pilot;
+    return ned_sts.data.map((s) => pilot.offset(s.pos));
 	}
 
 	withNewOrigin(newOrigin: Origin): FlightDataSource {

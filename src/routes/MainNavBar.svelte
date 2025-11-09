@@ -10,12 +10,156 @@
 	import * as nbc from '$lib/stores/navBarContents';
 	import { nMans, nRunning } from '$lib/stores/analysis';
 	import { servers } from '$lib/api';
+	import { activeFlight } from '$lib/stores/shared';
 	import { navBarContents } from '$lib/stores/navBarContents';
-
+	import { page } from '$app/state';
+	import { analyseAll, clearDataLoading } from '$lib/flight/analysis';
 	let { hasHelp = $bindable() }: { hasHelp: boolean } = $props();
+
+	const navBarItems = $derived({
+		'/flight': $activeFlight
+			? [
+					{
+						name: 'Box',
+						href: resolve('/flight/create/box/'),
+						icon: 'bi-box',
+						title: 'Locate the aerobatic box',
+						disabled: !$activeFlight
+					},
+					{
+						name: 'Manoeuvres',
+						href: resolve('/flight/create/manoeuvres/'),
+						icon: 'bi-scissors',
+						title: 'Segment the flight into manoeuvres',
+						disabled: !$activeFlight?.segmentation
+					},
+					{
+						name: 'Results',
+						href: resolve('/flight/results/'),
+						icon: 'bi-card-list',
+						title: 'View the analysis results',
+						disabled: !$activeFlight?.segmentation
+					},
+					...($user?.is_superuser
+						? [
+								{
+									name: 'Optimise All',
+									onclick: () => {
+										analyseAll(true, true);
+									},
+									icon: 'bi-plus-circle',
+									title: 'Load flight data',
+									disabled: false
+								}
+							]
+						: []),
+					{
+						name: 'Clear',
+						onclick: () => {
+							clearDataLoading();
+						},
+						icon: 'bi-trash',
+						title: 'Clear the current flight',
+						disabled: false
+					}
+				]
+			: [],
+		'/flight/results/manoeuvre': [
+			{
+				name: 'View',
+				href: resolve('/flight/results/manoeuvre/'),
+				icon: 'bi-card-text',
+				title: 'View Manoeuvre',
+				disabled: false
+			},
+			{
+				name: 'Segmentation',
+				href: resolve('/flight/results/manoeuvre/segmentation/'),
+				icon: 'bi-align-center',
+				title: 'Edit Element Segmentation',
+				disabled: false
+			},
+			{
+				name: 'Intra',
+				href: resolve('/flight/results/manoeuvre/intra/'),
+				icon: 'bi-columns-gap',
+				title: 'Intra Element Downgrades',
+				disabled: false
+			},
+			{
+				name: 'Inter',
+				href: resolve('/flight/results/manoeuvre/inter/'),
+				icon: 'bi-columns',
+				title: 'Inter Element Downgrades',
+				disabled: false
+			},
+			{
+				name: 'Positioning',
+				href: resolve('/flight/results/manoeuvre/positioning/'),
+				icon: 'bi-box',
+				title: 'Box downgrades',
+				disabled: false
+			},
+			{
+				name: 'Templates',
+				href: resolve('/flight/results/manoeuvre/templates/'),
+				icon: 'bi-file-earmark-text',
+				title: 'Show templates',
+				disabled: false
+			},
+			{
+				name: 'Back',
+				href: resolve('/flight/results'),
+				icon: 'bi-arrow-left',
+				title: 'Back to results',
+				disabled: false
+			}
+		],
+		'/database': [
+			{
+				href: resolve('/database/leaderboards'),
+				name: 'Leaderboards',
+				title: 'Show results in a table',
+				icon: 'bi-trophy'
+			},
+			{
+				href: resolve('/database/map'),
+				name: 'Map',
+				title: 'Show results in a map',
+				icon: 'bi-map'
+			}
+		],
+		'/competition/view': [
+			{
+				name: 'Results',
+				icon: 'bi-trophy',
+				title: 'Show results table',
+        active: true,
+			},
+			{
+				name: 'Running Order',
+				icon: 'bi-list-ol',
+				title: 'Show running order table'
+			}
+		]
+	});
 
 	const n = $derived($nMans - $nRunning);
 
+	$effect(() => {
+    let selectedNavBarItems = undefined;
+
+    for (const [path, items] of Object.entries(navBarItems)) {
+      if (page.url.pathname.startsWith(path)) {
+        selectedNavBarItems = items;
+      }
+    }
+
+    nbc.reset(selectedNavBarItems || []);
+
+	});
+
+	//$effect(()=>{nbc.checkUrl(page.url.pathname)});
 </script>
 
 <nav
@@ -66,20 +210,24 @@
 		</div>
 
 		<div class="col navbar-nav d-none d-lg-block" id="pageMenu">
-      <div class="row px-4">
-			{#each $navBarContents.items as pageLink, i }
-				<button
-					class="col-auto px-3 nav-link {$navBarContents.active.has(pageLink.name) ? 'active' : ''}"
-					role="link"
-					onclick={() => {nbc.click(i)}}
-					title={pageLink.title}
-					data-sveltekit-preload-data="tap"
-					disabled={pageLink.disabled}
-				>
-					{pageLink.name}
-				</button>
-			{/each}
-      </div>
+			<div class="row px-4">
+				{#each $navBarContents.items as pageLink, i}
+					<button
+						class="col-auto px-3 nav-link {pageLink.active
+							? 'active'
+							: ''}"
+						role="link"
+						onclick={() => {
+							nbc.click(i);
+						}}
+						title={pageLink.title}
+						data-sveltekit-preload-data="tap"
+						disabled={pageLink.disabled}
+					>
+						{pageLink.name}
+					</button>
+				{/each}
+			</div>
 		</div>
 
 		<ul class="col-auto justify-content-end navbar-nav">

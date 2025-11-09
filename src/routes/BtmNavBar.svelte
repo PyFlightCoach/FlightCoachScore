@@ -10,7 +10,7 @@
 			<div class="col row">
 				{#each $navBarContents.items as pageLink, i}
 					<button
-						class="col px-4 nav-link {$navBarContents.active.has(pageLink.name) ? 'bg-secondary' : ''}"
+						class="col px-4 nav-link {pageLink.active ? 'bg-secondary' : ''}"
 						role="link"
 						onclick={() => {
 							nbc.click(i);
