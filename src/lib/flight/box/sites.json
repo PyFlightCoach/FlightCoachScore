@@ -50,13 +50,27 @@
                                 "value": "1",
                                 "label": "1",
                                 "pilotGPS": {
-                                    "lat": "-36.753394",
-                                    "lng": "144.090520",
+                                    "lat": "-36.753411",
+                                    "lng": "144.090587",
                                     "alt": "191.00"
                                 },
                                 "centerGPS": {
-                                    "lat": "-36.754042", 
-                                    "lng": "144.090405",
+                                    "lat": "-36.764460", 
+                                    "lng": "144.088657",
+                                    "alt": "191.00"
+                                }
+                            },
+                            {
+                                "value": "2",
+                                "label": "2",
+                                "pilotGPS": {
+                                    "lat": "-36.753438",
+                                    "lng": "144.090851",
+                                    "alt": "191.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "-36.765305", 
+                                    "lng": "144.089293",
                                     "alt": "191.00"
                                 }
                             }
@@ -565,6 +579,26 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "value": "Pontville",
+                        "label": "Pontville",
+                        "children": [
+                            {
+                                "value": "RFAM",
+                                "label": "RFAM",
+                                "pilotGPS": {
+                                    "lat": "-42.665578",
+                                    "lng": "147.260162",
+                                    "alt": "59.1"
+                                },
+                                "centerGPS": {
+                                    "lat": "-42.666256",
+                                    "lng": "147.259091",
+                                    "alt": "59.1"
+                                }
+                            }
+                        ]
                     }
                 ]
             },
@@ -1026,6 +1060,45 @@
                         ]
                     },
                     {
+                        "value": "La Plata",
+                        "label": "La Plata",
+                        "children": [
+                            {
+                                "value": "Calp linea recta",
+                                "label": "Calp linea recta",
+                                "pilotGPS": {
+                                    "lat": "-34.968504",
+                                    "lng": "-57.880805",
+                                    "alt": "15.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "-34.969601",
+                                    "lng": "-57.882054",
+                                    "alt": "15.00"
+                                }
+                            }
+                        ]
+                    },{
+                        "value": "La Plata",
+                        "label": "La Plata",
+                        "children": [
+                            {
+                                "value": "CALP pista N-S",
+                                "label": "CALP pista N-S",
+                                "pilotGPS": {
+                                    "lat": "-34.968504",
+                                    "lng": "-57.880805",
+                                    "alt": "15.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "-34.96852",
+                                    "lng": "-57.88246",
+                                    "alt": "15.00"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "value": "Villa Gesell",
                         "label": "Villa Gesell",
                         "children": [
@@ -1062,12 +1135,32 @@
                 ]
             },
             {
-                "value": "Las Perdices",
-                "label": "Las Perdices",
+                "value": "Cordoba",
+                "label": "Cordoba",
                 "children": [
                     {
-                        "value": "Cordoba",
-                        "label": "Cordoba",
+                        "value": "Alta Garcia",
+                        "label": "Alta Garcia",
+                        "children": [
+                            {
+                                "value": "Alta Garcia Sur",
+                                "label": "Alta Garcia Sur",
+                                "pilotGPS": {
+                                    "lat": "-31.652678",
+                                    "lng": "-64.392578",
+                                    "alt": "544.3"
+                                },
+                                "centerGPS": {
+                                    "lat": "-31.652340",
+                                    "lng": "-64.392744",
+                                    "alt": "544.3"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "value": "Las Perdices",
+                        "label": "Las Perdices",
                         "children": [
                             {
                                 "value": "La Carona",
@@ -1335,6 +1428,46 @@
                 "value": "Belgium",
                 "label": "Belgium",
                 "children": [
+                    {
+                        "value": "Nivelles",
+                        "label": "Nivelles",
+                        "children": [
+                            {
+                                "value": "JDM Nivelles",
+                                "label": "JDM Nivelles",
+                                "pilotGPS": {
+                                    "lat": "50.5771399",
+                                    "lng": "4.3739585",
+                                    "alt": "150.3"
+                                },
+                                "centerGPS": {
+                                    "lat": "50.5775992",
+                                    "lng": "4.3761343",
+                                    "alt": "150.3"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "value": "Merchtem",
+                        "label": "Merchtem",
+                        "children": [
+                            {
+                                "value": "Moonrakers",
+                                "label": "Moonrakers",
+                                "pilotGPS": {
+                                    "lat": "50.9401758",
+                                    "lng": "4.2101709",
+                                    "alt": "35.4"
+                                },
+                                "centerGPS": {
+                                    "lat": "50.9409202",
+                                    "lng": "4.2117036",
+                                    "alt": "35.40"
+                                }
+                            }
+                        ]
+                    },
                     {
                         "value": "Saint-Géry",
                         "label": "Saint-Géry",
@@ -2388,6 +2521,32 @@
                 ]
             },
             {
+                "value": "Mělník",
+                "label": "Mělník",
+                "children": [
+                    {
+                        "value": "Neratovice",
+                        "label": "Neratovice",
+                        "children": [
+                            {
+                                "value": "RCK Neratovice",
+                                "label": "RCK Neratovice",
+                                "pilotGPS": {
+                                    "lat": "50.2662622",
+                                    "lng": "14.4896619",
+                                    "alt": "165.9"
+                                },
+                                "centerGPS": {
+                                    "lat": "50.2664756",
+                                    "lng": "14.4897756",
+                                    "alt": "165.9"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "value": "Prague-East",
                 "label": "Prague-East",
                 "children": [
@@ -2446,6 +2605,90 @@
                 ]
             }
         ]        
+    },
+    {
+        "value": "Deutschland",
+        "label": "Deutschland",
+        "children": [
+            {
+                "value": "Bayern",
+                "label": "Bayern",
+                "children": [
+                    {
+                        "value": "Tauting",
+                        "label": "Tauting",
+                        "children": [
+                            {
+                                "value": "MFVW",
+                                "label": "MFVW",
+                                "pilotGPS": {
+                                    "lat": "47.756060",
+                                    "lng": "11.185037",
+                                    "alt": "638.50"
+                                },
+                                "centerGPS": {
+                                    "lat": "47.756130",
+                                    "lng": "11.185270",
+                                    "alt": "638.50"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Hessen",
+                "label": "Hessen",
+                "children": [
+                    {
+                        "value": "Berkach",
+                        "label": "Berkach",
+                        "children": [
+                            {
+                                "value": "LufthansaSportverein",
+                                "label": "LufthansaSportverein",
+                                "pilotGPS": {
+                                    "lat": "49.891966",
+                                    "lng": "8.477207",
+                                    "alt": "86.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "49.891994",
+                                    "lng": "8.476867",
+                                    "alt": "86.00"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Hessen",
+                "label": "Hessen",
+                "children": [
+                    {
+                        "value": "Dreieich",
+                        "label": "Dreieich",
+                        "children": [
+                            {
+                                "value": "FSV Dreieich",
+                                "label": "FSV Dreieich",
+                                "pilotGPS": {
+                                    "lat": "50.021176",
+                                    "lng": "8.718156",
+                                    "alt": "151.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "50.018226",
+                                    "lng": "8.720570",
+                                    "alt": "151.00"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     },
     {
         "value": "Ecuador",
@@ -3182,6 +3425,32 @@
                 ]
             },
             {
+                "value": "Herault",
+                "label": "Herault",
+                "children": [
+                    {
+                        "value": "Bessan",
+                        "label": "Bessan",
+                        "children": [
+                            {
+                                "value": "Aile Volante Bessan",
+                                "label": "Aile Volante Bessan",
+                                "pilotGPS": {
+                                    "lat": "43.341682",
+                                    "lng": "3.408270",
+                                    "alt": "15"
+                                },
+                                "centerGPS": {
+                                    "lat": "43.342566",
+                                    "lng": "3.408758",
+                                    "alt": "15"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "value": "Ile de France",
                 "label": "Ile de France",
                 "children": [
@@ -3356,6 +3625,20 @@
                                     "lng": "1.111715",
                                     "alt": "105"
                                 }
+                            },
+                            {
+                                "value": "CMD 3",
+                                "label": "CMD 3",
+                                "pilotGPS": {
+                                    "lat": "49.849115",
+                                    "lng": "1.111013",
+                                    "alt": "105"
+                                },
+                                "centerGPS": {
+                                    "lat": "49.84959253270718",
+                                    "lng": "1.1129659737255122",
+                                    "alt": "105"
+                                }
                             }
                         ]
                     }
@@ -3436,64 +3719,6 @@
         ]
     },    
     {
-        "value": "Germany",
-        "label": "Germany",
-        "children": [
-            {
-                "value": "Hessen",
-                "label": "Hessen",
-                "children": [
-                    {
-                        "value": "Berkach",
-                        "label": "Berkach",
-                        "children": [
-                            {
-                                "value": "LufthansaSportverein",
-                                "label": "LufthansaSportverein",
-                                "pilotGPS": {
-                                    "lat": "49.891966",
-                                    "lng": "8.477207",
-                                    "alt": "86.00"
-                                },
-                                "centerGPS": {
-                                    "lat": "49.891994",
-                                    "lng": "8.476867",
-                                    "alt": "86.00"
-                                }
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "value": "Hessen",
-                "label": "Hessen",
-                "children": [
-                    {
-                        "value": "Dreieich",
-                        "label": "Dreieich",
-                        "children": [
-                            {
-                                "value": "FSV Dreieich",
-                                "label": "FSV Dreieich",
-                                "pilotGPS": {
-                                    "lat": "50.021176",
-                                    "lng": "8.718156",
-                                    "alt": "151.00"
-                                },
-                                "centerGPS": {
-                                    "lat": "50.018226",
-                                    "lng": "8.720570",
-                                    "alt": "151.00"
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    {
         "value": "Hong Kong",
         "label": "Hong Kong",
         "children": [
@@ -3531,6 +3756,64 @@
                                     "lat": "22.41484",
                                     "lng": "114.04322",
                                     "alt": "98.70"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "value": "Hungary",
+        "label": "Hungary",
+        "children": [
+            {
+                "value": "GyMS",
+                "label": "GyMS",
+                "children": [
+                    {
+                        "value": "Győr",
+                        "label": "Győr",
+                        "children": [
+                            {
+                                "value": "Sokoró RC Modell KSE",
+                                "label": "Sokoró RC Modell KSE",
+                                "pilotGPS": {
+                                    "lat": "47.60008849703068",
+                                    "lng": "17.595757575579405",
+                                    "alt": "122.5"
+                                },
+                                "centerGPS": {
+                                    "lat": "47.60038734505402",
+                                    "lng": "17.596097022284294",
+                                    "alt": "122.5"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Pest",
+                "label": "Pest",
+                "children": [
+                    {
+                        "value": "Ócsa",
+                        "label": "Ócsa",
+                        "children": [
+                            {
+                                "value": "Ferihegy3",
+                                "label": "Ferihegy3",
+                                "pilotGPS": {
+                                    "lat": "47.330340",
+                                    "lng": "19.286296",
+                                    "alt": "110.0"
+                                },
+                                "centerGPS": {
+                                    "lat": "47.330766",
+                                    "lng": "19.286935",
+                                    "alt": "110.0"
                                 }
                             }
                         ]
@@ -3902,20 +4185,20 @@
                 "label": "Fukushima",
                 "children": [
                     {
-                        "value": "Fukushima",
-                        "label": "Fukushima",
+                        "value": "Sukagawa",
+                        "label": "Sukagawa",
                         "children": [
                             {
-                                "value": "EW",
-                                "label": "EW",
+                                "value": "NSRC",
+                                "label": "NSRC",
                                 "pilotGPS": {
-                                    "lat": "37.2931518825118",
-                                    "lng": "140.402047075462",
+                                    "lat": "37.29310833",
+                                    "lng": "140.40203055",
                                     "alt": "237.00"
                                 },
                                 "centerGPS": {
-                                    "lat": "37.2944952697024",
-                                    "lng": "140.402201357188",
+                                    "lat": "37.29376666",
+                                    "lng": "140.40215555",
                                     "alt": "237.00"
                                 }
                             }
@@ -4132,6 +4415,26 @@
                 "label": "Ibaraki",
                 "children": [
                     {
+                        "value": "Goka",
+                        "label": "Goka",
+                        "children": [
+                            {
+                                "value": "五霞フライング",
+                                "label": "五霞フライング",
+                                "pilotGPS": {
+                                    "lat": "36.1273343",
+                                    "lng": "139.7494865",
+                                    "alt": "12.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "36.1274825",
+                                    "lng": "139.7494976",
+                                    "alt": "12.00"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "value": "Moriya",
                         "label": "Moriya",
                         "children": [
@@ -4310,6 +4613,26 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "value": "Mizusawa",
+                        "label": "Mizusawa",
+                        "children": [
+                            {
+                                "value": "IKRC",
+                                "label": "IKRC",
+                                "pilotGPS": {
+                                    "lat": "39.1606698",
+                                    "lng": "141.1627953",
+                                    "alt": "36.0"
+                                },
+                                "centerGPS": {
+                                    "lat": "39.1607057",
+                                    "lng": "141.1632171",
+                                    "alt": "36.0"
+                                }
+                            }
+                        ]
                     }
                 ]
             },
@@ -4448,6 +4771,26 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "value": "Wakayanagi",
+                        "label": "Wakayanagi",
+                        "children": [
+                            {
+                                "value": "WRC",
+                                "label": "WRC",
+                                "pilotGPS": {
+                                    "lat": "38.72747222",
+                                    "lng": "141.18191666",
+                                    "alt": "9.0"
+                                },
+                                "centerGPS": {
+                                    "lat": "38.72775000",
+                                    "lng": "141.18220277",
+                                    "alt": "9.0"
+                                }
+                            }
+                        ]
                     }
                 ]
             },
@@ -4563,6 +4906,20 @@
                                     "lat": "36.1728965",
                                     "lng": "139.6516469",
                                     "alt": "15.00"
+                                }
+                            },
+                            {
+                                "value": "加須FC　第一",
+                                "label": "加須FC　第一",
+                                "pilotGPS": {
+                                    "lat": "36.190712",
+                                    "lng": "139.612639",
+                                    "alt": "22.50"
+                                },
+                                "centerGPS": {
+                                    "lat": "36.190933",
+                                    "lng": "139.612828",
+                                    "alt": "22.50"
                                 }
                             }
                         ]
@@ -4780,8 +5137,8 @@
                 "label": "Tokushima",
                 "children": [
                     {
-                        "value": "徳島",
-                        "label": "徳島",
+                        "value": "石井",
+                        "label": "石井",
                         "children": [
                             {
                                 "value": "T.F.C",
@@ -4795,6 +5152,20 @@
                                     "lat": "34.091572",
                                     "lng": "134.410217",
                                     "alt": "11.00"
+                                }
+                            },
+                            {
+                                "value": "TRC",
+                                "label": "TRC",
+                                "pilotGPS": {
+                                    "lat": "34.103326",
+                                    "lng": "134.449516",
+                                    "alt": "10.00"
+                                },
+                                "centerGPS": {
+                                    "lat": "34.103599",
+                                    "lng": "134.449525",
+                                    "alt": "10.00"
                                 }
                             }
                         ]
@@ -4893,6 +5264,32 @@
                                     "lat": "34.505880",
                                     "lng": "131.600056",
                                     "alt": "544.00"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "Yamanashi",
+                "label": "Yamanashi",
+                "children": [
+                    {
+                        "value": "市川三郷",
+                        "label": "市川三郷",
+                        "children": [
+                            {
+                                "value": "YMCA",
+                                "label": "YMCA",
+                                "pilotGPS": {
+                                    "lat": "35.5639730",
+                                    "lng": "138.4811516",
+                                    "alt": "242.5"
+                                },
+                                "centerGPS": {
+                                    "lat": "35.5640935",
+                                    "lng": "138.4809915",
+                                    "alt": "242.5"
                                 }
                             }
                         ]
@@ -5702,6 +6099,20 @@
                                             "lng": "21.4862034",
                                             "alt": "157.00"
                                         }
+                                    },
+                                    {
+                                        "value": "South RWY",
+                                        "label": "South RWY",
+                                        "pilotGPS": {
+                                            "lat": "50.3726333",
+                                            "lng": "21.4835682",
+                                            "alt": "157.00"
+                                        },
+                                        "centerGPS": {
+                                            "lat": "50.3721152",
+                                            "lng": "21.4832741",
+                                            "alt": "157.00"
+                                        }
                                     }
                                 ]
                             }
@@ -6276,21 +6687,7 @@
                     {
                         "value": "Aargau",
                         "label": "Aargau",
-                        "children": [
-                            {
-                                "value": "Gnadenthal",
-                                "label": "Gnadenthal",
-                                "pilotGPS": {
-                                    "lat": "47.3870206",
-                                    "lng": "8.300321",
-                                    "alt": "371"
-                                },
-                                "centerGPS": {
-                                    "lat": "47.3876623",
-                                    "lng": "8.3017732",
-                                    "alt": "371"
-                                }
-                            },
+                        "children": [                            
                             {
                                 "value": "Auenstein",
                                 "label": "Auenstein",
@@ -6302,6 +6699,34 @@
                                 "centerGPS": {
                                     "lat": "47.455934",
                                     "lng": "8.152891",
+                                    "alt": "371"
+                                }
+                            },
+                            {
+                                "value": "Birrfeld",
+                                "label": "Birrfeld",
+                                "pilotGPS": {
+                                    "lat": "47.444469",
+                                    "lng": "8.238520",
+                                    "alt": "395.6"
+                                },
+                                "centerGPS": {
+                                    "lat": "47.452926",
+                                    "lng": "8.234738",
+                                    "alt": "395.6"
+                                }
+                            },
+                            {
+                                "value": "Gnadenthal",
+                                "label": "Gnadenthal",
+                                "pilotGPS": {
+                                    "lat": "47.3870206",
+                                    "lng": "8.300321",
+                                    "alt": "371"
+                                },
+                                "centerGPS": {
+                                    "lat": "47.3876623",
+                                    "lng": "8.3017732",
                                     "alt": "371"
                                 }
                             }
@@ -7082,6 +7507,20 @@
                                 "centerGPS": {
                                     "lat": "52.885499",
                                     "lng": "-0.899920",
+                                    "alt": "38.40"
+                                }
+                            },
+                            {
+                                "value": "CL1",
+                                "label": "CL1",
+                                "pilotGPS": {
+                                    "lat": "52.780146",
+                                    "lng": "-0.704541",
+                                    "alt": "38.4"
+                                },
+                                "centerGPS": {
+                                    "lat": "52.780581",
+                                    "lng": "-0.703857",
                                     "alt": "38.40"
                                 }
                             }
@@ -8682,6 +9121,26 @@
                         ]
                     },
                     {
+                        "value": "Hartwick",
+                        "label": "Hartwick",
+                        "children": [
+                            {
+                                "value": "GMO",
+                                "label": "GMO",
+                                "pilotGPS": {
+                                    "lat": "42.73176",
+                                    "lng": "-75.05761",
+                                    "alt": "523.5"
+                                },
+                                "centerGPS": {
+                                    "lat": "42.73148",
+                                    "lng": "-75.05611",
+                                    "alt": "523.5"                                    
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "value": "Haverstraw",
                         "label": "Haverstraw",
                         "children": [
@@ -8871,6 +9330,26 @@
                 "value": "South Carolina",
                 "label": "South Carolina",
                 "children": [
+                    {
+                        "value": "Aynor",
+                        "label": "Aynor",
+                        "children": [
+                            {
+                                "value": "Staples Field",
+                                "label": "Staples Field",
+                                "pilotGPS": {
+                                    "lat": "34.0089061",
+                                    "lng": "-79.1428264",
+                                    "alt": "30.0"
+                                },
+                                "centerGPS": {
+                                    "lat": "34.0091338",
+                                    "lng": "-79.1427644",
+                                    "alt": "30.0"
+                                }
+                            }
+                        ]
+                    },
                     {
                         "value": "Tabor City",
                         "label": "Tabor City",

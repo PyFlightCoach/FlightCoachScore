@@ -14,6 +14,8 @@
 	import { navBarContents } from '$lib/stores/navBarContents';
 	import { page } from '$app/state';
 	import { analyseAll, clearDataLoading } from '$lib/flight/analysis';
+  import { goto } from '$app/navigation';
+  
 	let { hasHelp = $bindable() }: { hasHelp: boolean } = $props();
 
 	const navBarItems = $derived({
@@ -109,21 +111,21 @@
 			},
 			{
 				name: 'Back',
-				href: resolve('/flight/results'),
 				icon: 'bi-arrow-left',
 				title: 'Back to results',
+        onclick: () =>{goto(resolve('/flight/results'))},
 				disabled: false
 			}
 		],
 		'/database': [
 			{
-				href: resolve('/database/leaderboards'),
+				href: resolve('/database/leaderboards/'),
 				name: 'Leaderboards',
 				title: 'Show results in a table',
 				icon: 'bi-trophy'
 			},
 			{
-				href: resolve('/database/map'),
+				href: resolve('/database/map/'),
 				name: 'Map',
 				title: 'Show results in a map',
 				icon: 'bi-map'

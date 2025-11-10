@@ -23,13 +23,9 @@ export class NavBarContents {
 	constructor(
 		readonly items: NavBarPage[] = [],
 	) {
-    this.items.forEach(item => {
-      console.log(`Checking nav item ${item.href} against ${page.url.pathname}`);
-      if (page.url.pathname == item.href) {
-        console.log(`Activating nav item ${item.href}`);
-        item.active = true;
-      }
-    });
+    this.items.filter(item => item.href).forEach(item=>item.active = false);
+    const activeItem = this.items.findLast(item => page.url.pathname.startsWith(item.href as string));
+    if (activeItem) activeItem.active = true;
   }
 
 	activate(i: number, unsetOthers = true) {

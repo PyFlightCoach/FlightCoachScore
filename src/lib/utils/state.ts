@@ -311,6 +311,8 @@ export class States {
 	body_to_world(p: Point) {
 		return this.data.map((st) => st.body_to_world(p));
 	}
+
+  
 	static from_xkf1(box: Origin, orgn: BinField, xkf1: BinField) {
 		const xorg = new GPS(orgn.Lat[0], orgn.Lng[0], orgn.Alt[0]);
 		const box_rot = Quaternion.parse_euler(

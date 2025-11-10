@@ -3,14 +3,15 @@
 	import { navBarContents, showCollapseToggle } from '$lib/stores/navBarContents';
 </script>
 
-{#if $navBarContents.items.length || $showCollapseToggle}
-	<nav class="navbar fixed-bottom navbar-expand-lg bg-body-secondary d-lg-none p-0">
-		<div class="container-fluid justify-content-between ">
+{#if $showCollapseToggle}
+	
+		<div class="container-fluid d-flex flex-row justify-content-between p-0 bg-light border-top">
 			<div class="col-auto"></div>
-			<div class="col row">
+      <div class="col-auto p-0 justify-content-center">
+        <div class="btn-group">
 				{#each $navBarContents.items as pageLink, i}
 					<button
-						class="col px-4 nav-link {pageLink.active ? 'bg-secondary' : ''}"
+						class="px-3 btn btn-outline-secondary {pageLink.active ? 'bg-secondary' : ''}"
 						role="link"
 						onclick={() => {
 							nbc.click(i);
@@ -26,6 +27,7 @@
 						{/if}
 					</button>
 				{/each}
+        </div>
 			</div>
 			<div class="col-auto">
 				{#if $showCollapseToggle}
@@ -42,5 +44,5 @@
 				{/if}
 			</div>
 		</div>
-	</nav>
+
 {/if}

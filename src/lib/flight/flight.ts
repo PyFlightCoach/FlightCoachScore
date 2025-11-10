@@ -14,7 +14,6 @@ import { get } from 'svelte/store';
 import type { DBSchedule } from '$lib/schedule/db';
 import { objfilter } from '$lib/utils/arrays';
 
-
 export class BinDataState {
 	constructor(
 		readonly data: BinData,
@@ -53,7 +52,6 @@ export class FlightDataSource {
 		readonly history: Record<string, unknown>[] = []
 	) {}
 
-	
 	get states(): States {
 		if (this.rawData instanceof States) {
 			return this.rawData;
@@ -64,16 +62,25 @@ export class FlightDataSource {
 		}
 	}
 
-	statesAtNewOrigin(newOrigin: Origin): States {    
-    const vec = GPS.sub(this.origin!.pilot, newOrigin.pilot);
-    const rot = Quaternion.mul(this.origin!.rotation.inverse(), newOrigin.rotation);
-    return this.states.transform(vec, rot);
+  checkOriginElevation(newOrigin : Origin | undefined, tol: number = 10) : boolean {
+    if (this.rawData! instanceof BinData ) {
+      const origin = this.rawData!.findOrigin();
+      return Math.abs(((newOrigin || this.origin!).alt - origin.alt)) < tol;
+    }
+    return true;
+  }
+
+
+	statesAtNewOrigin(newOrigin: Origin): States {
+		const vec = GPS.sub(this.origin!.pilot, newOrigin.pilot);
+		const rot = Quaternion.mul(this.origin!.rotation.inverse(), newOrigin.rotation);
+		return this.states.transform(vec, rot);
 	}
 
-gps() {
+	gps() {
 		const ned_sts = this.states.transform(new Point(0, 0, 0), this.origin!.rotation);
-    const pilot = this.origin!.pilot;
-    return ned_sts.data.map((s) => pilot.offset(s.pos));
+		const pilot = this.origin!.pilot;
+		return ned_sts.data.map((s) => pilot.offset(s.pos));
 	}
 
 	withNewOrigin(newOrigin: Origin): FlightDataSource {
@@ -84,22 +91,19 @@ gps() {
 	}
 
 	withNewSegmentation(newSegmentation: Splitting): FlightDataSource {
-
-    const updatedHistory = newSegmentation.mans.slice(1,-1).map((m, i) => {
-      if (equals(m, this.segmentation?.mans[i+1] || {}) || !this.history[i]) {
-        return this.history[i];
-      } else {
-        return objfilter(this.history[i], (k)=> k != get(faVersion));
-      }
-    });
-
-
+		const updatedHistory = newSegmentation.mans.slice(1, -1).map((m, i) => {
+			if (equals(m, this.segmentation?.mans[i + 1] || {}) || !this.history[i]) {
+				return this.history[i];
+			} else {
+				return objfilter(this.history[i], (k) => k != get(faVersion));
+			}
+		});
 
 		return Object.assign(this, {
 			segmentation: newSegmentation,
 			schedule: newSegmentation.schedule,
 			rawData: this.rawData instanceof BinData ? this.rawData : this.states,
-      history: updatedHistory
+			history: updatedHistory
 		});
 	}
 
@@ -108,12 +112,11 @@ gps() {
 		if (this.rawData instanceof BinData) {
 			return new BinDataState(this.rawData.slice(tstart, tstop), this.origin!);
 		} else {
-
-      let states: States = this.states!.slice(istart, istop);
-      const elements = states.element;
-      if (elements[0] != "entry_line" || elements[elements.length - 1] != "exit_line") {
-        states = states.removeLabels();
-      }
+			let states: States = this.states!.slice(istart, istop);
+			const elements = states.element;
+			if (elements[0] != 'entry_line' || elements[elements.length - 1] != 'exit_line') {
+				states = states.removeLabels();
+			}
 
 			return new GlobalState(states, this.origin!);
 		}
@@ -123,7 +126,7 @@ gps() {
 		return analysisServer
 			.get('example', blockProgress('Downloading Example'))
 			.then(async (res) => {
-        const splitting = await Splitting.parseAJson(res.data);
+				const splitting = await Splitting.parseAJson(res.data);
 				return new FlightDataSource(
 					undefined,
 					'example',
@@ -131,10 +134,10 @@ gps() {
 					new Date(Date.parse(res.data.bootTime)),
 					res.data as AJson,
 					Object.setPrototypeOf(res.data.origin, Origin.prototype),
-          splitting,
-          splitting.schedule,
-          undefined,
-          res.data.mans.map((m: AJMan) => m.history || {})
+					splitting,
+					splitting.schedule,
+					undefined,
+					res.data.mans.map((m: AJMan) => m.history || {})
 				);
 			})
 			.finally(unblockProgress);
@@ -259,9 +262,9 @@ gps() {
 						ajson,
 						this.origin,
 						this.segmentation,
-            this.schedule,
-            this.acroWrxMeta,
-            this.history
+						this.schedule,
+						this.acroWrxMeta,
+						this.history
 					),
 					compthing: res.data.compthing
 				};

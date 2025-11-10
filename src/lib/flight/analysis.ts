@@ -232,7 +232,7 @@ export async function loadAcrowrx(file: File): Promise<void> {
 					undefined,
 					new Date(Date.parse(response.data.boot_time)),
 					States.parse(response.data.data),
-					Object.setPrototypeOf(response.data.origin, Origin.prototype),
+					Origin.parse(response.data.origin),
 					Splitting.default(),
 					undefined,
 					response.data.meta
@@ -306,7 +306,6 @@ export async function analyseManoeuvre(
 }
 
 export async function checkDuplicate(md5: string, onload: () => void = () => {}) {
-	//await cat(bin, 'readAsArrayBuffer').then(md5);
 	return dbServer
 		.get(`flight/check_duplicate/${md5}`)
 		.then((res) => {
@@ -314,11 +313,11 @@ export async function checkDuplicate(md5: string, onload: () => void = () => {})
 			return undefined;
 		})
 		.catch((err) => {
-			console.log(err);
 			if (err.status === 409) {
         const detail: string | {is_a_duplicate: boolean; reason: string; id: string} = err.response.data.detail
 				return typeof detail == 'string' ? detail.split('id[')[1].split(']')[0] : detail.id;
 			} else {
+        console.error(err);
 				alert('Error checking duplicate: ' + prettyPrintHttpError(err));
 			}
 		})
@@ -333,9 +332,6 @@ export async function checkDuplicate(md5: string, onload: () => void = () => {})
             goto(resolve('/flight/results'));
             onload();
           });
-            
-			} else if (duplicate) {
-				throw new Error('Duplicate flight');
-			}
+			} 
 		});
 }

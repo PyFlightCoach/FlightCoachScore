@@ -179,7 +179,7 @@
 </script>
 
 <div
-	class="container-fluid h-100 d-flex flex-column p-0"
+	class="container-fluid h-100 d-flex flex-column p-0 "
 	role="button"
 	tabindex="0"
 	onmousedown={() => {

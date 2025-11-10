@@ -6,7 +6,7 @@ import { DBSchedule, type DBManoeuvre } from '$lib/schedule/db';
 import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
-import type { AJson, AJMan } from './ajson';
+import type { AJson } from './ajson';
 
 export interface Split {
 	category_name?: string | undefined;

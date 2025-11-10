@@ -67,11 +67,16 @@
 			<MainNavBar bind:hasHelp={pageHasHelp} />
 		</div>
 		<div class="row flex-grow-1 justify-content-center">
-			<slot />
+      <div class="container-fluid  d-flex flex-column p-0 b-0 ">
+			  <div class="col container-fluid d-flex flex-row p-0" >
+        <slot />
+        </div>
+        <div class="col-auto p-0">
+          <BtmNavBar/>
+          </div>
+      </div>
 		</div>
-    <div class="row justify-self-end">
-      <BtmNavBar/>
-    </div>
+    
 		
 	{/if}
 </div>
