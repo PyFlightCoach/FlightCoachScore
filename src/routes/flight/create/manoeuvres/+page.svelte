@@ -113,7 +113,7 @@
 
 <SideBarLayout sideBarWidth={3}>
 	{#snippet side()}
-		<div class="row">
+		<div class="row p-0">
 			<span class="h4 fw-bold text-start px-4 mt-2">Segment into Manoeuvres</span>
 		</div>
 		<hr class="mt-0" />

@@ -25,9 +25,9 @@
 	const getTopFlights = $derived($user ? loadTopFlights(3) : undefined);
 </script>
 
-<div class="row justify-content-around">
-	<div class="col-lg-{$user ? '6' : '10'} col-auto px-lg-2 px-0">
-		<div class="row mb-3">
+<div class="row ps-4 w-100">
+	<div class="col-lg-{$user ? '6' : '10'} col-auto  ">
+		<div class="row mb-3 ">
 			<h1 class="text-center pt-3 h-1">Flight Coach Score</h1>
 			<lead class="lead text-center text-muted"
 				>Automatic judging and score sharing for precision aerobatics</lead
