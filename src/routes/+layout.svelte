@@ -66,12 +66,12 @@
 		<div class="row justify-self-start">
 			<MainNavBar bind:hasHelp={pageHasHelp} />
 		</div>
-		<div class="row flex-grow-1 justify-content-center w-100">
+		<div class="row flex-grow-1 justify-content-center">
       <div class="container-fluid  d-flex flex-column p-0  ">
-			  <div class="col container-fluid d-flex flex-row p-0 " >
-        <slot />
+			  <div class="col container-fluid d-flex flex-row justify-content-center p-1 px-1 " >
+          <slot />
         </div>
-        <div class="col-auto p-0">
+        <div class="col-auto p-0 ">
           <BtmNavBar/>
           </div>
       </div>

@@ -11,7 +11,7 @@
         <div class="btn-group">
 				{#each $navBarContents.items as pageLink, i}
 					<button
-						class="px-3 btn btn-outline-secondary {pageLink.active ? 'bg-secondary' : ''}"
+						class="px-3 btn btn-outline-secondary {pageLink.active ? 'active' : ''}"
 						role="link"
 						onclick={() => {
 							nbc.click(i);

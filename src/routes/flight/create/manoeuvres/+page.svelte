@@ -178,7 +178,7 @@
 								{i == 0
 									? 0
 									: mans[i].stop
-										? $activeFlight!.states!.t[mans[i].stop!].toFixed(1)
+										? $activeFlight!.states!.t[mans[i].stop!]?.toFixed(1) || "-"
 										: '-'}
 							</td>
 						</tr>
@@ -208,9 +208,9 @@
 	{/snippet}
 	{#snippet main()}
 		<div
-			class="container-fluid d-flex flex-column justify-content-between align-items-stretch h-100 p-2"
+			class="container-fluid d-flex flex-column justify-content-between align-items-stretch h-100 p-0"
 		>
-			<div class="col container-fluid border rounded p-1">
+			<div class="col container-fluid border rounded p-0">
 				<PlotSec
 					bind:i={activeIndex}
 					bind:range

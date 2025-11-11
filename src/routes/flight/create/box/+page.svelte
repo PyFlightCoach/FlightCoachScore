@@ -37,34 +37,49 @@
 		</div>
 		<hr class="mt-0" />
 		<div class="row">
-			<label for="displayOptions" class="col-auto col-form-label">Display:</label>
-			<div id="displayOptions" class="col mb-2 py-2 btn-group">
-				<input type="radio" class="btn-check" value="map" id="mapDisplay" bind:group={display} />
-				<label class="btn btn-outline-secondary btn-sm" for="mapDisplay">Map</label>
-				<input
-					type="radio"
-					class="btn-check"
-					value="state"
-					id="stateDisplay"
-					bind:group={display}
-				/>
-				<label class="btn btn-outline-secondary btn-sm" for="stateDisplay">3D</label>
+			<div class="col-auto">
+				<label for="displayOptions" class="col-auto col-form-label">Display:</label>
+				<div id="displayOptions" class="col-auto btn-group">
+					<input type="radio" class="btn-check" value="map" id="mapDisplay" bind:group={display} />
+					<label class="btn btn-outline-secondary btn-sm" for="mapDisplay">Map</label>
+					<input
+						type="radio"
+						class="btn-check"
+						value="state"
+						id="stateDisplay"
+						bind:group={display}
+					/>
+					<label class="btn btn-outline-secondary btn-sm" for="stateDisplay">3D</label>
+				</div>
 			</div>
-
-			<label for="boxOptions" class="col-auto col-form-label">Box:</label>
-			<div id="boxOptions" class="col mb-2 py-2 btn-group">
-				<input type="radio" class="btn-check" value="F3A" id="F3ADisplay" bind:group={boxDisplay} />
-				<label class="btn btn-outline-secondary btn-sm" for="F3ADisplay">F3A</label>
-				<input
-					type="radio"
-					class="btn-check"
-					value="IMAC"
-					id="IMACDisplay"
-					bind:group={boxDisplay}
-				/>
-				<label class="btn btn-outline-secondary btn-sm" for="IMACDisplay">IMAC</label>
-				<input type="radio" class="btn-check" value="IAC" id="IACDisplay" bind:group={boxDisplay} />
-				<label class="btn btn-outline-secondary btn-sm" for="IACDisplay">IAC/CIVA</label>
+			<div class="col-auto">
+				<label for="boxOptions" class="col-auto col-form-label">Box:</label>
+				<div id="boxOptions" class="col btn-group">
+					<input
+						type="radio"
+						class="btn-check"
+						value="F3A"
+						id="F3ADisplay"
+						bind:group={boxDisplay}
+					/>
+					<label class="btn btn-outline-secondary btn-sm" for="F3ADisplay">F3A</label>
+					<input
+						type="radio"
+						class="btn-check"
+						value="IMAC"
+						id="IMACDisplay"
+						bind:group={boxDisplay}
+					/>
+					<label class="btn btn-outline-secondary btn-sm" for="IMACDisplay">IMAC</label>
+					<input
+						type="radio"
+						class="btn-check"
+						value="IAC"
+						id="IACDisplay"
+						bind:group={boxDisplay}
+					/>
+					<label class="btn btn-outline-secondary btn-sm" for="IACDisplay">IAC/CIVA</label>
+				</div>
 			</div>
 		</div>
 		{#if !$activeFlight!.checkOriginElevation(newOrigin, 10)}

@@ -28,7 +28,7 @@
 		id="sidebar"
 		class="{showSidebar
 			? `col-${sideBarWidth}`
-			: 'offcanvas offcanvas-start'} bg-light border overflow-auto"
+			: 'offcanvas offcanvas-start'} bg-light border overflow-auto  "
 	>
 		{#if !showSidebar}
 			<div class="offcanvas-header">
@@ -37,7 +37,7 @@
 			</div>
 		{/if}
 		<div style="position:relative; height: 100%;">
-			<div class="container w-100 overflow-auto" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+			<div class="container-fluid overflow-auto" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
 				{@render side?.()}
 			</div>
 		</div>

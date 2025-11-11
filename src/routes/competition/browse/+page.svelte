@@ -11,8 +11,10 @@
 	);
 </script>
 
+<div class="container">
 <CompetitionSelect 
   bind:competition={$activeComp} 
   {filterSubset} 
   actionSubset={['View', 'Enter']} 
 />
+</div>

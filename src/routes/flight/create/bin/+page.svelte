@@ -49,13 +49,13 @@
 	);
 </script>
 
-<div class="container-auto py-4" style="max-width: 800px;">
+<div class="col" style="max-width:800px;">
 	<div class="container border rounded">
-		<div class="row px-1 mb-1">
+		<div class="row">
 			<label for="bin-file-input" class="col col-form-label">Select Ardupilot BIN File:</label>
 			<input
 				id="binfile"
-				class="col-auto form-control mt-1"
+				class="col-auto form-control"
 				style="max-width:400px;"
 				type="file"
 				accept=".bin, .BIN"
@@ -136,13 +136,12 @@
 		{/if}
 	</div>
 	{#if bin}
-		<div class="mt-1 container border rounded">
-			<p>
-				OPTIONAL: If a flight coach json file is included the box and manoeuvre splitting can be loaded from
-				it. This can also be set up manually within FCScore.
-			</p>
-
-			<div class="row px-1 mb-1">
+		<div class="container border rounded">
+			<span class=" row p-2">
+				OPTIONAL: If a flight coach json file is included the box and manoeuvre splitting can be
+				loaded from it. This can also be set up manually within FCScore.
+			</span>
+			<div class="row">
 				<label for="fcj_file" class="col col-form-label">Select Flight Coach JSON File:</label>
 				<input
 					id="fcj_file"
@@ -196,7 +195,7 @@
 							binData,
 							origin,
 							segmentation,
-              segmentation.schedule,
+							segmentation.schedule
 						);
 						goto(resolve('/flight/create/box'));
 					}}

@@ -3,9 +3,6 @@
 	import ResultsSidebar from './ResultsSidebar.svelte';
 	import AnalysisSummary from './AnalysisSummary.svelte';
 	import { totalScore } from '$lib/stores/analysis';
-
-
-
 </script>
 
 <SideBarLayout sideBarWidth={4}>
@@ -14,14 +11,13 @@
 	{/snippet}
 
 	{#snippet main()}
-		<div class="container-fluid">
-			<div class="row justify-content-center">
-				<div class="col-auto mt-4">
-					<AnalysisSummary />
-				</div>
-
-				<h2 class="">Total Score = {$totalScore}</h2>
+		<div class="container">
+      <div class="row justify-content-center py-xxl-5">
+			<div class="col-auto">
+				<AnalysisSummary />
 			</div>
+      </div>
+			<h2 class="row justify-content-center">Total Score = {$totalScore}</h2>
 		</div>
 	{/snippet}
 </SideBarLayout>

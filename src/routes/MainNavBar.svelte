@@ -54,16 +54,7 @@
 									disabled: false
 								}
 							]
-						: []),
-					{
-						name: 'Clear',
-						onclick: () => {
-							clearDataLoading();
-						},
-						icon: 'bi-trash',
-						title: 'Clear the current flight',
-						disabled: false
-					}
+						: [])
 				]
 			: [],
 		'/flight/results/manoeuvre': [
