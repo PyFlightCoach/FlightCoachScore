@@ -285,7 +285,7 @@ export async function analyseManoeuvre(
 			v[id] = true;
 			return v;
 		});
-
+    
 		await ma!
 			.run(optimise, reset)
 			.then((res) => {
