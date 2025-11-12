@@ -24,7 +24,7 @@ export class NavBarContents {
 		readonly items: NavBarPage[] = [],
 	) {
     this.items.filter(item => item.href).forEach(item=>item.active = false);
-    const activeItem = this.items.findLast(item => page.url.pathname.startsWith(item.href as string));
+    const activeItem = this.items.findLast(item => page.url.pathname.includes(item.href as string));
     if (activeItem) activeItem.active = true;
   }
 
