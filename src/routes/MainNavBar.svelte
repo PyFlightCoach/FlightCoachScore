@@ -15,6 +15,7 @@
 	import { page } from '$app/state';
 	import { analyseAll, clearDataLoading } from '$lib/flight/analysis';
   import { goto } from '$app/navigation';
+
   
 	let { hasHelp = $bindable() }: { hasHelp: boolean } = $props();
 
@@ -141,10 +142,12 @@
 
 	$effect(() => {
     let selectedNavBarItems = undefined;
-
+      
     for (const [path, items] of Object.entries(navBarItems)) {
-      if (page.url.pathname.startsWith(path)) {
+      console.log("checking:", resolve(path));    
+      if (page.url.pathname.startsWith(resolve(path))) {
         selectedNavBarItems = items;
+        break;
       }
     }
 

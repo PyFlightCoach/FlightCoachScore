@@ -77,3 +77,7 @@ export function prettyDate(date: Date | undefined, includeTime=true): string {
   return day;
   
 }
+
+export function noTrailingSlash(path: string) {
+  return path.endsWith("/") ? path.slice(0, path.length - 1 ) : path;
+}

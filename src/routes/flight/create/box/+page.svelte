@@ -8,7 +8,6 @@
 	import { BinData } from '$lib/flight/bin';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { GPS, Quaternion } from '$lib/utils/geometry';
 
 	let newOrigin = $state($activeFlight!.origin);
 
@@ -28,6 +27,10 @@
 	$effect(() => {
 		$isFullSize = boxDisplay === 'IAC';
 	});
+
+  $inspect($activeFlight?.origin);
+  $inspect(newOrigin);
+
 </script>
 
 <SideBarLayout sideBarWidth={4}>
