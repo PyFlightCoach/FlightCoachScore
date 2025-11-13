@@ -1,12 +1,12 @@
 import { writable, type Writable } from 'svelte/store';
-import type { Pathname } from '$app/types';
+
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
 import {get} from 'svelte/store';
 import { resolve } from '$app/paths';
 
 export type NavBarPage = {
-	href?: Pathname | undefined;
+	href?: string | undefined;
 	onclick?: () => void;
 	icon: string;
 	name: string;
@@ -42,7 +42,7 @@ export class NavBarContents {
 			this.items[i].onclick();
 		}
 		if (this.items[i].href) {
-			goto(this.items[i].href);
+			goto(resolve(this.items[i].href));
 		}
     return this.activate(i);
 	}
