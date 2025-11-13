@@ -23,21 +23,21 @@
 			? [
 					{
 						name: 'Box',
-						href: resolve('/flight/create/box/'),
+						href: '/flight/create/box/',
 						icon: 'bi-box',
 						title: 'Locate the aerobatic box',
 						disabled: !$activeFlight
 					},
 					{
 						name: 'Manoeuvres',
-						href: resolve('/flight/create/manoeuvres/'),
+						href: '/flight/create/manoeuvres/',
 						icon: 'bi-scissors',
 						title: 'Segment the flight into manoeuvres',
 						disabled: !$activeFlight?.segmentation
 					},
 					{
 						name: 'Results',
-						href: resolve('/flight/results/'),
+						href: '/flight/results/',
 						icon: 'bi-card-list',
 						title: 'View the analysis results',
 						disabled: !$activeFlight?.segmentation
@@ -60,42 +60,42 @@
 		'/flight/results/manoeuvre': [
 			{
 				name: 'View',
-				href: resolve('/flight/results/manoeuvre/'),
+				href: '/flight/results/manoeuvre/',
 				icon: 'bi-card-text',
 				title: 'View Manoeuvre',
 				disabled: false
 			},
 			{
 				name: 'Segmentation',
-				href: resolve('/flight/results/manoeuvre/segmentation/'),
+				href: '/flight/results/manoeuvre/segmentation/',
 				icon: 'bi-align-center',
 				title: 'Edit Element Segmentation',
 				disabled: false
 			},
 			{
 				name: 'Intra',
-				href: resolve('/flight/results/manoeuvre/intra/'),
+				href: '/flight/results/manoeuvre/intra/',
 				icon: 'bi-columns-gap',
 				title: 'Intra Element Downgrades',
 				disabled: false
 			},
 			{
 				name: 'Inter',
-				href: resolve('/flight/results/manoeuvre/inter/'),
+				href: '/flight/results/manoeuvre/inter/',
 				icon: 'bi-columns',
 				title: 'Inter Element Downgrades',
 				disabled: false
 			},
 			{
 				name: 'Positioning',
-				href: resolve('/flight/results/manoeuvre/positioning/'),
+				href: '/flight/results/manoeuvre/positioning/',
 				icon: 'bi-box',
 				title: 'Box downgrades',
 				disabled: false
 			},
 			{
 				name: 'Templates',
-				href: resolve('/flight/results/manoeuvre/templates/'),
+				href: '/flight/results/manoeuvre/templates/',
 				icon: 'bi-file-earmark-text',
 				title: 'Show templates',
 				disabled: false
@@ -110,13 +110,13 @@
 		],
 		'/database': [
 			{
-				href: resolve('/database/leaderboards/'),
+				href: '/database/leaderboards/',
 				name: 'Leaderboards',
 				title: 'Show results in a table',
 				icon: 'bi-trophy'
 			},
 			{
-				href: resolve('/database/map/'),
+				href: '/database/map/',
 				name: 'Map',
 				title: 'Show results in a map',
 				icon: 'bi-map'
