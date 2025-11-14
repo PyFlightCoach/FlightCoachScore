@@ -9,7 +9,7 @@ import {
 } from '$lib/stores/shared';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get, writable } from 'svelte/store';
-import { schedule as getScheduleFromSplit, Splitting } from '$lib/flight/splitting';
+import { Splitting } from '$lib/flight/splitting';
 import { FCJManResult, Origin, ScheduleInfo } from './fcjson';
 import { library } from '$lib/schedule/library';
 import { analysisServer, dbServer } from '$lib/api/api';
@@ -117,14 +117,14 @@ export async function newAnalysis(flight: FlightDataSource) {
 
 	segmentation.analysisMans.forEach(async (id: number, i: number) => {
 		sts.runInfo[i].set(`New Analysis Created At ${new Date().toLocaleTimeString()}`);
-		const sch = getScheduleFromSplit(segmentation.mans[id]);
+		const sch = segmentation.mans[id].schedule;
 
 		const data = flight.slice(id);
 
 		setAnalysis(
 			i,
 			new MA(
-				segmentation.mans[id].manoeuvre!.short_name,
+				segmentation.mans[id].name,
 				id,
 				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
@@ -233,7 +233,7 @@ export async function loadAcrowrx(file: File): Promise<void> {
 					new Date(Date.parse(response.data.boot_time)),
 					States.parse(response.data.data),
 					Origin.parse(response.data.origin),
-					Splitting.default(),
+					Splitting.default(response.data.data.length),
 					undefined,
 					response.data.meta
 				)

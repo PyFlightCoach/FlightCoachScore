@@ -11,9 +11,8 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { GPS } from '$lib/utils/geometry';
-	import { Splitting } from '$lib/flight/splitting';
+	import { Splitting, ManSplit } from '$lib/flight/splitting';
 	import { checkDuplicate, importAnalysis, loadAnalysisFromDB } from '$lib/flight/analysis';
-	import type { AJson } from '$lib/flight/ajson';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 
 	let fcjFile: File | undefined = $state();
@@ -45,8 +44,9 @@
 	);
 
 	let loadSegmentation = $derived(
-		fcjson && states ? Splitting.parseFCJ(fcjson, states) : Splitting.default()
+		fcjson && states ? Splitting.parseFCJ(fcjson, states) : Splitting.default(Math.min(3000, binData?.xkf1.length))
 	);
+  
 </script>
 
 <div class="col" style="max-width:800px;">

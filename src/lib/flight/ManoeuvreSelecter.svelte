@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as sp from '$lib/flight/splitting';
+	import {ManSplit} from '$lib/flight/splitting';
 	import type { ScheduleLibrary } from '$lib/schedule/library';
 	import { schedule_id } from '$lib/leaderboards/stores';
 
@@ -9,15 +9,17 @@
 		stopLevel = 2,
 		specialManoeuvres = ['Break', 'Landing'],
     disabled=$bindable(false),  
-		onselected = (new_man: sp.Split) => {},
+    dropDirection = 'down',
+		onselected = (new_man: ManSplit) => {},
 		ondeselect = () => {}
 	}: {
 		library: ScheduleLibrary;
-		old_man: sp.Split;
+		old_man: ManSplit;
 		stopLevel?: number;
 		specialManoeuvres?: string[];
     disabled?: boolean;
-		onselected?: (new_man: sp.Split) => void;
+    dropDirection?: 'down' | 'up' ;
+		onselected?: (new_man: ManSplit) => void;
 		ondeselect?: () => void;
 	} = $props();
 
@@ -56,7 +58,7 @@
 	const checkSelected = () => {
 		const isMan = !specialManoeuvres.includes(man.manoeuvre_name);
 
-		const spo: sp.Split = {
+		const spo: ManSplit = {
 			category_name: level > 0 ? man.category_name : undefined,
 			schedule_name: level > 1 ? man.schedule_name : undefined
 		};
@@ -104,7 +106,7 @@
 	let sLevel: number = $derived(Math.min(level, stopLevel));
 </script>
 
-<div class="btn-group w-100 dropup" >
+<div class="btn-group w-100 {dropDirection == 'up' ? 'dropup' : ''}" >
 	
 		{#if level > 0}
 			<button

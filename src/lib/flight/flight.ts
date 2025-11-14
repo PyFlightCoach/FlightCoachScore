@@ -3,7 +3,7 @@ import { States } from '$lib/utils/state';
 import type { AJMan, AJson } from './ajson';
 import { BinData } from './bin';
 import { Origin } from './fcjson';
-import { Splitting, equals } from './splitting';
+import { Splitting, ManSplit } from './splitting';
 import { dbServer, analysisServer } from '$lib/api';
 import JSZip from 'jszip';
 import { blockProgress, faVersion, unblockProgress } from '$lib/stores/shared';
@@ -62,17 +62,15 @@ export class FlightDataSource {
 		}
 	}
 
-  checkOriginElevation(newOrigin : Origin | undefined, tol: number = 10) : boolean {
-    if (this.rawData! instanceof BinData ) {
-      const origin = this.rawData!.findOrigin();
-      return Math.abs(((newOrigin || this.origin!).alt - origin.alt)) < tol;
-    }
-    return true;
-  }
-
+	checkOriginElevation(newOrigin: Origin | undefined, tol: number = 10): boolean {
+		if (this.rawData! instanceof BinData) {
+			const origin = this.rawData!.findOrigin();
+			return Math.abs((newOrigin || this.origin!).alt - origin.alt) < tol;
+		}
+		return true;
+	}
 
 	statesAtNewOrigin(newOrigin: Origin): States {
-    
 		const vec = GPS.sub(this.origin!.pilot, newOrigin.pilot);
 		const rot = Quaternion.mul(newOrigin.rotation.inverse(), this.origin!.rotation);
 		return this.states.transform(vec, rot);
@@ -88,13 +86,17 @@ export class FlightDataSource {
 		return Object.assign(this, {
 			rawData: this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
 			origin: newOrigin,
-      history: this.history?.map(m=>objfilter(m, (k) => k != get(faVersion)))
+			history: this.history?.map((m) => objfilter(m, (k) => k != get(faVersion)))
 		});
 	}
 
 	withNewSegmentation(newSegmentation: Splitting): FlightDataSource {
 		const updatedHistory = newSegmentation.mans.slice(1, -1).map((m, i) => {
-			if (equals(m, this.segmentation?.mans[i + 1] || {}) || !this.history[i]) {
+			if (
+				(this.segmentation && i >= this.segmentation.mans.length) ||
+				ManSplit.equals(m, this.segmentation!.mans[i + 1]) ||
+				!this.history[i]
+			) {
 				return this.history[i];
 			} else {
 				return objfilter(this.history[i], (k) => k != get(faVersion));
