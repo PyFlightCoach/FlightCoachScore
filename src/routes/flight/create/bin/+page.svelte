@@ -138,8 +138,7 @@
 	{#if bin}
 		<div class="container border rounded">
 			<span class=" row p-2">
-				OPTIONAL: If a flight coach json file is included the box and manoeuvre splitting can be
-				loaded from it. This can also be set up manually within FCScore.
+				OPTIONAL: If you have a matching Flight Coach JSON file, you can select it here to use its box and manoeuvre segmentation.
 			</span>
 			<div class="row">
 				<label for="fcj_file" class="col col-form-label">Select Flight Coach JSON File:</label>
