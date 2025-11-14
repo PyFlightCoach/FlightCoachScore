@@ -3,31 +3,13 @@
 
 	let {
 		onorigin = () => {},
-    onfcj = () => {}
+		file = $bindable()
 	}: {
 		onorigin?: (origin: Origin) => void;
-    onfcj?: (fcjson: FCJson) => void;
+		file?: File | undefined;
 	} = $props();
 
-	let files: FileList | undefined = $state();
 
-	const loadBoxFile = (file: File) => {
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			const _norg = Origin.parseF3aZone(reader.result as string);
-			if (_norg) {
-        onorigin(_norg);
-			} else {
-				const newfcj = FCJson.parse(JSON.parse(reader.result as string));
-
-				if (newfcj) {
-          onorigin(newfcj.origin);
-          onfcj(newfcj);
-				}
-			}
-		};
-		reader.readAsText(file);
-	};
 </script>
 
 <div class="row">
@@ -38,8 +20,8 @@
 			class="btn btn-outline-secondary form-control text-nowrap"
 			style:overflow="hidden"
 		>
-			{#if files && files.length > 0}
-				{files[0].name}
+			{#if file}
+				{file.name}
 			{:else}
 				Select File
 			{/if}
@@ -49,11 +31,23 @@
 			class="form-control"
 			type="file"
 			accept=".json, .f3a, '.F3A"
-			bind:files
 			style="display:none"
-			onchange={() => {
+			onchange={(e) => {
+				const files = (e.target as HTMLInputElement).files;
 				if (files && files.length) {
-					loadBoxFile(files[0]);
+					
+					const reader = new FileReader();
+					reader.onload = (e) => {
+            try {
+              const newOrigin = Origin.parseString(reader.result as string);
+              file = files[0];
+              onorigin(newOrigin);
+            } catch (err) {
+              alert('Error parsing Box file: ' + err);
+            }
+
+					};
+					reader.readAsText(files[0]);
 				}
 			}}
 		/>

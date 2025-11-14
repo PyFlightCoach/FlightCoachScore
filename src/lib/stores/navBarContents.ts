@@ -2,7 +2,7 @@ import { writable, type Writable } from 'svelte/store';
 
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
-import {get} from 'svelte/store';
+import { get } from 'svelte/store';
 import { resolve } from '$app/paths';
 
 export type NavBarPage = {
@@ -12,30 +12,26 @@ export type NavBarPage = {
 	name: string;
 	title: string;
 	disabled?: boolean;
-  active?: boolean;
+	active?: boolean;
 };
 
-
-
-
-
 export class NavBarContents {
-	constructor(
-		readonly items: NavBarPage[] = [],
-	) {
-    this.items.filter(item => item.href).forEach(item=>item.active = false);
-    const activeItem = this.items.findLast(item => item.href ? page.url.pathname.startsWith(resolve(item.href)) : false);
-    if (activeItem) activeItem.active = true;
-  }
+	constructor(readonly items: NavBarPage[] = []) {
+		this.items.filter((item) => item.href).forEach((item) => (item.active = false));
+		const activeItem = this.items.findLast((item) =>
+			item.href ? page.url.pathname.startsWith(resolve(item.href)) : false
+		);
+		if (activeItem) activeItem.active = true;
+	}
 
 	activate(i: number, unsetOthers = true) {
 		return new NavBarContents(
 			this.items.map((item, idx) => ({
-        ...item,
-        active: unsetOthers ? idx === i : item.active || idx === i,
-      })),
-    );
-  }
+				...item,
+				active: unsetOthers ? idx === i : item.active || idx === i
+			}))
+		);
+	}
 
 	click(i: number) {
 		if (this.items[i].onclick) {
@@ -44,33 +40,26 @@ export class NavBarContents {
 		if (this.items[i].href) {
 			goto(resolve(this.items[i].href));
 		}
-    return this.activate(i);
+		return this.activate(i);
 	}
 
-  get active() {
-    return this.items.find(item=>item.active)?.name;
-  }
-
+	get active() {
+		return this.items.find((item) => item.active)?.name;
+	}
 }
-
-
 
 export const navBarContents: Writable<NavBarContents> = writable(new NavBarContents());
 
-
 export function reset(items: NavBarPage[] = []) {
-  console.log("setting navbar contents");
-  navBarContents.set(new NavBarContents(items));
+	navBarContents.set(new NavBarContents(items));
 
-  console.log(get(navBarContents).active);
-
-  return ()=>{
-    console.log("clearing navbar contents");
-    navBarContents.set(new NavBarContents([]))};
+	return () => {
+		navBarContents.set(new NavBarContents([]));
+	};
 }
 
 export function click(i: number) {
-  navBarContents.update((nbc=>nbc.click(i)))
+	navBarContents.update((nbc) => nbc.click(i));
 }
 
 export const showCollapseToggle: Writable<boolean> = writable(false);

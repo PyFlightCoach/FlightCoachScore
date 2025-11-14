@@ -42,7 +42,7 @@
 		onchange={(e) => {
 			const oldInputMode = rollInput.checkOption(value);
 			const newInputMode = (e.target as HTMLSelectElement).value;
-			console.log(`switch from ${inputMode} to ${newInputMode}`);
+			
 			switch (newInputMode) {
 				case 'MP':
 					if (Array.isArray(value) && typeof value[0] === 'string') {

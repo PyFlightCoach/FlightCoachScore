@@ -72,7 +72,7 @@ export class FlightDataSource {
 
 
 	statesAtNewOrigin(newOrigin: Origin): States {
-    console.log("getting states at new origin: ", newOrigin);
+    
 		const vec = GPS.sub(this.origin!.pilot, newOrigin.pilot);
 		const rot = Quaternion.mul(newOrigin.rotation.inverse(), this.origin!.rotation);
 		return this.states.transform(vec, rot);

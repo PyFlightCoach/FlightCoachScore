@@ -146,10 +146,7 @@ export async function loadAllServerData() {
 	serverDataLoaded.set(false);
 	return await Promise.all([loadGuiLists(), loadRules(), reloadSchedules(), loadFAVersion()])
 		.then(() => {
-			console.log('All data loaded successfully.');
 			serverDataLoaded.set(true);
 		})
-		.catch((e) => {
-			console.error('Error loading required data', e);
-		});
+		.catch();
 }

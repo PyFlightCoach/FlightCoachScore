@@ -322,7 +322,7 @@ export class ContestManager {
 
 			return 'Acceptable';
 		});
-		console.log('round checks:', roundChecks);
+		
 		return roundChecks.some((r) => r === 'Acceptable');
 	}
 

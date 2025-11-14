@@ -195,7 +195,6 @@
 						const newSplitting = new ms.Splitting(mans);
 
 						if (!ms.Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
-							console.log('splitting has been modified');
 							$activeFlight = $activeFlight!.withNewSegmentation(newSplitting);
 						}
 						goto(resolve('/flight/results'));
@@ -312,7 +311,6 @@
 									const newSplitting = new ms.Splitting(mans);
 
 									if (!ms.Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
-										console.log('splitting has been modified');
 										$activeFlight = $activeFlight!.withNewSegmentation(newSplitting);
 									}
 									goto(resolve('/flight/results'));

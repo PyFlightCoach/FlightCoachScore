@@ -144,7 +144,6 @@
     let selectedNavBarItems = undefined;
       
     for (const [path, items] of Object.entries(navBarItems)) {
-      console.log("checking:", resolve(path));    
       if (page.url.pathname.startsWith(resolve(path))) {
         selectedNavBarItems = items;
         break;

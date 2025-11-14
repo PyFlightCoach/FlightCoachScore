@@ -23,14 +23,6 @@ export async function load({ url}) {
 
   const promise1 = setServer(mainServer ? 'uk' : devServer ? 'dev' : localServer ? 'local' : get(servers));
   
-  checkUser(false, false, false)
-    .then((u) => {
-      if (u) {
-        console.log('User is logged in, loading user data') ;
-      }
-    })
-    .catch(() => {
-      console.log('User not logged in');
-    });
+  checkUser(false, false, false).catch();
   await promise1;
 }

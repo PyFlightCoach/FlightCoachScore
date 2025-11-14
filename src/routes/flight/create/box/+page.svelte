@@ -8,10 +8,11 @@
 	import { BinData } from '$lib/flight/bin';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-  import DisplayDict from '$lib/components/DisplayDict.svelte';
-	import {user} from "$lib/stores/user";
+	import DisplayDict from '$lib/components/DisplayDict.svelte';
+	import { user } from '$lib/stores/user';
+	import { GPS } from '$lib/utils/geometry';
 
-  let newOrigin = $state($activeFlight!.origin);
+	let newOrigin = $state($activeFlight!.origin);
 
 	let newStates = $derived($activeFlight!.statesAtNewOrigin(newOrigin!));
 
@@ -28,8 +29,8 @@
 		$isFullSize = boxDisplay === 'IAC';
 	});
 
-  $inspect(newStates);
-  $inspect(newOrigin);
+  let boxFile: File | undefined = $state(undefined);
+
 </script>
 
 <SideBarLayout sideBarWidth={4}>
@@ -84,13 +85,34 @@
 				</div>
 			</div>
 		</div>
-		{#if !$activeFlight!.checkOriginElevation(newOrigin, 10)}
+
+		{#if binDataOrigin && GPS.sub(newOrigin!.pilot!, binDataOrigin).length() > 500}
 			<div class="alert alert-warning" role="alert">
-				<strong>Warning:</strong> The box elevation is more than 10m from the initial elevation ({binDataOrigin?.alt.toFixed(
+				<strong>Warning:</strong> The box is a long way from the flight data. 
+        Please check this is correct.
+			</div>
+		{:else if !$activeFlight!.checkOriginElevation(newOrigin, 10)}
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning:</strong> The box elevation is more than 10m from the 
+        initial elevation ({binDataOrigin?.alt.toFixed(
 					0
-				)}m). Please check this is correct.
+				)}m). Click
+				<button
+					class="btn btn-link p-0"
+					onclick={() => {
+						newOrigin = new Origin(
+              newOrigin!.lat,
+              newOrigin!.lng,
+              binDataOrigin!.alt,
+              newOrigin!.heading,
+              newOrigin!.move_east,
+              newOrigin!.move_north
+            );
+					}}>here</button
+				> to reset it to the initial elevation.
 			</div>
 		{/if}
+
 		{#if $activeFlight!.kind === 'acrowrx'}
 			<p>
 				The position of the box has been taken from Acrowrx, but all judging in FCScore assumes a
@@ -105,6 +127,7 @@
 			origin={newOrigin!}
 			onorigin={(neworigin: Origin) => (newOrigin = neworigin)}
 			siteInputMode={newOrigin ? 'ph' : 'fcsites'}
+      bind:boxFile={boxFile}
 		/>
 
 		<div class="row px-2">
@@ -112,7 +135,9 @@
 				class="col btn btn-outline-secondary"
 				onclick={() => {
 					newOrigin = $activeFlight!.origin;
+          boxFile = undefined;
 				}}
+        title="Reset the box to the original origin"
 			>
 				Reset
 			</button>
@@ -126,11 +151,13 @@
 				}}>Next</button
 			>
 		</div>
-    {#if $user?.is_superuser }
-    <DisplayDict dict={newOrigin as Record<string, any>} title="New Origin Details" />
-    <DisplayDict dict={$activeFlight?.origin as Record<string, any> || {}} title="Active Flight Origin Details" />
-
-    {/if}
+		{#if $user?.is_superuser}
+			<DisplayDict dict={newOrigin as Record<string, any>} title="New Origin Details" />
+			<DisplayDict
+				dict={($activeFlight?.origin as Record<string, any>) || {}}
+				title="Active Flight Origin Details"
+			/>
+		{/if}
 	{/snippet}
 
 	{#snippet main()}

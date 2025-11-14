@@ -39,7 +39,6 @@ class UserCheckInterval {
     this.stop();
     this.interval = setInterval(() => {
       dbServer.get('users/me').catch(() => {
-        console.log('Session expired, logging out');
         user.set(undefined);
       });
     }, this.duration);
@@ -86,7 +85,6 @@ export async function loginUser(email: string, password: string) {
 		)
 		.then(() => dbServer.get('users/me'))
 		.then((res) => {
-			console.log('Login successful');
 			user.set(res.data);
 		})
 		.then(postLoginUser);
@@ -95,9 +93,6 @@ export async function loginUser(email: string, password: string) {
 export async function logoutUser() {
 	await dbServer
 		.post('auth/jwt/logout')
-		.then(() => {
-			console.log('Logout successful');
-		})
 		.catch((error) => {
 			console.error('Logout error:', error);
 		})
