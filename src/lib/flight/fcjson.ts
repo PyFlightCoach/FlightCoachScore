@@ -326,6 +326,7 @@ export class FCJson {
 	short_name: string;
 	sinfo: ScheduleInfo;
 	origin: Origin;
+  originAlt: number;
 	constructor(
 		readonly version: string,
 		readonly comments: string,
@@ -351,15 +352,14 @@ export class FCJson {
 
 		this.short_name = this.name.replace(/\.[^/.]+$/, '');
 		this.sinfo = ScheduleInfo.from_fcj_sch(this.parameters.schedule);
-		this.origin = new Origin(
+
+    this.origin = new Origin(
 			parseFloat(this.parameters.pilotLat),
 			parseFloat(this.parameters.pilotLng),
-			typeof this.parameters.originAlt == 'number'
-				? this.parameters.originAlt
-				: parseFloat(this.parameters.originAlt),
+			parseFloat(this.parameters.originAlt.toString()),
 			(this.parameters.rotation * 180) / Math.PI,
-			this.parameters.moveEast,
-			this.parameters.moveNorth
+			//this.parameters.moveEast,
+			//this.parameters.moveNorth
 		);
 	}
 

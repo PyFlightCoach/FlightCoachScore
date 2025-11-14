@@ -21,7 +21,7 @@ export class BinDataState {
 	) {}
 
 	get states() {
-		return States.from_xkf1(this.origin, this.data.orgn, this.data.xkf1);
+		return States.from_binData(this.origin, this.data);
 	}
 }
 
@@ -56,7 +56,7 @@ export class FlightDataSource {
 		if (this.rawData instanceof States) {
 			return this.rawData;
 		} else if (this.rawData instanceof BinData) {
-			return States.from_xkf1(this.origin!, this.rawData.orgn, this.rawData.xkf1);
+			return States.from_binData(this.origin!, this.rawData);
 		} else {
 			return States.stack(this.rawData!.mans.map((m) => States.parse(m.flown)));
 		}
@@ -72,6 +72,7 @@ export class FlightDataSource {
 
 
 	statesAtNewOrigin(newOrigin: Origin): States {
+    console.log("getting states at new origin: ", newOrigin);
 		const vec = GPS.sub(this.origin!.pilot, newOrigin.pilot);
 		const rot = Quaternion.mul(newOrigin.rotation.inverse(), this.origin!.rotation);
 		return this.states.transform(vec, rot);
@@ -86,7 +87,8 @@ export class FlightDataSource {
 	withNewOrigin(newOrigin: Origin): FlightDataSource {
 		return Object.assign(this, {
 			rawData: this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
-			origin: newOrigin
+			origin: newOrigin,
+      history: this.history?.map(m=>objfilter(m, (k) => k != get(faVersion)))
 		});
 	}
 

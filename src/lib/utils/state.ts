@@ -1,7 +1,7 @@
 import { Point, Quaternion, GPS } from '$lib/utils/geometry';
 import { FCJson, Origin } from '$lib/flight/fcjson';
-import { BinField } from '$lib/flight/bin/bindata';
-
+import { BinData, BinField } from '$lib/flight/bin/bindata';
+import {lookupMonotonic} from '$lib/utils/arrays';
 
 export interface IState {
   t: number,
@@ -313,15 +313,19 @@ export class States {
 	}
 
   
-	static from_xkf1(box: Origin, orgn: BinField, xkf1: BinField) {
-		const xorg = new GPS(orgn.Lat[0], orgn.Lng[0], orgn.Alt[0]);
-		const box_rot = Quaternion.parse_euler(
+	static from_binData(box: Origin, binData: BinData) {
+
+    const xkf1 = binData.xkf1;
+    
+    const xorg = binData.findOrigin();
+
+    const box_rot = Quaternion.parse_euler(
 			new Point(Math.PI, 0, (box.heading * Math.PI) / 180 + Math.PI / 2)
 		);
 		const box_pos = new GPS(box.lat, box.lng, box.alt);
 		let sts = [];
     
-    const shift = new Point(box.move_east, -box.move_north, 0);
+    const shift =  new Point(box.move_east, -box.move_north, 0);
 
 		for (let i = 0; i < xkf1.length; i++) {
 			const posned = GPS.sub(xorg.offset(new Point(xkf1.PN[i], xkf1.PE[i], xkf1.PD[i])), box_pos);

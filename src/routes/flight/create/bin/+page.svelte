@@ -41,7 +41,7 @@
 	let origin = $derived(fcjson?.origin.noMove() || localStorageOrigin || binOrigin);
 
 	let states = $derived(
-		origin && binData ? States.from_xkf1(origin, binData.orgn, binData.xkf1) : undefined
+		origin && binData ? States.from_binData(origin, binData) : undefined
 	);
 
 	let loadSegmentation = $derived(

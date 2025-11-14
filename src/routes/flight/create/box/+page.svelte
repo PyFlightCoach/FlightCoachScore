@@ -8,16 +8,16 @@
 	import { BinData } from '$lib/flight/bin';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+  import DisplayDict from '$lib/components/DisplayDict.svelte';
+	import {user} from "$lib/stores/user";
 
-	let newOrigin = $state($activeFlight!.origin);
+  let newOrigin = $state($activeFlight!.origin);
 
 	let newStates = $derived($activeFlight!.statesAtNewOrigin(newOrigin!));
 
 	let binDataOrigin = $derived(
 		$activeFlight!.rawData instanceof BinData ? $activeFlight!.rawData.findOrigin() : undefined
 	);
-
-	let originWarning = $derived(Math.abs(newStates.data[newStates.data.length - 1].z) > 10);
 
 	let boxDisplay: 'F3A' | 'IMAC' | 'IAC' = $state(
 		$activeFlight?.kind === 'acrowrx' ? 'IAC' : 'F3A'
@@ -28,9 +28,8 @@
 		$isFullSize = boxDisplay === 'IAC';
 	});
 
-  $inspect($activeFlight?.origin);
+  $inspect(newStates);
   $inspect(newOrigin);
-
 </script>
 
 <SideBarLayout sideBarWidth={4}>
@@ -127,6 +126,11 @@
 				}}>Next</button
 			>
 		</div>
+    {#if $user?.is_superuser }
+    <DisplayDict dict={newOrigin as Record<string, any>} title="New Origin Details" />
+    <DisplayDict dict={$activeFlight?.origin as Record<string, any> || {}} title="Active Flight Origin Details" />
+
+    {/if}
 	{/snippet}
 
 	{#snippet main()}

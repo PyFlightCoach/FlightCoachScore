@@ -30,10 +30,9 @@
 		cat(bin!)
 			.then((fileData) => checkDuplicate(md5(fileData as ArrayBuffer)))
 			.then(() => {
-				const states = States.from_xkf1(
+				const states = States.from_binData(
 					Object.setPrototypeOf(data.origin, fcj.Origin.prototype),
-					binData.orgn,
-					binData.xkf1
+					binData
 				);
 
 				const manSplits = [split.takeOff(lookupMonotonic(data.splits![0], states.t))];

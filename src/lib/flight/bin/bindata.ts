@@ -1,5 +1,5 @@
 import { lookupMonotonic } from '$lib/utils/arrays';
-import {GPS} from '$lib/utils/geometry';
+import {GPS, Point} from '$lib/utils/geometry';
 
 
 export class BinField {
@@ -9,6 +9,17 @@ export class BinField {
       BinField.prototype
     );
 	}
+
+  get columns() {
+    return Object.keys(this)
+  }
+
+  firstNonZero() {
+    return this.t.findIndex((_: number, i: number)=>{
+      Object.keys(this).every(k=>this[k][i]!=0)
+    })
+
+  }
 
 	get t() {
 		return this.time_boot_s || [];
@@ -97,8 +108,19 @@ export class BinData {
 			Object.fromEntries(Object.entries(data).map(([k, v]) => [k, new BinField(v)]))
 		);
 	}
-
   findOrigin() {
+    let xkfi0 = this.xkf1.firstNonZero();
+    xkfi0 = parseInt(xkfi0 + (this.xkf1.t.length - xkfi0) * 0.05 );
+    const t0 = this.xkf1.t[xkfi0]
+    const posi0 = lookupMonotonic(t0, this.pos.t);
+
+    const gps = new GPS(this.pos.Lat[posi0], this.pos.Lng[posi0], this.pos.Alt[posi0]);
+    const offset = new Point(-this.xkf1.PN[xkfi0], -this.xkf1.PE[xkfi0], this.xkf1.PD[xkfi0]);
+
+    return gps.offset(offset);
+    
+  }
+  findOriginOld() {
     // find the point where GPA accuracy is below something, ref Artur
     
     let i = 1;

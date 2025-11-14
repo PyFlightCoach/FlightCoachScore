@@ -131,39 +131,47 @@ export const points = (pos: Point[], text: string[] | undefined = undefined): Re
 };
 
 export const boxtraces = (kind: "F3A" | "IMAC" | "IAC" = "F3A") => {
-  let ymin
-  let ymax
-  let xmin
-  let xmax
-  let zmin
-  let zmax
+  let ymin: number;
+  let ymax: number;
+  let xmin: number;
+  let xmax: number;
+  let bmin: number;
+  let bmax: number;
+  let tmin: number;
+  let tmax: number;
   if (kind === "F3A") {
     ymin = 150
     ymax = 175
     xmin = ymin * Math.tan((60 * Math.PI) / 180);
     xmax = ymax * Math.tan((60 * Math.PI) / 180);
-    zmin = ymin * Math.tan((15 * Math.PI) / 180);
-    zmax = ymax * Math.tan((60 * Math.PI) / 180);
+    bmin = ymin * Math.tan((15 * Math.PI) / 180);
+    bmax = ymax * Math.tan((15 * Math.PI) / 180);
+    tmin = ymin * Math.tan((60 * Math.PI) / 180);
+    tmax = ymax * Math.tan((60 * Math.PI) / 180);
     } else if (kind === "IMAC") {
     ymin = 50;
     ymax = 500;
     xmin = 400;
     xmax = 400;
-    zmin = 50;
-    zmax = 500; 
+    bmin = 50;
+    tmin = 500;
+    bmax = 50;
+    tmax = 500; 
   } else {
     ymin = 200;
     ymax = 1200;
     xmin = 500;
     xmax = 500;
-    zmin = 200;
-    zmax = 1200;
+    bmin = 200;
+    tmin = 1200;
+    bmax = 200;
+    tmax = 1200;
   }
 
 	return [{
     x: [0, -xmin, -xmax, -xmin, -xmax,  xmin,  xmax,  xmin,  xmax],
     y: [0,  ymin,  ymax,  ymin,  ymax,  ymin,  ymax,  ymin,  ymax],
-    z: [0,  zmin,  zmin,  zmax,  zmax,  zmin,  zmin,  zmax,  zmax],
+    z: [0,  bmin,  bmax,  tmin,  tmax,  bmin,  bmax,  tmin,  tmax],
     i: [1, 2, 5, 6, 1, 5, 3, 8, 1, 3, 2, 6],
     j: [2, 4, 6, 8, 5, 6, 7, 4, 5, 5, 6, 8],
     k: [3, 3, 7, 7, 2, 2, 8, 3, 3, 7, 4, 4],
@@ -182,7 +190,7 @@ export const boxtraces = (kind: "F3A" | "IMAC" | "IAC" = "F3A") => {
 	},{
     x: [-xmin, xmin, xmin, -xmin, -xmin, -xmax, xmax, xmin,  xmax, xmax,xmin,xmax,-xmax,-xmin,-xmax, -xmax, -xmax],
     y: [ ymin, ymin, ymin,  ymin,  ymin,  ymax, ymax, ymin,  ymax, ymax,ymin,ymax, ymax, ymin, ymax,  ymax,  ymax],
-    z: [ zmin, zmin, zmax,  zmax,  zmin,  zmin, zmin, zmin,  zmin, zmax,zmax,zmax, zmax, zmax, zmax,  zmin,  zmin],
+    z: [ bmin, bmin, tmin,  tmin,  bmin,  bmax, bmax, bmin,  bmax, tmax,tmin,tmax, tmax, tmin, tmax,  bmax,  tmin],
     type: 'scatter3d',
     mode: 'lines',
     line: { color: 'grey', width: 2, opacity: 0.5 },

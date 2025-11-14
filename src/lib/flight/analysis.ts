@@ -308,8 +308,7 @@ export async function analyseManoeuvre(
 export async function checkDuplicate(md5: string, onload: () => void = () => {}) {
 	return dbServer
 		.get(`flight/check_duplicate/${md5}`)
-		.then((res) => {
-			console.log(res);
+		.then(() => {
 			return undefined;
 		})
 		.catch((err) => {
