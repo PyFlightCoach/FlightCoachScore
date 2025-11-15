@@ -270,9 +270,12 @@
 							const newSplitting = new Splitting(mans);
 
 							if (!Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
-								$activeFlight = $activeFlight!.withNewSegmentation(newSplitting);
+                newSplitting.loadManDefs()
+                .then((newSplits) => {
+								$activeFlight = $activeFlight!.withNewSegmentation(newSplits);
+                goto(resolve('/flight/results'));
+                });
 							}
-							goto(resolve('/flight/results'));
 						}}
 					>
 						Complete
