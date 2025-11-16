@@ -46,7 +46,7 @@
 
 <GdprBanner {...gpdc} />
 
-<div class="container-fluid  d-flex flex-column overflow-auto" style="min-height:100svh;">
+<div class="container-fluid  d-flex flex-column overflow-auto" style="min-height:100dvh;">
 	{#if !$serverDataLoaded || typeof $serverDataLoaded === 'string'}
 		<div class="row flex-grow-1 justify-content-center align-items-center">
 			<div class="col-lg-4 col-10">

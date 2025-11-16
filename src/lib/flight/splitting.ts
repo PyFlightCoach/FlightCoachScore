@@ -58,13 +58,13 @@ export class ManSplit {
 		}
 	}
 
-	next() {
+	next(): DBManoeuvre | 'Landing' | undefined {
 		if (this.schedule_id) {
 			const schedule = get(library).subset({ schedule_id: this.schedule_id }).first;
 			if (this.manoeuvre === 'TakeOff') {
 				return schedule!.manoeuvres[0];
 			} else if (typeof this.manoeuvre != 'string') {
-				if (this.manoeuvre.index < schedule.manoeuvres.length - 1) {
+				if (this.manoeuvre.index < schedule.manoeuvres.length) {
 					return schedule.manoeuvres[this.manoeuvre.index];
 				} else {
 					return 'Landing';

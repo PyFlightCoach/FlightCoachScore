@@ -48,8 +48,13 @@
 				activeMan.stop + Math.min(lastLength, 500),
 				$activeFlight!.states!.data.length - 1
 			);
-			if (nextMan && nextMan != 'Landing') {
-				newMan = new ManSplit(nextMan, nextI);
+			if (nextMan) {
+        if (nextMan=="Landing") {
+          newMan = ManSplit.landing($activeFlight!.states!.data.length);
+        } else {
+          newMan = new ManSplit(nextMan, nextI);
+        }
+				
 			}
 		} else {
 			//The first manoeuvre
@@ -81,16 +86,6 @@
 		reader.readAsText(file);
 	};
 
-	function nextManoeuvre() {
-		if (newMan) {
-			mans = [...mans, newMan];
-			newMan = undefined;
-			selectManoeuvre(activeManId);
-		} else {
-			selectManoeuvre(activeManId + 1);
-		}
-	}
-
   function changeManoeuvre(manoeuvre: DBManoeuvre | 'Landing' | 'Break') {
     if (newMan) {
       newMan = new ManSplit(manoeuvre, newMan.stop, newMan.fixed, newMan.mdef);
@@ -107,7 +102,15 @@
 	onkeydown={(e) => {
 		switch (e.key) {
 			case 'Enter':
-				nextManoeuvre();
+        if (newMan) {
+          const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
+          mans = [...mans, man];
+          newMan = undefined;
+          selectManoeuvre(activeManId)
+        } else {
+          selectManoeuvre(activeManId + 1);
+        }
+				
 				break;
 		}
 	}}
