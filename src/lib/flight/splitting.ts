@@ -10,7 +10,7 @@ import type { AJson } from './ajson';
 
 export class ManSplit {
 	constructor(
-		readonly manoeuvre: DBManoeuvre | 'TakeOff' | 'Landing' | 'Break',
+		readonly manoeuvre: DBManoeuvre | 'TakeOff' | 'Landing' | 'Break' | undefined,
 		readonly stop: number,
 		readonly fixed: boolean = false,
 		readonly mdef: ManDef | ManOpt | undefined = undefined
@@ -24,7 +24,7 @@ export class ManSplit {
 			case 'Break':
 				return undefined;
 			default:
-				return this.manoeuvre.schedule_id;
+				return this.manoeuvre?.schedule_id || get(schedule_id);
 		}
 	}
 
@@ -33,11 +33,12 @@ export class ManSplit {
 	}
 
 	get name() {
-		return typeof this.manoeuvre == 'string' ? this.manoeuvre : this.manoeuvre.short_name;
+		return typeof this.manoeuvre == 'string' ? this.manoeuvre : this.manoeuvre?.short_name;
 	}
 
-	static equals(a: ManSplit, b: ManSplit) {
-		return a.manoeuvre == b.manoeuvre && a.stop == b.stop;
+	static equals(a: ManSplit, b: ManSplit, offset: number = 0) {
+    // Offset applies to manoeuvre B, it accounts for the case where the states come from an ajson and there is no takeoff
+		return a.manoeuvre == b.manoeuvre && a.stop == b.stop + offset;
 	}
 
 	static takeOff(stop: number) {
@@ -60,12 +61,11 @@ export class ManSplit {
 
 	next(): DBManoeuvre | 'Landing' | undefined {
 		if (this.schedule_id) {
-			const schedule = get(library).subset({ schedule_id: this.schedule_id }).first;
 			if (this.manoeuvre === 'TakeOff') {
-				return schedule!.manoeuvres[0];
+				return this.schedule?.manoeuvres[0];
 			} else if (typeof this.manoeuvre != 'string') {
-				if (this.manoeuvre.index < schedule.manoeuvres.length) {
-					return schedule.manoeuvres[this.manoeuvre.index];
+				if (this.manoeuvre!.index < this.schedule.manoeuvres.length) {
+					return this.schedule.manoeuvres[this.manoeuvre!.index];
 				} else {
 					return 'Landing';
 				}
@@ -160,7 +160,7 @@ export class Splitting {
 		return new Splitting([ManSplit.takeOff(0), ...ajmans, ManSplit.landing(lasti)]).loadManDefs();
 	}
 
-	static default(n: number) {
+	static default() {
 		return new Splitting([]);
 	}
 
@@ -170,13 +170,16 @@ export class Splitting {
 
 	static equals(a: Splitting | undefined, b: Splitting | undefined) {
 		if (a === undefined || b === undefined) {
+      console.log("Splitting.equals: one is undefined", a, b);
 			return a === b;
 		}
 		if (a.length != b.length) {
+      console.log("Splitting.equals: length mismatch", a.length, b.length);
 			return false;
 		}
 		for (let i = 0; i < a.length; i++) {
 			if (!ManSplit.equals(a.mans[i], b.mans[i])) {
+        console.log("Splitting.equals: mans mismatch at index", i, a.mans[i], b.mans[i]);
 				return false;
 			}
 		}

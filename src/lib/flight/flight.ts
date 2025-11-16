@@ -49,7 +49,8 @@ export class FlightDataSource {
 		readonly acroWrxMeta:
 			| { flightFileName: string; sequenceFolderName: string }
 			| undefined = undefined,
-		readonly history: Record<string, unknown>[] = []
+		readonly history: Record<string, unknown>[] = [],
+    readonly updated: boolean = false
 	) {}
 
 	get states(): States {
@@ -83,11 +84,16 @@ export class FlightDataSource {
 	}
 
 	withNewOrigin(newOrigin: Origin): FlightDataSource {
-		return Object.assign(this, {
-			rawData: this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
-			origin: newOrigin,
-			history: this.history?.map((m) => objfilter(m, (k) => k != get(faVersion)))
-		});
+    if (!Origin.equals(this.origin, newOrigin)) {
+        return Object.assign(this, {
+        rawData: this.rawData instanceof BinData ? this.rawData : this.statesAtNewOrigin(newOrigin),
+        origin: newOrigin,
+        history: this.history?.map((m) => objfilter(m, (k) => k != get(faVersion))),
+        updated: true
+      });
+    } else {
+      return this;
+    }		
 	}
 
 	withNewSegmentation(newSegmentation: Splitting): FlightDataSource {
@@ -107,7 +113,8 @@ export class FlightDataSource {
 			segmentation: newSegmentation,
 			schedule: newSegmentation.schedule,
 			rawData: this.rawData instanceof BinData ? this.rawData : this.states,
-			history: updatedHistory
+			history: updatedHistory,
+      updated: true
 		});
 	}
 

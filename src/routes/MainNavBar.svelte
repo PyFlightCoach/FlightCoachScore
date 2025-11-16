@@ -143,7 +143,7 @@
 	$effect(() => {
     let selectedNavBarItems = undefined;
       
-    for (const [path, items] of Object.entries(navBarItems)) {
+    for (const [path, items] of Object.entries(navBarItems).reverse()) {
       if (page.url.pathname.startsWith(resolve(path))) {
         selectedNavBarItems = items;
         break;

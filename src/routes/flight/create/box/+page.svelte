@@ -11,6 +11,8 @@
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
 	import { user } from '$lib/stores/user';
 	import { GPS } from '$lib/utils/geometry';
+	import { breakPoints, breakPoint } from '$lib/stores/shared';
+
 
 	let newOrigin = $state($activeFlight!.origin);
 
@@ -143,6 +145,8 @@
 			</button>
 			<button
 				class="col btn btn-outline-primary"
+        data-bs-dismiss={breakPoints['lg'] > breakPoints[$breakPoint] ? 'offcanvas' : undefined}
+
 				onclick={() => {
 					if (!Origin.equals(newOrigin, $activeFlight?.origin)) {
 						$activeFlight = $activeFlight!.withNewOrigin(newOrigin!);

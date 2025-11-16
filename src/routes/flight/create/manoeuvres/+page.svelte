@@ -17,13 +17,14 @@
 	let selectedSchedule: DBSchedule | undefined = $state($activeFlight?.segmentation?.schedule);
 	let categoryName: string | undefined = $derived(selectedSchedule?.category_name || "All");
 
-	let activeManId: number = $state(0);
+	let activeManId: number = $state(mans.length - 1 );
 	const activeMan = $derived(
 		mans.length && activeManId < mans.length ? mans[activeManId] : undefined
 	);
+  
 	let range: [number, number] = $state([
 		0,
-		mans.length ? mans[0].stop : Math.min(2000, $activeFlight!.states.data.length - 1)
+		activeMan ? activeMan.stop : Math.min(2000, $activeFlight!.states.data.length - 1)
 	]); // the visible range in the plot
 
 	let activeIndex: number = $state(range[1]); // the current index (little plane)
@@ -33,7 +34,8 @@
 			? undefined
 			: ManSplit.takeOff(Math.min(2000, $activeFlight!.states.data.length - 1))
 	);
-
+  const thisMan = $derived(activeMan || newMan);
+  
 	function selectManoeuvre(i: number) {
 		i = Math.max(i, 0);
 		i = Math.min(i, mans.length);
@@ -48,14 +50,15 @@
 				activeMan.stop + Math.min(lastLength, 500),
 				$activeFlight!.states!.data.length - 1
 			);
-			if (nextMan) {
+			
         if (nextMan=="Landing") {
           newMan = ManSplit.landing($activeFlight!.states!.data.length);
-        } else {
+        } else if (nextMan) {
           newMan = new ManSplit(nextMan, nextI);
+        } else {
+          newMan = new ManSplit(undefined, nextI);
         }
-				
-			}
+			
 		} else {
 			//The first manoeuvre
 			newMan = ManSplit.takeOff(Math.min(2000, $activeFlight!.states.data.length - 1));
@@ -95,14 +98,19 @@
   }
 
   let rangeLimits: [number, number] = $derived([0, activeManId < mans.length - 1 ? mans[activeManId + 1].stop : $activeFlight!.states.data.length - 1]);
-
+  $inspect("newMan:", !!newMan)
+  $inspect("newMan schedule:", newMan?.schedule);
+  $inspect("newMan manoeuvre:", newMan?.manoeuvre);
+  $inspect("activeMAn:", !!activeMan)
+  $inspect("activeMan schedule:", activeMan?.schedule);
+  $inspect("activeMan manoeuvre:", activeMan?.manoeuvre);
 </script>
 
 <svelte:window
 	onkeydown={(e) => {
 		switch (e.key) {
 			case 'Enter':
-        if (newMan) {
+        if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre==="string")) {
           const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
           mans = [...mans, man];
           newMan = undefined;
@@ -276,9 +284,9 @@
                 newSplitting.loadManDefs()
                 .then((newSplits) => {
 								$activeFlight = $activeFlight!.withNewSegmentation(newSplits);
-                goto(resolve('/flight/results'));
                 });
 							}
+              goto(resolve('/flight/results'));
 						}}
 					>
 						Complete
@@ -288,6 +296,7 @@
 						class="btn btn-outline-secondary px-2"
 						title="Save manoeuvre"
 						aria-label="Set Manoeuvre"
+            disabled={!(thisMan?.schedule || typeof thisMan?.manoeuvre === "string")}
 						onclick={() => {
 							const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
 							if (newMan) {
@@ -324,11 +333,8 @@
 		onselected={(schedule) => {
 			showScheduleSelector = false;
 			selectedSchedule = schedule;
-      if (newMan) {
-        newMan = Object.assign(newMan, { manoeuvre: schedule.manoeuvres[0] });
-      } else if (activeMan) {
-        mans[activeManId] = Object.assign(activeMan, { manoeuvre: schedule.manoeuvres[0] });
-      }
+      changeManoeuvre(schedule.manoeuvres[0])
+
 		}}
 	/>
 </Popup>
