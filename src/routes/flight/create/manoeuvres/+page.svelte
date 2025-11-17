@@ -9,19 +9,17 @@
 	import Popup from '$lib/components/Popup.svelte';
 	import ScheduleSelector from '$lib/schedule/ScheduleSelector.svelte';
 	import type { DBManoeuvre, DBSchedule } from '$lib/schedule/db';
+  import {schedule_id} from '$lib/leaderboards/stores';
 
 	let mans = $state($activeFlight!.segmentation!.mans);
 
 	let showScheduleSelector: boolean = $state(false);
 
-	let selectedSchedule: DBSchedule | undefined = $state($activeFlight?.segmentation?.schedule);
-	let categoryName: string | undefined = $derived(selectedSchedule?.category_name || "All");
-
-	let activeManId: number = $state(mans.length - 1 );
+	let activeManId: number = $state(mans.length - 1);
 	const activeMan = $derived(
 		mans.length && activeManId < mans.length ? mans[activeManId] : undefined
 	);
-  
+
 	let range: [number, number] = $state([
 		0,
 		activeMan ? activeMan.stop : Math.min(2000, $activeFlight!.states.data.length - 1)
@@ -34,8 +32,7 @@
 			? undefined
 			: ManSplit.takeOff(Math.min(2000, $activeFlight!.states.data.length - 1))
 	);
-  const thisMan = $derived(activeMan || newMan);
-  
+	const thisMan = $derived(activeMan || newMan);
 	function selectManoeuvre(i: number) {
 		i = Math.max(i, 0);
 		i = Math.min(i, mans.length);
@@ -44,21 +41,19 @@
 		} else if (activeMan) {
 			// The next manoeuvre
 			const nextMan = activeMan.next();
-      selectedSchedule = activeMan?.schedule;
 			const lastLength = activeMan.stop - (mans.length > 1 ? mans[mans.length - 2].stop : 0);
 			const nextI = Math.min(
 				activeMan.stop + Math.min(lastLength, 500),
 				$activeFlight!.states!.data.length - 1
 			);
-			
-        if (nextMan=="Landing") {
-          newMan = ManSplit.landing($activeFlight!.states!.data.length);
-        } else if (nextMan) {
-          newMan = new ManSplit(nextMan, nextI);
-        } else {
-          newMan = new ManSplit(undefined, nextI);
-        }
-			
+
+			if (nextMan == 'Landing') {
+				newMan = ManSplit.landing($activeFlight!.states!.data.length);
+			} else if (nextMan) {
+				newMan = new ManSplit(nextMan, nextI);
+			} else {
+				newMan = new ManSplit(undefined, nextI);
+			}
 		} else {
 			//The first manoeuvre
 			newMan = ManSplit.takeOff(Math.min(2000, $activeFlight!.states.data.length - 1));
@@ -89,63 +84,58 @@
 		reader.readAsText(file);
 	};
 
-  function changeManoeuvre(manoeuvre: DBManoeuvre | 'Landing' | 'Break') {
-    if (newMan) {
-      newMan = new ManSplit(manoeuvre, newMan.stop, newMan.fixed, newMan.mdef);
-    } else if (activeMan) {
-      mans[activeManId] = new ManSplit(manoeuvre, activeMan.stop, activeMan.fixed, activeMan.mdef);
-    }
-  }
+	function changeManoeuvre(manoeuvre: DBManoeuvre | 'Landing' | 'Break') {
+		if (newMan) {
+			newMan = new ManSplit(manoeuvre, newMan.stop, newMan.fixed, newMan.mdef);
+		} else if (activeMan) {
+			mans[activeManId] = new ManSplit(manoeuvre, activeMan.stop, activeMan.fixed, activeMan.mdef);
+		}
+	}
 
-  let rangeLimits: [number, number] = $derived([0, activeManId < mans.length - 1 ? mans[activeManId + 1].stop : $activeFlight!.states.data.length - 1]);
-  $inspect("newMan:", !!newMan)
-  $inspect("newMan schedule:", newMan?.schedule);
-  $inspect("newMan manoeuvre:", newMan?.manoeuvre);
-  $inspect("activeMAn:", !!activeMan)
-  $inspect("activeMan schedule:", activeMan?.schedule);
-  $inspect("activeMan manoeuvre:", activeMan?.manoeuvre);
+	let rangeLimits: [number, number] = $derived([
+		0,
+		activeManId < mans.length - 1
+			? mans[activeManId + 1].stop
+			: $activeFlight!.states.data.length - 1
+	]);
 </script>
 
 <svelte:window
 	onkeydown={(e) => {
 		switch (e.key) {
 			case 'Enter':
-        if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre==="string")) {
-          const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
-          mans = [...mans, man];
-          newMan = undefined;
-          selectManoeuvre(activeManId)
-        } else {
-          selectManoeuvre(activeManId + 1);
-        }
-				
+				if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre === 'string')) {
+					const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
+					mans = [...mans, man];
+					newMan = undefined;
+					selectManoeuvre(activeManId);
+				} else {
+					selectManoeuvre(activeManId + 1);
+				}
+
 				break;
 		}
 	}}
 />
 
-<div
-	class="container-fluid d-flex flex-column justify-content-between align-items-stretch h-100 p-0"
->
+<div class="container-fluid d-flex flex-column justify-content-between align-items-stretch p-2">
 	<div class="col container-fluid border rounded p-0">
 		<PlotSec
 			bind:i={activeIndex}
 			bind:range
-      bind:rangeLimits
+			bind:rangeLimits
 			flst={$activeFlight!.states}
 			greyUnselected={true}
 			controls={['slider', 'modelClick']}
-
 			scale={$isFullSize ? 3.5 : 1.5}
 		/>
 	</div>
 
 	<div class="col-auto pt-1">
 		<div class="row justify-content-center">
-
-			<div id="manselect" class="col-auto btn-group p-0 text-nowrap dropup btn-group-sm" >
+			<div id="manselect" class="col-auto btn-group p-0 text-nowrap dropup btn-group-sm">
 				<button
-					class="btn btn-outline-secondary "
+					class="btn btn-outline-secondary"
 					title="previous manoeuvre"
 					aria-label="Previous manoeuvre"
 					disabled={activeManId == 0}
@@ -222,47 +212,71 @@
 					</ul>
 				</div>
 
-				{#if (activeMan || newMan)?.fixed || selectedSchedule}
+				{#if thisMan?.fixed}
+					<button
+						class="col-auto btn btn-outline-secondary dropdown-toggle"
+						aria-expanded="false"
+						aria-label="Toggle Dropdown"
+						disabled={true}
+						title="Select manoeuvre from schedule library"
+					>
+						{thisMan.name}
+					</button>
+				{:else if thisMan?.schedule}
 					<div class="btn-group btn-group-sm" role="group">
 						<button
 							class="col-auto btn btn-outline-secondary dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              aria-label="Toggle Dropdown"
-							disabled={newMan ? newMan.fixed : activeMan?.fixed}
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+							aria-label="Toggle Dropdown"
+							disabled={thisMan.fixed}
 							title="Select manoeuvre from schedule library"
 						>
-							{newMan ? newMan.name : activeMan?.name || 'Select Manoeuvre'}
+							{thisMan.name || 'Select Manoeuvre'}
 						</button>
 						<ul class="dropdown-menu" style="max-height:300px; overflow-y:auto;">
-              <button onclick={() => {showScheduleSelector = true;}} class="dropdown-item">
-                Select Schedule
-              </button>
-              <div class="dropdown-divider"></div>
-              <div class="dropdown-header text-sm py-0">{selectedSchedule?.repr().toUpperCase()}</div>
-              
-              {#if selectedSchedule}
-                {#each selectedSchedule!.manoeuvres as manoeuvre}
-                  <button
-                    class="dropdown-item {manoeuvre == (newMan || activeMan)?.manoeuvre ? 'active' : ''}"
-                    onclick={() => {changeManoeuvre(manoeuvre)}}
-                  >
-                    {manoeuvre.name}
-                  </button>
-                
-                {/each}
-              {/if}
-              <div class="dropdown-divider"></div>
-              <button class="dropdown-item {(newMan || activeMan)?.manoeuvre == 'Break' ? 'active' : ''}" onclick={() => {
-                changeManoeuvre("Break")
-              }}>
-                Break
-              </button>
-              <button class="dropdown-item {(newMan || activeMan)?.manoeuvre == 'Landing' ? 'active' : ''}" onclick={() => {
-                changeManoeuvre("Landing")
-              }}>
-                Landing
-              </button>
+							<button
+								onclick={() => {
+									showScheduleSelector = true;
+								}}
+								class="dropdown-item"
+							>
+								Select Schedule
+							</button>
+							<div class="dropdown-divider"></div>
+							<div class="dropdown-header text-sm py-0">
+								{thisMan?.schedule?.repr().toUpperCase()}
+							</div>
+							{#each thisMan.schedule.manoeuvres as manoeuvre}
+								<button
+									class="dropdown-item {manoeuvre == thisMan.manoeuvre ? 'active' : ''}"
+									onclick={() => {
+										changeManoeuvre(manoeuvre);
+									}}
+								>
+									{manoeuvre.name}
+								</button>
+							{/each}
+
+							<div class="dropdown-divider"></div>
+							<button
+								class="dropdown-item {(newMan || activeMan)?.manoeuvre == 'Break' ? 'active' : ''}"
+								onclick={() => {
+									changeManoeuvre('Break');
+								}}
+							>
+								Break
+							</button>
+							<button
+								class="dropdown-item {(newMan || activeMan)?.manoeuvre == 'Landing'
+									? 'active'
+									: ''}"
+								onclick={() => {
+									changeManoeuvre('Landing');
+								}}
+							>
+								Landing
+							</button>
 						</ul>
 					</div>
 				{:else}
@@ -281,12 +295,11 @@
 							const newSplitting = new Splitting(mans);
 
 							if (!Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
-                newSplitting.loadManDefs()
-                .then((newSplits) => {
-								$activeFlight = $activeFlight!.withNewSegmentation(newSplits);
-                });
+								newSplitting.loadManDefs().then((newSplits) => {
+									$activeFlight = $activeFlight!.withNewSegmentation(newSplits);
+								});
 							}
-              goto(resolve('/flight/results'));
+							goto(resolve('/flight/results'));
 						}}
 					>
 						Complete
@@ -296,7 +309,7 @@
 						class="btn btn-outline-secondary px-2"
 						title="Save manoeuvre"
 						aria-label="Set Manoeuvre"
-            disabled={!(thisMan?.schedule || typeof thisMan?.manoeuvre === "string")}
+						disabled={!(thisMan?.schedule || typeof thisMan?.manoeuvre === 'string')}
 						onclick={() => {
 							const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
 							if (newMan) {
@@ -329,12 +342,11 @@
 
 <Popup bind:show={showScheduleSelector}>
 	<ScheduleSelector
-    bind:category={categoryName}
+		category={thisMan?.schedule?.category_name}
 		onselected={(schedule) => {
+      $schedule_id = schedule.schedule_id;
 			showScheduleSelector = false;
-			selectedSchedule = schedule;
-      changeManoeuvre(schedule.manoeuvres[0])
-
+			changeManoeuvre(schedule.manoeuvres[0]);
 		}}
 	/>
 </Popup>

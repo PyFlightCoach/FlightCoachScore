@@ -25,37 +25,34 @@
 </script>
 
 
-<table class="table table-bordered table-striped table-sm text-center">
+<table class="table table-bordered table-striped table-sm text-center text-nowrap ">
   <thead class="table-dark">
     <tr>
-      <th class="p-0">
-        <select class="form-select form-select-sm" id="selectOwner" bind:value={owner}>
-          <option value="All">Select Owner</option>
-          {#each owners as own}
-            <option value={own}>{own}</option>
-          {/each}
-        </select>
-      </th>
+      <th></th>
       <th class="p-0">
         <select class="form-select form-select-sm" id="selectCategory"  bind:value={category}>
-          <option value="All">Select Category</option>
+          <option value="All">Category</option>
           {#each categories as cat}
             <option value={cat}>{cat}</option>
           {/each}
         </select>
       </th>
-      <th>Type</th>
       <th>Schedule</th>
-      <th></th>
+      <th>Type</th>
+      <th class="p-0">
+        <select class="form-select form-select-sm" id="selectOwner" bind:value={owner}>
+          <option value="All">Owner</option>
+          {#each owners as own}
+            <option value={own}>{own}</option>
+          {/each}
+        </select>
+      </th>
+      
     </tr>
   </thead>
   <tbody>
     {#each schedules.schedules as sched}
       <tr>
-        <td>{sched.owner_name}</td>
-        <td>{sched.category_name}</td>
-        <td>Known</td>
-        <td>{sched.schedule_name}</td>
         <td class="p-0"><button
             class="btn btn-outline-secondary p-1 b-0"
             onclick={() => {
@@ -64,6 +61,12 @@
           >
             Select
         </button></td>
+        <td>{sched.category_name}</td>
+        <td>{sched.schedule_name}</td>
+        <td>{sched.owner_name}</td>
+        
+        <td>Known</td>
+        
       </tr>
     {/each}
   </tbody>
