@@ -55,14 +55,17 @@
 	}
 </script>
 
-<div class="col-12 border">
-	<PlotDTW bind:sts={states} bind:activeEl={element} scale={$isFullSize ? 3 : 1.5} expand={30} />
-
-	<nav class="navbar fixed-bottom">
-		<div class="container-fluid">
-			<div class="row w-100 justify-content-center">
+<div class="container-fluid d-flex flex-column h-100 justify-content-around">
+  <div class="col-auto"></div>
+  <div class="col">
+    <PlotDTW bind:sts={states} bind:activeEl={element} scale={$isFullSize ? 3 : 1.5} expand={30} />
+  </div>
+	
+	<div class="col-auto d-flex flex-row">
+		
+			<div class="row w-100 justify-content-center ">
 				<select
-					class="nav-item col-auto form-select"
+					class="nav-item col-auto form-select "
 					style="width:auto"
 					title="Select element to edit (or click ribbon)"
 					bind:value={element}
@@ -127,6 +130,6 @@
 					>
 				</div>
 			</div>
-		</div>
-	</nav>
+		
+	</div>
 </div>

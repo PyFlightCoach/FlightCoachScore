@@ -7,7 +7,7 @@
 	import { d3Color } from '$lib/plots/styling';
   import {mean} from 'lodash';
   import {isFullSize} from '$lib/stores/shared';
-  
+  import SideBarLayout from '$lib/components/SideBarLayout.svelte';
 	let man = analyses[$selManID!];
 
 	let states = $derived($man!.flown!.split());
@@ -66,7 +66,9 @@
   const ceNames = $derived($man!.mdef!.info.centred_els.map((i) => 'Element '.concat(i[0].toString())));
 </script>
 
-<div class="col-md-4 bg-light border">
+
+<SideBarLayout sideBarWidth={4}>
+  {#snippet side()}
   <small>Box Downgrades</small>
 	<div class="row pt-2 px-2">
 		<label class="col col-form-label" for="criteriaTable">Select DG:</label>
@@ -170,11 +172,9 @@
     </div>
 
 	{/if}
-</div>
-
-<div class="col-md-8 flex-grow-1 d-flex flex-column">
-	<div class="row flex-grow-1" style="min-height:450px">
-		<Plot
+  {/snippet}
+  {#snippet main()}
+    <Plot
 			data={[
 				ribbon(
 					$man!.flown!,
@@ -197,6 +197,8 @@
 				boxfunc()
 			]}
 			layout={layout3d}
+      config={{ responsive: true }} 
 		/>
-	</div>
-</div>
+  {/snippet}
+  </SideBarLayout>  
+

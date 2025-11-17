@@ -95,13 +95,6 @@
 				disabled: false
 			},
 			{
-				name: 'Templates',
-				href: '/flight/results/manoeuvre/templates/',
-				icon: 'bi-file-earmark-text',
-				title: 'Show templates',
-				disabled: false
-			},
-			{
 				name: 'Back',
 				icon: 'bi-arrow-left',
 				title: 'Back to results',

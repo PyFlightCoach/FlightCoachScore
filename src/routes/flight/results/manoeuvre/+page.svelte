@@ -7,12 +7,12 @@
   let man = $derived(analyses[$selManID!]);
   
   let flown = $derived($man?.flown instanceof States ? $man?.flown : $man?.flown.states());
-
+  let template = $derived($man?.template);
 
 </script>  
 <div class="col">
   {#if flown} 
-    <PlotSec flst={flown} i={1} expand={50} includeZero scale={$isFullSize ? 3 : 1.5}
+    <PlotSec flst={flown} tpst={$man?.template}  i={1} expand={50} includeZero scale={$isFullSize ? 3 : 1.5}
     controls={[
       'slider',
       'play',

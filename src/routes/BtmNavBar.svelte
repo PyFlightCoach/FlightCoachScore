@@ -5,7 +5,7 @@
 
 {#if $showCollapseToggle}
 	
-		<div class="container-fluid d-flex flex-row justify-content-between p-0 bg-light border-top">
+		<div class="container d-flex flex-row justify-content-between p-0 bg-light border-top mw-100 overflow-auto">
 			<div class="col-auto"></div>
       <div class="col-auto p-0 justify-content-center">
         <div class="btn-group">

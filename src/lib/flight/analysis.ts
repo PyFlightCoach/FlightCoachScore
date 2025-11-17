@@ -87,11 +87,13 @@ export function clearDataLoading() {
 }
 
 export async function newAnalysis(flight: FlightDataSource) {
+
 	if (
 		!(flight.rawData instanceof BinData) &&
 		!(flight.rawData instanceof States)
 	) {
-		return importAnalysis(flight.rawData!);
+		return importAnalysis(flight.rawData!)
+    .then(()=>Object.assign(flight, {updated: false}));
 	}
 	const segmentation = await flight.segmentation!.loadManDefs();
 	sts.origin.set(flight.origin);
@@ -124,7 +126,7 @@ export async function newAnalysis(flight: FlightDataSource) {
 		setAnalysis(
 			i,
 			new MA(
-				segmentation.mans[id].name,
+				segmentation.mans[id].name!,
 				id,
 				new ScheduleInfo(sch.category_name, sch.schedule_name),
 				direction,
@@ -134,6 +136,8 @@ export async function newAnalysis(flight: FlightDataSource) {
 			)
 		);
 	});
+
+  return Object.assign(flight, {updated: false});
 }
 
 export function createAnalysisExport(small: boolean = false) {
@@ -175,6 +179,7 @@ export async function importAnalysis(data: AJson) {
 			}).first
 		);
 	}
+
 }
 
 export async function loadExample() {

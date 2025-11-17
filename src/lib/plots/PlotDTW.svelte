@@ -131,6 +131,7 @@
 					last_changed = Date.now();
 				}
 			}}
+      config={{ responsive: true }}
 		/>
 	</div>
 </div>

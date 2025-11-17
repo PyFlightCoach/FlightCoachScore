@@ -4,7 +4,7 @@
 	import { States } from '$lib/utils/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import * as split from '$lib/flight/splitting';
+	import { Splitting, ManSplit } from '$lib/flight/splitting';
 	import { lookupMonotonic } from '$lib/utils/arrays';
 	import { activeFlight } from '$lib/stores/shared';
 	import { FlightDataSource } from '$lib/flight/flight';
@@ -35,36 +35,31 @@
 					binData
 				);
 
-				const manSplits = [split.takeOff(lookupMonotonic(data.splits![0], states.t))];
+				const manSplits = [ManSplit.takeOff(lookupMonotonic(data.splits![0], states.t))];
 				data
 					.splits!.slice(1, data.splits!.length - 1)
 					.forEach((m, i) =>
-						manSplits.push(
-							split.build(
-								data.schedule!.category_name,
-								data.schedule!.schedule_name,
-								data.schedule!.manoeuvres[i],
-								lookupMonotonic(m, states.t)
-							)
-						)
+						manSplits.push(new ManSplit(data.schedule!.manoeuvres[i], lookupMonotonic(m, states.t)))
 					);
-				manSplits.push(split.landing(states.data.length));
+				manSplits.push(ManSplit.landing(states.data.length));
 
-				new split.Splitting(manSplits).loadManDefs().then(async (splitting) => {
-					activeFlight.set(
-						new FlightDataSource(
-							bin,
-							'bin',
-							undefined,
-							bootTime,
-							binData,
-							Object.setPrototypeOf(data.origin, fcj.Origin.prototype),
-							splitting
-						)
-					);
-					newAnalysis($activeFlight!);
-					goto(resolve('/flight/results'));
-				});
+				const splitting = new Splitting(manSplits);
+
+				$activeFlight = new FlightDataSource(
+					bin,
+					'bin',
+					undefined,
+					bootTime,
+					binData,
+					Object.setPrototypeOf(data.origin, fcj.Origin.prototype),
+					splitting,
+					splitting.schedule,
+					undefined,
+					undefined,
+					true
+				);
+
+				goto(resolve('/flight/results'));
 			});
 	}}
 	showInput={false}

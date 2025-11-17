@@ -17,11 +17,11 @@ export async function load() {
     if (get(activeFlight)!.updated) {
       console.log("Flight data input updated, reloading analysis")
       clearAnalysis();
-      newAnalysis(get(activeFlight)!);
+      newAnalysis(get(activeFlight)!).then(activeFlight!.set);
     }
   } else {
     console.log("loading new analysis")
-    newAnalysis(get(activeFlight)!);
+    newAnalysis(get(activeFlight)!).then(activeFlight!.set);
   }
   
   

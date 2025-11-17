@@ -39,4 +39,4 @@
 
 
 
-<Plot data={traces} layout={layout3d} />
+<Plot data={traces} layout={layout3d} config={{ responsive: true }}/>
