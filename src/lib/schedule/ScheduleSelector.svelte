@@ -63,9 +63,8 @@
         </button></td>
         <td>{sched.category_name}</td>
         <td>{sched.schedule_name}</td>
-        <td>{sched.owner_name}</td>
-        
         <td>Known</td>
+        <td>{sched.owner_name}</td>
         
       </tr>
     {/each}

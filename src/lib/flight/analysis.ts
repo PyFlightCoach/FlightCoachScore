@@ -93,7 +93,7 @@ export async function newAnalysis(flight: FlightDataSource) {
 	) {
 		return importAnalysis(flight.rawData!);
 	}
-	const segmentation = flight.segmentation!;
+	const segmentation = await flight.segmentation!.loadManDefs();
 	sts.origin.set(flight.origin);
 	sts.schedule.set(segmentation.schedule);
 	sts.isCompFlight.set(!!segmentation.schedule);

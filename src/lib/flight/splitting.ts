@@ -48,11 +48,11 @@ export class ManSplit {
 		return new ManSplit('Break', stop);
 	}
 	static landing(stop: number) {
-		return new ManSplit('Landing', stop);
+		return new ManSplit('Landing', stop, true);
 	}
 
 	async loadManDef() {
-		if (this.manoeuvre && typeof this.manoeuvre != 'string') {
+		if (this.manoeuvre && typeof this.manoeuvre != 'string' && (!this.mdef || this.mdef.info.short_name != this.manoeuvre.short_name)) {
 			return loadManDef(this.manoeuvre.id).then((mdef) => Object.assign(this, { mdef }));
 		} else {
 			return this;
@@ -126,7 +126,7 @@ export class Splitting {
 	}
 
 	get manNames() {
-		return this.analysisMans.map((i) => this.mans[i].name);
+		return this.analysisMans.map((i) => this.mans[i].name!);
 	}
 
 	get schedule(): DBSchedule | undefined {

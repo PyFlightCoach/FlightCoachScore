@@ -21,7 +21,7 @@
 	);
 
 	let range: [number, number] = $state([
-		0,
+		activeManId > 0 ? mans[activeManId - 1].stop : 0,
 		activeMan ? activeMan.stop : Math.min(2000, $activeFlight!.states.data.length - 1)
 	]); // the visible range in the plot
 
@@ -98,6 +98,30 @@
 			? mans[activeManId + 1].stop
 			: $activeFlight!.states.data.length - 1
 	]);
+
+  function nextManoeuvre() {
+    selectManoeuvre(activeManId + 1);
+    if (newMan?.name=="Landing") {
+      setManoeuvre();
+    }
+  }
+
+  function setManoeuvre () {
+    const man = Object.assign(thisMan!, { stop: activeIndex });
+    if (newMan) {
+      mans = [...mans, man];
+      newMan = undefined;
+    } else {
+      mans[activeManId] = man;
+    }
+    selectManoeuvre(activeManId);
+
+    
+    $activeFlight = $activeFlight!.withNewSegmentation(new Splitting(mans));
+    
+
+  }
+
 </script>
 
 <svelte:window
@@ -105,12 +129,9 @@
 		switch (e.key) {
 			case 'Enter':
 				if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre === 'string')) {
-					const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
-					mans = [...mans, man];
-					newMan = undefined;
-					selectManoeuvre(activeManId);
+					setManoeuvre();
 				} else {
-					selectManoeuvre(activeManId + 1);
+					nextManoeuvre();
 				}
 
 				break;
@@ -212,7 +233,7 @@
 					</ul>
 				</div>
 
-				{#if thisMan?.fixed}
+				{#if thisMan?.name == "TakeOff"}
 					<button
 						class="col-auto btn btn-outline-secondary dropdown-toggle"
 						aria-expanded="false"
@@ -222,14 +243,14 @@
 					>
 						{thisMan.name}
 					</button>
-				{:else if thisMan?.schedule}
+				{:else if thisMan?.schedule || thisMan?.name =="Landing" || thisMan?.name =="Break"}
 					<div class="btn-group btn-group-sm" role="group">
 						<button
 							class="col-auto btn btn-outline-secondary dropdown-toggle"
 							data-bs-toggle="dropdown"
 							aria-expanded="false"
 							aria-label="Toggle Dropdown"
-							disabled={thisMan.fixed}
+							disabled={thisMan.name == "TakeOff"}
 							title="Select manoeuvre from schedule library"
 						>
 							{thisMan.name || 'Select Manoeuvre'}
@@ -243,11 +264,12 @@
 							>
 								Select Schedule
 							</button>
+              {#if thisMan?.schedule}
 							<div class="dropdown-divider"></div>
 							<div class="dropdown-header text-sm py-0">
 								{thisMan?.schedule?.repr().toUpperCase()}
 							</div>
-							{#each thisMan.schedule.manoeuvres as manoeuvre}
+							{#each thisMan.schedule?.manoeuvres as manoeuvre}
 								<button
 									class="dropdown-item {manoeuvre == thisMan.manoeuvre ? 'active' : ''}"
 									onclick={() => {
@@ -257,7 +279,7 @@
 									{manoeuvre.name}
 								</button>
 							{/each}
-
+                {/if}
 							<div class="dropdown-divider"></div>
 							<button
 								class="dropdown-item {(newMan || activeMan)?.manoeuvre == 'Break' ? 'active' : ''}"
@@ -292,13 +314,7 @@
 					<button
 						class="btn btn-outline-primary form-control-sm"
 						onclick={() => {
-							const newSplitting = new Splitting(mans);
-
-							if (!Splitting.equals(newSplitting, $activeFlight?.segmentation)) {
-								newSplitting.loadManDefs().then((newSplits) => {
-									$activeFlight = $activeFlight!.withNewSegmentation(newSplits);
-								});
-							}
+							
 							goto(resolve('/flight/results'));
 						}}
 					>
@@ -310,16 +326,7 @@
 						title="Save manoeuvre"
 						aria-label="Set Manoeuvre"
 						disabled={!(thisMan?.schedule || typeof thisMan?.manoeuvre === 'string')}
-						onclick={() => {
-							const man = Object.assign(newMan || activeMan!, { stop: activeIndex });
-							if (newMan) {
-								mans = [...mans, man];
-								newMan = undefined;
-							} else {
-								mans[activeManId] = man;
-							}
-							selectManoeuvre(activeManId);
-						}}
+						onclick={setManoeuvre}
 					>
 						Set {#if newMan}(⏎){/if}
 					</button>
@@ -328,9 +335,7 @@
 						title="Next manoeuvre"
 						aria-label="Next manoeuvre"
 						disabled={!!newMan}
-						onclick={() => {
-							selectManoeuvre(activeManId + 1);
-						}}
+						onclick={nextManoeuvre}
 					>
 						Next {#if !newMan}(⏎){/if}
 					</button>
