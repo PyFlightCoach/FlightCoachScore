@@ -63,6 +63,23 @@ export class FlightDataSource {
 		}
 	}
 
+  prettyKind() {
+    switch (this.kind) {
+      case 'acrowrx':
+        return 'AcroWrx';
+      case 'bin':
+        return 'BIN File';
+      case 'db':
+        return 'Database';
+      case 'ajson':
+        return 'AJSON';
+      case 'example':
+        return 'Example';
+      default:
+        return 'Unknown';
+    }
+  }
+
 	checkOriginElevation(newOrigin: Origin | undefined, tol: number = 10): boolean {
 		if (this.rawData! instanceof BinData) {
 			const origin = this.rawData!.findOrigin();

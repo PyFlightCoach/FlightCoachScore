@@ -104,7 +104,7 @@
 		<tbody>
 			<tr
 				><th class="p-0 bg-light">Source:</th>
-				<td class="p-0 bg-light"> {$activeFlight?.kind}</td></tr
+				<td class="p-0 bg-light"> {$activeFlight?.prettyKind()}</td></tr
 			>
       {#if $activeFlight?.db}
         <tr
