@@ -10,6 +10,8 @@
 	import ScheduleSelector from '$lib/schedule/ScheduleSelector.svelte';
 	import type { DBManoeuvre, DBSchedule } from '$lib/schedule/db';
   import {schedule_id} from '$lib/leaderboards/stores';
+  import {  nRunning } from '$lib/stores/analysis';
+  import {get} from "svelte/store";
 
 	let mans = $state($activeFlight!.segmentation!.mans);
 
@@ -126,9 +128,11 @@
 
 <svelte:window
 	onkeyup={(e) => {
+    if (get(nRunning)) {return}
 		switch (e.key) {
 			case "Enter":
       case "NumpadEnter":
+
         if (thisMan && thisMan.name!=="Landing" ) {
           if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre === 'string')) {
 					setManoeuvre();
@@ -329,7 +333,7 @@
 						class="btn btn-outline-secondary px-2"
 						title="Save manoeuvre"
 						aria-label="Set Manoeuvre"
-						disabled={!(thisMan?.schedule || typeof thisMan?.manoeuvre === 'string')}
+						disabled={!(thisMan?.schedule || typeof thisMan?.manoeuvre === 'string') || !!$nRunning}
 						onclick={setManoeuvre}
 					>
 						Set {#if newMan}(⏎){/if}

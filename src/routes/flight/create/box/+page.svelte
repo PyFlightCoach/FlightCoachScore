@@ -12,6 +12,7 @@
 	import { user } from '$lib/stores/user';
 	import { GPS } from '$lib/utils/geometry';
 	import { breakPoints, breakPoint } from '$lib/stores/shared';
+  import {  nRunning } from '$lib/stores/analysis';
 
 
 	let newOrigin = $state($activeFlight!.origin);
@@ -146,7 +147,7 @@
 			<button
 				class="col btn btn-outline-primary"
         data-bs-dismiss={breakPoints['lg'] > breakPoints[$breakPoint] ? 'offcanvas' : undefined}
-
+        disabled={!!$nRunning}
 				onclick={() => {
 					if (!Origin.equals(newOrigin, $activeFlight?.origin)) {
 						$activeFlight = $activeFlight!.withNewOrigin(newOrigin!);
