@@ -125,14 +125,18 @@
 </script>
 
 <svelte:window
-	onkeydown={(e) => {
+	onkeyup={(e) => {
 		switch (e.key) {
-			case 'Enter':
-				if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre === 'string')) {
+			case "Enter":
+      case "NumpadEnter":
+        if (thisMan && thisMan.name!=="Landing" ) {
+          if (newMan && (newMan.schedule_id || typeof newMan.manoeuvre === 'string')) {
 					setManoeuvre();
 				} else {
 					nextManoeuvre();
 				}
+        }
+				
 
 				break;
 		}

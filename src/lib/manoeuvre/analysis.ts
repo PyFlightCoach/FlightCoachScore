@@ -148,7 +148,7 @@ export class MA {
 			res.corrected_template ? States.parse(res.corrected_template) : undefined,
 			res.full_scores ? ManoeuvreResult.parse(res.full_scores) : undefined,
 			res.info,
-			this.mdef instanceof ManOpt ? this.mdef : undefined
+			this.mdef instanceof ManOpt ? this.mdef : new ManOpt([this.mdef])
 		);
 	}
 
