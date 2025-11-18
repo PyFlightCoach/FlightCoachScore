@@ -284,6 +284,7 @@ export class States {
     return this.data[this.data.length - 1];
   }
 
+
   shift(offset: Point) {
     return new States(
 			this.data.map((st) => {

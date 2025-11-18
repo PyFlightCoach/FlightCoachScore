@@ -389,8 +389,12 @@ export class ManDef {
 	setmp(name: string, value: string | number) {
 		this.mps[name].defaul = value;
 	}
-}
 
+  checkElementNames(els: string[]) {
+    const elnames = Object.keys(this.eds);
+    return els.length == elnames.length && els.every((v,i)=>v==elnames[i]);
+  }
+}
 export interface IManOpt {
 	options: IManDef[];
 }
@@ -428,4 +432,14 @@ export class ManOpt {
 	setmp(name: string, value: string | number) {
 		this.options.forEach((o) => o.setmp(name, value));
 	}
+
+  activeOption(mdef: ManDef | ManOpt) {
+    if (mdef instanceof ManOpt) {
+      return undefined;
+    } else {
+      const optionID = this.options.findIndex(o=>{o.checkElementNames(Object.keys(mdef.eds))});
+      return optionID >=0 ? optionID : undefined;
+    }
+  }
+
 }

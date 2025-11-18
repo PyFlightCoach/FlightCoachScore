@@ -6,6 +6,7 @@
 	import { loadManDef, library } from '$lib/schedule/library';
 	import { States } from '$lib/utils/state';
 	import { GlobalState } from '$lib/flight/flight';
+	import { ManOpt } from '$lib/manoeuvre/definition.svelte';
 
 	let step: number = $state(0.2);
 	let element: string | undefined = $state();
@@ -16,6 +17,8 @@
 	const end_info = $derived(flown.end_info());
 	let states = $derived(flown.split());
 
+	let selectedOption = $state($man?.activeOption());
+	$inspect(selectedOption);
 	const editsplit = (stp: number, elname: string | undefined) => {
 		if (elname == null) return;
 		let data = flown.data;
@@ -50,40 +53,31 @@
 					}).first!.manoeuvres[$man!.id - 1].id
 				)
 			: $man!.mdef;
-    $man = Object.assign($man!, { data: new GlobalState(flown, $man?.data.origin!), mdef: md });
+		$man = Object.assign($man!, { data: new GlobalState(flown, $man?.data.origin!), mdef: md });
 		analyseManoeuvre($selManID!, force, optimise, reset);
 	}
 </script>
 
 <div class="container-fluid d-flex flex-column h-100 justify-content-around">
-  <div class="col-auto"></div>
-  <div class="col">
-    <PlotDTW bind:sts={states} bind:activeEl={element} scale={$isFullSize ? 3 : 1.5} expand={30} />
-  </div>
-	
-	<div class="col-auto d-flex flex-row">
-		
-			<div class="row w-100 justify-content-center ">
-				<select
-					class="nav-item col-auto form-select "
-					style="width:auto"
-					title="Select element to edit (or click ribbon)"
-					bind:value={element}
-				>
-					{#each ['Select Element'].concat(...Object.keys(states)) as el, i}
-						<option value={el}>{$man?.mdef?.eds[el]?.describe || el}</option>
-					{/each}
-				</select>
-				<input
-					title="Enter step size in seconds"
-					class="nav-item col-auto form-control text-center"
-					style="width: 100px;"
-					type="number"
-					id="stepsize"
-					bind:value={step}
-					step="0.1"
-				/>
-				<div class="col-auto btn-group p-0">
+	<div class="col-auto"></div>
+	<div class="col">
+		<PlotDTW bind:sts={states} bind:activeEl={element} scale={$isFullSize ? 3 : 1.5} expand={30} />
+	</div>
+
+	<div class="col-auto">
+		<div class="container-auto d-flex flex-row justify-content-center">
+			<div class="row">
+				<div class="input-group">
+					<select
+						class="form-select"
+						style="max-width:150px;"
+						title="Select element to edit (or click ribbon)"
+						bind:value={element}
+					>
+						{#each ['Element'].concat(...Object.keys(states)) as el, i}
+							<option value={el}>{$man?.mdef?.eds[el]?.describe || el}</option>
+						{/each}
+					</select>
 					<button
 						class="btn btn-outline-secondary"
 						title="Adjust split location backwards"
@@ -91,6 +85,15 @@
 							editsplit(-Number(step), element);
 						}}>&#60</button
 					>
+					<input
+						title="Enter step size in seconds"
+						class=" form-control text-center"
+						style="max-width:70px;"
+						type="number"
+						id="stepsize"
+						bind:value={step}
+						step="0.1"
+					/>
 					<button
 						class="btn btn-outline-secondary"
 						title="Adjust split location forwards"
@@ -98,38 +101,74 @@
 							editsplit(Number(step), element);
 						}}>&#62</button
 					>
-				</div>
-				<div class="btn-group p-0 col-auto">
-					<button
-						class="btn btn-outline-secondary"
-						title="Recalculate score without optimisation"
-						onclick={() => {
-							run(true, false, false);
-						}}>Score</button
-					>
-					<button
-						class="btn btn-outline-secondary"
-						title="Run aligment optimisation"
-						onclick={() => {
-							run(true, true, false);
-						}}>Optimise</button
-					>
-					<button
-						class="btn btn-outline-secondary"
-						title="Recalculate score without optimisation"
-						onclick={() => {
-							run(true, true, true);
-						}}>DTW</button
-					>
-					<button
-						class="btn btn-outline-secondary"
-						title="Rerun the analysis from scratch, inluding the initial DTW alignment"
-						onclick={() => {
-							flown = States.parse(structuredClone($man!.flown.data));
-						}}>Reset</button
-					>
+					<div class=" btn-group p-0 dropup">
+						<div class="btn-group btn-group-sm" role="group">
+							<button
+								class="btn btn-outline-secondary dropdown-toggle"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+								aria-label="Toggle Dropdown"
+							>
+								<i class="bi bi-gear"></i>
+							</button>
+
+							<ul class="dropdown-menu" style="max-height:300px; overflow-y:auto;">
+								<div class="dropdown-item">
+									<label for="selectOption">Select Option:</label>
+									<select
+										id="selectOption"
+										class="form-select"
+										size="3"
+										bind:value={selectedOption}
+									>
+										{#if $man!.allOptions.length > 1}
+											<option value={undefined}> Auto </option>
+										{/if}
+										{#each $man?.allOptions as _, i}
+											<option title="Select option {i}" value={i}>
+												Option {i}
+											</option>
+										{/each}
+									</select>
+								</div>
+								<button
+									class="dropdown-item"
+									title="Rerun analysis from scratch with the selected option"
+									onclick={() => {
+										$man = $man!.selectOption(selectedOption);
+                    analyseManoeuvre($selManID!, true, true, false);
+									}}>Rerun</button
+								>
+
+								<div class="dropdown-divider"></div>
+
+								<button
+									class="dropdown-item"
+									title="Recalculate score without optimisation"
+									onclick={() => {
+										run(true, false, false);
+									}}>Score</button
+								>
+								<button
+									class="dropdown-item"
+									title="Run aligment optimisation from current segmentation"
+									onclick={() => {
+										run(true, true, false);
+									}}>Optimise</button
+								>
+
+								<button
+									class="dropdown-item"
+									title="Reset the segmentation changes made in this session"
+									onclick={() => {
+										flown = States.parse(structuredClone($man!.flown.data));
+									}}>Reset</button
+								>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
-		
+		</div>
 	</div>
 </div>

@@ -191,24 +191,24 @@
 					</button>
 
 					<ul class="dropdown-menu" style="max-height:300px; overflow-y:auto;">
-						<li>
-							<label class="dropdown-item">
-								<input
-									type="file"
-									name="input-name"
-									style="display: none;"
-									accept=" .json"
-									title="Load manoeuvre segmentation from Flight Coach JSON file"
-									onchange={(e: Event) => {
-										const files = (e.target as HTMLInputElement).files!;
-										if (files.length > 0) {
-											parseFCJ(files[0]);
-										}
-									}}
-								/>
-								<span>Load Segmentation from FC Json</span>
-							</label>
-						</li>
+          
+            <label class="dropdown-item">
+              <input
+                type="file"
+                name="input-name"
+                style="display: none;"
+                accept=" .json"
+                title="Load manoeuvre segmentation from Flight Coach JSON file"
+                onchange={(e: Event) => {
+                  const files = (e.target as HTMLInputElement).files!;
+                  if (files.length > 0) {
+                    parseFCJ(files[0]);
+                  }
+                }}
+              />
+              <span>Load Segmentation from FC Json</span>
+            </label>
+						
 						<button
 							class="dropdown-item"
 							title="Undo changes made in this session"

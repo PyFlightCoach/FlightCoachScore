@@ -22,6 +22,7 @@ import { States } from '$lib/utils/state';
 import { checkUser } from '$lib/stores/user';
 import { BinData } from './bin';
 import { objmap } from '$lib/utils/arrays';
+import { ManOpt } from '$lib/manoeuvre/definition.svelte';
 
 export function checkComplete() {
 	return Boolean(
