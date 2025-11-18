@@ -3,9 +3,9 @@
 	import { navBarContents, showCollapseToggle } from '$lib/stores/navBarContents';
 </script>
 
-{#if $showCollapseToggle}
+{#if $showCollapseToggle || $navBarContents.length }
 	
-		<div class="container d-flex flex-row justify-content-between p-0 bg-light border-top mw-100 overflow-auto">
+		<div class="container d-flex flex-row justify-content-between p-0 bg-light border-top mw-100 overflow-auto d-lg-none">
 			<div class="col-auto"></div>
       <div class="col-auto p-0 justify-content-center">
         <div class="btn-group">

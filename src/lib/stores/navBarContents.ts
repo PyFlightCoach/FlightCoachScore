@@ -46,6 +46,10 @@ export class NavBarContents {
 	get active() {
 		return this.items.find((item) => item.active)?.name;
 	}
+
+  get length() {
+    return this.items.length;
+  }
 }
 
 export const navBarContents: Writable<NavBarContents> = writable(new NavBarContents());
@@ -61,5 +65,6 @@ export function reset(items: NavBarPage[] = []) {
 export function click(i: number) {
 	navBarContents.update((nbc) => nbc.click(i));
 }
+
 
 export const showCollapseToggle: Writable<boolean> = writable(false);
