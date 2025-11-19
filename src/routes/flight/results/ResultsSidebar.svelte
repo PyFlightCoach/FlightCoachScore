@@ -219,7 +219,7 @@
 			bind:value={comment}
 		></textarea>
 	</div>
-	{#if isNew || isUpdated}
+	{#if (isNew || isUpdated) && $activeFlight?.kind!="example"}
 		<div class="row mb-2 px-2">
 			<button
 				class="col btn btn-primary mx-2"
