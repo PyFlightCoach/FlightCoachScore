@@ -50,7 +50,7 @@ export class FlightDataSource {
 			| { flightFileName: string; sequenceFolderName: string }
 			| undefined = undefined,
 		readonly history: Record<string, unknown>[] = [],
-    readonly updated: boolean = false
+    readonly updated: boolean = true
 	) {}
 
 	get states(): States {
@@ -202,7 +202,8 @@ export class FlightDataSource {
 					segmentation,
 					segmentation.schedule,
 					undefined,
-					data.mans.map((m) => m.history || {})
+					data.mans.map((m) => m.history || {}),
+          true
 				);
 			})
 			.finally(unblockProgress);

@@ -5,7 +5,7 @@
 	let {
 		topflights
 	}: {
-		topflights: { schedule: string; count: number; flights: DBFlightRanked[] }[];
+		topflights: { schedule: string; count: number; flights: DBFlightRanked[] }[] | undefined;
 	} = $props();
 
 
@@ -17,15 +17,17 @@
 		<thead class="table-dark">
 			<tr>
 				<th class="text-start">Schedule</th>
-				{#each topflights[0]?.flights as _, i}
-					<th>{numberToPosition(i + 1)}</th>
-				{/each}
+        {#if topflights && topflights[0]}
+          {#each topflights[0]?.flights as _, i}
+            <th>{numberToPosition(i + 1)}</th>
+          {/each}
+        {/if}
 				<th>Flight Count</th>
 				<!--<th colspan="2">Best Normalised</th>-->
 			</tr>
 		</thead>
 		<tbody>
-			{#each topflights as row, i}
+			{#each topflights || [] as row, i}
 				{#if row.count > 0}
 					<tr class="align-middle">
 						<th class="text-start">{row.schedule.toUpperCase()}</th>

@@ -96,7 +96,7 @@
 				/>
 				<label class="btn btn-outline-secondary btn-sm" for="userActivity">Prolific Users</label>
 
-				<input type="radio" class="btn-check" value="last20" id="last20" bind:group={tableShow} />
+				<input type="radio"  class="btn-check" value="last20" id="last20" bind:group={tableShow} />
 				<label class="btn btn-outline-secondary btn-sm" for="last20">Recent Flights</label>
 
 				<input
@@ -110,15 +110,15 @@
 			</div>
 			{#if tableShow == 'userActivity'}
 				{#await getUserActivity then userActivity}
-					{#if userActivity}<UserActivity activity={userActivity} />{/if}
+					<UserActivity activity={userActivity} />
 				{/await}
 			{:else if tableShow == 'last20'}
 				{#await getRecent then recent}
-					{#if recent}<RecentFlights flightlist={recent} />{/if}
+					<RecentFlights flightlist={recent} />
 				{/await}
 			{:else if tableShow == 'topFlights'}
 				{#await getTopFlights then topflights}
-					{#if topflights}<TopFlights {topflights} />{/if}
+					<TopFlights topflights={topflights || undefined} />
 				{/await}
 			{/if}
 		</div>

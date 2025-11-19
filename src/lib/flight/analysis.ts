@@ -200,6 +200,7 @@ export async function loadAnalysisFromDB(flight_id: string) {
 	if (get(sts.manNames) && !confirm('Loading from DB will clear current analysis, continue?')) {
 		return;
 	}
+  clearDataLoading();
 	loading.set(true);
 	return FlightDataSource.db(flight_id)
 		.then((f) => {
@@ -241,7 +242,9 @@ export async function loadAcrowrx(file: File): Promise<void> {
 					Origin.parse(response.data.origin),
 					Splitting.default(response.data.data.length),
 					undefined,
-					response.data.meta
+					response.data.meta,
+          undefined,
+          true
 				)
 			);
 		})

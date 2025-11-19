@@ -2,7 +2,7 @@
 	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 	import { library } from '$lib/schedule/library';
 
-	let { flightlist }: { flightlist: DBFlightRanked[] } = $props();
+	let { flightlist }: { flightlist: DBFlightRanked[] | undefined } = $props();
 
 	let scheduleSummary = $derived($library.summarize());
 
@@ -23,7 +23,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each flightlist as row, i}
+			{#each flightlist || [] as row, i}
 				<tr style="font-family: 'Twemoji Country Flags', sans-serif !important">
 					<td class="text-start">{row.name} {getFlag(row.country)}</td>
 					<td>{scheduleSummary[row.schedule_id].repr.toUpperCase()}</td>
