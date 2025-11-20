@@ -1,13 +1,13 @@
 <script lang="ts">
 	import FlightInfo from './FlightInfo.svelte';
-	import { Flight } from '$lib/database/flight';
+	import { DBFlight } from '$lib/database/flight';
 	import { activeFlight } from '$lib/stores/shared';
 	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 
 	let {
-		lastResponse = undefined,
-		table_rows
+		lastResponse = $bindable(),
+		table_rows = $bindable()
 	}: { lastResponse: 'leaderboard' | 'flightlist' | undefined; table_rows: DBFlightRanked[] } =
 		$props();
 
@@ -40,7 +40,7 @@
 </script>
 
 {#if lastResponse}
-	<div class="table-responsive">
+  <div class="table-responsive w-100">
 		<table class="table table-striped text-center">
 			<thead class="table-dark" style="z-index:-1">
 				<tr>
@@ -56,7 +56,7 @@
 						<tr><td colspan={col_heads.length + 1} class="p-0 bg-secondary">...</td></tr>
 					{/if}
 					<tr
-						class={row.flight_id == $activeFlight?.meta.flight_id ? 'table-active' : ''}
+						class={row.flight_id == $activeFlight?.db?.flight_id ? 'table-active' : ''}
 						role="button"
 						style="font-family: 'Twemoji Country Flags', sans-serif !important"
 						onclick={() => {
@@ -81,7 +81,7 @@
 					{#if showFlight?.flight_id == row.flight_id}
 						<tr class="p-0">
 							<td colspan={col_heads.length + 1} class="p-1">
-                {#await Flight.load(row.flight_id) then res}
+                {#await DBFlight.load(row.flight_id) then res}
                   <FlightInfo f={res} rank={row.rank} />
                 {:catch error}
                   Error loading flight: {prettyPrintHttpError(error)}
@@ -93,4 +93,5 @@
 			</tbody>
 		</table>
 	</div>
+
 {/if}

@@ -1,37 +1,13 @@
 import { writable, type Writable, type Readable, derived } from 'svelte/store';
-import { FCJson, Origin } from '$lib/flight/fcjson';
-import { States } from '$lib/utils/state';
 import { MA } from '$lib/manoeuvre/analysis';
 import { get } from 'svelte/store';
-import { BinData } from '$lib/flight/bin/bindata';
-import { isComp, type Split, takeOff} from '$lib/flight/splitting';
-import { isFullSize } from './shared';
 import type { DBSchedule } from '$lib/schedule/db';
+import { Origin } from '$lib/flight/fcjson';
 
 export const isCompFlight: Writable<boolean> = writable(true);
 
-export const bin: Writable<File | undefined> = writable();
-export const binData: Writable<BinData | undefined> = writable();
-export const bootTime: Writable<Date | undefined> = writable();
-export const origin: Writable<Origin | undefined> = writable(Origin.load());
-export const fcj: Writable<FCJson | undefined> = writable();
-export const states: Writable<States | undefined> = writable();
-
 export const schedule = writable<DBSchedule | undefined>();
-
-states.subscribe((sts: States | undefined) => {
-	isFullSize.set(sts ? Math.max(sts.range('z'), sts.range('x'), sts.range('y')) > 1000 : false);
-});
-
-export const manSplits: Writable<Split[]> = writable([takeOff()]);
-
-manSplits.subscribe(msplits=>{
-  const scehedule = isComp(msplits)
-  isCompFlight.set(scehedule!==undefined);
-  schedule.set(scehedule);  
-
-});
-
+export const origin: Writable<Origin | undefined> = writable();
 export const manNames: Writable<string[] | undefined> = writable();
 export const nMans: Readable<number> = derived(manNames, (mns) => mns?.length || 0);
 export const analyses: Writable<MA | undefined>[] = [];
@@ -85,3 +61,5 @@ truncate.subscribe((value) => {
 });
 
 export const isComplete: Writable<boolean> = writable(false);
+
+

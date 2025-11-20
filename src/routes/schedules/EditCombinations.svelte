@@ -122,7 +122,6 @@
 						const comboName = newComboName.replaceAll(' ', '_');
 						let suffix = 0;
 						const all_parms = [...Object.keys(newCombos), ...Object.keys(builder.parameters)];
-            console.log(all_parms);
             while (
 							all_parms.includes(
 								`${comboName}${suffix || ""}`

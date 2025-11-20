@@ -8,13 +8,13 @@ export function validateEmail(email: string | undefined): boolean {
 
 export function prettyPrintHttpError(err: any): string {
   
-  if (err.response && err.response.data && err.response.data.detail) {
-    return `Error ${err.response.status}: ${err.response.data.detail.detail || err.response.data.detail.msg || err.response.data.detail}`;
-  } else if (err.message) {
-    return `Error: ${err.message}`;
+  if (err.response && err.response.data && err.response.data.detail && err.response.data.detail.length && err.response.data.detail[0].msg) {
+    return err.response.data.detail[0].msg;
   } else {
-    return 'An unknown error occurred.';
+    return err.response.data.detail || err.message || 'An unknown error occurred.';
+
   }
+  
 } 
 
 
@@ -41,4 +41,43 @@ export function numberToPosition(n: number): string {
   const suffixes = ["th", "st", "nd", "rd"];
   const value = n % 100;
   return n + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]);
+}
+
+
+function isToday(date: Date): boolean {
+  const today = new Date();
+  return date.toDateString() === today.toDateString();
+}
+
+function isYesterday(date: Date): boolean {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return date.toDateString() === yesterday.toDateString();
+}
+
+export function prettyDate(date: Date | undefined, includeTime=true): string {
+
+  if (!date) return "-";
+
+  let day: string | undefined = undefined;
+  if (isToday(date)) {
+    day = "Today";
+  } else if (isYesterday(date)) {
+    day = "Yesterday";
+  } else {
+    day = date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+  }
+  if (includeTime) {
+    return `${day} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  }
+  return day;
+  
+}
+
+export function noTrailingSlash(path: string) {
+  return path.endsWith("/") ? path.slice(0, path.length - 1 ) : path;
 }

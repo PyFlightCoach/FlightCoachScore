@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { PilotManager } from '$lib/competitions/competitors/PilotManager';
-	import { activeFlight } from '$lib/stores/shared';
-	import { bin, isCompFlight, isComplete } from '$lib/stores/analysis';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import Popup from '$lib/components/Popup.svelte';
 	import LinkDbFlight from '$lib/competitions/competitors/LinkDBFlight.svelte';
@@ -9,7 +7,7 @@
 	import { loadInPlotter } from '$lib/database/flight';
 	import DisplayDict from '$lib/components/DisplayDict.svelte';
 	import { user } from '$lib/stores/user';
-	import { Flight } from '$lib/database/flight';
+	import { DBFlight } from '$lib/database/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { prettyPrintHttpError } from '$lib/utils/text';
 	
@@ -29,9 +27,9 @@
 	let showDBLinkMenu = $state(false);
 	let showProperties = $state(false);
 
-	const flightInfo: Promise<Flight | undefined> = $derived(
+	const flightInfo: Promise<DBFlight | undefined> = $derived(
 		competitor?.competitor.flight_id
-			? Flight.load(competitor.competitor.flight_id)
+			? DBFlight.load(competitor.competitor.flight_id)
 			: Promise.resolve(undefined)
 	);
 
@@ -45,7 +43,7 @@
 				round.competition.summary.add_rules?.cd_and_self_flight_add &&
 				competitor.isMe($user!.id) )
 	);
-    $inspect(competitor.isMe($user!.id), 'is Me');
+    
 </script>
 
 {#snippet displayValue()}

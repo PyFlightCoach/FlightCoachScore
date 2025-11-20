@@ -2,155 +2,111 @@ import { type FCJson, type FCJMan } from '$lib/flight/fcjson';
 import { States } from '$lib/utils/state';
 import { lookupMonotonic } from '$lib/utils/arrays';
 import { loadManDef, library } from '$lib/schedule/library';
-import { type DBManoeuvre } from '$lib/schedule/db';
+import { DBSchedule, DBManoeuvre } from '$lib/schedule/db';
 import { get } from 'svelte/store';
 import { schedule_id } from '$lib/leaderboards/stores';
 import type { ManDef, ManOpt } from '../manoeuvre/definition.svelte';
+import type { AJson } from './ajson';
 
-export interface Split {
-	category_name?: string | undefined;
-	schedule_name?: string | undefined;
-	manoeuvre?: DBManoeuvre | undefined;
-	stop?: number | undefined;
-	fixed?: boolean;
-	alternate_name?: 'TakeOff' | 'Landing' | 'Break' | undefined;
-	mdef?: ManDef | ManOpt | undefined;
-}
+export class ManSplit {
+	constructor(
+		readonly manoeuvre: DBManoeuvre | 'TakeOff' | 'Landing' | 'Break' | undefined,
+		readonly stop: number,
+		readonly fixed: boolean = false,
+		readonly mdef: ManDef | ManOpt | undefined = undefined
+	) {}
 
-export function build(
-	category_name: string | undefined = undefined,
-	schedule_name: string | undefined = undefined,
-	manoeuvre: DBManoeuvre | undefined = undefined,
-	stop: number | undefined = undefined,
-	fixed: boolean = false,
-	alternate_name: 'TakeOff' | 'Landing' | 'Break' | undefined = undefined
-) {
-	return {
-		category_name,
-		schedule_name,
-		manoeuvre,
-		stop,
-		fixed,
-		alternate_name
-	} as Split;
-}
-
-export function takeOff(stop: number | undefined = undefined) {
-	return { fixed: true, stop, alternate_name: 'TakeOff' } as Split;
-}
-export function sequence_break(stop: number | undefined = undefined) {
-	return { stop, alternate_name: 'Break' } as Split;
-}
-export function landing(stop: number | undefined = undefined) {
-	return { stop, alternate_name: 'Landing' } as Split;
-}
-
-export function empty(stop: number | undefined = undefined) {
-	return { stop } as Split;
-}
-
-export function schedule(split: Split) {
-	return get(library).subset({
-		category_name: split.category_name!,
-		schedule_name: split.schedule_name!
-	}).first;
-}
-
-export function addManDef(split: Split) {
-	if (split.manoeuvre) {
-		const mdef = loadManDef(split.manoeuvre!.id);
-		return Object.assign({}, split, { mdef });
-	} else {
-		return split;
-	}
-}
-
-export function next(last: Split, stop: number | undefined = undefined) {
-	const msBase = empty(stop);
-
-	if (get(schedule_id) && !last.manoeuvre) {
-		const last_schedule = get(library).subset({ schedule_id: get(schedule_id) }).first;
-		if (last_schedule) {
-			msBase.category_name = last_schedule.category_name;
-			msBase.schedule_name = last_schedule.schedule_name;
-			msBase.manoeuvre = last_schedule.manoeuvres[0];
+	get schedule_id() {
+		switch (this.manoeuvre) {
+			case 'TakeOff':
+				return get(schedule_id);
+			case 'Landing':
+			case 'Break':
+				return undefined;
+			default:
+				return this.manoeuvre?.schedule_id || get(schedule_id);
 		}
 	}
 
-	switch (last.alternate_name) {
-		case 'Break':
-		case undefined:
-			if ((last.category_name && last.schedule_name && last.manoeuvre) || last.alternate_name) {
-				if (last.manoeuvre) {
-					const mans = schedule(last).manoeuvres;
+	get schedule() {
+		return get(library).subset({ schedule_id: this.schedule_id }).first;
+	}
 
-					if (last.manoeuvre.index < mans.length) {
-						return {
-							...last,
-							...{
-								manoeuvre: mans[last.manoeuvre!.index],
-								stop
-							}
-						};
-					} else {
-						return landing(stop);
-					}
+	get name() {
+		return typeof this.manoeuvre == 'string' ? this.manoeuvre : this.manoeuvre?.short_name;
+	}
+
+	static equals(a: ManSplit, b: ManSplit, offset: number = 0) {
+    // Offset applies to manoeuvre B, it accounts for the case where the states come from an ajson and there is no takeoff
+		return a.manoeuvre == b.manoeuvre && a.stop == b.stop + offset;
+	}
+
+	static takeOff(stop: number) {
+		return new ManSplit('TakeOff', stop, true);
+	}
+	static sequence_break(stop: number) {
+		return new ManSplit('Break', stop);
+	}
+	static landing(stop: number) {
+		return new ManSplit('Landing', stop, true);
+	}
+
+	async loadManDef() {
+		if (this.manoeuvre && typeof this.manoeuvre != 'string' && (!this.mdef || this.mdef.info.short_name != this.manoeuvre.short_name)) {
+			return loadManDef(this.manoeuvre.id).then((mdef) => Object.assign(this, { mdef }));
+		} else {
+			return this;
+		}
+	}
+
+	next(): DBManoeuvre | 'Landing' | undefined {
+		if (this.schedule_id) {
+			if (this.manoeuvre === 'TakeOff') {
+				return this.schedule?.manoeuvres[0];
+			} else if (typeof this.manoeuvre != 'string') {
+				if (this.manoeuvre!.index < this.schedule.manoeuvres.length) {
+					return this.schedule.manoeuvres[this.manoeuvre!.index];
 				} else {
-					return {
-						...last,
-						...{
-							manoeuvre: undefined,
-							stop
-						}
-					};
+					return 'Landing';
 				}
-			} else {
-				throw new Error('Cannot make next manoeuvre without fully defining previous');
 			}
-		case 'Landing':
-			throw new Error('Landing must be the last manoeuvre');
-		case 'TakeOff':
-			//case 'Break':
-			return msBase;
+		}
 	}
 }
 
-export function isComp(splits: Split[]) {
+export function isComp(splits: ManSplit[]) {
 	if (splits.length < 3) {
 		return;
 	}
+	if (splits[0].manoeuvre != 'TakeOff' || splits[splits.length - 1].manoeuvre != 'Landing') {
+		return;
+	}
+	const schedule = get(library).subset({ schedule_id: splits[1].schedule_id }).first;
 	if (
-		(splits[0].alternate_name != 'TakeOff' || splits[splits.length - 1].alternate_name != 'Landing')
+		schedule.manoeuvres.every((m, i) => {
+			const sman = splits[i + 1].manoeuvre;
+			return sman instanceof DBManoeuvre && sman.id == m.id;
+		})
 	) {
-		return;
+		return schedule;
 	}
-
-	if (!splits[1].manoeuvre) {
-		return;
-	}
-
-	const schedule = get(library).subset({
-		category_name: splits[1].category_name,
-		schedule_name: splits[1].schedule_name
-	}).first;
-
-	if (splits.length - 2 != schedule.manoeuvres.length) {
-		return;
-	}
-
-	if (schedule.manoeuvres.some((m, i) => m.short_name != splits[i+1].manoeuvre?.short_name)) {
-    return;
-  };
-  return schedule;
 }
 
 export class Splitting {
-	constructor(readonly mans: Split[]) {}
+	constructor(readonly mans: ManSplit[]) {}
+
+	get stops() {
+		return this.mans.map((m) => m.stop).join(', ');
+	}
+
+	get length() {
+		return this.mans.length;
+	}
 
 	get analysisMans() {
 		const oMans: number[] = [];
 		this.mans.forEach((man, i) => {
-			if (man.manoeuvre) {
+			if (man.manoeuvre instanceof DBManoeuvre) {
 				oMans.push(i);
 			}
 		});
@@ -170,7 +126,64 @@ export class Splitting {
 	}
 
 	get manNames() {
-		return this.analysisMans.map((iman) => this.mans[iman].manoeuvre!.short_name);
+		return this.analysisMans.map((i) => this.mans[i].name!);
+	}
+
+	get schedule(): DBSchedule | undefined {
+		return isComp(this.mans);
+	}
+
+	sliceInfo(id: number, t: number[]) {
+		const istart = id > 0 ? this.mans[id - 1].stop! : 0;
+		const istop = this.mans[id].stop!;
+		return { istart, tstart: t[istart], istop, tstop: t[istop] };
+	}
+
+	static async parseFCJ(fcj: FCJson, states: States) {
+		return parseFCJMans(fcj, states)
+			.then(loadManDefs)
+			.then((splits) => new Splitting(splits));
+	}
+
+	static async parseAJson(ajson: AJson) {
+		let lasti = 0;
+		const ajmans = ajson.mans.map((ajman) => {
+			lasti += ajman.flown.length - 1;
+			return new ManSplit(
+				get(library).subset({
+					schedule_name: ajman.schedule.name,
+					category_name: ajman.schedule.category
+				}).first.manoeuvres[ajman.id - 1],
+				lasti
+			);
+		});
+		return new Splitting([ManSplit.takeOff(0), ...ajmans, ManSplit.landing(lasti)]).loadManDefs();
+	}
+
+	static default() {
+		return new Splitting([]);
+	}
+
+	async loadManDefs() {
+		return new Splitting(await loadManDefs(this.mans));
+	}
+
+	static equals(a: Splitting | undefined, b: Splitting | undefined) {
+		if (a === undefined || b === undefined) {
+      console.log("Splitting.equals: one is undefined", a, b);
+			return a === b;
+		}
+		if (a.length != b.length) {
+      console.log("Splitting.equals: length mismatch", a.length, b.length);
+			return false;
+		}
+		for (let i = 0; i < a.length; i++) {
+			if (!ManSplit.equals(a.mans[i], b.mans[i])) {
+        console.log("Splitting.equals: mans mismatch at index", i, a.mans[i], b.mans[i]);
+				return false;
+			}
+		}
+		return true;
 	}
 }
 
@@ -187,26 +200,21 @@ export async function parseFCJMans(fcj: FCJson, states: States) {
 		const stStop = lookupMonotonic(fcj.data[man.stop].time / 1e6, stTime);
 		switch (i) {
 			case 0:
-				return takeOff(stStop);
+				return ManSplit.takeOff(stStop);
 			case fcj.mans.length - 1:
-				return landing(stTime.length);
+				return ManSplit.landing(stTime.length);
 			default:
-				return build(
-					schedule.category_name,
-					schedule.schedule_name,
-					schedule.manoeuvres[i - 1],
-					stStop
-				);
+				return new ManSplit(schedule.manoeuvres[i - 1], stStop);
 		}
 	});
 }
 
-export async function loadManDefs(splits: Split[]): Promise<Split[]> {
-	const oMans: Promise<Split>[] = [];
+export async function loadManDefs(splits: ManSplit[]): Promise<ManSplit[]> {
+	const oMans: Promise<ManSplit>[] = [];
 
 	for (const man of splits) {
-		if (man.manoeuvre) {
-			oMans.push(loadManDef(man.manoeuvre.id).then((md) => ({ ...man, mdef: md })));
+		if (man.manoeuvre instanceof DBManoeuvre) {
+			oMans.push(loadManDef(man.manoeuvre.id).then((mdef) => Object.assign(man, { mdef })));
 		} else {
 			oMans.push((async () => man)());
 		}

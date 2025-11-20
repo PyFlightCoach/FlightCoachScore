@@ -80,6 +80,24 @@ export class ContestManager {
 		).length;
 	}
 
+  get startTime() {
+    const date = this.summary.client_meta?.start_date || this.summary.date_start;
+    if (date) {
+      return new Date(Date.parse(date))
+    } else {
+      return undefined
+    }
+  }
+
+  get endTime () {
+    const date = this.summary.client_meta?.end_date || this.summary.date_end;
+    if (date) {
+      return new Date(Date.parse(date))
+    } else {
+      return undefined
+    }
+  }
+
 	sortCompetitors(by: 'Running Order' | 'Results') {
 		return this.competitors.sort((a, b) => {
 			if (by === 'Running Order') {
@@ -231,16 +249,13 @@ export class ContestManager {
 		schedule_id: string | undefined
 	) {
 		if (user_id) {
-			console.log('Checking can upload for comp:', this.summary.name);
 			if (this.competitors.length === 0) {
-				console.log('no competitors');
 				return false;
 			}
 
 			// Check the Add rules
 			// I am not the CD and only the CD can add flights
 			if (!this.competition.summary.add_rules?.cd_and_self_flight_add && !this.isMyComp) {
-				console.log('cannot add flights');
 				return false;
 			}
 		}
@@ -307,7 +322,7 @@ export class ContestManager {
 
 			return 'Acceptable';
 		});
-		console.log('round checks:', roundChecks);
+		
 		return roundChecks.some((r) => r === 'Acceptable');
 	}
 

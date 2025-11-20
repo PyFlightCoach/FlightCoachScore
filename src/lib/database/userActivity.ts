@@ -21,13 +21,13 @@ export interface UserActivityResponse {
 export async function loadActivity() {
 	return dbServer.get('/analysis/user_activity').then((res) => {
 		return res.data.results as UserActivityResponse[];
-	});
+	}).catch();
 }
 
 export async function loadRecent(n_results = 18) {
 	return dbServer.get('/analysis/flightlist', { params: {n_results} } ).then((res) => {
 		return res.data.results as DBFlightRanked[];
-	});
+	}).catch();
 }
 
 export async function loadScheduleFlights(schedule_id: string, n_results: number) {
@@ -35,7 +35,19 @@ export async function loadScheduleFlights(schedule_id: string, n_results: number
 		.get('/analysis/leaderboard', {
 			params: { schedule_id, n_results, version: get(faVersion), one_per_pilot_flag: true }
 		})
-		.then((res) => res.data.results as DBFlightRanked[]);
+		.then((res) => {
+      const flights: (DBFlightRanked | null)[] = res.data.results as DBFlightRanked[];
+      for (let i = flights.length; i < n_results; i++) {
+        flights.push(null);
+      }
+      return flights;    
+    });
+}
+
+export interface TopFlightsResponse {
+  schedule: string;
+  count: number;
+  flights: (DBFlightRanked | null)[];
 }
 
 export async function loadTopFlights(n_results = 3) {
@@ -49,9 +61,9 @@ export async function loadTopFlights(n_results = 3) {
       schedule: sched.repr,
 			count: sched.count,
       flights: flights,
-		};
+		} as TopFlightsResponse;
     }));
 	}
 
-  return Promise.all(flightLoads);
+  return Promise.all(flightLoads).catch();;
 }

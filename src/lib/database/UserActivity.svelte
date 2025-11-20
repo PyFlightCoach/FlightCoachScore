@@ -2,8 +2,9 @@
 	import { library } from '$lib/schedule/library';
 	import { type UserActivityResponse } from '$lib/database/userActivity';
 	import { nth } from '$lib/utils/numbers';
-	
-	let { activity }: { activity: UserActivityResponse[] } = $props();
+	import { loadActivity, loadRecent, loadTopFlights } from '$lib/database/userActivity';
+  
+	let { activity=$bindable() }: { activity: UserActivityResponse[] | undefined } = $props();
 
 	let scheduleSummary = $derived($library.summarize());
 </script>
@@ -32,7 +33,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each activity.slice(undefined, 18) as row, i}
+			{#each activity?.slice(undefined, 18) || [] as row, i}
 				{#if scheduleSummary[row.best_rank_schedule_id]}
 					<tr class="align-middle">
 						<td>{i + 1}</td>

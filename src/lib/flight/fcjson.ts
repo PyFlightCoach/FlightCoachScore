@@ -26,6 +26,17 @@ export class Origin {
 		this.move_north = move_north;
 	}
 
+  static parse (data: Record<string, number>) {
+    return new Origin(
+      data.lat,
+      data.lng,
+      data.alt,
+      data.heading,
+      data.move_east || 0,
+      data.move_north || 0
+    );
+  }
+
 	save() {
 		localStorage.setItem('orginLat', this.lat.toFixed(10));
 		localStorage.setItem('orginLon', this.lng.toFixed(10));
@@ -51,12 +62,19 @@ export class Origin {
 		}
 	}
 
+  static equals(a: Origin | undefined, b: Origin | undefined) {
+    if (a===undefined || b===undefined) {
+      return a==b;
+    }
+    return a.lat == b.lat && a.lng == b.lng && a.alt == b.alt && a.heading == b.heading;
+  }
+
 	get radHeading() {
 		return (this.heading * Math.PI) / 180;
 	}
 
 	get pilot() {
-		return new GPS(this.lat, this.lng, this.alt);
+		return new GPS(this.lat, this.lng, -this.alt);
 	}
 
   get centre() {
@@ -70,7 +88,10 @@ export class Origin {
 		return new Origin(this.lat, this.lng, this.alt, this.heading);
 	}
 
-	static from_centre(pil: GPS, centre: GPS) {
+	static from_centre(pil: GPS, centre: GPS | undefined = undefined) {
+    if (!centre) {
+      return new Origin(pil.lat, pil.lon, pil.alt, 0);
+    }
 		const vec = GPS.sub(centre, pil);
 		return new Origin(pil.lat, pil.lon, pil.alt, (Math.atan2(vec.y, vec.x) * 180) / Math.PI, 0, 0);
 	}
@@ -305,6 +326,7 @@ export class FCJson {
 	short_name: string;
 	sinfo: ScheduleInfo;
 	origin: Origin;
+  originAlt: number;
 	constructor(
 		readonly version: string,
 		readonly comments: string,
@@ -330,15 +352,14 @@ export class FCJson {
 
 		this.short_name = this.name.replace(/\.[^/.]+$/, '');
 		this.sinfo = ScheduleInfo.from_fcj_sch(this.parameters.schedule);
-		this.origin = new Origin(
+
+    this.origin = new Origin(
 			parseFloat(this.parameters.pilotLat),
 			parseFloat(this.parameters.pilotLng),
-			typeof this.parameters.originAlt == 'number'
-				? this.parameters.originAlt
-				: parseFloat(this.parameters.originAlt),
+			parseFloat(this.parameters.originAlt.toString()),
 			(this.parameters.rotation * 180) / Math.PI,
-			this.parameters.moveEast,
-			this.parameters.moveNorth
+			//this.parameters.moveEast,
+			//this.parameters.moveNorth
 		);
 	}
 

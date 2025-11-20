@@ -37,7 +37,7 @@
 		}}
 	>
     <button 
-      class="btn btn-link text-dark w-100 text-nowrap text-decoration-none m-0 text-start fw-bold p-0"
+      class="btn btn-link text-dark w-100 text-decoration-none m-0 text-start fw-bold p-0"
       data-bs-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"

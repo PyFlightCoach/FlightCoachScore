@@ -5,10 +5,10 @@
 	import RecentFlights from '$lib/database/RecentFlights.svelte';
 	import TopFlights from '$lib/database/TopFlights.svelte';
 	import { loadActivity, loadRecent, loadTopFlights } from '$lib/database/userActivity';
-	import * as nbc from '$lib/stores/navBarContents';
 	import { dbServer } from '$lib/api';
+	import type { UserActivityResponse, TopFlightsResponse } from '$lib/database/userActivity';
+	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 
-	nbc.reset();
 	let activeNews = $state(0);
 	let show = $state('About');
 	const getNews = $derived(
@@ -21,14 +21,23 @@
 			: []
 	);
 
-	let tableShow = $state('userActivity');
-	const getUserActivity = $derived($user ? loadActivity() : undefined);
-	const getRecent = $derived($user ? loadRecent() : undefined);
-	const getTopFlights = $derived($user ? loadTopFlights(3) : undefined);
+	let tableShow = $state('last20');
+
+	let userActivity: UserActivityResponse[] | undefined = $state();
+	let recent: DBFlightRanked[] | undefined = $state();
+	let topFlights: TopFlightsResponse[] | undefined = $state();
+    
+	$effect(() => {
+		if ($user) {
+			loadActivity().then((data) => (userActivity = data));
+			loadRecent().then((data) => (recent = data));
+			loadTopFlights(3).then((data) => (topFlights = data));
+		}
+	});
 </script>
 
-<div class="row justify-content-around">
-	<div class="col-lg-{$user ? '6' : '10'} col-auto px-lg-2 px-0">
+<div class="row ps-4 w-100">
+	<div class="col-lg-{$user ? '6' : '10'} col-auto">
 		<div class="row mb-3">
 			<h1 class="text-center pt-3 h-1">Flight Coach Score</h1>
 			<lead class="lead text-center text-muted"
@@ -88,40 +97,19 @@
 	</div>
 	{#if $user}
 		<div class="col-lg-6 justify-content-center px-lg-2 px-0">
-			<div class="button-grp mb-2 text-center py-2">
-				<input
-					type="radio"
-					class="btn-check"
-					value="userActivity"
-					id="userActivity"
-					bind:group={tableShow}
-				/>
-				<label class="btn btn-outline-secondary btn-sm" for="userActivity">Prolific Users</label>
-
-				<input type="radio" class="btn-check" value="last20" id="last20" bind:group={tableShow} />
-				<label class="btn btn-outline-secondary btn-sm" for="last20">Recent Flights</label>
-
-				<input
-					type="radio"
-					class="btn-check"
-					value="topFlights"
-					id="topFlights"
-					bind:group={tableShow}
-				/>
-				<label class="btn btn-outline-secondary btn-sm" for="topFlights">Top Flights</label>
+      <div class="row justify-content-center py-0">
+			<div class="col-auto btn-group mb-2 text-center py-2 py-0">
+        <button class="btn btn-sm btn-outline-secondary {tableShow=='userActivity' ? 'active' : ''}" onclick={()=>{tableShow='userActivity'}}>User Activity</button>
+        <button class="btn btn-sm btn-outline-secondary {tableShow=='last20' ? 'active' : ''}" onclick={()=>{tableShow='last20'}}>Recent Flights</button>
+        <button class="btn btn-sm btn-outline-secondary {tableShow=='topFlights' ? 'active' : ''}" onclick={()=>{tableShow='topFlights'}}>Top Flights</button>
 			</div>
+      </div>
 			{#if tableShow == 'userActivity'}
-				{#await getUserActivity then userActivity}
-					{#if userActivity}<UserActivity activity={userActivity} />{/if}
-				{/await}
+				<UserActivity bind:activity={userActivity} />
 			{:else if tableShow == 'last20'}
-				{#await getRecent then recent}
-					{#if recent}<RecentFlights flightlist={recent} />{/if}
-				{/await}
+				<RecentFlights bind:flightlist={recent} />
 			{:else if tableShow == 'topFlights'}
-				{#await getTopFlights then topflights}
-					{#if topflights}<TopFlights {topflights} />{/if}
-				{/await}
+				<TopFlights bind:topflights={topFlights} />
 			{/if}
 		</div>
 	{/if}

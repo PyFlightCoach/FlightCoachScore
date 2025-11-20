@@ -6,7 +6,7 @@
 	import colddraft from '$lib/plots/colddraft';
 	
 	let {
-		sts,
+		sts = $bindable(),
 		activeEl = $bindable(),
 		scale = 1,
 		defaultValue = undefined,
@@ -131,6 +131,7 @@
 					last_changed = Date.now();
 				}
 			}}
+      config={{ responsive: true }}
 		/>
 	</div>
 </div>

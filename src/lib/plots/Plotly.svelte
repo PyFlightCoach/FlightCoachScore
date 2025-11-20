@@ -85,7 +85,6 @@
 			}) => {
 				loaded = false;
 				return Plotly.react(node, data, layout, config).then(() => {
-					console.debug('update ploty', data);
 					loaded = true;
 				});
 			},

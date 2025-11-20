@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { States } from '$lib/utils/state';
 	import Plot from './Plotly.svelte';
-	import { ribbon, boxtrace, plotCorners } from '$lib/plots/traces';
+	import { ribbon, boxtraces, plotCorners } from '$lib/plots/traces';
 	import DoubleSlider from '$lib/plots/DoubleSlider.svelte';
 	import colddraft from '$lib/plots/colddraft';
-	
+
 	const availableControls = [
 		'slider',
 		'play',
@@ -18,19 +18,22 @@
 	];
 
 	let {
-		flst,
-		tpst = undefined,
+		flst = $bindable(),
+		tpst = $bindable(undefined),
 		i = $bindable(undefined),
-		controls = availableControls,
+		onselected = () => {},
+		controls = $bindable(availableControls),
 		exclude_controls = [],
 		showBefore = false,
 		showAfter = false,
-		scale = 1,
+		scale = $bindable(1),
 		speed = $bindable(20),
 		range = $bindable([0, flst.data.length]),
+    rangeLimits = $bindable([0, flst.data.length]),
 		greyUnselected = false,
 		fixRange = false,
 		showBox = $bindable(false),
+		boxDisplay = $bindable('F3A'),
 		includeZero = $bindable(false),
 		expand = 0,
 		hideAxes = false,
@@ -40,6 +43,7 @@
 		flst: States;
 		tpst?: States | undefined;
 		i?: number | undefined;
+		onselected?: (index: number) => void;
 		controls?: string[];
 		exclude_controls?: string[];
 		showBefore?: boolean;
@@ -47,9 +51,11 @@
 		scale?: number;
 		speed?: number;
 		range?: [number, number];
+    rangeLimits?: [number, number];
 		greyUnselected?: boolean;
 		fixRange?: boolean;
 		showBox?: boolean;
+		boxDisplay?: 'F3A' | 'IMAC' | 'IAC';
 		includeZero?: boolean;
 		expand?: number;
 		hideAxes?: boolean;
@@ -63,13 +69,26 @@
 	//	$: if (flst && fixRange) {
 	//		range = [0, flst.data.length];
 	//	}
-  
-	const createRibbonTrace = (st: States | undefined, sc: number, min: number, max: number, color:string, opacity: number=1.0) => {
+
+	const createRibbonTrace = (
+		st: States | undefined,
+		sc: number,
+		min: number,
+		max: number,
+		color: string,
+		opacity: number = 1.0
+	) => {
 		if (!st) {
 			return { type: 'mesh3d', visible: false };
 		} else {
 			max = max == -1 ? st.data.length : max;
-			return { ...ribbon(new States(st.data.slice(min, max)), sc), hoverinfo: 'none', color, opacity };
+      
+			return {
+				...ribbon(new States(st.data.slice(Math.max(min, rangeLimits[0]), Math.min(max, rangeLimits[1]))), sc),
+				hoverinfo: 'none',
+				color,
+				opacity
+			};
 		}
 	};
 
@@ -84,9 +103,9 @@
 				eye: { x: 0, y: -1.5, z: -1 },
 				projection: { type: projection }
 			},
-      xaxis: {visible:!hideAxes},
-			yaxis: {visible:!hideAxes},
-			zaxis: {visible:!hideAxes}
+			xaxis: { visible: !hideAxes },
+			yaxis: { visible: !hideAxes },
+			zaxis: { visible: !hideAxes }
 		}
 	});
 
@@ -94,12 +113,23 @@
 		projection = projection == 'perspective' ? 'orthographic' : 'perspective';
 	};
 
-	const createModelTrace = (st: States | undefined, i: number | undefined, sc: number, color: string, opacity: number=1.0) => {
+	const createModelTrace = (
+		st: States | undefined,
+		i: number | undefined,
+		sc: number,
+		color: string,
+		opacity: number = 1.0
+	) => {
 		if (st && typeof i !== 'undefined' && i < st.data.length && st.data[i]) {
 			const fst = st.data[i];
 			return colddraft
 				.scale(sc * 0.6)
-				.to_mesh3d(fst.pos, fst.att, { opacity: opacity, hoverinfo: 'skip', name: 'fl model', color });
+				.to_mesh3d(fst.pos, fst.att, {
+					opacity: opacity,
+					hoverinfo: 'skip',
+					name: 'fl model',
+					color
+				});
 		} else {
 			return { type: 'mesh3d', visible: false };
 		}
@@ -130,7 +160,14 @@
 	const grey_ribbon2 = $derived(
 		greyUnselected && range[1] < flst.data.length
 			? {
-					...createRibbonTrace(flst, scale * scale_multiplier, range[1], flst.data.length, 'grey', 0.2),
+					...createRibbonTrace(
+						flst,
+						scale * scale_multiplier,
+						range[1],
+						flst.data.length,
+						'grey',
+						0.2
+					),
 					opacity: 0.2,
 					name: 'after',
 					color: 'grey',
@@ -138,7 +175,7 @@
 				}
 			: { type: 'mesh3d', visible: false, name: 'grey2' }
 	);
-	const box = $derived(showBox ? boxtrace() : { type: 'mesh3d', visible: false });
+	const box = $derived(showBox ? boxtraces(boxDisplay) : [{ type: 'mesh3d', visible: false }]);
 	const traces = $derived([
 		corners,
 		fl_ribbon,
@@ -147,7 +184,7 @@
 		tp_model,
 		grey_ribbon1,
 		grey_ribbon2,
-		box,
+		...box,
 		...extraTraces
 	]);
 
@@ -173,7 +210,6 @@
 			fun();
 		}
 	};
-
 </script>
 
 <div
@@ -194,8 +230,8 @@
 			<Plot
 				data={traces}
 				{layout}
+				config={{ responsive: true }}
 				onclick={(e) => {
-					console.log(e);
 					if (e.points?.length) {
 						const offset = {
 							fl: range[0],
@@ -208,6 +244,7 @@
 						if (offset != undefined) {
 							if (showcontrols.includes('modelClick')) {
 								i = offset + Math.floor(e.points[0].pointNumber / 2);
+								onselected(i);
 							} else if (showcontrols.includes('rangeEndClick')) {
 								range[1] = offset + Math.floor(e.points[0].pointNumber / 2);
 							} else if (showcontrols.includes('rangeStartClick')) {

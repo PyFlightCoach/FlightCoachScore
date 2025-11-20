@@ -4,7 +4,7 @@
 		development for over 10 years. The application is free to use for flight data recorded in <a
 			href="https://ardupilot.org/">Ardupilot</a
 		>
-		dataflash log files and <a href="https://www.flightcoach.org/">Flight Coach</a> JSON files. The automatic
+		dataflash log files. The automatic
 		judging process is entirely deterministic based on the rules for the relevant aerobatic category,
 		allowing you to see exactly how every score is calculated and hence how to improve your flying.
 	</p>

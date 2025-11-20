@@ -1,34 +1,83 @@
 import { States } from '$lib/utils/state';
 import { ManDef, ManOpt } from '$lib/manoeuvre/definition.svelte';
 import { ManoeuvreResult } from '$lib/manoeuvre/scores';
-import { FCJManResult, FCJScore, ScheduleInfo } from '$lib/flight/fcjson';
+import { FCJManResult, FCJScore, Origin, ScheduleInfo } from '$lib/flight/fcjson';
 import { analysisServer } from '$lib/api/api';
-import { selectedResult, binData, origin } from '$lib/stores/analysis';
-import { get } from 'svelte/store';
+import { selectedResult } from '$lib/stores/analysis';
 import { isAnalysisModified } from '$lib/stores/shared';
 import { Manoeuvre } from './raw.svelte';
 import { objmap } from '$lib/utils/arrays';
-
+import { BinDataState, GlobalState } from '$lib/flight/flight';
+import { loadManDef, library } from '$lib/schedule/library';
+import { get } from 'svelte/store';
 
 export class MA {
 	constructor(
 		readonly name: string,
 		readonly id: number,
-		readonly tStart: number,
-		readonly tStop: number,
 		readonly schedule: ScheduleInfo,
 		readonly scheduleDirection: string,
+		readonly data: GlobalState | BinDataState,
+		readonly mdef: ManDef | ManOpt,
 		readonly history: Record<string, FCJManResult> = {},
-		readonly k: number | undefined = undefined,
-		readonly flown: States | undefined = undefined,
-		readonly mdef: ManDef | ManOpt | undefined = undefined,
 		readonly manoeuvre: Manoeuvre | undefined = undefined,
 		readonly template: States | undefined = undefined,
 		readonly corrected: Manoeuvre | undefined = undefined,
 		readonly corrected_template: States | undefined = undefined,
 		readonly scores: ManoeuvreResult | undefined = undefined,
-    readonly runinfo: string = ''
+		readonly runinfo: string = '',
+		readonly options: ManOpt | undefined = undefined
 	) {}
+
+	get flown() {
+		return this.data.states;
+	}
+
+	get k() {
+		return this.mdef?.info.k || 1;
+	}
+
+	get allOptions() {
+		return this.options
+			? this.options.options
+			: this.mdef instanceof ManOpt
+				? this.mdef.options
+				: [this.mdef];
+	}
+
+	activeOption() {
+		const els =
+			this.flown.element?.filter((v, i, a) => a.indexOf(v) === i) || this.mdef instanceof ManDef
+				? Object.keys(this.mdef.eds)
+				: undefined;
+
+    return els && this.allOptions.findIndex(opt => opt.checkElementNames(els));
+	}
+
+	selectOption(i: number | undefined) {
+		if (i == this.activeOption()) {
+			return this;
+		} else if (this.allOptions.length > 1) {
+			return new MA(
+				this.name,
+				this.id,
+				this.schedule,
+				this.scheduleDirection,
+				this.data instanceof GlobalState
+					? new GlobalState(this.data.states.removeLabels(), this.data.origin)
+					: this.data,
+				i ? this.allOptions[i] : this.options || this.mdef,
+				this.history,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				'',
+				this.options
+			);
+		}
+	}
 
 	summary() {
 		return {
@@ -50,42 +99,36 @@ export class MA {
 		}
 	}
 
-  reset(newmd?: ManDef | ManOpt | undefined) {
-    return new MA(
-      this.name,
-      this.id,
-      this.tStart,
-      this.tStop,
-      this.schedule,
-      this.scheduleDirection,
-      this.history,
-      this.k,
-      this.flown,
-      newmd || this.mdef,
-    );
-  }
+	reset(newmd?: ManDef | ManOpt | undefined) {
+		return new MA(
+			this.name,
+			this.id,
+			this.schedule,
+			this.scheduleDirection,
+			this.data,
+			newmd || this.mdef,
+			this.history
+		);
+	}
 
 	async run(optimise: boolean, reset: boolean) {
-
 		const res = (
 			await analysisServer.post('analyse', {
 				id: this.id,
 				mdef: this.mdef!.dump(),
 				optimise_alignment: optimise,
-				flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
-				origin: get(origin),
+				flown: this.data.data,
+				origin: this.data.origin,
 				schedule_direction: this.scheduleDirection,
-        reset
+				reset
 			})
 		).data;
 		selectedResult.set(res.fa_version);
 
-
 		const results = res.els && res.results ? FCJManResult.parse(res) : undefined;
 		const isNewFAVersion = !this.history[res.fa_version];
-		const isNewSplit = results && !isNewFAVersion
-			? !this.history[res.fa_version].compareSplit(results)
-			: false;
+		const isNewSplit =
+			results && !isNewFAVersion ? !this.history[res.fa_version].compareSplit(results) : false;
 
 		if (isNewFAVersion || isNewSplit) {
 			isAnalysisModified.set(true);
@@ -94,20 +137,18 @@ export class MA {
 		return new MA(
 			this.name,
 			this.id,
-			this.tStart,
-			this.tStop,
 			this.schedule,
 			this.scheduleDirection,
-			{ ...this.history, [res.fa_version]: results },
-			res.mdef.info.k,
-			States.parse(res.flown),
+			new GlobalState(States.parse(res.flown), this.data.origin),
 			ManDef.parse(res.mdef),
-			res.manoeuvre ? Manoeuvre.parse(res.manoeuvre): undefined,
+			{ ...this.history, [res.fa_version]: results },
+			res.manoeuvre ? Manoeuvre.parse(res.manoeuvre) : undefined,
 			res.template ? States.parse(res.template) : undefined,
 			res.corrected ? Manoeuvre.parse(res.corrected) : undefined,
 			res.corrected_template ? States.parse(res.corrected_template) : undefined,
 			res.full_scores ? ManoeuvreResult.parse(res.full_scores) : undefined,
-      res.info  
+			res.info,
+			this.mdef instanceof ManOpt ? this.mdef : new ManOpt([this.mdef])
 		);
 	}
 
@@ -117,7 +158,7 @@ export class MA {
 			id: this.id,
 			schedule: this.schedule,
 			schedule_direction: this.scheduleDirection,
-			flown: this.flown?.data || get(binData)!.slice(this.tStart, this.tStop),
+			flown: this.flown?.data,
 			history: this.history
 		};
 	}
@@ -134,18 +175,24 @@ export class MA {
 		};
 	}
 
-	static async parse(data: Record<string, any>) {
+	static async parse(data: Record<string, any>, origin: Origin) {
+		const mdef =
+			data.mdef ||
+			(await loadManDef(
+				get(library).subset({
+					category_name: data.schedule.category,
+					schedule_name: data.schedule.name
+				}).first!.manoeuvres[data.id - 1].id
+			));
+
 		return new MA(
-			data.name,
+			data.name as string,
 			data.id,
-			data.flown[0].t,
-			data.flown[data.flown.length - 1].t,
 			Object.setPrototypeOf(data.schedule, ScheduleInfo.prototype),
 			data.schedule_direction,
-      objmap(data.history, (_, v)=>FCJManResult.parse(v as Record<string, any>)),
-			data.mdef?.info.k,
-			data.flown ? States.parse(data.flown) : undefined,
-			data.mdef ? ManDef.parse(data.mdef) : undefined,
+			new GlobalState(States.parse(data.flown), origin),
+			mdef,
+			data.history ? objmap(data.history, (_, v) => FCJManResult.parse(v)) : undefined,
 			data.manoeuvre,
 			data.template ? States.parse(data.template) : undefined,
 			data.corrected,
@@ -153,8 +200,4 @@ export class MA {
 			data.scores ? ManoeuvreResult.parse(data.scores) : undefined
 		);
 	}
-
-
 }
-
-

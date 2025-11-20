@@ -1,7 +1,7 @@
 import { Point, Quaternion, GPS } from '$lib/utils/geometry';
 import { FCJson, Origin } from '$lib/flight/fcjson';
-import { BinField } from '$lib/flight/bin/bindata';
-
+import { BinData, BinField } from '$lib/flight/bin/bindata';
+import {lookupMonotonic} from '$lib/utils/arrays';
 
 export interface IState {
   t: number,
@@ -169,6 +169,24 @@ export class State{
 	direction_str() {
 		return this.direction() > 0 ? 'LTOR' : 'RTOL';
 	}
+
+  transform(pos: Point, att: Quaternion) {
+    const newpos = att.transform_point(this.pos).offset(pos);
+    const newatt = Quaternion.mul(att, this.att);
+    return State.parse({
+      ...this,
+      x: newpos.x,
+      y: newpos.y,
+      z: newpos.z,
+      rw: newatt.w,
+      rx: newatt.x,
+      ry: newatt.y,
+      rz: newatt.z
+    });
+  
+
+  }
+
 }
 
 export class States {
@@ -219,6 +237,16 @@ export class States {
 		return fcjl;
 	}
 
+  removeLabels() {
+    return new States(this.data.map((st)=>{
+      return State.parse({
+        ...st,
+        manoeuvre: undefined,
+        element: undefined
+      });
+    }));
+  }
+
   get t() {
     return this.data.map((state) => state.t);
   }
@@ -256,6 +284,7 @@ export class States {
     return this.data[this.data.length - 1];
   }
 
+
   shift(offset: Point) {
     return new States(
 			this.data.map((st) => {
@@ -274,18 +303,30 @@ export class States {
 		return this.shift(offset);
 	}
 
+  transform(pos: Point, att: Quaternion) {
+    return new States(
+      this.data.map((st) => st.transform(pos, att))
+    );
+  }
+
 	body_to_world(p: Point) {
 		return this.data.map((st) => st.body_to_world(p));
 	}
-	static from_xkf1(box: Origin, orgn: BinField, xkf1: BinField) {
-		const xorg = new GPS(orgn.Lat[0], orgn.Lng[0], orgn.Alt[0]);
-		const box_rot = Quaternion.parse_euler(
+
+  
+	static from_binData(box: Origin, binData: BinData) {
+
+    const xkf1 = binData.xkf1;
+    
+    const xorg = binData.findOrigin();
+
+    const box_rot = Quaternion.parse_euler(
 			new Point(Math.PI, 0, (box.heading * Math.PI) / 180 + Math.PI / 2)
 		);
 		const box_pos = new GPS(box.lat, box.lng, box.alt);
 		let sts = [];
     
-    const shift = new Point(box.move_east, -box.move_north, 0);
+    const shift =  new Point(box.move_east, -box.move_north, 0);
 
 		for (let i = 0; i < xkf1.length; i++) {
 			const posned = GPS.sub(xorg.offset(new Point(xkf1.PN[i], xkf1.PE[i], xkf1.PD[i])), box_pos);
@@ -352,7 +393,7 @@ export class States {
 	}
 
 	slice(start: number, stop: number) {
-		return new States(this.data.slice(start, stop));
+		return new States(this.data.slice(start, stop+1));
 	}
 
 	range(col: string) {
@@ -432,6 +473,20 @@ export class States {
 			})
 		);
 	}
+
+  static stack(statesList: States[]) {
+    return new States(statesList.map((sts, i)=>{
+      if (sts.data.length > 0) {
+        if (i < statesList.length - 1) {
+          return sts.data.slice(0, sts.data.length - 1);
+        } else {
+          return sts.data;
+        }
+      }
+    }).filter(sts=>!!sts).flat());
+  }
+
+
 }
 
 export function state_range(state: State[], col: string, extend: number = 0) {

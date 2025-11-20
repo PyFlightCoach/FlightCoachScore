@@ -1,29 +1,24 @@
 <script lang="ts">
 	import {
-		bin,
 		selectedResult,
 		fa_versions,
-		bootTime,
 		isComplete,
 		difficulty,
 		truncate,
 		isCompFlight,
-		schedule
+		schedule,
+		totalScore
 	} from '$lib/stores/analysis';
 	import {
-		dataSource,
 		activeFlight,
 		isAnalysisModified,
 		loading,
 		unblockProgress,
-		loadGuiLists,
-		faVersion
+		loadGuiLists
 	} from '$lib/stores/shared';
-	import { uploadFlight } from '$lib/flight/analysis';
 	import { privacyOptions } from '$lib/api/DBInterfaces/flight';
-	import { createAnalysisExport, createScoreCSV } from '$lib/flight/analysis';
+	import { createAnalysisExport } from '$lib/flight/analysis';
 	import { user, checkUser } from '$lib/stores/user';
-	import { Flight } from '$lib/database/flight';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { postUploadSearch } from '$lib/leaderboards/stores';
@@ -31,67 +26,66 @@
 	import { activeComp } from '$lib/stores/contests';
 	import UploadForCompetitor from '$lib/competitions/competitors/UploadForCompetitor.svelte';
 	import { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import { prettyPrintHttpError } from '$lib/utils/text';
+	import { prettyDate, prettyPrintHttpError } from '$lib/utils/text';
+	import UploadForOtherPilot from './UploadForOtherPilot.svelte';
+	import { breakPoints, breakPoint } from '$lib/stores/shared';
 
-	let comment: string | undefined = $state($activeFlight?.meta.comment || '');
-	let privacy: string | undefined = $state($activeFlight?.meta.privacy || 'view_analysis');
+	let comment: string | undefined = $state($activeFlight?.db?.comment || '');
+	let privacy: string | undefined = $state($activeFlight?.db?.privacy || 'view_analysis');
 
-	const isNew = $derived(($bin && !$activeFlight) || false);
+	const isNew = $derived($activeFlight?.file);
 
 	const isUpdated = $derived(
-		$activeFlight?.meta.comment != comment ||
-			$activeFlight?.meta.privacy != privacy ||
+		$activeFlight?.db?.comment != comment ||
+			$activeFlight?.db?.privacy != privacy ||
 			$isAnalysisModified ||
 			false
 	);
 
-	const canI = $derived(
-		$user?.is_verified && ($activeFlight?.isMine || isNew || $user?.is_superuser)
-	);
+	const canI = $derived($user?.is_verified && ($activeFlight?.isMine || $user?.is_superuser));
 
-  
 	let competition = $state(
-		$activeComp?.checkCanUpload($bootTime, new Date(), $user?.id, $schedule?.schedule_id) ? $activeComp : undefined
+		$activeComp?.checkCanUpload(
+			$activeFlight?.bootTime,
+			new Date(),
+			$user?.id,
+			$schedule?.schedule_id
+		)
+			? $activeComp
+			: undefined
 	);
 
-  let pilotId: string | undefined = $state();
+	let pilotId: string | undefined = $state();
 	let showCompetitionForm = $state(false);
 	let showResultsSelection: boolean = $state(false);
 	let round: ContestManager | undefined = $state();
-	
 
 	const upload = async () => {
+		$loading = true;
+		const ajson = createAnalysisExport(true);
 		checkUser(false, false, false)
 			.then(() => {
-				$loading = true;
-				return uploadFlight(
-					createAnalysisExport(true),
-					isNew ? $bin : undefined,
+				return $activeFlight!.upload(
+					ajson,
 					privacy,
 					comment,
-					$activeFlight?.meta.flight_id,
 					pilotId || (round ? $user?.id : undefined),
 					round?.summary.id
 				);
 			})
 			.then(async (res) => {
+				$activeFlight = res!.flight;
 				$isAnalysisModified = false;
-				if (res.data.meta) {
-					$activeFlight = new Flight(res.data.meta, $schedule!);
-				} else {
-					await Flight.load(res.data.id).then((f) => {
-						$activeFlight = f;
-					});
-				}
 
-				if (res.data.compthing) {
-					goto(resolve(`/competition/view`) + `/?id=${res.data.compthing.id}`);
+				if (res.compthing) {
+					goto(resolve(`/competition/view`) + `/?id=${res.compthing.id}`);
 				} else {
 					postUploadSearch();
 					goto(resolve('/database/leaderboards'));
 				}
 			})
-      .catch((e) => {
+			.catch((e) => {
+				console.error(e);
 				alert(prettyPrintHttpError(e));
 			})
 			.then(loadGuiLists)
@@ -102,86 +96,110 @@
 	};
 </script>
 
-<div class="row p-2" style="max-width:450px">
-	<span>
-		{#if $selectedResult}
-			Showing results for
-			{#if $dataSource == 'example'}
-				the example flight.
-			{:else if $dataSource == 'db'}
-				a flight by {$activeFlight?.meta.name}, loaded from the db.
-			{:else}
-				your flight imported from a {$dataSource} file.
-			{/if}
-		{:else if $fa_versions.length == 0}
-			Run some analyses to view result
-		{/if}
-	</span>
-	{#if $dataSource == 'bin'}
-		<span> Boot time: {$bootTime || $activeFlight?.meta.date}. </span>
-	{/if}
+<div class="row">
+	<span class="h4 fw-bold text-start px-4 mt-2">View Results</span>
 </div>
 <div class="row p-2">
-	<button
-		id="showResSel"
-		class="btn btn-outline-secondary w-100"
-		onclick={() => {
-			showResultsSelection = !showResultsSelection;
-		}}
-	>
-		{$selectedResult}, {['Easy', 'Medium', 'Hard'][$difficulty - 1]}{#if $truncate}, T{/if}
-		<i class="bi {showResultsSelection ? 'bi-chevron-up' : 'bi-chevron-down'}"></i>
-	</button>
-</div>
-{#if showResultsSelection}
-	<div class="container border rounded mb-2">
-		<div class="row p-2">
-			<label for="version" class="col col-form-label text-nowrap">Analysis Version</label>
-			<select id="version" class="col form-select text-center" bind:value={$selectedResult}>
-				{#each $fa_versions as version}
-					<option value={version}>
-						{version}
-					</option>
-				{/each}
-			</select>
-		</div>
-
-		<div class="row p-2">
-			<label class="col col-form-label" for="difficulty">Difficulty</label>
-			<select
-				id="difficulty"
-				class="col form-select text-center"
-				name="difficulty"
-				required
-				bind:value={$difficulty}
+	<table class="table table-borderless table-sm p-0">
+		<tbody>
+			<tr
+				><th class="p-0 bg-light">Source:</th>
+				<td class="p-0 bg-light"> {$activeFlight?.prettyKind()}</td></tr
 			>
-				<option value={3}>Hard</option>
-				<option value={2}>Moderate</option>
-				<option value={1}>Easy</option>
-			</select>
-		</div>
-
-		<div class="form-check pt-2 px-4" title="Truncate individual downgrades before adding up">
-			<input
-				type="checkbox"
-				class="form-check-input"
-				id="truncate"
-				name="truncate"
-				bind:checked={$truncate}
-			/>
-			<label for="truncate">Truncate</label>
-		</div>
+      {#if $activeFlight?.db}
+        <tr
+          ><th class="p-0 bg-light">Pilot:</th>
+          <td class="p-0 bg-light"> {$activeFlight?.db?.name}</td></tr
+        >
+      {/if}
+			<tr
+				><th class="p-0 bg-light">Schedule:</th>
+				<td class="p-0 bg-light"> {$schedule?.repr().toUpperCase()}</td></tr
+			>
+			<tr
+				><th class="p-0 bg-light">Boot Time: </th>
+				<td class="p-0 bg-light"> {prettyDate($activeFlight?.bootTime)}. </td></tr
+			>
+			<tr
+				><th class="p-0 bg-light">Total Score:</th> <td class="p-0 bg-light"> {$totalScore}</td></tr
+			>
+		</tbody>
+	</table>
+</div>
+{#if $fa_versions.length}
+	<div class="row p-2">
+		<button
+			id="showResSel"
+			class="btn btn-outline-secondary w-100"
+			onclick={() => {
+				showResultsSelection = !showResultsSelection;
+			}}
+		>
+			{$selectedResult}, {['Easy', 'Medium', 'Hard'][$difficulty - 1]}{#if $truncate}, T{/if}
+			<i class="bi {showResultsSelection ? 'bi-chevron-up' : 'bi-chevron-down'}"></i>
+		</button>
 	</div>
-{/if}
+	{#if showResultsSelection}
+		<div class="container border rounded mb-2">
+			<div class="row p-2">
+				<label for="version" class="col col-form-label text-nowrap">Analysis Version</label>
+				<select id="version" class="col form-select text-center" bind:value={$selectedResult}>
+					{#each $fa_versions as version}
+						<option value={version}>
+							{version}
+						</option>
+					{/each}
+				</select>
+			</div>
 
-{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && $dataSource == 'bin'}
+			<div class="row p-2">
+				<label class="col col-form-label" for="difficulty">Difficulty</label>
+				<select
+					id="difficulty"
+					class="col form-select text-center"
+					name="difficulty"
+					required
+					bind:value={$difficulty}
+				>
+					<option value={3}>Hard</option>
+					<option value={2}>Moderate</option>
+					<option value={1}>Easy</option>
+				</select>
+			</div>
+
+			<div class="form-check pt-2 px-4" title="Truncate individual downgrades before adding up">
+				<input
+					type="checkbox"
+					class="form-check-input"
+					id="truncate"
+					name="truncate"
+					bind:checked={$truncate}
+				/>
+				<label for="truncate">Truncate</label>
+			</div>
+		</div>
+	{/if}
+{/if}
+{#if canI && $isComplete && isNew && $isCompFlight}
 	<div class="container-auto border rounded p-2 mb-2">
-		<UploadForCompetitor bind:competition bind:pilotID={pilotId} bind:round schedule={$schedule} 
-      bootTime={$bootTime} />
+		<UploadForCompetitor
+			bind:competition
+			bind:pilotID={pilotId}
+			bind:round
+			schedule={$schedule}
+			bootTime={$activeFlight?.bootTime}
+		/>
 	</div>
+	{#if !round && $user?.is_superuser}
+		<UploadForOtherPilot bind:pilotID={pilotId} />
+	{/if}
 {/if}
 
-<div class="container-auto border rounded p-2">
+<div class="row">
+	<span class="h4 fw-bold text-start px-4 mt-2">Share to the Database</span>
+</div>
+
+{#if canI && $isComplete && $isCompFlight && (!round || pilotId)}
 	<div class="row p-2">
 		<label class="col-auto col-form-label" for="set-privacy">Privacy</label>
 		<select class="col form-select" disabled={!canI} id="set-privacy" bind:value={privacy}>
@@ -201,23 +219,25 @@
 			bind:value={comment}
 		></textarea>
 	</div>
-
-	{#if canI && $isComplete && (isNew || isUpdated) && $isCompFlight && ($dataSource == 'bin' || $dataSource == 'db') && (!round || pilotId)}
+	{#if (isNew || isUpdated) && $activeFlight?.kind!="example"}
 		<div class="row mb-2 px-2">
 			<button
 				class="col btn btn-primary mx-2"
 				type="submit"
 				onclick={upload}
-        disabled={$loading}
-				data-bs-dismiss="offcanvas"
+				disabled={$loading}
+        data-bs-dismiss={breakPoints['lg'] > breakPoints[$breakPoint] ? 'offcanvas' : undefined}
+
 				>{isNew ? 'Upload' : 'Update'}
 			</button>
 		</div>
 	{/if}
-
+{:else}
 	<div class="row mb-2 px-2">
-		{#if $dataSource != 'bin' && $dataSource != 'db'}
-			<span>You can only upload original flights loaded from a .bin file</span>
+		{#if !$activeFlight?.isMine}
+			<span
+				>You can only upload original flights loaded from an Ardupilot BIN file or from Acrowrx</span
+			>
 		{:else if !$isCompFlight}
 			<span>Only complete flights can be uploaded</span>
 		{:else if !canI}
@@ -235,11 +255,10 @@
 			<span>Nothing to update</span>
 		{:else if !$isComplete}
 			<span>Run all analyses for the latest analysis version before uploading</span>
-    {:else if round && !pilotId}
-      <span>Either select a pilot or dont select a competition</span>
+		{:else if round && !pilotId}
+			<span>Either select a pilot or dont select a competition</span>
 		{/if}
 	</div>
-</div>
-
+{/if}
 
 <Popup bind:show={showCompetitionForm}>Competition Selection</Popup>

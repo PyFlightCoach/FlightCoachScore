@@ -36,6 +36,8 @@
 	polyfillCountryFlagEmojis();
 
 	let pageHasHelp = $state(false);
+
+  
 </script>
 
 <svelte:window bind:innerWidth={$windowWidth} bind:innerHeight={$windowHeight} />
@@ -44,7 +46,7 @@
 
 <GdprBanner {...gpdc} />
 
-<div class="container-fluid min-vh-100 d-flex flex-column overflow-auto">
+<div class="container-fluid  d-flex flex-column overflow-auto" style="min-height:100svh;">
 	{#if !$serverDataLoaded || typeof $serverDataLoaded === 'string'}
 		<div class="row flex-grow-1 justify-content-center align-items-center">
 			<div class="col-lg-4 col-10">
@@ -65,11 +67,16 @@
 			<MainNavBar bind:hasHelp={pageHasHelp} />
 		</div>
 		<div class="row flex-grow-1 justify-content-center">
-			<slot />
+      <div class="container-fluid  d-flex flex-column p-0  ">
+			  <div class="col container-fluid d-flex flex-row justify-content-center p-1 px-1 " >
+          <slot />
+        </div>
+        <div class="col-auto p-0 ">
+          <BtmNavBar/>
+          </div>
+      </div>
 		</div>
-    <div class="row justify-self-end">
-      <BtmNavBar/>
-    </div>
+    
 		
 	{/if}
 </div>

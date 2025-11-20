@@ -1,6 +1,6 @@
 import type { Origin } from '$lib/flight/fcjson';
-import type { BinData } from '$lib/flight/bin';
 import { drawBoxInWorld, getPointOnCentre } from '$lib/flight/box';
+import type { GPS } from '$lib/utils/geometry';
 
 
 export const originMapTraces = (origin: Origin, kind: string) => {
@@ -46,10 +46,10 @@ export const originMapTraces = (origin: Origin, kind: string) => {
 };
 
 
-export const binDataMapTrace = (binData: BinData) => { 
+export const mapTrace = (gps: GPS[]) => { 
   return {
-    lat: binData?.pos.Lat,
-    lon: binData?.pos.Lng,
+    lat: gps.map(g=>g.lat),
+    lon: gps.map(g=>g.lon),
     type: 'scattermap',
     mode: 'lines',
     hovermode: false,

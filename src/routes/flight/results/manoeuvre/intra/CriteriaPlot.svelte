@@ -54,5 +54,5 @@
 		autosize: true,
 		margin: { l: 40, r: 0, t: 0, b: 40 }
 	}}
-	fillParent={true}
+  config = {{staticPlot: true, responsive: true}}
 />

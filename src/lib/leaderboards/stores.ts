@@ -6,6 +6,7 @@ import { checkUser } from '$lib/stores/user';
 import * as types from '$lib/api/DBInterfaces/flight';
 import { activeFlight, faVersion } from '$lib/stores/shared';
 import { library } from '$lib/schedule/library';
+import { prettyPrintHttpError } from '$lib/utils/text';
 
 export const n_results = newCookieStoreInt('n_results', 10);
 export const n_days_val = newCookieStoreInt('search_n_days', 30);
@@ -43,17 +44,17 @@ export const postUploadSearch = () => {
   const fl = get(activeFlight)!;
 
   select_by_date.set(true);
-  const dbefore = fl!.date;
+  const dbefore = new Date(fl!.bootTime!.getTime());
   dbefore.setDate(dbefore.getDate() + 1);
   date_before.set(dbefore.toISOString().split('T')[0]);
-  const dafter = fl!.date;
-  dafter.setDate(dafter.getDate() - 30);
+  const dafter = new Date(fl!.bootTime!.getTime());
+  dafter.setDate(dafter.getMonth() - 1);
   date_after.set(dafter.toISOString().split('T')[0]);
   //n_days_val.set(30);
-  schedule_id.set(fl?.meta?.schedule_id || '');
+  schedule_id.set(fl!.schedule!.schedule_id || '');
   sort_by_score_flag.set(false);
   version.set(get(faVersion)!);
-  n_results.set(1000);
+  n_results.set(20);
   //includeActive.set(3);
   updateTable();
 }
@@ -82,12 +83,16 @@ export const updateTable = async () => {
     };
 
     const _method = get(sort_by_score_flag) ? 'leaderboard' : 'flightlist';
-
+    
     dbServer.get(`analysis/${_method}`, {params:q}).then((res) => {
       table_rows.set(res.data.results.map((row: types.DBFlightRanked | types.DBFlightScore) => {
         return { ...row, score: Math.round(row.score * 100) / 100 };
       }));
-    }).catch((e) => {console.error(e);});
+    }).catch((e) => {
+      console.error(e);
+      alert('Error fetching leaderboard: ' + prettyPrintHttpError(e));
+      table_rows.set([]);
+    });
     lastResponse.set(_method);
   }
 }

@@ -17,15 +17,15 @@
 	let {
     target,
 		origin,
+    boxFile= $bindable(),
 		onorigin = () => {},
-		onfcj = () => {},
     siteInputMode = $bindable('fcsites')
 	}: {
     target: GPS;
 		origin: Origin;
+    boxFile?: File | undefined;
 		onorigin: (neworigin: Origin) => void;
-		onfcj: (newfcj: FCJson) => void;
-    siteInputMode: keyof typeof inputNames;
+    siteInputMode?: keyof typeof inputNames;
 	} = $props();
 
 
@@ -49,7 +49,7 @@
 	{#if siteInputMode === 'fcsites'}
 		<FCSites target={target} onchange={onorigin} />
 	{:else if siteInputMode === 'fcj'}
-		<BoxFile {onorigin} {onfcj}/>
+		<BoxFile {onorigin} bind:file={boxFile}/>
 	{:else if siteInputMode === 'pc'}
 		<PilotCentre {origin} onchange={onorigin}/>
 	{:else if siteInputMode === 'ph'}

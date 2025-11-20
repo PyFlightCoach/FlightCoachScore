@@ -21,6 +21,12 @@ export interface DBUser {
 	is_fake: boolean;
 }
 
+export async function getUser(userId: string) {
+  return dbServer.get(`users/${userId}`).then((res) => {
+    return res.data as DBUser;
+  });
+}
+
 export const user: Writable<DBUser | undefined> = writable();
 
 export const users: Writable<DBUser[]> = writable([]);
@@ -33,7 +39,6 @@ class UserCheckInterval {
     this.stop();
     this.interval = setInterval(() => {
       dbServer.get('users/me').catch(() => {
-        console.log('Session expired, logging out');
         user.set(undefined);
       });
     }, this.duration);
@@ -80,7 +85,6 @@ export async function loginUser(email: string, password: string) {
 		)
 		.then(() => dbServer.get('users/me'))
 		.then((res) => {
-			console.log('Login successful');
 			user.set(res.data);
 		})
 		.then(postLoginUser);
@@ -89,9 +93,6 @@ export async function loginUser(email: string, password: string) {
 export async function logoutUser() {
 	await dbServer
 		.post('auth/jwt/logout')
-		.then(() => {
-			console.log('Logout successful');
-		})
 		.catch((error) => {
 			console.error('Logout error:', error);
 		})
@@ -143,3 +144,5 @@ export async function checkUser(
 			throw new Error('Not logged in');
 		});
 }
+
+

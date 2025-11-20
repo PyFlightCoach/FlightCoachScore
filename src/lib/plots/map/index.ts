@@ -1,4 +1,4 @@
 import MapPlot from "./MapPlot.svelte";
-import { originMapTraces, binDataMapTrace } from "./mapTraces";
+import { originMapTraces, mapTrace } from "./mapTraces";
 
-export { MapPlot, originMapTraces, binDataMapTrace };
+export { MapPlot, originMapTraces, mapTrace };

@@ -5,16 +5,16 @@
 	import { listComps, type ContestGroup, type ContestAction } from './contests';
 	import CompetitionTable from './CompetitionTable.svelte';
 	import type { DBSchedule } from '$lib/schedule/db';
-  
+
 	let {
 		competition = $bindable(),
 		fullDisplay = $bindable(true),
 		filterSubset = ['All', 'Mine', 'Open', 'Entered', 'Ready'],
 		actionSubset = ['View', 'Edit', 'Enter', 'Select'],
 		schedule = undefined,
-    userID = undefined,
-    bootTime = undefined,
-    uploadTime = undefined,
+		userID = undefined,
+		bootTime = undefined,
+		uploadTime = undefined,
 		onselected = () => {},
 		onentered = () => {}
 	}: {
@@ -23,28 +23,42 @@
 		filterSubset?: ContestGroup[];
 		actionSubset?: ContestAction[];
 		schedule?: DBSchedule | undefined;
-    userID?: string | undefined;
-    bootTime?: Date | undefined;
-    uploadTime?: Date | undefined;
+		userID?: string | undefined;
+		bootTime?: Date | undefined;
+		uploadTime?: Date | undefined;
 		onselected?: () => void;
 		onentered?: () => void;
 	} = $props();
 
-	
 	let categories = $derived(getCategories());
-  let category = $state("All");
-  
+	let category = $state('All');
+
 	let group: ContestGroup = $state(filterSubset[0]);
+
+  const actionSubSubset = $derived.by( ()=>{
+    if (group==="Ready") {
+      return actionSubset.filter(a=>a!=="Enter")
+    } else {
+      return actionSubset.filter(a=>a!=="Select")
+    }
+  });
 
 	const competitions: Promise<ContestManager[]> = $derived(
 		listComps(group, category === 'All' ? undefined : category, true).then((comps) => {
-			return comps.filter(
-				(c) => c.checkCanUpload(bootTime, uploadTime, category=="Open" ? userID : undefined, schedule?.schedule_id)
-			)
-    })
+			if (['Open', 'Ready'].includes(category)) {
+				return comps.filter((c) =>
+					c.checkCanUpload(
+						bootTime,
+						uploadTime,
+						['Open', 'Ready'].includes(category) ? userID : undefined,
+						schedule?.schedule_id
+					)
+				);
+			} else {
+				return comps;
+			}
+		})
 	);
-
-	
 </script>
 
 <div class="container-auto p-0">
@@ -91,13 +105,16 @@
 					competition = comp;
 					onselected();
 				}}
-				{actionSubset}
-				onentered={()=>{
-          if (filterSubset.includes("Ready")) {
-            group="Ready";
+				actionSubset={actionSubSubset}
+				onentered={() => {
+					if (filterSubset.includes('Ready')) {
+						group = 'Ready';
+					} 
+          if (filterSubset.includes('Entered')) {
+            group = 'Entered';
           }
-          onentered();
-        }}
+					onentered();
+				}}
 			/>
 		{/await}
 	</div>

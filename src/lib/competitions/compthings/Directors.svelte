@@ -8,7 +8,7 @@
 	let { competition }: { competition: ContestManager } = $props();
 
 	let showAddDirector = $state(false);
-  $inspect(competition.summary.directors, $user?.id);
+  
 </script>
 
 <div class="container border rounded p-1 mb-2">

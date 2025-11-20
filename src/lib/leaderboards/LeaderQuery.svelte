@@ -28,7 +28,7 @@
 
 	let lib = $derived(schedule_ids ? $library.downselect(schedule_ids) : $library);
 	let categories = $derived(lib.unique('category_name') || []);
-	let selectedCategory: string | undefined = $state();
+	let selectedCategory: string | undefined = $state(categories[0]);
 	let schedules = $derived(
 		selectedCategory ? lib?.subset({ category_name: selectedCategory }).unique('schedule_name') : []
 	);

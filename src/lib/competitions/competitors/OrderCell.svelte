@@ -1,17 +1,6 @@
 <script lang="ts">
 	import { PilotManager } from '$lib/competitions/competitors/PilotManager';
-	import { activeFlight, loading, unblockProgress } from '$lib/stores/shared';
-	import { bin, isCompFlight, bootTime, isComplete } from '$lib/stores/analysis';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
-	import Popup from '$lib/components/Popup.svelte';
-	import LinkDbFlight from '$lib/competitions/competitors/LinkDBFlight.svelte';
-	import { loadAnalysisFromDB } from '$lib/flight/analysis';
-	import { loadInPlotter } from '$lib/database/flight';
-	import DisplayDict from '$lib/components/DisplayDict.svelte';
-	import { user } from '$lib/stores/user';
-	import { Flight } from '$lib/database/flight';
-	import { setComp } from '$lib/stores/contests';
-	import { prettyPrintHttpError } from '$lib/utils/text';
 
 	let { round, competitorID }: { round: ContestManager; competitorID: string } = $props();
 

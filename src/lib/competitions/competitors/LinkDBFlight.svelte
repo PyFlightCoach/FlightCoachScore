@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { dbServer } from '$lib/api';
-	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
+	import type { DBFlightRanked, DBFlightScore } from '$lib/api/DBInterfaces/flight';
 	import { setComp } from '$lib/stores/contests';
 	import { faVersion } from '$lib/stores/shared';
 	import type { ContestManager } from '$lib/competitions/compthings/ContestManager';
 	import type { PilotManager } from '$lib/competitions/competitors/PilotManager';
 	import { compareUUIDs, prettyPrintHttpError } from '$lib/utils/text';
+	import { me_only_flag, one_per_pilot_flag } from '$lib/leaderboards/stores';
 
 	let {
 		round,
@@ -18,16 +19,19 @@
 	let flights: DBFlightRanked[] | undefined = $state();
 	let params = {
 		n_results: 100,
-		fa_version: $faVersion,
+    me_only_flag: false,
+		difficulty: 3,
+    truncate: false,
 		schedule_id: round.summary.schedule_id || undefined,
-		date_after: round.parent!.summary.flight_rules?.flown_whilst_open
+    one_per_pilot_flag: false,
+    version: $faVersion,
+    date_after: round.parent!.summary.flight_rules?.flown_whilst_open
 			? round.summary.date_start || undefined
 			: undefined
 	};
 
-	$inspect(round.summary.schedule_id, 'schedule id');
 	dbServer.get('analysis/flightlist', { params }).then((res) => {
-		flights = res.data.results.filter((f: DBFlightRanked) => {
+		flights = res.data.results.filter((f: DBFlightRanked | DBFlightScore) => {
 			return (
 				!usedFlights.includes(f.flight_id) &&
 				compareUUIDs(f.pilot_id, competitor.competitor.id) &&

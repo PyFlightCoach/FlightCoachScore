@@ -100,7 +100,7 @@
 		modebar: { orientation: 'v' }
 	}}
 	onclick={(e) => {
-    console.log(e);
+    console.error(e);
 		activeIndex = e.points[0].x as number;
 	}}
 />
