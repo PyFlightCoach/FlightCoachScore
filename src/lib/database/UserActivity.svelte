@@ -4,7 +4,7 @@
 	import { nth } from '$lib/utils/numbers';
 	import { loadActivity, loadRecent, loadTopFlights } from '$lib/database/userActivity';
   
-	let { activity }: { activity: UserActivityResponse[] | undefined } = $props();
+	let { activity=$bindable() }: { activity: UserActivityResponse[] | undefined } = $props();
 
 	let scheduleSummary = $derived($library.summarize());
 </script>

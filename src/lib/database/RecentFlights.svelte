@@ -2,7 +2,7 @@
 	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 	import { library } from '$lib/schedule/library';
 
-	let { flightlist }: { flightlist: DBFlightRanked[] | undefined } = $props();
+	let { flightlist=$bindable() }: { flightlist: DBFlightRanked[] | undefined } = $props();
 
 	let scheduleSummary = $derived($library.summarize());
 

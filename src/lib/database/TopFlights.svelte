@@ -2,10 +2,11 @@
 	import type { DBFlightRanked } from '$lib/api/DBInterfaces/flight';
 	import { numberToPosition } from '$lib/utils/text';
   import TopFlightCell from '$lib/database/TopFlightCell.svelte';
+  import type {TopFlightsResponse} from '$lib/database/userActivity';
 	let {
-		topflights
+		topflights=$bindable()
 	}: {
-		topflights: { schedule: string; count: number; flights: DBFlightRanked[] }[] | undefined;
+		topflights: TopFlightsResponse[] | undefined;
 	} = $props();
 
 
@@ -31,9 +32,9 @@
 				{#if row.count > 0}
 					<tr class="align-middle">
 						<th class="text-start">{row.schedule.toUpperCase()}</th>
-						<TopFlightCell flight={row.flights[0]} />
-						<TopFlightCell flight={row.flights[1]} />
-						<TopFlightCell flight={row.flights[2]} />
+						<TopFlightCell flight={row.flights[0] || undefined} />
+						<TopFlightCell flight={row.flights[1] || undefined} />
+						<TopFlightCell flight={row.flights[2] || undefined} />
 						<td>{row.count}</td>
 					</tr>
 				{/if}
