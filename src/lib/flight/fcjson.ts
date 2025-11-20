@@ -74,7 +74,7 @@ export class Origin {
 	}
 
 	get pilot() {
-		return new GPS(this.lat, this.lng, this.alt);
+		return new GPS(this.lat, this.lng, -this.alt);
 	}
 
   get centre() {
